@@ -1,0 +1,317 @@
+/* Imagen de la iniciativa */
+.image {
+  margin-top: 30px;
+  height: 255px;
+  width: 255px;
+  background-color: #699AA0;
+  border-radius: 50%;
+  float: left;
+}
+
+/* Título */
+.container {
+  width: 700px;
+  float: left;
+  margin: 10px;
+  margin-bottom: 50px;
+}
+
+.titulo-container {
+  height: 80px;
+  float: left;
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.titulo {
+  display: flex;
+  align-items: center;
+  font-size: 70px;
+  font-weight: 600;
+}
+
+.btn-lapiz {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #A0C1BF;
+  font-size: 20px;
+}
+
+/* Botones etiquetas */
+.etiquetas {
+  margin-top: 0px;
+  list-style-type: none;
+  padding: 0;
+}
+
+.etiquetas li {
+  display: inline-block;
+  background-color: #f2f2f2;
+  padding: 5px 15px;
+  border-radius: 30px;
+  height: 40px;
+  margin-right: 10px;
+  margin-top: 5px;
+  margin-bottom: 10px;
+}
+
+li.etiqueta-item.highlighted {
+  background-color: #A0C1BF;
+}
+
+li.etiqueta-item {
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 30px;
+}
+
+/* Fila */
+.container2 {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 80px;
+  width: 680px;
+}
+
+.col {
+  flex: 1;
+}
+
+.calendario {
+  height: 50px;
+  width: 90px;
+  font-size: 25px;
+  background-color: #A0C1BF;
+  border-radius: 25px;
+  float: left;
+}
+
+/* Dropdown privacidad y ubicación */
+.selecciona-dropdown {
+  position: relative;
+  display: inline-flex;
+  justify-content: left;
+  height: 50px;
+  width: 180px;
+  padding: 8px 16px;
+  font-size: 20px;
+  font-weight: 600;
+  background-color: #A0C1BF;
+  border-color: transparent;
+  border-radius: 25px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.selecciona-dropdown:focus,
+.selecciona-dropdown:hover {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+}
+
+.dropdown-arrow {
+  position: absolute;
+  top: 50%;
+  right: 16px;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  fill: currentColor;
+}
+
+.dropdown {
+  position: absolute;
+  width: 180px;
+  margin-left: 20px;
+  padding: 8px 16px;
+  z-index: 10;
+  border-radius: 6px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-item {
+  display: block;
+  padding: 8px 16px;
+  color: #4a5568;
+  background-color: #ffffff;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.dropdown-item:hover {
+  background-color: #edf2f7;
+}
+
+.dropdown-item:active {
+  background-color: #a5b4fc;
+}
+
+/* Búsqueda dropdown */
+.dropdown-input {
+  width: 100%;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #4a5568;
+  border: 1px solid #cbd5e0;
+  border-radius: 6px;
+  outline: none;
+}
+
+.dropdown-input:focus,
+.dropdown-input:hover {
+  border-color: #2563eb;
+}
+
+.container3 {
+  width: 1000px;
+  float: left;
+  margin-top: 10px;
+}
+
+.desc {
+  width: 1000px;
+  background-color: #A0C1BF;
+  border-radius: 25px;
+  float: left;
+  text-align: left;
+  padding: 10px 15px;
+  font-weight: 600;
+  font-size: 20px;
+}
+
+.btn-lapiz-desc {
+  position: relative;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.container4 {
+  width: 1000px;
+  float: left;
+  margin-top: 20px;
+}
+
+.agregarTarea {
+  background-color: #A0C1BF;
+  border-radius: 25px;
+  font-size: 17px;
+  float: left;
+  height: 40px;
+  padding: 5px 25px;
+  font-weight: 600;
+}
+
+.invitarMiembro {
+  background-color: #A0C1BF;
+  border-radius: 25px;
+  font-size: 17px;
+  float: right;
+  height: 40px;
+  padding: 5px 25px;
+  font-weight: 600;
+}
+
+.tarea {
+  height: 120px;
+  width: 600px;
+  background-color: #E2EBF1;
+  border-radius: 25px;
+  float: left;
+  text-align: left;
+  margin-top: 15px;
+  padding: 10px 15px;
+}
+
+.tareaTitle {
+  font-size: 25px;
+  margin-left: 15px;
+  font-weight: 600;
+}
+
+.tareaText {
+  font-size: 14px;
+  margin-left: 15px;
+  font-weight: 600;
+}
+
+.btn-entrega {
+  height: 25px;
+  background-color: #A0C1BF;
+  border-radius: 25px;
+  font-size: 14px;
+  float: right;
+  margin-top: 10px;
+  margin-right: 10px;
+  padding: 5px 10px;
+  text-align: center;
+  line-height: 15px;
+}
+
+.edita-titulo {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #A0C1BF;
+  font-size: 20px;
+}
+
+.edita-desc {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  font-size: 20px;
+}
+
+.calendario-fecha {
+  height: 50px;
+  width: 90px;
+  flex-direction: column;
+  align-items: center;
+  font-size: 13px; 
+  border-radius: 25px;
+  float: left;
+}
+
+.calendario-fecha .react-datepicker__input-container input {
+  width: 80px;
+  margin-top: 20px;
+}
+
+.calendario-container {
+  display: flex;
+  align-items: center;
+}
+
+.calendario-separator {
+  margin: 0 10px;
+  font-size: 50px;
+  line-height: 50px; 
+}
+
+.container5 {
+  position: relative;
+  width: 1000px;
+  float: left;
+}
+
+.btn-crear {
+  position: absolute;
+  top: 0;
+  right: 0;
+  font-size: 30px;
+  font-weight: 600;
+  padding: 12px;
+  width: 200px;
+  background-color: #A0C1BF;
+  border-radius: 30px;
+}

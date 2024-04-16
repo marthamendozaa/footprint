@@ -1,0 +1,167 @@
+body {
+    background-color: white;
+    color: black;
+  }
+  
+  .App-header {
+    text-align: left;
+    padding: 20px;
+  }
+  
+  .Foto-perfil {
+    border-radius: 50%;
+    width: 150px; 
+    height: 150px;
+    object-fit: cover;
+    position: relative;
+  }
+  
+  .edit-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centra el icono en la foto */
+    color: white;
+    opacity: 0; /* Inicialmente invisible */
+    transition: opacity 0.3s ease; /* Transición suave de la opacidad */
+    z-index: 1;
+  }
+  
+  .Foto-perfil:hover::after {
+    content: ''; /* Agrega un pseudo-elemento para el filtro gris */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Filtro gris con transparencia media */
+    border-radius: 50%; /* Mantiene la forma circular */
+  }
+    
+  .Foto-perfil:hover .edit-icon {
+    opacity: 1; /* Muestra el icono al pasar el mouse sobre la foto */
+  }
+
+  .profile-info {
+    display: flex;
+    align-items: center;
+  }
+  
+  .profile-info-left {
+    flex: 1;
+  }
+  
+  .profile-info-right {
+    flex: 1;
+    
+  }
+  
+
+  /*style={{ textDecoration: 'underline', cursor: 'pointer' }}*/
+  .change-password{
+    text-decoration: underline; 
+    cursor: pointer;
+  }
+
+  .change-password-form {
+    margin-top: 20px;
+  }
+  
+  .change-password-input {
+    margin-bottom: 10px;
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+  }
+  
+  .change-password-submit {
+    margin-top: 10px;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .change-password-submit:hover {
+    background-color: #45a049;
+    color: white;
+  }
+
+  .change-password-cancel {
+    margin-top: 10px;
+    margin-right: 5px;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .change-password-cancel:hover {
+    background-color: #cb3c3c;
+    color: white;
+  }
+
+  .subtitle {
+    margin-top: 20px;
+  }
+  
+  .skills-interests {
+    margin-top: 10px;
+  }
+  
+  .skills-interests ul {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .skills-interests ul li {
+    display: inline-block;
+    background-color: #f2f2f2;
+    padding: 5px 10px;
+    border-radius: 10px;
+    margin: 5px;
+  }
+
+
+.edit-profile-btn {
+    position: fixed;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #A0C1BF;
+    font-size: 20px;
+    
+}
+
+.edit-skill-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #cb3c3c;
+  font-size: 16px;
+  visibility: hidden; /* Inicialmente oculto */
+  padding: 0%;
+}
+
+li:hover .edit-skill-btn {
+  visibility: visible; /* Muestra el botón al pasar el mouse sobre el elemento de la lista */
+  /*margin-left: 5px; /* Ajusta el margen del botón */
+}
+
+li.skill-item.highlighted {
+  background-color: rgb(206, 221, 226);
+}
+
+li.skill-item {
+  cursor: pointer; /* Cambia el cursor al pasar sobre la habilidad */
+}
+
+.skill-item button {
+  display: none; /* Oculta el botón de eliminar habilidad */
+}
+
+.skill-item:hover button {
+  display: inline-block; /* Muestra el botón de eliminar habilidad al pasar el mouse sobre la habilidad */
+}

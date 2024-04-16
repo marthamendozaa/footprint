@@ -1,0 +1,243 @@
+/* Imagen de la iniciativa */
+.image {
+    margin-top: 30px;
+    height: 255px;
+    width: 255px;
+    background-color: #699AA0;
+    border-radius: 50%;
+    float: left;
+    object-fit: cover;
+}
+  
+.container {
+    width: 700px;
+    float: left;
+    margin: 10px;
+    margin-bottom: 50px;
+}
+  
+.titulo-container {
+    height: 80px;
+    float: left;
+    text-align: left;
+    margin-bottom: 30px;
+}
+  
+.titulo {
+    display: flex;
+    align-items: center;
+    font-size: 70px;
+    font-weight: 600;
+}
+  
+.etiquetas {
+    margin-top: 0px;
+    list-style-type: none;
+    padding: 0;
+ }
+  
+.etiquetas li {
+    display: inline-block;
+    background-color: #f2f2f2;
+    padding: 5px 15px;
+    border-radius: 30px;
+    height: 40px;
+    margin-right: 10px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+}
+  
+.container2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 80px;
+    width: 680px;
+}
+  
+.col {
+    flex: 1;
+}
+  
+.calendario {
+    height: 50px;
+    width: 90px;
+    font-size: 25px;
+    background-color: #A0C1BF;
+    border-radius: 25px;
+    float: left;
+}
+
+.selecciona-dropdown {
+    height: 50px;
+    width: 180px;
+    padding: 8px 16px;
+    font-size: 20px;
+    font-weight: 600;
+    background-color: #A0C1BF;
+    border-color: transparent;
+    border-radius: 25px;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    /* Agrega estilo para centrar el texto */
+    margin: auto;
+    display: flex;
+    justify-content: center !important;
+    align-items: center !important;
+}  
+
+.container3 {
+    width: 1000px;
+    float: left;
+    margin-top: 10px;
+}
+  
+.desc {
+    height: 100px;
+    width: 1000px;
+    background-color: #A0C1BF;
+    border-radius: 25px;
+    float: left;
+    text-align: left;
+    padding: 10px 15px;
+    font-weight: 600;
+}
+  
+.descText {
+    font-size: 20px;
+    margin-left: 10px;
+}
+
+.invitarMiembro {
+    background-color: #A0C1BF;
+    border-radius: 25px;
+    font-size: 17px;
+    float: right;
+    height: 40px;
+    padding: 5px 25px;
+    font-weight: 600;
+}
+  
+.tarea {
+    height: 120px;
+    width: 600px;
+    background-color: #E2EBF1;
+    border-radius: 25px;
+    float: left;
+    text-align: left;
+    margin-top: 15px;
+    padding: 10px 15px;
+}
+  
+.tareaTitle {
+    font-size: 25px;
+    margin-left: 15px;
+    font-weight: 600;
+}
+  
+.tareaText {
+    font-size: 14px;
+    margin-left: 15px;
+    font-weight: 600;
+}
+  
+.btn-entrega {
+    height: 25px;
+    background-color: #A0C1BF;
+    border-radius: 25px;
+    font-size: 14px;
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+    padding: 5px 10px;
+    text-align: center;
+    line-height: 15px;
+}
+  
+.calendario-fecha {
+    margin-top: 20px;
+    height: 50px;
+    width: 90px;
+    flex-direction: column;
+    align-items: center;
+    font-size: 13px; 
+    border-radius: 25px;
+    float: left;
+}
+  
+.calendario-container {
+    display: flex;
+    align-items: center;
+}
+  
+.calendario-separator {
+    margin: 0 10px;
+    font-size: 50px;
+    line-height: 50px; 
+}
+  
+
+.btn-custom {
+    width: 100%;
+    background-color: #E2EBF1;
+    border-radius: 20px;
+    border: none;
+    padding-right: 30px; /* Para espacio del icono */
+    position: relative;
+}
+
+.btn-custom:hover {
+    background-color: #E2EBF1; /* Mantenemos el mismo color al pasar el cursor */
+}
+
+.icon-container {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-60%);
+}
+
+.icon-times-circle {
+    color: rgba(0, 0, 0, 0.5); 
+    font-size: 20px;
+}
+
+.btn-ver-solicitudes {
+    background-color: #838F96; 
+    border: none; 
+    border-radius: 15px;
+    padding: 10px 20px; 
+    font-size: 16px;
+    color: #000000;
+    font-weight: bold; 
+    transition: background-color 0.3s ease;
+}
+
+.btn-ver-solicitudes:hover {
+    background-color: #6b7780;
+}
+
+/* Estilos para la barra de progreso */
+.progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    position: relative;
+}
+  
+.progress-bar {
+    height: 100%;
+    background-color: #A8BDC4;
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out;
+}
+  
+.progress-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #000;
+    font-weight: bold;
+}  

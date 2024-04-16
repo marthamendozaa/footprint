@@ -1,0 +1,47 @@
+.side-navbar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100px;
+    background-color: #ffffff;
+    padding-top: 80px; 
+    transition: width 0.5s ease;
+    border-right: 7px solid #CEDDE2;
+}
+  
+/* Ancho cuando está abierto */
+.side-navbar.open {
+    width: 190px;
+}
+  
+.side-navbar ul {
+    list-style-type: none;
+    padding: 0;
+}
+  
+.side-navbar li {
+    margin-bottom: 10px;
+    display: flex;
+}
+  
+.side-navbar li a {
+    display: felx;
+    color: #A0C1BF;
+    padding: 15px;
+    font-size: 18px;
+}
+
+.side-navbar li.selected a {
+    color: #000000;
+}
+
+.side-navbar li:hover a {
+    color: #000000; 
+}
+
+.boton-cerrar {
+    position: absolute;
+    top: 0;
+    right: 0;
+}

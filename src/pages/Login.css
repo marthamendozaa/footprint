@@ -1,0 +1,131 @@
+.container-login-1 {
+    position: relative;
+    height: 100%;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}  
+
+.container-login-2 {
+    height: 450px;
+    width: 450px;
+    background-color: #CEDDE2;
+    border-radius: 10px;
+}
+
+.header-login {
+    padding: 15px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.container-correo{
+    padding: 0px;
+    margin-left: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.correo-texto{
+    align-self: flex-start;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.correo-caja{
+    width: 350px;
+    height: 45px;
+    border-radius: 15px;
+    border-color: transparent;
+}
+
+.container-contrasena{
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 35px;
+}
+
+.contrasena-texto{
+    align-self: flex-start;
+    font-weight: bold;
+    margin-left: 50px;
+    font-size: 20px;
+}
+
+.ojo-contrasena{
+    width: 350px;
+    height: 45px;
+    border-radius: 15px;
+    border-color: transparent;
+}
+
+.ojo-contrasena-2{
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.flecha-login{
+    padding: 10px;
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 15px;
+}
+
+.boton-politicas-privacidad{
+    border: none;
+    background: transparent;
+    outline: none;
+    text-align: center;
+    padding: 10px;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.pop-up{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pop-up-2 {
+    background: #fff;
+    padding: 20px;
+    max-height: 80%;
+    overflow-y: auto;
+    width: 80%;
+    text-align: left;
+}
+
+.pop-up-2 button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 30px;
+    background-color: #547B80;
+}
+
+.pop-up-3 {
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.pop-up-3 button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 30px;
+    background-color: #547B80;
+}
