@@ -59,10 +59,10 @@ export const ExploreAdmin = () => {
       {filteredIniciativas && filteredIniciativas.map((item, index) => (
         <div key={index} className='col-md-6 col-lg-3 mx-0 mb-4'>
           <div className='card p- overflow.hidden h-100 shadow'>
-            <img src={item.urlImagen} className='card-img-top imagesize' alt={item.nombre} />
+            <img src={item.urlImagen} className='card-img-top imagesize' alt={item.titulo} />
             <div className='card-body'>
-              <h5 className='card-title titles'>{item.nombre}</h5>
-              <p className='card-text'>{item.desc}</p>
+              <h5 className='card-title titles'>{item.titulo}</h5>
+              <p className='card-text'>{item.descripcion}</p>
               <Button onClick={() => handleEliminaIniciativa(item.idIniciativa)} variant="primary">Eliminar</Button>
             </div>
           </div>

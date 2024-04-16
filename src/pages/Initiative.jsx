@@ -35,15 +35,15 @@ export const Initiative = () => {
     <div>
       <img src="https://source.unsplash.com/random" className="image"/> 
       <div className="container">
-        {/* Cambiar título */}
+        {/* Título */}
         <div className="titulo-container">
           <div className="titulo"> Titulo </div>
         </div>
 
-        {/* Agregar etiquetas */}
-        <div className="etiquetas">
+        {/* Etiquetas */}
+        <div className="etiquetas-container">
           {etiquetas.map((etiqueta, idEtiqueta) => (
-            <li key={idEtiqueta} className={`etiqueta-item ${etiquetasIniciativa.includes(etiqueta)}`}>
+            <li key={idEtiqueta} className={`etiquetas-item ${etiquetasIniciativa.includes(etiqueta)}`}>
               {etiqueta}
             </li>
           ))}
@@ -68,14 +68,14 @@ export const Initiative = () => {
             </div>
           </div>
 
-          {/* Seleccionar privacidad */}
+          {/* Privacidad */}
           <div className="col" style={{ marginLeft: '20px' }}>
-            <button className="selecciona-dropdown">Privada</button>
+            <div className="info-item">Privada</div>
           </div>
           
-          {/* Agregar región */}
+          {/* Región */}
           <div className="col">
-            <button className="selecciona-dropdown">Mexico</button>
+            <div className="info-item">Mexico</div>
             </div>
           </div>
         </div>
@@ -125,7 +125,7 @@ export const Initiative = () => {
             </div>
 
             {/* Personas */}
-          <div className="col-3 my-3" style={{height: "100%"}}>
+            <div className="col-3 my-3" style={{height: "100%"}}>
               <div className="invitarMiembro" style={{ width: '100%', height: '178px', fontSize: '14px', background: "transparent"}}>
                   <div style={{fontSize: '20px'}}>Dueño</div>
                   <button type="button" className="btn btn-custom">

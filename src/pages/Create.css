@@ -17,7 +17,7 @@
 }
 
 .titulo-container {
-  height: 80px;
+  height: auto;
   float: left;
   text-align: left;
   margin-bottom: 30px;
@@ -28,6 +28,16 @@
   align-items: center;
   font-size: 70px;
   font-weight: 600;
+}
+
+.titulo-input {
+  height: 100%;
+  width: 100%;
+  background-color: transparent;
+  border-color: transparent;
+  float: left;
+  text-align: left;
+  outline: none;
 }
 
 .btn-lapiz {
@@ -69,6 +79,10 @@ li.etiqueta-item {
   line-height: 30px;
 }
 
+li.etiqueta-item:hover {
+  box-shadow: 0 0 0 3px #A0C1BF;
+}
+
 /* Fila */
 .container2 {
   display: flex;
@@ -82,13 +96,38 @@ li.etiqueta-item {
   flex: 1;
 }
 
+/* Fechas de inicio y cierre */
+.calendario-container {
+  display: flex;
+  align-items: center;
+}
+
 .calendario {
   height: 50px;
-  width: 90px;
+  width: 100px;
   font-size: 25px;
   background-color: #A0C1BF;
   border-radius: 25px;
-  float: left;
+  cursor: pointer;
+}
+
+.calendario:hover {
+  box-shadow: 0 0 0 3px #699AA0;
+}
+
+.calendario-fecha .react-datepicker__input-container input {
+  width: 100px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 5px 10px;
+  text-align: center;
+}
+
+.calendario-separator {
+  margin: 0 10px;
+  font-size: 50px;
+  line-height: 50px; 
 }
 
 /* Dropdown privacidad y ubicación */
@@ -107,10 +146,8 @@ li.etiqueta-item {
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.selecciona-dropdown:focus,
 .selecciona-dropdown:hover {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.5);
+  box-shadow: 0 0 0 3px #699AA0;
 }
 
 .dropdown-arrow {
@@ -144,14 +181,6 @@ li.etiqueta-item {
   border-radius: 6px;
 }
 
-.dropdown-item:hover {
-  background-color: #edf2f7;
-}
-
-.dropdown-item:active {
-  background-color: #a5b4fc;
-}
-
 /* Búsqueda dropdown */
 .dropdown-input {
   width: 100%;
@@ -175,7 +204,7 @@ li.etiqueta-item {
 }
 
 .desc {
-  width: 1000px;
+  height: auto;
   background-color: #A0C1BF;
   border-radius: 25px;
   float: left;
@@ -185,13 +214,24 @@ li.etiqueta-item {
   font-size: 20px;
 }
 
+.desc-input {
+  height: 100%;
+  width: 100%;
+  padding: 10px 15px;
+  background-color: transparent;
+  border-color: transparent;
+  float: left;
+  text-align: left;
+  font-size: 20px;
+  outline: none;
+}
+
 .btn-lapiz-desc {
   position: relative;
   background: none;
   border: none;
   cursor: pointer;
   color: #ffffff;
-  font-size: 20px;
 }
 
 .container4 {
@@ -270,32 +310,6 @@ li.etiqueta-item {
   cursor: pointer;
   color: #ffffff;
   font-size: 20px;
-}
-
-.calendario-fecha {
-  height: 50px;
-  width: 90px;
-  flex-direction: column;
-  align-items: center;
-  font-size: 13px; 
-  border-radius: 25px;
-  float: left;
-}
-
-.calendario-fecha .react-datepicker__input-container input {
-  width: 80px;
-  margin-top: 20px;
-}
-
-.calendario-container {
-  display: flex;
-  align-items: center;
-}
-
-.calendario-separator {
-  margin: 0 10px;
-  font-size: 50px;
-  line-height: 50px; 
 }
 
 .container5 {
