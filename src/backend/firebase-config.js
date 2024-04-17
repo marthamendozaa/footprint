@@ -3,13 +3,13 @@ import { getAuth } from "firebase/auth";
 import { getDatabase, ref } from "firebase/database";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCN3VcpUepRMmeWU4HM5OE5WLAsYE_aaG8",
-  authDomain: "evertech-db.firebaseapp.com",
-  databaseURL: "https://evertech-db-default-rtdb.firebaseio.com",
-  projectId: "evertech-db",
-  storageBucket: "evertech-db.appspot.com",
-  messagingSenderId: "224256696685",
-  appId: "1:224256696685:web:5a9a31d1516ccb6d9d7a64"
+  apiKey: "AIzaSyCadgVY4YYKAekxSJp9xPyfJw76b5kWEng",
+  authDomain: "evertech-sprint1.firebaseapp.com",
+  databaseURL: "https://evertech-sprint1-default-rtdb.firebaseio.com/",
+  projectId: "evertech-sprint1",
+  storageBucket: "evertech-sprint1.appspot.com",
+  messagingSenderId: "910018975332",
+  appId: "1:910018975332:web:ae986df6395636a6577171"
 };
 
 const app = initializeApp(firebaseConfig);
