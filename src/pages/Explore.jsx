@@ -23,11 +23,12 @@ export const Explore = () => {
     }, []);
 
     const searchText = (event) => {
-        const searchTerm = event.target.value.toLowerCase();
+        const searchTerm = event.target.value;
+        console.log("Search Term:", searchTerm);
         setFilter(searchTerm);
 
         const filtered = iniciativas.filter(iniciativa =>
-            iniciativa.nombre.toLowerCase().includes(searchTerm)
+            iniciativa.titulo.toLowerCase().includes(searchTerm)
         );
         setFilteredIniciativas(filtered);
     }
@@ -73,14 +74,22 @@ export const Explore = () => {
             {/* Modal */}
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>{selectedIniciativa && selectedIniciativa.titulo}</Modal.Title>
+                    <Modal.Title className='modaltitle'>{selectedIniciativa && selectedIniciativa.titulo}</Modal.Title>
                 </Modal.Header>
-                <Modal.Body>
-                    {selectedIniciativa && <p>{selectedIniciativa.descripcion}</p>}
+                <Modal.Body className='modalinfo'>
+                    {selectedIniciativa && (
+                        <>
+                            <img src={selectedIniciativa.urlImagen} alt={selectedIniciativa.titulo} className="img-fluid" />
+                            <p>{selectedIniciativa.descripcion}</p>
+                            <p>{selectedIniciativa.fechaInicio} - {selectedIniciativa.fechaCierre} </p>
+                            
+                        </>
+                    )}
+                    
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={() => setShowModal(false)}>
-                        Close
+                        Suscribirse
                     </Button>
                 </Modal.Footer>
             </Modal>
