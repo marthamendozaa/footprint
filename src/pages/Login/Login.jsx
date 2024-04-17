@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { loginUsuario, getEsAdmin } from './Login.js';
+import { loginUsuario, getEsAdmin } from './Login-fb.js';
 import { FaArrowRight, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
 import './Login.css';
 
