@@ -1,13 +1,14 @@
-body {
+.profile-page {
     background-color: white;
     color: black;
     max-width: 1200px;
-    margin: 0 auto;
+    margin-left: -25%;
+    text-align: left;
   }
 
   .Profile-header {
     text-align: left;
-    padding: 20px;
+    padding: 0px;
   }
   
   .Foto-perfil {

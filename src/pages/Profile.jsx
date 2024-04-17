@@ -152,7 +152,7 @@ export const Profile = () => {
   };
 
   return (
-    <div className="Profile">
+    <div className="profile-page">
       <header className="Profile-header container mt-6">
         <h1>Mi perfil</h1>
         <div className="profile-info row">
