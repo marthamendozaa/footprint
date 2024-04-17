@@ -1,9 +1,11 @@
 body {
     background-color: white;
     color: black;
+    max-width: 1200px;
+    margin: 0 auto;
   }
-  
-  .App-header {
+
+  .Profile-header {
     text-align: left;
     padding: 20px;
   }
@@ -53,11 +55,35 @@ body {
   
   .profile-info-right {
     flex: 1;
-    
+  }
+
+  .name-container {
+    position: relative; /* Asegura que el contenedor del nombre tenga una posición relativa */
   }
   
+  .edit-profile-btn {
+    position: absolute;
+    top: 20px; /* Coloca el botón en la parte superior del contenedor del nombre */
+    right: 25px; /* Ajusta el espaciado del botón desde el nombre */
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #A0C1BF;
+    font-size: 20px;
+    transform: translateY(-50%); /* Centra verticalmente el botón */
+  }
 
-  /*style={{ textDecoration: 'underline', cursor: 'pointer' }}*/
+  .guardar{
+    top: 20px;
+    right: -35%;
+    color: black;
+    padding: 5px 10px;
+    border-radius: 10px;
+    margin: 0px;
+    background-color: rgb(206, 221, 226);
+  }
+  
+  
   .change-password{
     text-decoration: underline; 
     cursor: pointer;
@@ -123,17 +149,6 @@ body {
     border-radius: 10px;
     margin: 5px;
   }
-
-
-.edit-profile-btn {
-    position: fixed;
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #A0C1BF;
-    font-size: 20px;
-    
-}
 
 .edit-skill-btn {
   background: none;
