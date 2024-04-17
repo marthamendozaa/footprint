@@ -131,6 +131,10 @@ export const Profile = () => {
   // Función para manejar el submit del cambio de contraseña
   const handleSubmitPassword = async (event) => {
     event.preventDefault();
+    if (nuevaContrasena !== confirmarContrasena) {
+      setError('Las nuevas contraseñas no coinciden');
+      return;
+    }
 
     // Validar que la contraseña actual sea correcta
     try {
