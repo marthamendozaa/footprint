@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { FaCalendar, FaFolder, FaTimesCircle  } from 'react-icons/fa';
 import { useParams } from 'react-router-dom';
 import { Progress, Typography } from "@material-tailwind/react";
-import { getIniciativa } from '../backend/Initiative-functions.js';
+import { getIniciativa } from './Initiative-fb.js';
 import './Initiative.css';
 
 export const Initiative = () => {

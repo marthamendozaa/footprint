@@ -1,4 +1,4 @@
-import { db, database } from "./firebase-config.js";
+import { db, database } from "../../backend/firebase-config.js";
 import { child, get, set, ref} from "firebase/database";
 
 // Explora Admin: todas las iniciativas

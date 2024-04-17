@@ -2,17 +2,17 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '../assets/Navbar';
 import NavbarAdmin from '../assets/NavbarAdmin';
-import { Home } from '../pages/Home';
-import { Explore } from '../pages/Explore';
-import { Requests } from '../pages/Requests';
-import { MyInitiatives } from '../pages/MyInitiatives';
-import { Initiative } from '../pages/Initiative'; 
-import { Profile } from '../pages/Profile';
-import { Create } from '../pages/Create';
-import { Login } from '../pages/Login';
-import { ExploreAdmin } from '../pages/ExploreAdmin';
-import { ProfileAdmin } from '../pages/ProfileAdmin';
-import { getEsAdmin } from '../backend/Login-functions.js';
+import { Home } from '../pages/Home/Home.jsx';
+import { Explore } from '../pages/Explore/Explore.jsx';
+import { Requests } from '../pages/Requests/Requests.jsx';
+import { MyInitiatives } from '../pages/MyInitiatives/MyInitiatives.jsx';
+import { Initiative } from '../pages/Initiative/Initiative.jsx'; 
+import { Profile } from '../pages/Profile/Profile.jsx';
+import { Create } from '../pages/Create/Create.jsx';
+import { Login } from '../pages/Login/Login.jsx';
+import { ExploreAdmin } from '../pages/ExploreAdmin/ExploreAdmin.jsx';
+import { ProfileAdmin } from '../pages/ProfileAdmin/ProfileAdmin.jsx';
+import { getEsAdmin } from '../pages/Login/Login.js';
 import { auth } from '../backend/firebase-config.js';
 
 export const AppRouter = () => {

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getIniciativasMiembro, getIniciativasAdmin } from '../backend/MyInitiatives-functions.js';
+import { getIniciativasMiembro, getIniciativasAdmin } from './MyInitiatives-fb.js';
 import './MyInitiatives.css';
 
 export const MyInitiatives = () => {
