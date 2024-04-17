@@ -152,38 +152,40 @@ export const Profile = () => {
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
+    <div className="Profile">
+      <header className="Profile-header container mt-6">
         <h1>Mi perfil</h1>
-        <div className="profile-info">
-          <div className="profile-info-left">
-            <div className="Foto-perfil">
-                <img src={informacionUsuario.urlImagen} className="Foto-perfil" alt="perfil" />
-                <FaPen className="edit-icon" />
+        <div className="profile-info row">
+          <div className="profile-info-left col-md-4">
+            <div className="Foto-perfil position-relative">
+                <img src={informacionUsuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
+                <FaPen className="edit-icon position-absolute top-50 start-50 translate-middle text-white" />
             </div>
           </div>
-          <div className="profile-info-right">
-          <h2>
-              {editingNombre ? (
-                <input
-                  type="text"
-                  value={nuevoNombre}
-                  onChange={handleNombreChange}
-                />
-              ) : (
-                informacionUsuario.nombre
-              )}
-              {!editingNombre && (
-                <button className="edit-profile-btn" onClick={handleNombreEdit}>
-                  <FaPen />
-                </button>
-              )}
-              {editingNombre && (
-                <button className="edit-profile-btn" onClick={handleNombreSubmit}>
-                  Guardar
-                </button>
-              )}
-            </h2>
+          <div className="profile-info-right col-md-8">
+          <div className="name-container">
+            <h2>
+                {editingNombre ? (
+                  <input
+                    type="text"
+                    value={nuevoNombre}
+                    onChange={handleNombreChange}
+                  />
+                ) : (
+                  informacionUsuario.nombre
+                )}
+                {!editingNombre && (
+                  <button className="edit-profile-btn" onClick={handleNombreEdit}>
+                    <FaPen />
+                  </button>
+                )}
+                {editingNombre && (
+                  <button className="edit-profile-btn guardar" onClick={handleNombreSubmit}>
+                    Guardar
+                  </button>
+                )}
+              </h2>
+              </div>
             <p>{informacionUsuario.edad} años</p>
             <h3>{informacionUsuario.nombreUsuario} </h3>
             <p>{informacionUsuario.correo} </p>
