@@ -12,7 +12,7 @@ import { Create } from '../pages/Create/Create.jsx';
 import { Login } from '../pages/Login/Login.jsx';
 import { ExploreAdmin } from '../pages/ExploreAdmin/ExploreAdmin.jsx';
 import { ProfileAdmin } from '../pages/ProfileAdmin/ProfileAdmin.jsx';
-import { getEsAdmin } from '../pages/Login/Login.js';
+import { getEsAdmin } from '../pages/Login/Login-fb.js';
 import { auth } from '../backend/firebase-config.js';
 
 export const AppRouter = () => {
