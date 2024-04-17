@@ -24,11 +24,14 @@ export const MyInitiatives = () => {
       <div className="container-iniciativas">
         {iniciativasMiembro && iniciativasMiembro.map((iniciativaMiembro, index) => (
           <div key={index}>
-            <div className="rounded-box-img">
-              <img src={iniciativaMiembro.urlImagen} alt={iniciativaMiembro.titulo} />
-            </div>
+            <Link to={`/initiative/${iniciativaMiembro.idIniciativa}`}>
+              <button className="rounded-box-img">
+                <img src={iniciativaMiembro.urlImagen} alt={iniciativaMiembro.titulo} />
+              </button>
+            </Link>
             <div className="rounded-box-txt">
-              <p>{iniciativaMiembro.titulo}</p>
+              <p1>{iniciativaMiembro.titulo}</p1>
+              <p2>{iniciativaMiembro.descripcion}</p2>
             </div>
           </div>
         ))}
@@ -40,23 +43,19 @@ export const MyInitiatives = () => {
       <div className="container-iniciativas">
         {iniciativasAdmin && iniciativasAdmin.map((iniciativaAdmin, index) => (
           <div key={index}>
-            <div className="rounded-box-img">
-              <img src={iniciativaAdmin.urlImagen} alt={iniciativaAdmin.titulo} />
-            </div>
+            <Link to={`/initiative/${iniciativaAdmin.idIniciativa}`}>
+              <button className="rounded-box-img">
+                <img src={iniciativaAdmin.urlImagen} alt={iniciativaAdmin.titulo} />
+              </button>
+            </Link>
             <div className="rounded-box-txt">
-              <p>{iniciativaAdmin.titulo}</p>
+              <p1>{iniciativaAdmin.titulo}</p1>
+              <p2>{iniciativaAdmin.descripcion}</p2>
             </div>
           </div>
         ))}
       </div>
     </div>
-
-    <Link to="/initiative">
-      <button type="button" className="btn" style={{ fontSize: "18px", width: "130px", backgroundColor: "#D9D9D9", borderRadius: "18px", height: "50px", fontWeight: "bold" }}>
-        Info
-      </button>
-    </Link>
-
   </div>
   );
 }

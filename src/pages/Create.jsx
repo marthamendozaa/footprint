@@ -3,6 +3,7 @@ import { FaCalendar, FaFolder, FaPen } from 'react-icons/fa';
 import { Modal, Button } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { format } from 'date-fns';
 import { getEtiquetas, getRegiones, crearIniciativa } from '../backend/Create-functions.js';
 import Iniciativa from '../backend/obj-Iniciativa.js';
 import './Create.css';
@@ -158,8 +159,11 @@ export const Create = () => {
       handleMostrarError();
       return;
     }
+    
+    const fechaInicioMini = format(fechaInicio, 'dd/MM/yyyy');
+    const fechaCierreMini = fechaCierre ? format(fechaCierre, 'dd/MM/yyyy') : null;
 
-    const infoIniciativa = new Iniciativa(titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicio, fechaCierre);
+    const infoIniciativa = new Iniciativa(titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
     console.log(infoIniciativa);
     
     await crearIniciativa(infoIniciativa);

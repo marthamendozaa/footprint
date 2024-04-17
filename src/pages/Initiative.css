@@ -9,15 +9,7 @@
     object-fit: cover;
 }
   
-.container {
-    width: 700px;
-    float: left;
-    margin: 10px;
-    margin-bottom: 50px;
-}
-  
 .titulo-container {
-    height: 80px;
     float: left;
     text-align: left;
     margin-bottom: 30px;
@@ -43,7 +35,6 @@
     border-radius: 30px;
     height: 40px;
     margin-right: 10px;
-    margin-top: 5px;
     margin-bottom: 10px;
 }
   
@@ -59,13 +50,22 @@
     flex: 1;
 }
   
-.calendario {
+.ver-calendario {
     height: 50px;
     width: 90px;
     font-size: 25px;
     background-color: #A0C1BF;
     border-radius: 25px;
     float: left;
+}
+
+.ver-calendario-fecha {
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  padding: 5px 10px;
+  text-align: center;
+  margin-top: 15px;
 }
 
 .info-item {

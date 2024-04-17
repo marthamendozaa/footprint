@@ -24,6 +24,9 @@ h2 {
 }
 
 .rounded-box-img {
+  border: none;
+  padding: 0;
+  background: none;
   border-radius: 30px;
   background-color: #D9D9D9;
   width: 300px;
@@ -40,19 +43,30 @@ h2 {
 }
 
 .rounded-box-txt {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
   border-radius: 30px;
   background-color: #D9D9D9;
   width: 300px;
   height: 90px;
-  padding-top: 10px;
   padding-left: 20px;
   margin-bottom: 20px;
   margin-right: 30px;
 }
 
-.rounded-box-txt p {
+.rounded-box-txt p1 {
   font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 600;
+  text-align: left;
+}
+
+.rounded-box-txt p2 {
+  font-family: "Inter", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color:rgb(62, 60, 64);
   text-align: left;
 }
