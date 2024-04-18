@@ -17,5 +17,5 @@ jobs:
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVERTECH_DB }}'
-          projectId: evertech-db
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_EVERTECH_SPRINT1 }}'
+          projectId: evertech-sprint1

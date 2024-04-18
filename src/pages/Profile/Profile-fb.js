@@ -1,5 +1,5 @@
 import { signOut, reauthenticateWithCredential, updatePassword, EmailAuthProvider } from "firebase/auth";
-import { auth, db, database } from "./firebase-config.js";
+import { auth, db, database } from "../../backend/firebase-config.js";
 import { child, get, set, ref } from "firebase/database";
 
 

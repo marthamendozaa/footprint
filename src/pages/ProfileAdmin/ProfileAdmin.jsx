@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cerrarSesion } from '../backend/Profile-functions.js';
+import { cerrarSesion } from '../Profile/Profile-fb.js';
 
 export const ProfileAdmin = () => {
     const [sesionCerrada, setSesionCerrada] = useState(false);

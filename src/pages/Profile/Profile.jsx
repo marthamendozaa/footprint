@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import { FaPen, FaTimes } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, agregaHabilidad, eliminaHabilidad, getIntereses, getInteresesUsuario, agregaInteres, eliminaInteres, cerrarSesion, cambiarContrasena } from '../backend/Profile-functions.js';
-import Usuario from '../backend/obj-Usuario.js';
+import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, agregaHabilidad, eliminaHabilidad, getIntereses, getInteresesUsuario, agregaInteres, eliminaInteres, cerrarSesion, cambiarContrasena } from './Profile-fb.js';
+import Usuario from '../../backend/obj-Usuario.js';
 import './Profile.css';
 
 export const Profile = () => {

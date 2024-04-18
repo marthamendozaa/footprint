@@ -1,4 +1,4 @@
-import { db } from "./firebase-config.js";
+import { db } from "../../backend/firebase-config.js";
 import { child, get } from "firebase/database";
 
 // Iniciativa: obtener información de una iniciativa

@@ -4,8 +4,8 @@ import { Modal, Button } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
-import { getEtiquetas, getRegiones, crearIniciativa } from '../backend/Create-functions.js';
-import Iniciativa from '../backend/obj-Iniciativa.js';
+import { getEtiquetas, getRegiones, crearIniciativa } from './Create-fb.js';
+import Iniciativa from '../../backend/obj-Iniciativa.js';
 import './Create.css';
 
 export const Create = () => {
