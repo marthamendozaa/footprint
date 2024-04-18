@@ -34,119 +34,127 @@ export const Initiative = () => {
   return (
     <div>
       {iniciativa && (
-        <div>
-          <img src={iniciativa.urlImagen} className="image"/> 
-          <div className="container">
+      <div className="i-container">
+        <div className="i-iniciativa-container">
+          {/* Foto de iniciativa */}
+          <img src={iniciativa.urlImagen} className="i-foto-iniciativa"/> 
+            
+          <div className="i-info-container"> 
             {/* Título */}
-            <div className="titulo-container">
-              <div className="titulo"> {iniciativa.titulo} </div>
+            <div className="i-titulo">
+              <div className="i-titulo-texto">{iniciativa.titulo}</div>
             </div>
 
             {/* Etiquetas */}
-            <div className="etiquetas-container">
+            <div className="i-etiquetas">
               {Object.values(iniciativa.listaEtiquetas).map((etiqueta, idEtiqueta) => (
-                <li key={idEtiqueta} className={`etiquetas-item`}>
+                <li key={idEtiqueta} className={`i-etiqueta-item`}>
                   {etiqueta}
                 </li>
               ))}
             </div>
-            
-            <div className="container2">
+
+            <div className="i-datos">
               {/* Fecha inicio y fecha cierre */}
-              <div className="calendario-container">
-                {/* Fecha inicio */}
-                <div className="ver-calendario">
-                  <FaCalendar />
-                  <div className='ver-calendario-fecha'>{iniciativa.fechaInicio}</div>
-                </div>
+              <div className="i-calendarios-container">
+                <div className="i-calendarios">
+                  {/* Fecha inicio */}
+                  <div className="i-calendario-container">
+                    <div className="i-calendario">
+                      <div className="i-icono-calendario">
+                        <FaCalendar/>
+                      </div>
+                    </div>
+                    <div className='i-fecha'>{iniciativa.fechaInicio}</div>
+                  </div>
+                  
+                  {/* Dash */}
+                  <div className="i-calendario-separador"> - </div>
 
-                {/* Dash */}
-                <span className="calendario-separator">-</span>
-
-                {/* Fecha cierre */}
-                <div className="ver-calendario">
-                  <FaCalendar />
-                  <div className='ver-calendario-fecha'>{iniciativa.fechaCierre}</div>
+                  {/* Fecha cierre */}
+                  <div className="i-calendario-container">
+                    <div className="i-calendario">
+                      <div className="i-icono-calendario">
+                        <FaCalendar/>
+                      </div>
+                    </div>
+                    <div className='i-fecha'>{iniciativa.fechaCierre}</div>
+                  </div>
                 </div>
               </div>
 
               {/* Privacidad */}
-              <div className="col" style={{ marginLeft: '20px' }}>
-                <div className="info-item">{iniciativa.esPublica ? "Pública" : "Privada"}</div>
+              <div className="i-dato-container">
+                <div className="i-dato">
+                  {iniciativa.esPublica ? "Pública" : "Privada"}
+                </div>
               </div>
-              
-              {/* Región */}
-              <div className="col">
-                <div className="info-item">{iniciativa.region}</div>
+
+              {/* Ubicación */}
+              <div className="i-dato-container">
+                <div className="i-dato">
+                  {iniciativa.region}
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
-          {/* Descripción */}
-          <div className="container3">
-            <div style={{ fontWeight: 'bold', textAlign: 'left', fontSize: '20px' }}>Progreso</div>
-            <ProgressBar progress={50} />
-            <div className="desc">
-              <div className="descText">
-                {iniciativa.descripcion}
+        {/* Descripción */}
+        <div className="i-desc">
+          <div className="i-progreso-texto">Progreso</div>
+          <ProgressBar progress={50} />
+          <div className="i-desc-texto">
+            {iniciativa.descripcion}
+          </div>
+        </div>
+
+
+        {/* Tareas y Miembros*/}
+        <div className="i-tareas-miembros">
+          <div className="i-seccion-tareas">
+            <div className="i-tareas-container">
+              {/* Tarea 1 */}
+              <div className="i-tarea">
+                <div className="i-tarea-info">
+                  <div className="i-tarea-titulo">Sprint 1</div>
+                  <div className="i-tarea-texto">Instrucciones...</div>
+                </div>
+                <div className="i-tarea-botones">
+                  <div className="i-tarea-boton"><FaCalendar /> Fecha</div>
+                  <div className="i-tarea-boton"><FaFolder /> Subir</div>
+                </div>
+              </div>
+
+              {/* Tarea 2 */}
+              <div className="i-tarea">
+                <div className="i-tarea-info">
+                  <div className="i-tarea-titulo">Sprint 2</div>
+                  <div className="i-tarea-texto">Instrucciones...</div>
+                </div>
+                <div className="i-tarea-botones">
+                  <div className="i-tarea-boton"><FaCalendar /> Fecha</div>
+                  <div className="i-tarea-boton"><FaFolder /> Subir</div>
+                </div>
               </div>
             </div>
+          </div>
 
-            {/* Tareas */}
-            <div className="row">
-                <div className="col-9">
-                    {/* Requerimientos */}
-                    <div className="row">
-                        <div className="contenedor" style={{ width: '100%', height: '80px', fontSize: '14px'}}>
-                            <div className="tarea" style={{width: "100%"}}>
-                                <div className="tareaTitle">Requerimientos
-                                <div className="btn-entrega"><FaCalendar /> </div>
-                                <div className="btn-entrega"><FaFolder /> </div>
-                                <div className="btn-entrega"> miembros </div>
-                                <div className="btn-entrega"> sin completar </div>
-                            </div>
-                                <div className="tareaText">Instrucciones...</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Evidencias */}
-                    <div className="row" style={{marginTop: "60px"}}>
-                      <div className="contenedor" style={{ width: '100%', height: '80px', fontSize: '14px'}}>
-                        <div className="tarea" style={{width: "100%"}}>
-                              <div className="tareaTitle">Evidencia 2
-                              <div className="btn-entrega"><FaCalendar /> </div>
-                              <div className="btn-entrega"><FaFolder /> </div>
-                              <div className="btn-entrega"> miembros </div>
-                              <div className="btn-entrega"> sin completar </div>
-                          </div>
-                              <div className="tareaText">Instrucciones...</div>
-                          </div>
-                      </div>
-                    </div>
-                </div>
-
-                {/* Personas */}
-                <div className="col-3 my-3" style={{height: "100%"}}>
-                  <div className="invitarMiembro" style={{ width: '100%', height: '178px', fontSize: '14px', background: "transparent"}}>
-                      <div style={{fontSize: '20px'}}>Dueño</div>
-                      <button type="button" className="btn btn-custom">
-                          @isabellaEverTech 
-                      </button>
-                      <div style={{fontSize: '20px'}}>Miembros</div>
-                      <button type="button" className="btn btn-custom">
-                          @valeEverTech 
-                          <span className="icon-container">
-                              <FaTimesCircle className="icon-times-circle" />
-                          </span>
-                      </button>
-                  </div>
-
-                  <button type="button" className="btn btn-ver-solicitudes">
-                      VER SOLICITUDES
-                  </button>
-
-              </div>
+          <div className="i-seccion-miembros">
+            <div className="i-tipo-miembro">Dueño</div>
+              <button type="button" className="i-btn-miembro">
+                @isabellaEverTech 
+              </button>
+            <div className="i-tipo-miembro">Miembros</div>
+              <button type="button" className="i-btn-miembro">
+                  @valeEverTech
+                <span className="i-icono-elimina-miembro">
+                  <FaTimesCircle className="i-icon-times-circle" />
+                </span>
+              </button>
+              <button type="button" className="i-btn-ver-solicitudes">
+                VER SOLICITUDES
+              </button>
             </div>
           </div>
         </div>

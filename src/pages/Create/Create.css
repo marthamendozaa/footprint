@@ -3,6 +3,12 @@
   width: 1000px;
   margin-bottom: 20px;
   align-items: center;
+  flex-direction: column;
+}
+
+.c-iniciativa-container {
+  display: flex;
+  width: 100%;
 }
 
 /* Imagen de la iniciativa */
@@ -150,12 +156,6 @@ li.c-etiqueta-item:hover {
   height: 50px;
 }
 
-.c-calendario-inputs {
-  display: flex;
-  align-items: center;
-  flex-direction: row;
-}
-
 .react-datepicker__input-container input {
   width: 100px;
   font-family: "Inter", sans-serif;
@@ -245,13 +245,13 @@ li.c-etiqueta-item:hover {
 /* Descripción */
 .c-desc {
   display: flex;
-  width: 1000px;
+  width: 100%;
   margin-top: 20px;
 }
 
-.c-desc-container {
+.c-desc-texto {
   position: relative;
-  width: 1000px;
+  width: 100%;
   background-color: #A0C1BF;
   border-radius: 25px;
   padding: 15px;
@@ -303,7 +303,7 @@ li.c-etiqueta-item:hover {
 /* Botones agregar tareas y miembros */
 .c-tareas-miembros {
   display: flex;
-  width: 1000px;
+  width: 100%;
   margin-top: 20px;
 }
 
@@ -335,6 +335,7 @@ li.c-etiqueta-item:hover {
 .c-tareas-container {
   display: flex;
   width: 80%;
+  flex-direction: column;
 }
 
 .c-tarea {
@@ -386,7 +387,7 @@ li.c-etiqueta-item:hover {
   display: flex;
   margin-top: 20px;
   position: relative;
-  width: 1000px;
+  width: 100%;
 }
 
 .c-btn-crear {
