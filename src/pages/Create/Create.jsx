@@ -173,167 +173,210 @@ export const Create = () => {
 
   return (
     <div>
-      <div className="image"></div>
-      <div className="container">
-        {/* Cambiar título */}
-        <div className="titulo-container">
-          <div className="titulo">
+      <div className="c-container">
+        {/* Foto de iniciativa */}
+        <div className="c-foto-iniciativa"></div>
+
+        <div className="c-info-container"> 
+          {/* Cambiar título */}
+          <div className="c-titulo">
             {editandoTitulo ? (
-                <input type="text" className="titulo-input"
-                value={titulo}
-                onChange={handleCambioTitulo}
-                onBlur={handleGuardarTitulo}
-                onKeyDown={handleOnKeyDown}
-                autoFocus />
-              ) : (titulo ? titulo : "Título")}
-            {!editandoTitulo && (<button className="btn-lapiz" onClick={handleEditarTitulo}><FaPen /></button>)}
-          </div>
-        </div>
-
-        {/* Agregar etiquetas */}
-        <div className="etiquetas">
-          {etiquetas.map((etiqueta, idEtiqueta) => (
-            <li key={idEtiqueta} className={`etiqueta-item ${etiquetasIniciativa.hasOwnProperty(idEtiqueta) ? "highlighted" : ""}`} onClick={() => seleccionaEtiqueta(etiqueta, idEtiqueta)}>
-              {etiqueta}
-            </li>
-          ))}
-        </div>
-        
-        <div className="container2">
-          {/* Fecha inicio y fecha cierre */}
-          <div className="calendario-container">
-            {/* Fecha inicio */}
-            <div className="calendario" onClick={handleCambioFechaInicio}> <FaCalendar/>
-              <div className="calendario-fecha">
-                <DatePicker
-                  selected={fechaInicio}
-                  onChange={(date) => setFechaInicio(date)}
-                  dateFormat="dd/MM/yyyy"
-                  ref={datePickerInicio}
+              <div className="c-titulo-input">
+                <input
+                  type="text"
+                  className="c-titulo-input-texto"
+                  value={titulo}
+                  onChange={handleCambioTitulo}
+                  onBlur={handleGuardarTitulo}
+                  onKeyDown={handleOnKeyDown}
+                  autoFocus
+                  maxLength={30}
                 />
-              </div>
-            </div>
-
-            {/* Dash */}
-            <span className="calendario-separator">-</span>
-
-            {/* Fecha cierre */}
-            <div className="calendario" onClick={handleCambioFechaCierre}> <FaCalendar/>
-              <div className="calendario-fecha">
-                <DatePicker
-                  selected={fechaCierre}
-                  onChange={(date) => setFechaCierre(date)}
-                  dateFormat="dd/MM/yyyy"
-                  ref={datePickerCierre}
-                />
-              </div>
-            </div>
+                <div className="c-titulo-conteo">
+                  {titulo ? `${titulo.length}/30` : `0/30`}
+                </div>
+              </div>) : (
+                <div className="c-titulo-texto">
+                  {titulo ? titulo : "Título"}
+                  <button className="c-btn-editar-titulo" onClick={handleEditarTitulo}>
+                    <FaPen />
+                  </button>
+                </div>
+              )}
           </div>
 
-          {/* Seleccionar privacidad */}
-          <div className="col" style={{ marginLeft: '20px' }}>
-            <button className="selecciona-dropdown" onClick={() => setDropdownPrivacidad(!dropdownPrivacidad)}>
-              <span>{esPublica ? "Pública" : "Privada"}</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
-                <path fillRule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-              </svg>
-            </button>
-            {dropdownPrivacidad && (
-              <div className="dropdown">
-                {/* Dropdown privacidad */}
-                <a className="dropdown-item" onClick={() => handleSeleccionaPrivacidad(true)}>Pública</a>
-                <a className="dropdown-item" onClick={() => handleSeleccionaPrivacidad(false)}>Privada</a>
-              </div>
-            )}
+          {/* Agregar etiquetas */}
+          <div className="c-etiquetas">
+            {etiquetas.map((etiqueta, idEtiqueta) => (
+              <li key={idEtiqueta} className={`c-etiqueta-item ${etiquetasIniciativa.hasOwnProperty(idEtiqueta) ? "highlighted" : ""}`} onClick={() => seleccionaEtiqueta(etiqueta, idEtiqueta)}>
+                {etiqueta}
+              </li>
+            ))}
           </div>
           
-          {/* Agregar región */}
-          <div className="col">
-            <button className="selecciona-dropdown" onClick={() => setDropdownRegion(!dropdownRegion)}>
-              <span className="mr-2">{region ? region : "Ubicación"}</span>
-                <svg xmlns="http://www.w3.org/2000/svg" className="dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
+          <div className="c-datos">
+            {/* Fecha inicio y fecha cierre */}
+            <div className="c-calendarios-container">
+              <div className="c-calendarios">
+                {/* Fecha inicio */}
+                <div className="c-calendario-input">
+                  <div className="c-calendario" onClick={handleCambioFechaInicio}>
+                    <div className="c-icono-calendario">
+                      <FaCalendar/>
+                    </div>
+                  </div>
+                  <DatePicker
+                    selected={fechaInicio}
+                    onChange={(date) => setFechaInicio(date)}
+                    dateFormat="dd/MM/yyyy"
+                    ref={datePickerInicio}
+                  />
+                </div>
+                
+                {/* Dash */}
+                <div className="c-calendario-separador"> - </div>
+
+                {/* Fecha cierre */}
+                <div className="c-calendario-input">
+                  <div className="c-calendario" onClick={handleCambioFechaCierre}>
+                    <div className="c-icono-calendario">
+                      <FaCalendar/>
+                    </div>
+                  </div>
+                  <DatePicker
+                    selected={fechaCierre}
+                    onChange={(date) => setFechaCierre(date)}
+                    dateFormat="dd/MM/yyyy"
+                    ref={datePickerCierre}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Seleccionar privacidad */}
+            <div className="c-dropdown-container">
+              <button className="c-selecciona-dropdown" onClick={() => setDropdownPrivacidad(!dropdownPrivacidad)}>
+                <span>{esPublica ? "Pública" : "Privada"}</span>
+                <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
                   <path fillRule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
                 </svg>
-            </button>
-            {dropdownRegion && (
-              <div className="dropdown">
-                {/* Input búsqueda región */}
-                <input className="dropdown-input" type="text" placeholder="Buscar..." autoComplete="off" value={buscaRegion} onChange={handleBuscaRegion} />
-                {/* Resultados búsqueda región */}
-                {resultadosRegion.map((region, idRegion) => (
-                  <a key={idRegion} className="dropdown-item" onClick={() => handleSeleccionaRegion(region)}> {region} </a>
-                ))}
-              </div>
+              </button>
+              {dropdownPrivacidad && (
+                <div className="c-dropdown">
+                  {/* Dropdown privacidad */}
+                  <a className="c-dropdown-item" onClick={() => handleSeleccionaPrivacidad(true)}>Pública</a>
+                  <a className="c-dropdown-item" onClick={() => handleSeleccionaPrivacidad(false)}>Privada</a>
+                </div>
               )}
+            </div>
+            
+            {/* Agregar región */}
+            <div className="c-dropdown-container">
+              <button className="c-selecciona-dropdown" onClick={() => setDropdownRegion(!dropdownRegion)}>
+                <span className="mr-2">{region ? region : "Ubicación"}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fillRule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+              </button>
+              {dropdownRegion && (
+                <div className="c-dropdown">
+                  {/* Input búsqueda región */}
+                  <input className="c-dropdown-input" type="text" placeholder="Buscar..." autoComplete="off" value={buscaRegion} onChange={handleBuscaRegion} />
+                  {/* Resultados búsqueda región */}
+                  {resultadosRegion.map((region, idRegion) => (
+                    <a key={idRegion} className="c-dropdown-item" onClick={() => handleSeleccionaRegion(region)}> {region} </a>
+                  ))}
+                </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
 
       {/* Descripción */}
-      <div className="container3">
-        <div className="desc">
+      <div className="c-desc">
+        <div className="c-desc-container">
           {editandoDesc ? (
-              <input type="text" className="desc-input"
-              value={desc}
-              onChange={handleCambioDesc}
-              onBlur={handleGuardarDesc}
-              onKeyDown={handleOnKeyDown}
-              autoFocus />
-            ) : (desc ? desc : "Descripción")}
-          {!editandoDesc && (<button className="btn-lapiz-desc" onClick={handleEditarDesc}><FaPen /></button>)}
-        </div>
-
-        {/* Tareas */}
-        <div className="container4">
-          <div className="agregarTarea">Añadir tarea</div>
-          <div className="invitarMiembro">Invitar miembro</div>
-        </div>
-        <div className="container5">
-          <div className="tarea">
-            <div className="tareaTitle">Nombre de tarea
-              <div className="btn-entrega"><FaCalendar /> Fecha de entrega</div>
-              <div className="btn-entrega"><FaFolder /> Tipo de entrega</div>
+            <div className="c-desc-input">
+              <textarea className="c-desc-input-texto"
+                value={desc}
+                onChange={handleCambioDesc}
+                onBlur={handleGuardarDesc}
+                onKeyDown={handleOnKeyDown}
+                autoFocus
+                maxLength={200} />
+              <div className="c-desc-conteo">
+                {desc ? `${desc.length}/200` : `0/200`}
+              </div>
+          </div>) : (
+            <div style={desc ? {} : { color: '#677D7C' }}>
+              {desc ? desc : "Agrega tu descripción aquí..."}
             </div>
-              <div className="tareaText">Instrucciones...</div>
+          )}
+          {!editandoDesc && (<button className="c-btn-editar-desc" onClick={handleEditarDesc}><FaPen /></button>)}
+        </div>
+      </div>
+
+      {/* Tareas y Miembros*/}
+      <div className="c-tareas-miembros">
+        <div className="c-seccion-tareas">
+          <div className="c-btn-agregar-tarea">Añadir tarea</div>
+
+          <div className="c-tareas-container">
+            <div className="c-tarea">
+              <div className="c-tarea-info">
+                <div className="c-tarea-titulo">Nombre de tarea</div>
+                <div className="c-tarea-texto">Instrucciones...</div>
+              </div>
+              <div className="c-tarea-botones">
+                <div className="c-tarea-boton"><FaCalendar /> Fecha</div>
+                <div className="c-tarea-boton"><FaFolder /> Documento</div>
+              </div>
+            </div>
           </div>
         </div>
-        
-        {/* Botón crear */}
-        <div className="container5">
-          <button type="button" className="btn-crear" onClick={handleCrearIniciativa}> Crear </button>
+
+        <div className="c-seccion-miembros">
+          <div className="c-btn-invitar-miembro">Invitar miembro</div>
         </div>
-
-        <Modal show={modalError} onHide={handleCerrarError}>
-          <Modal.Header closeButton>
-            <Modal.Title>Error</Modal.Title>
-          </Modal.Header>
-            <Modal.Body>
-              No se pueden dejar los siguientes campos vacíos:
-              <ul>
-                {(!titulo && <li>Título</li>)}
-                {(!desc && <li>Descripción</li>)}
-                {(region === "" && <li>Región</li>)}
-                {Object.keys(etiquetasIniciativa).length === 0 && <li>Etiquetas</li>}
-                {!fechaInicio && <li>Fecha de inicio</li>}
-              </ul>
-            </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleCerrarError}> Cerrar </Button>
-          </Modal.Footer>
-        </Modal>
-
-        <Modal show={modalExito} onHide={handleCerrarExito}>
-          <Modal.Header closeButton>
-          <Modal.Title>{titulo}</Modal.Title>
-          </Modal.Header>
-            <Modal.Body>
-              Iniciativa creada exitosamente
-            </Modal.Body>
-          <Modal.Footer>
-            <Button variant="secondary" onClick={handleCerrarExito}> Cerrar </Button>
-          </Modal.Footer>
-        </Modal>
       </div>
+      
+      
+      {/* Botón crear */}
+      <div className="c-crear-container">
+        <button type="button" className="c-btn-crear" onClick={handleCrearIniciativa}> Crear </button>
+      </div>
+
+      <Modal show={modalError} onHide={handleCerrarError}>
+        <Modal.Header closeButton>
+          <Modal.Title>Error</Modal.Title>
+        </Modal.Header>
+          <Modal.Body>
+            No se pueden dejar los siguientes campos vacíos:
+            <ul>
+              {(!titulo && <li>Título</li>)}
+              {(!desc && <li>Descripción</li>)}
+              {(region === "" && <li>Región</li>)}
+              {Object.keys(etiquetasIniciativa).length === 0 && <li>Etiquetas</li>}
+              {!fechaInicio && <li>Fecha de inicio</li>}
+            </ul>
+          </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCerrarError}> Cerrar </Button>
+        </Modal.Footer>
+      </Modal>
+
+      <Modal show={modalExito} onHide={handleCerrarExito}>
+        <Modal.Header closeButton>
+        <Modal.Title>{titulo}</Modal.Title>
+        </Modal.Header>
+          <Modal.Body>
+            Iniciativa creada exitosamente
+          </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCerrarExito}> Cerrar </Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
