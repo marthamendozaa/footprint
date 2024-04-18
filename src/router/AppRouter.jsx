@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '../assets/Navbar';
 import NavbarAdmin from '../assets/NavbarAdmin';
@@ -42,6 +42,17 @@ export const AppRouter = () => {
         }
     }, [currentUser]);
 
+    const location = useLocation();
+    const saveLocation = () => {
+      localStorage.setItem('savedLocation', location.pathname);
+    }
+
+    useEffect(() => {
+      saveLocation();
+    }, [location]);
+
+    const savedLocation = localStorage.getItem('savedLocation') || '/login';
+
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
@@ -65,6 +76,7 @@ export const AppRouter = () => {
             ) : (
                 <Route path="*" element={<Navigate to="/login" />} />
             )}
+            {savedLocation && Navigate(savedLocation)}
         </Routes>
     );
 };
