@@ -1,7 +1,9 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FaCalendar, FaFolder, FaTimesCircle  } from 'react-icons/fa';
+import { FaClock } from "react-icons/fa";
+import { BsPeopleFill } from "react-icons/bs";
+import { MdUpload } from "react-icons/md";
 import { useParams } from 'react-router-dom';
-import { Progress, Typography } from "@material-tailwind/react";
 import { getIniciativa } from './Initiative-fb.js';
 import './Initiative.css';
 
@@ -34,17 +36,17 @@ export const Initiative = () => {
   return (
     <div>
       {iniciativa && (
-      <div className="i-container">
-        <div className="i-iniciativa-container">
-          {/* Foto de iniciativa */}
-          <img src={iniciativa.urlImagen} className="i-foto-iniciativa"/> 
+        <div className="i-container">
+          <div className="i-iniciativa-container">
+            {/* Foto de iniciativa */}
+            <img src={iniciativa.urlImagen} className="i-foto-iniciativa"/> 
             
-          <div className="i-info-container"> 
-            {/* Título */}
-            <div className="i-titulo">
-              <div className="i-titulo-texto">{iniciativa.titulo}</div>
-            </div>
-
+            <div className="i-info-container"> 
+              {/* Título */}
+              <div className="i-titulo">
+                <div className="i-titulo-texto">{iniciativa.titulo}</div>
+              </div>
+  
             {/* Etiquetas */}
             <div className="i-etiquetas">
               {Object.values(iniciativa.listaEtiquetas).map((etiqueta, idEtiqueta) => (
@@ -53,7 +55,7 @@ export const Initiative = () => {
                 </li>
               ))}
             </div>
-
+  
             <div className="i-datos">
               {/* Fecha inicio y fecha cierre */}
               <div className="i-calendarios-container">
@@ -89,7 +91,7 @@ export const Initiative = () => {
                   {iniciativa.esPublica ? "Pública" : "Privada"}
                 </div>
               </div>
-
+  
               {/* Ubicación */}
               <div className="i-dato-container">
                 <div className="i-dato">
@@ -99,7 +101,7 @@ export const Initiative = () => {
             </div>
           </div>
         </div>
-
+  
         {/* Descripción */}
         <div className="i-desc">
           <div className="i-progreso-texto">Progreso</div>
@@ -108,25 +110,26 @@ export const Initiative = () => {
             {iniciativa.descripcion}
           </div>
         </div>
-
-
+          
         {/* Tareas y Miembros*/}
         <div className="i-tareas-miembros">
           <div className="i-seccion-tareas">
             <div className="i-tareas-container">
-              {/* Tarea 1 */}
+              <div className="i-titulo-tareas">Evidencias</div>
+              {/* Tarea Pública */}
               <div className="i-tarea">
                 <div className="i-tarea-info">
                   <div className="i-tarea-titulo">Sprint 1</div>
                   <div className="i-tarea-texto">Instrucciones...</div>
                 </div>
                 <div className="i-tarea-botones">
-                  <div className="i-tarea-boton"><FaCalendar /> Fecha</div>
-                  <div className="i-tarea-boton"><FaFolder /> Subir</div>
+                  <div className="i-tarea-boton"><BsPeopleFill /> Miembro</div>
+                  <div className="i-tarea-boton"><FaFolder /> Entrega</div>
                 </div>
               </div>
 
-              {/* Tarea 2 */}
+              {/* Tarea asignada a mí */}
+              <div className="i-titulo-tareas">Mis Tareas</div>
               <div className="i-tarea">
                 <div className="i-tarea-info">
                   <div className="i-tarea-titulo">Sprint 2</div>
@@ -134,7 +137,8 @@ export const Initiative = () => {
                 </div>
                 <div className="i-tarea-botones">
                   <div className="i-tarea-boton"><FaCalendar /> Fecha</div>
-                  <div className="i-tarea-boton"><FaFolder /> Subir</div>
+                  <div className="i-tarea-boton"><FaClock /> Estado</div>
+                  <div className="i-tarea-boton"><MdUpload /> Subir</div>
                 </div>
               </div>
             </div>
@@ -142,12 +146,9 @@ export const Initiative = () => {
 
           <div className="i-seccion-miembros">
             <div className="i-tipo-miembro">Dueño</div>
-              <button type="button" className="i-btn-miembro">
-                @isabellaEverTech 
-              </button>
+              <button type="button" className="i-btn-miembro">@isabellaEverTech</button>
             <div className="i-tipo-miembro">Miembros</div>
-              <button type="button" className="i-btn-miembro">
-                  @valeEverTech
+              <button type="button" className="i-btn-miembro">@valeEverTech
                 <span className="i-icono-elimina-miembro">
                   <FaTimesCircle className="i-icon-times-circle" />
                 </span>

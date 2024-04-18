@@ -238,13 +238,20 @@ li.i-etiqueta-item {
   flex-direction: column;
 }
 
+.i-titulo-tareas {
+  font-size: 25px;
+  font-weight: 600;
+  text-align: left;
+}
+
 .i-tarea {
   display: flex;
   height: 120px;
   width: 100%;
   background-color: #E2EBF1;
   border-radius: 25px;
-  margin-top: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   padding: 10px 25px;
   align-items: flex-start;
   font-weight: 600;
@@ -292,6 +299,8 @@ li.i-etiqueta-item {
   width: 100%;
   background-color: #E2EBF1;
   border-radius: 20px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   border: none;
   padding-right: 30px;
   position: relative;
