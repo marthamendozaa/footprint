@@ -9,7 +9,6 @@ export const loginUsuario = async (email, password, setUser) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     console.log("Login exitoso:", user);
-    sessionStorage.setItem('user', JSON.stringify(user));
     setUser(user);
     return user;
   }

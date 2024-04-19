@@ -153,16 +153,16 @@ export const Profile = () => {
 
   return (
     <div className="profile-page">
-      <header className="Profile-header container mt-6">
+      <header className="Profile-header">
         <h1>Mi perfil</h1>
-        <div className="profile-info row">
-          <div className="profile-info-left col-md-4">
+        <div className="profile-info">
+          <div className="profile-info-left">
             <div className="Foto-perfil position-relative">
                 <img src={informacionUsuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
-                <FaPen className="edit-icon position-absolute top-50 start-50 translate-middle text-white" />
+                <FaPen className="edit-icon" />
             </div>
           </div>
-          <div className="profile-info-right col-md-8">
+          <div className="profile-info-right">
           <div className="name-container">
             <h2>
                 {editingNombre ? (
@@ -220,27 +220,27 @@ export const Profile = () => {
         </div>
         <div className="subtitle skills-interests">
           <h3>Habilidades</h3>
-          <ul>
+          <div className='p-etiquetas'>
             {habilidades.map((habilidad, idHabilidad) => (
-              <li key={idHabilidad} className={`skill-item ${habilidadesUsuario.includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
+              <li key={idHabilidad} className={`p-etiquetas-item ${habilidadesUsuario.includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
                 {habilidad}
-                <button className="edit-skill-btn"><FaTimes /></button>
               </li>
             ))}
-          </ul>
+          </div>
         </div>
         <div className="subtitle skills-interests">
           <h3>Temas de interés</h3> 
-          <ul>
+          <div className='p-etiquetas'>
             {intereses.map((interes, idInteres) => (
-              <li key={idInteres} className={`skill-item ${interesesUsuario.includes(interes) ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
+              <li key={idInteres} className={`p-etiquetas-item  ${interesesUsuario.includes(interes) ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
                 {interes}
-                <button className="edit-skill-btn"><FaTimes /></button>
               </li>
             ))}
-          </ul>
+          </div>
         </div>
-        <div className="logout-btn"><button onClick={botonCerrarSesion}>Cerrar Sesión</button></div>
+        <div className="perfil-logout" style={{borderRadius: "18px"}}>
+          <button onClick={botonCerrarSesion}>Cerrar Sesión</button>
+          </div>
       </header>
     </div>
   )

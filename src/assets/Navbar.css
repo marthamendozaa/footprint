@@ -8,6 +8,7 @@
     padding-top: 80px; 
     transition: width 0.5s ease;
     border-right: 7px solid #CEDDE2;
+    z-index: 1;
 }
   
 /* Ancho cuando está abierto */

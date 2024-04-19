@@ -3,9 +3,48 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './ExploreAdmin.css';
 import { AiOutlineSearch } from "react-icons/ai";
 import { getIniciativas, eliminaIniciativa } from './ExploreAdmin-fb.js';
-import Button from 'react-bootstrap/Button';
+import { Modal, Button } from 'react-bootstrap';
 
 export const ExploreAdmin = () => {
+  // Iniciativa seleccionada a eliminar
+  const [iniciativaEliminar, setIniciativaEliminar] = useState(null);
+  const [idIniciativaEliminar, setIdIniciativaEliminar] = useState(null);
+
+  // Modal de confirmación de eliminación
+  const [modalEliminar, setModalEliminar] = useState(false);
+  const handleCerrarEliminar = () => setModalEliminar(false);
+  const handleMostrarEliminar = (iniciativa, idIniciativa) => {
+    setIniciativaEliminar(iniciativa);
+    setIdIniciativaEliminar(idIniciativa);
+    setModalEliminar(true);
+  }
+
+  // Modal de iniciativa eliminada
+  const [modalEliminada, setModalEliminada] = useState(false);
+  const handleMostrarEliminada = () => setModalEliminada(true);
+  const handleCerrarEliminada = async () => {
+    setModalEliminada(false);
+    const dataIniciativas = await getIniciativas();
+    setIniciativas(dataIniciativas);
+    setFilteredIniciativas(dataIniciativas);
+  }
+
+  // Modal de error
+  const [modalError, setModalError] = useState(false);
+  const handleMostrarError = () => setModalError(true);
+  const handleCerrarError = () => setModalError(false);
+
+  // Eliminar iniciativa
+  const handleEliminaIniciativa = async () => {
+    try {
+      await eliminaIniciativa(idIniciativaEliminar);
+      handleCerrarEliminar();
+      handleMostrarEliminada();
+    } catch {
+      handleMostrarError();
+    }
+  };
+
   const [filter, setFilter] = useState('');
   const [iniciativas, setIniciativas] = useState(null);
   const [filteredIniciativas, setFilteredIniciativas] = useState(null);
@@ -27,13 +66,6 @@ export const ExploreAdmin = () => {
       iniciativa.nombre.toLowerCase().includes(searchTerm)
     );
     setFilteredIniciativas(filtered);
-  };
-
-  const handleEliminaIniciativa = async (idIniciativa) => {
-    await eliminaIniciativa(idIniciativa);
-    const dataIniciativas = await getIniciativas();
-    setIniciativas(dataIniciativas);
-    setFilteredIniciativas(dataIniciativas);
   };
 
   return (
@@ -63,11 +95,47 @@ export const ExploreAdmin = () => {
             <div className='card-body'>
               <h5 className='card-title titles'>{item.titulo}</h5>
               <p className='card-text'>{item.descripcion}</p>
-              <Button onClick={() => handleEliminaIniciativa(item.idIniciativa)} variant="primary">Eliminar</Button>
+              <Button onClick={() => handleMostrarEliminar(item.titulo, item.idIniciativa)}>Eliminar</Button>
             </div>
           </div>
         </div>
       ))}
+
+      {/* Modal confirmar eliminar iniciativa*/}
+      <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
+        <Modal.Header>
+          <Modal.Title>Confirmar eliminación</Modal.Title>
+        </Modal.Header>
+          <Modal.Body>
+            ¿Estás seguro que quieres eliminar la iniciativa <span style={{fontWeight:'bold'}}>{iniciativaEliminar}</span>?
+          </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleEliminaIniciativa}>Eliminar</Button>
+          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+      
+      {/* Modal iniciativa eliminada*/}
+      <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
+        <Modal.Header></Modal.Header>
+          <Modal.Body>
+            Iniciativa <span style={{fontWeight:'bold'}}>{iniciativaEliminar}</span> eliminada exitosamente
+          </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleCerrarEliminada}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+      
+      {/* Modal error eliminar*/}
+      <Modal className="ea-modal" show={modalError} onHide={handleCerrarError}>
+        <Modal.Header></Modal.Header>
+          <Modal.Body>
+            Error al eliminar iniciativa <span style={{fontWeight:'bold'}}>{iniciativaEliminar}</span>
+          </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={handleCerrarError}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
     </div>
   );
 };
