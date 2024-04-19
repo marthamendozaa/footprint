@@ -57,3 +57,11 @@ button {
   font-family: "Inter", sans-serif;
   cursor: pointer;
 }
+
+/* Cargando */
+.spinner {
+  display: flex;
+  align-items: center;
+  height: 100vh;
+  color: #A0C1BF;
+}

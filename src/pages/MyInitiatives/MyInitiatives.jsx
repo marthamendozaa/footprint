@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
 import { getIniciativasMiembro, getIniciativasAdmin } from './MyInitiatives-fb.js';
 import './MyInitiatives.css';
 
@@ -19,7 +20,7 @@ export const MyInitiatives = () => {
 
   return (
     <div>
-      {iniciativasMiembro && iniciativasAdmin && (
+      {iniciativasMiembro && iniciativasAdmin ? (
         <div className="m-container">
           <div className="m-seccion-container">
             <div className="m-iniciativas-titulo">Iniciativas donde soy miembro</div>
@@ -72,6 +73,10 @@ export const MyInitiatives = () => {
               </div>
             )}
           </div>
+        </div>
+      ) : (
+        <div className="spinner">
+          <Spinner animation="border" role="status"></Spinner>
         </div>
       )}
     </div>

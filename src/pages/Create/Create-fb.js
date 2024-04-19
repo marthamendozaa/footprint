@@ -66,7 +66,8 @@ export const crearIniciativa = async (iniciativa) => {
       const usuarioRef = ref(database, `Usuarios/${user.uid}/listaIniciativasAdmin`);
       await set(usuarioRef, listaIniciativasAdmin);
       console.log("Iniciativa creada agregada a lista del usuario");
-
+      
+      return iniciativa.idIniciativa;
     } catch (error) {
       console.error("Error agregando iniciativa creada al usuario: ", error.message);
     }
