@@ -290,7 +290,6 @@ export const eliminaInteres = async (idInteres) => {
 export const cerrarSesion = async () => {
   try {
     await signOut(auth);
-    sessionStorage.removeItem('user');
     console.log("Sesión cerrada exitosamente");
   } catch (error) {
     console.error("Error al cerrar sesión:", error.message);

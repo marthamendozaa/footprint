@@ -62,14 +62,14 @@
   padding: 15px 20px;
 }
 
-.m-iniciativa-texto p1 {
+.m-titulo {
   font-family: "Inter", sans-serif;
   font-size: 20px;
   font-weight: 600;
   text-align: left;
 }
 
-.m-iniciativa-texto p2 {
+.m-desc {
   font-family: "Inter", sans-serif;
   font-size: 15px;
   font-weight: 600;

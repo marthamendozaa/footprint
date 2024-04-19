@@ -39,8 +39,8 @@ export const MyInitiatives = () => {
                       </button>
                     </Link>
                     <div className="m-iniciativa-texto">
-                      <p1>{iniciativa.titulo}</p1>
-                      <p2>{iniciativa.descripcion}</p2>
+                      <div className="m-titulo">{iniciativa.titulo}</div>
+                      <div className="m-desc">{iniciativa.descripcion}</div>
                     </div>
                   </div>
                 ))}
@@ -65,8 +65,8 @@ export const MyInitiatives = () => {
                       </button>
                     </Link>
                     <div className="m-iniciativa-texto">
-                      <p1>{iniciativa.titulo}</p1>
-                      <p2>{iniciativa.descripcion}</p2>
+                      <div className="m-titulo">{iniciativa.titulo}</div>
+                      <div className="m-desc">{iniciativa.descripcion}</div>
                     </div>
                   </div>
                 ))}
