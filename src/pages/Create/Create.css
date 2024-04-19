@@ -195,7 +195,7 @@ li.c-etiqueta-item:hover {
   font-size: 20px;
   font-weight: 600;
   background-color: #A0C1BF;
-  border-color: transparent;
+  border: none;
   border-radius: 25px;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
@@ -407,4 +407,43 @@ li.c-etiqueta-item:hover {
   padding: 10px 50px;
   background-color: #A0C1BF;
   border-radius: 30px;
+}
+
+/* Modal crear iniciativas */
+.c-modal .modal-content {
+  display: flex;
+  align-items: center;
+  background-color: #D9D9D9;
+  border-radius: 20px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.c-modal .modal-header,
+.c-modal .modal-footer {
+  border: none;
+}
+
+.c-modal .modal-title.h4 {
+  font-weight: 600;
+}
+
+.c-modal .modal-footer {
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+  border: none;
+}
+
+.c-modal .btn.btn-primary {
+  color: #000;
+  background-color: #ffffff;
+  padding: 10px 30px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+}
+
+.c-modal .btn.btn-primary:hover {
+  background-color: #bdbdbd;
 }

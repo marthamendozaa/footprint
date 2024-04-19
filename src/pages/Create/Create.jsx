@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { FaCalendar, FaFolder, FaPen } from 'react-icons/fa';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
@@ -63,7 +64,7 @@ export const Create = () => {
 
 
   // Seleccionar etiquetas
-  const [etiquetas, setEtiquetas] = useState([]);
+  const [etiquetas, setEtiquetas] = useState(null);
   const [etiquetasIniciativa, setEtiquetasIniciativa] = useState({});
 
   const seleccionaEtiqueta = async (etiqueta, idEtiqueta) => {
@@ -112,7 +113,7 @@ export const Create = () => {
 
   // Búsqueda y dropdown región
   const [region, setRegion] = useState("");
-  const [regiones, setRegiones] = useState([]);
+  const [regiones, setRegiones] = useState(null);
   const [buscaRegion, setBuscaRegion] = useState("");
   const [resultadosRegion, setResultadosRegion] = useState([]);
   const [dropdownRegion, setDropdownRegion] = useState(false);
@@ -121,7 +122,7 @@ export const Create = () => {
 
   // Búsqueda regiones
   useEffect(() => {
-    if (regiones.length > 0) {
+    if (regiones) {
       const resultados = regiones.filter(region =>
         region.toLowerCase().includes(buscaRegion.toLowerCase())
       );
@@ -150,9 +151,10 @@ export const Create = () => {
   const handleCerrarError = () => setModalError(false);
   const handleMostrarError = () => setModalError(true);
 
-  const [modalExito, setModalExito] = useState(false);
-  const handleCerrarExito = () => setModalExito(false);
-  const handleMostrarExito = () => setModalExito(true);
+  const [idIniciativaCreada, setIdIniciativaCreada] = useState(null);
+  const [modalCreada, setModalCreada] = useState(false);
+  const handleCerrarCreada = () => setModalCreada(false);
+  const handleMostrarCreada = () => setModalCreada(true);
 
   const handleCrearIniciativa = async () => {
     if (!titulo || !desc || region === "" || Object.keys(etiquetasIniciativa).length === 0 || !fechaInicio) {
@@ -166,14 +168,15 @@ export const Create = () => {
     const infoIniciativa = new Iniciativa(titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
     console.log(infoIniciativa);
     
-    await crearIniciativa(infoIniciativa);
-    handleMostrarExito();
+    const idIniciativa = await crearIniciativa(infoIniciativa);
+    setIdIniciativaCreada(idIniciativa);
+    handleMostrarCreada();
   };
 
 
   return (
     <div>
-      {etiquetas && regiones && (
+      {etiquetas && regiones ? (
         <div className="c-container">
           <div className="c-iniciativa-container">
             {/* Foto de iniciativa */}
@@ -349,11 +352,11 @@ export const Create = () => {
             <button type="button" className="c-btn-crear" onClick={handleCrearIniciativa}> Crear </button>
           </div>
 
-          <Modal show={modalError} onHide={handleCerrarError}>
-            <Modal.Header closeButton>
+          <Modal className="c-modal" show={modalError} onHide={handleCerrarError}>
+            <Modal.Header>
               <Modal.Title>Error</Modal.Title>
             </Modal.Header>
-              <Modal.Body>
+              <Modal.Body style={{textAlign:'left'}}>
                 No se pueden dejar los siguientes campos vacíos:
                 <ul>
                   {(!titulo && <li>Título</li>)}
@@ -364,21 +367,25 @@ export const Create = () => {
                 </ul>
               </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleCerrarError}> Cerrar </Button>
+              <Button onClick={handleCerrarError}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
 
-          <Modal show={modalExito} onHide={handleCerrarExito}>
-            <Modal.Header closeButton>
-            <Modal.Title>{titulo}</Modal.Title>
-            </Modal.Header>
+          <Modal className="c-modal" show={modalCreada} onHide={handleCerrarCreada}>
+            <Modal.Header></Modal.Header>
               <Modal.Body>
-                Iniciativa creada exitosamente
+                Iniciativa <span style={{fontWeight: 'bold'}}>{titulo}</span> creada exitosamente
               </Modal.Body>
             <Modal.Footer>
-              <Button variant="secondary" onClick={handleCerrarExito}> Cerrar </Button>
+              <Button onClick={handleCerrarCreada}>
+                <Link to={`/initiative/${idIniciativaCreada}`}>Ver Iniciativa</Link>
+              </Button>
             </Modal.Footer>
           </Modal>
+        </div>
+      ) : (
+        <div className="spinner">
+          <Spinner animation="border" role="status"></Spinner>
         </div>
       )}
     </div>

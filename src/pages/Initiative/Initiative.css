@@ -140,7 +140,7 @@ li.i-etiqueta-item {
   font-size: 20px;
   font-weight: 600;
   background-color: #A0C1BF;
-  border-color: transparent;
+  border: none;
   border-radius: 25px;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }

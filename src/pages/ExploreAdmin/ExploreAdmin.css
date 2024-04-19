@@ -23,3 +23,42 @@
 .color {
     background-color: #D9D9D9;
 }
+
+/* Modal eliminar iniciativas */
+.ea-modal .modal-content {
+  display: flex;
+  align-items: center;
+  background-color: #D9D9D9;
+  border-radius: 20px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.ea-modal .modal-header,
+.ea-modal .modal-footer {
+  border: none;
+}
+
+.ea-modal .modal-title.h4 {
+  font-weight: 600;
+}
+
+.ea-modal .modal-footer {
+  display: flex;
+  width: 100%;
+  justify-content: space-evenly;
+  border: none;
+}
+
+.ea-modal .btn.btn-primary {
+  color: #000;
+  background-color: #ffffff;
+  padding: 10px 30px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+}
+
+.ea-modal .btn.btn-primary:hover {
+  background-color: #bdbdbd;
+}

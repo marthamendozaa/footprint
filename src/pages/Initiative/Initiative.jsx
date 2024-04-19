@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { FaCalendar, FaFolder, FaTimesCircle  } from 'react-icons/fa';
 import { FaClock } from "react-icons/fa";
 import { BsPeopleFill } from "react-icons/bs";
-import { MdUpload } from "react-icons/md";
+import { MdUpload } from "react-icons/md"
+import { Spinner } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { getIniciativa } from './Initiative-fb.js';
 import './Initiative.css';
@@ -35,7 +36,7 @@ export const Initiative = () => {
 
   return (
     <div>
-      {iniciativa && (
+      {iniciativa ? (
         <div className="i-container">
           <div className="i-iniciativa-container">
             {/* Foto de iniciativa */}
@@ -158,6 +159,10 @@ export const Initiative = () => {
               </button>
             </div>
           </div>
+        </div>
+      ) : (
+        <div className="spinner">
+          <Spinner animation="border" role="status"></Spinner>
         </div>
       )}
     </div>
