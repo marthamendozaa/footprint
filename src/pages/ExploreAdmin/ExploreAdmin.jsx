@@ -110,7 +110,7 @@ export const ExploreAdmin = () => {
             ¿Estás seguro que quieres eliminar la iniciativa <span style={{fontWeight:'bold'}}>{iniciativaEliminar}</span>?
           </Modal.Body>
         <Modal.Footer>
-          <Button onClick={handleEliminaIniciativa}>Eliminar</Button>
+          <Button className="eliminar" onClick={handleEliminaIniciativa}>Eliminar</Button>
           <Button onClick={handleCerrarEliminar}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
