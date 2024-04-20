@@ -16,6 +16,7 @@
   height: 255px;
   width: 255px;
   margin: 15px;
+  margin-bottom: 0px;
   background-color: #699AA0;
   border-radius: 50%;
   float: left;
@@ -23,11 +24,10 @@
 
 /* Información */
 .c-info-container {
-  height: 230px;
   width: 700px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 /* Título */
@@ -39,13 +39,13 @@
   line-height: 1;
   text-align: left;
   white-space: nowrap;
-  overflow-x: auto;
 }
 
 .c-titulo-texto,
 .c-titulo-input {
   display: flex;
   overflow: overlay;
+  align-items: flex-end;
 }
 
 .c-titulo-texto::-webkit-scrollbar,
@@ -83,14 +83,9 @@
 /* Botones etiquetas */
 .c-etiquetas {
   display: flex;
-  height: 50px;
   list-style-type: none;
-  overflow: overlay;
   align-items: center;
-}
-
-.c-etiquetas::-webkit-scrollbar {
-  display: none;
+  flex-wrap: wrap;
 }
 
 .c-etiquetas li {
@@ -255,7 +250,7 @@ li.c-etiqueta-item:hover {
 .c-desc {
   display: flex;
   width: 100%;
-  margin-top: 20px;
+  margin-top: 30px;
 }
 
 .c-desc-texto {
@@ -353,7 +348,8 @@ li.c-etiqueta-item:hover {
   width: 100%;
   background-color: #E2EBF1;
   border-radius: 25px;
-  margin-top: 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
   padding: 10px 25px;
   align-items: flex-start;
   font-weight: 600;
@@ -395,26 +391,39 @@ li.c-etiqueta-item:hover {
 .c-crear-container {
   display: flex;
   margin-top: 20px;
-  position: relative;
   width: 100%;
+  height: 50px;
+  position: relative;
+}
+
+.c-btn-crear-container {
+  display: flex;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 20%;
+  justify-content: space-around;
 }
 
 .c-btn-crear {
-  position: absolute;
-  right: 0px;
-  font-size: 30px;
+  font-size: 25px;
   font-weight: 600;
-  padding: 10px 50px;
+  padding: 10px 30px;
   background-color: #A0C1BF;
   border-radius: 30px;
 }
 
 /* Modal crear iniciativas */
+.fade.c-modal.modal.show {
+  display: flex !important;
+  align-items: center;
+}
+
 .c-modal .modal-content {
   display: flex;
   align-items: center;
-  background-color: #D9D9D9;
   border-radius: 20px;
+  padding: 10px;
   font-size: 20px;
   text-align: center;
 }
@@ -422,10 +431,12 @@ li.c-etiqueta-item:hover {
 .c-modal .modal-header,
 .c-modal .modal-footer {
   border: none;
+  padding: 0;
 }
 
 .c-modal .modal-title.h4 {
   font-weight: 600;
+  font-size: 30px;
 }
 
 .c-modal .modal-footer {
@@ -437,7 +448,7 @@ li.c-etiqueta-item:hover {
 
 .c-modal .btn.btn-primary {
   color: #000;
-  background-color: #ffffff;
+  background-color: #A0C1BF;
   padding: 10px 30px;
   font-weight: 600;
   border: none;
@@ -445,5 +456,5 @@ li.c-etiqueta-item:hover {
 }
 
 .c-modal .btn.btn-primary:hover {
-  background-color: #bdbdbd;
+  background-color: #699AA0;
 }

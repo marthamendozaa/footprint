@@ -349,7 +349,9 @@ export const Create = () => {
           
           {/* Botón crear */}
           <div className="c-crear-container">
-            <button type="button" className="c-btn-crear" onClick={handleCrearIniciativa}> Crear </button>
+            <div className="c-btn-crear-container">
+              <button type="button" className="c-btn-crear" onClick={handleCrearIniciativa}> Crear </button>
+            </div>
           </div>
 
           <Modal className="c-modal" show={modalError} onHide={handleCerrarError}>

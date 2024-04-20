@@ -32,17 +32,17 @@ export const MyInitiatives = () => {
             ) : (
               <div className="m-iniciativas-container">
                 {iniciativasMiembro.map((iniciativa, index) => (
-                  <div className="m-iniciativa" key={index}>
-                    <Link to={`/initiative/${iniciativa.idIniciativa}`}>
-                      <button className="m-iniciativa-imagen">
-                        <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
-                      </button>
-                    </Link>
-                    <div className="m-iniciativa-texto">
-                      <div className="m-titulo">{iniciativa.titulo}</div>
-                      <div className="m-desc">{iniciativa.descripcion}</div>
+                  <Link to={`/initiative/${iniciativa.idIniciativa}`}>
+                    <div className="m-iniciativa" key={index}>
+                        <div className="m-iniciativa-imagen">
+                          <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
+                        </div>
+                      <div className="m-iniciativa-texto">
+                        <div className="m-titulo">{iniciativa.titulo}</div>
+                        <div className="m-desc">{iniciativa.descripcion}</div>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
@@ -58,17 +58,17 @@ export const MyInitiatives = () => {
             ) : (
               <div className="m-iniciativas-container">
                 {iniciativasAdmin.map((iniciativa, index) => (
-                  <div className="m-iniciativa" key={index}>
-                    <Link to={`/initiative/${iniciativa.idIniciativa}`}>
-                      <button className="m-iniciativa-imagen">
-                        <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
-                      </button>
-                    </Link>
-                    <div className="m-iniciativa-texto">
-                      <div className="m-titulo">{iniciativa.titulo}</div>
-                      <div className="m-desc">{iniciativa.descripcion}</div>
+                  <Link to={`/initiative/${iniciativa.idIniciativa}`}>
+                    <div className="m-iniciativa" key={index}>
+                        <div className="m-iniciativa-imagen">
+                          <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
+                        </div>
+                      <div className="m-iniciativa-texto">
+                        <div className="m-titulo">{iniciativa.titulo}</div>
+                        <div className="m-desc">{iniciativa.descripcion}</div>
+                      </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}
