@@ -5,6 +5,7 @@ import { Spinner } from 'react-bootstrap';
 import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, actualizaHabilidades, getIntereses, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage } from './Profile-fb.js';
 import Usuario from '../../backend/obj-Usuario.js';
 import Modal from 'react-bootstrap/Modal';
+import Compressor from 'compressorjs';
 import './Profile.css';
 
 export const Profile = () => {
@@ -140,6 +141,7 @@ export const Profile = () => {
 
   const handleChangePassword = () => {
     setCambiandoContrasena(true);
+    setError('')
   };
 
   // Función para manejar el submit del cambio de contraseña
@@ -167,29 +169,71 @@ export const Profile = () => {
 
   
   // Cargar imagen de perfil
-  const [selectedFile, setSelectedFile] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [errorI, setErrorI] = useState('');
 
   const openModal = () => {
     setShowModal(true);
+    setErrorI('');
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
   };
 
   const handleUploadProfileImage = async () => {
-    if (selectedImage) {
-      try {
-        const imageUrl = await uploadProfileImage(selectedImage); // Subir la imagen seleccionada a Firebase Storage
-        await updateUsuarioImage(imageUrl); // Actualizar la URL de la imagen en Firebase Database
-        const infoUsuario = await getUsuario(); // Obtener la información actualizada del usuario
-        setinformacionUsuario(infoUsuario); // Actualizar el estado del usuario con la nueva información
-       // closeModal(); // Cerrar el modal después de subir la imagen
-      } catch (error) {
-        console.error("Error al subir la imagen de perfil:", error.message);
-      }
-    } else {
-      console.log("No se ha seleccionado ninguna imagen");
+    if (!selectedImage) {
+      setErrorI('Selecciona una imagen');
+      return;
+    }
+
+    // Verificar el tamaño de la imagen seleccionada
+  if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
+    // Comprimir la imagen si excede los 2 MB
+    try {
+      const compressedImage = await compressImage(selectedImage);
+      setSelectedImage(compressedImage);
+    } catch (error) {
+      console.error("Error al comprimir la imagen:", error.message);
+      setErrorI('Error al comprimir la imagen');
+      return;
+    }
+  }
+
+  if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
+    setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
+    return;
+  }
+  
+    try {
+      const imageUrl = await uploadProfileImage(selectedImage);
+      await updateUsuarioImage(imageUrl);
+      const infoUsuario = await getUsuario();
+      setinformacionUsuario(infoUsuario);
+      closeModal();
+    } catch (error) {
+      console.error("Error al subir la imagen de perfil:", error.message);
     }
   };
+
+  // Función para comprimir la imagen utilizando image-compressor
+const compressImage = async (image) => {
+  return new Promise((resolve, reject) => {
+    new Compressor(image, {
+      quality: 0.6, // Calidad de compresión
+      maxWidth: 1920, // Ancho máximo de la imagen
+      maxHeight: 1080, // Alto máximo de la imagen
+      mimeType: 'image/jpeg', // Tipo de imagen de salida
+      success(result) {
+        resolve(result);
+      },
+      error(error) {
+        reject(error);
+      },
+    });
+  });
+};
 
   return (
     <div className="profile-page">
@@ -209,8 +253,7 @@ export const Profile = () => {
                       </Modal.Header>
                       <Modal.Body className='p-modalinfo'>
                       <input type="file" accept="image/*" onChange={(e) => setSelectedImage(e.target.files[0])} />
-                      
-                          
+                      {errorI && <p style={{ color: 'red' }}>{errorI}</p>}
                       </Modal.Body>
                       <Modal.Footer>
                           <button variant="secondary" onClick={handleUploadProfileImage}>
