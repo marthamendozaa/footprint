@@ -1,7 +1,39 @@
 import { signOut, reauthenticateWithCredential, updatePassword, EmailAuthProvider } from "firebase/auth";
-import { auth, db, database } from "../../backend/firebase-config.js";
+import { auth, db, database, storage } from "../../backend/firebase-config.js";
 import { child, get, set, ref } from "firebase/database";
+import { uploadBytes, getDownloadURL } from "firebase/storage";
 
+//Imagen Perfil
+export const uploadProfileImage = async (file) => {
+  try {
+    const storageRef = ref(storage, `profile-images/${file.name}`); // Referencia al archivo en Firebase Storage
+    await uploadBytes(storageRef, file); // Sube el archivo a Firebase Storage
+
+    // Obtiene la URL de descarga del archivo
+    const url = await getDownloadURL(storageRef);
+    console.log("Imagen de perfil subida exitosamente:", url);
+    return url;
+  } catch (error) {
+    console.error("Error al subir la imagen de perfil:", error.message);
+    throw error;
+  }
+};
+
+export const updateUsuarioImage = async (imageUrl) => {
+  const user = auth.currentUser;
+  if (!user) {
+    console.error("No hay usuario autenticado");
+    return;
+  }
+
+  try {
+    await set(child(db, `Usuarios/${user.uid}/urlImagen`), imageUrl);
+    console.log("URL de la imagen del usuario actualizada exitosamente");
+  } catch (error) {
+    console.error("Error al actualizar la URL de la imagen del usuario:", error.message);
+    throw error;
+  }
+};
 
 // Perfil: información del usuario
 export const getUsuario = async () => {

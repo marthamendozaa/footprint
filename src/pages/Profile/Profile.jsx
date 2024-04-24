@@ -1,14 +1,18 @@
 import { useEffect, useState } from 'react';
-import { FaPen, FaTimes } from 'react-icons/fa';
+import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, agregaHabilidad, eliminaHabilidad, getIntereses, getInteresesUsuario, agregaInteres, eliminaInteres, cerrarSesion, cambiarContrasena } from './Profile-fb.js';
+import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, agregaHabilidad, eliminaHabilidad, getIntereses, getInteresesUsuario, agregaInteres, eliminaInteres, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage } from './Profile-fb.js';
 import Usuario from '../../backend/obj-Usuario.js';
+import Modal from 'react-bootstrap/Modal';
 import './Profile.css';
 
 export const Profile = () => {
   const [informacionUsuario, setinformacionUsuario] = useState(new Usuario());
   const [editingNombre, setEditingNombre] = useState(false);
   const [nuevoNombre, setNuevoNombre] = useState('');
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const [habilidades, setHabilidades] = useState([]);
   const [habilidadesUsuario, setHabilidadesUsuario] = useState([]);
@@ -16,7 +20,7 @@ export const Profile = () => {
   const [interesesUsuario, setInteresesUsuario] = useState([]);
 
   const [sesionCerrada, setSesionCerrada] = useState(false);
-  const [cambiandoContrasena, setCambiandoContrasena] = useState(false); // Estado para controlar si se está cambiando la contraseña
+  const [cambiandoContrasena, setCambiandoContrasena] = useState(false);
   const [contrasenaActual, setContrasenaActual] = useState('');
   const [nuevaContrasena, setNuevaContrasena] = useState('');
   const [confirmarContrasena, setConfirmarContrasena] = useState('');
@@ -151,17 +155,54 @@ export const Profile = () => {
     }
   };
 
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const handleUploadProfileImage = async () => {
+    if (selectedImage) {
+      try {
+        const imageUrl = await uploadProfileImage(selectedImage); // Subir la imagen seleccionada a Firebase Storage
+        await updateUsuarioImage(imageUrl); // Actualizar la URL de la imagen en Firebase Database
+        const infoUsuario = await getUsuario(); // Obtener la información actualizada del usuario
+        setinformacionUsuario(infoUsuario); // Actualizar el estado del usuario con la nueva información
+       // closeModal(); // Cerrar el modal después de subir la imagen
+      } catch (error) {
+        console.error("Error al subir la imagen de perfil:", error.message);
+      }
+    } else {
+      console.log("No se ha seleccionado ninguna imagen");
+    }
+  };
+
   return (
     <div className="profile-page">
       <header className="Profile-header">
         <h1>Mi perfil</h1>
         <div className="profile-info">
-          <div className="profile-info-left">
-            <div className="Foto-perfil position-relative">
-                <img src={informacionUsuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
-                <FaPen className="edit-icon" />
-            </div>
-          </div>
+        <div className="profile-info-left">
+        <div className="Foto-perfil position-relative">
+          <img src={informacionUsuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
+          <FaPen className="edit-icon" onClick={openModal} /> {/* Abrir el modal al hacer clic en el ícono */}
+        
+          {/* Modal */}
+          <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title className='p-modaltitle'>Foto de perfil</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className='p-modalinfo'>
+                <input type="file" accept="image/*" onChange={(e) => setSelectedImage(e.target.files[0])} />
+                
+                    
+                </Modal.Body>
+                <Modal.Footer>
+                    <button variant="secondary" onClick={handleUploadProfileImage}>
+                        Guardar Imagen
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        </div>
+    </div>
           <div className="profile-info-right">
           <div className="name-container">
             <h2>
