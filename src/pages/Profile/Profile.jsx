@@ -193,6 +193,7 @@ export const Profile = () => {
 
   return (
     <div className="profile-page">
+      {habilidades && habilidadesUsuario && intereses && interesesUsuario ? (
       <header className="Profile-header">
         <h1>Mi perfil</h1>
         <div className="profile-info">
