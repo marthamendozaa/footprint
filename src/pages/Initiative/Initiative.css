@@ -32,19 +32,17 @@
   
 /* Título */
 .i-titulo {
-  height: 80px;
   display: flex;
   font-size: 70px;
   font-weight: 600;
-  line-height: 1;
   text-align: left;
   white-space: nowrap;
+  align-items: center;
 }
 
 .i-titulo-texto {
   display: flex;
   overflow: overlay;
-  align-items: flex-end;
 }
 
 .i-titulo-texto::-webkit-scrollbar {

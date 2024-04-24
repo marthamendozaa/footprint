@@ -364,10 +364,10 @@ export const Create = () => {
           </div>
 
           <Modal className="c-modal" show={modalError} onHide={handleCerrarError}>
-            <Modal.Header>
-              <Modal.Title>Error</Modal.Title>
+            <Modal.Header closeButton>
+              <div className="c-modal-title">Error</div>
             </Modal.Header>
-              <Modal.Body style={{textAlign:'left'}}>
+              <div className="c-modal-body" style={{textAlign:'left'}}>
                 No se pueden dejar los siguientes campos vacíos:
                 <ul>
                   {(!titulo && <li>Título</li>)}
@@ -376,29 +376,31 @@ export const Create = () => {
                   {Object.keys(etiquetasIniciativa).length === 0 && <li>Etiquetas</li>}
                   {!fechaInicio && <li>Fecha de inicio</li>}
                 </ul>
-              </Modal.Body>
+              </div>
             <Modal.Footer>
               <Button onClick={handleCerrarError}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
 
           <Modal className="c-modal" show={modalCreada} onHide={handleCerrarCreada}>
-            <Modal.Header></Modal.Header>
-              <Modal.Body>
+            <Modal.Header closeButton>
+              <div className="c-modal-title">Éxito</div>
+            </Modal.Header>
+              <div className="c-modal-body">
                 Iniciativa <span style={{fontWeight: 'bold'}}>{titulo}</span> creada exitosamente
-              </Modal.Body>
+              </div>
             <Modal.Footer>
-              <Button onClick={handleCerrarCreada}>
+              <Button class="btn btn-primary" onClick={handleCerrarCreada}>
                 <Link to={`/initiative/${idIniciativaCreada}`}>Ver Iniciativa</Link>
               </Button>
             </Modal.Footer>
           </Modal>
 
           <Modal className="c-modal" show={modalErrorCreada} onHide={handleCerrarErrorCreada}>
-            <Modal.Header></Modal.Header>
-              <Modal.Body>
+            <div className="c-modal-title">Error</div>
+              <div className="c-modal-body">
                 Error al crear iniciativa <span style={{fontWeight: 'bold'}}>{titulo}</span>
-              </Modal.Body>
+              </div>
             <Modal.Footer>
               <Button onClick={handleCerrarErrorCreada}>Cerrar</Button>
             </Modal.Footer>

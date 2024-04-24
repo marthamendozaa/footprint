@@ -32,20 +32,18 @@
 
 /* Título */
 .c-titulo {
-  height: 80px;
   display: flex;
   font-size: 70px;
   font-weight: 600;
-  line-height: 1;
   text-align: left;
   white-space: nowrap;
+  align-items: center;
 }
 
 .c-titulo-texto,
 .c-titulo-input {
   display: flex;
   overflow: overlay;
-  align-items: flex-end;
 }
 
 .c-titulo-texto::-webkit-scrollbar,
@@ -57,7 +55,6 @@
   width: 100%;
   font-size: 70px;
   font-weight: 600;
-  line-height: 1;
   outline: none;
   border: none;
 }
@@ -428,22 +425,26 @@ li.c-etiqueta-item:hover {
   text-align: center;
 }
 
+.c-modal-body {
+  padding: 16px;
+  font-family: "Inter", sans-serif;
+}
+
 .c-modal .modal-header,
 .c-modal .modal-footer {
   border: none;
   padding: 0;
 }
 
-.c-modal .modal-title.h4 {
-  font-weight: 600;
-  font-size: 30px;
+.c-modal .modal-header .btn-close {
+  position: absolute;
+  right: 5%;
 }
 
-.c-modal .modal-footer {
-  display: flex;
-  width: 100%;
-  justify-content: space-evenly;
-  border: none;
+.c-modal-title {
+  font-weight: 600;
+  font-size: 30px;
+  font-family: "Inter", sans-serif;
 }
 
 .c-modal .btn.btn-primary {
@@ -457,4 +458,8 @@ li.c-etiqueta-item:hover {
 
 .c-modal .btn.btn-primary:hover {
   background-color: #699AA0;
+}
+
+.c-modal .btn.btn-primary a {
+  color: #000;
 }
