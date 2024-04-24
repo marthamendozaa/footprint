@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
-import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, actualizaHabilidades, getIntereses, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena } from './Profile-fb.js';
+import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, actualizaHabilidades, getIntereses, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage } from './Profile-fb.js';
 import Usuario from '../../backend/obj-Usuario.js';
+import Modal from 'react-bootstrap/Modal';
 import './Profile.css';
 
 export const Profile = () => {
@@ -164,17 +165,83 @@ export const Profile = () => {
     }
   };
 
+  
+  // Cargar imagen de perfil
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const openModal = () => {
+    setShowModal(true);
+  };
+
+  const handleUploadProfileImage = async () => {
+    if (selectedImage) {
+      try {
+        const imageUrl = await uploadProfileImage(selectedImage); // Subir la imagen seleccionada a Firebase Storage
+        await updateUsuarioImage(imageUrl); // Actualizar la URL de la imagen en Firebase Database
+        const infoUsuario = await getUsuario(); // Obtener la información actualizada del usuario
+        setinformacionUsuario(infoUsuario); // Actualizar el estado del usuario con la nueva información
+       // closeModal(); // Cerrar el modal después de subir la imagen
+      } catch (error) {
+        console.error("Error al subir la imagen de perfil:", error.message);
+      }
+    } else {
+      console.log("No se ha seleccionado ninguna imagen");
+    }
+  };
 
   return (
     <div className="profile-page">
-      {habilidades && habilidadesUsuario && intereses && interesesUsuario ? (
-        <header className="Profile-header">
-          <h1>Mi perfil</h1>
-          <div className="profile-info">
-            <div className="profile-info-left">
-              <div className="Foto-perfil position-relative">
-                  <img src={informacionUsuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
-                  <FaPen className="edit-icon" />
+      <header className="Profile-header">
+        <h1>Mi perfil</h1>
+        <div className="profile-info">
+        <div className="profile-info-left">
+        <div className="Foto-perfil position-relative">
+          <img src={informacionUsuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
+          <FaPen className="edit-icon" onClick={openModal} /> {/* Abrir el modal al hacer clic en el ícono */}
+        
+          {/* Modal */}
+          <Modal show={showModal} onHide={() => setShowModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title className='p-modaltitle'>Foto de perfil</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className='p-modalinfo'>
+                <input type="file" accept="image/*" onChange={(e) => setSelectedImage(e.target.files[0])} />
+                
+                    
+                </Modal.Body>
+                <Modal.Footer>
+                    <button variant="secondary" onClick={handleUploadProfileImage}>
+                        Guardar Imagen
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        </div>
+    </div>
+          <div className="profile-info-right">
+          <div className="name-container">
+            <h2>
+                {editingNombre ? (
+                  <input
+                    type="text"
+                    value={nuevoNombre}
+                    onChange={handleNombreChange}
+                  />
+                ) : (
+                  informacionUsuario.nombre
+                )}
+                {!editingNombre && (
+                  <button className="edit-profile-btn" onClick={handleNombreEdit}>
+                    <FaPen />
+                  </button>
+                )}
+                {editingNombre && (
+                  <button className="edit-profile-btn guardar" onClick={handleNombreSubmit}>
+                    Guardar
+                  </button>
+                )}
+              </h2>
               </div>
             </div>
             <div className="profile-info-right">
