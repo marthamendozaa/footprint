@@ -11,4 +11,19 @@ export default class Iniciativa {
     this.fechaInicio = fechaInicio;
     this.fechaCierre = fechaCierre;
   }
+
+  convertirAObjeto() {
+    return {
+      idIniciativa: this.idIniciativa,
+      idAdmin: this.idAdmin,
+      titulo: this.titulo,
+      descripcion: this.descripcion,
+      region: this.region,
+      urlImagen: this.urlImagen,
+      esPublica: this.esPublica,
+      listaEtiquetas: this.listaEtiquetas,
+      fechaInicio: this.fechaInicio,
+      fechaCierre: this.fechaCierre
+    };
+  }
 }

@@ -1,5 +1,6 @@
-import { db } from "../../backend/firebase-config.js";
-import { child, get } from "firebase/database";
+import { firestore } from "../../backend/firebase-config.js";
+import { doc, getDoc } from "firebase/firestore";
+
 
 // Mis Iniciativas: iniciativas donde es miembro
 export const getIniciativasMiembro = async () => {
@@ -10,27 +11,24 @@ export const getIniciativasMiembro = async () => {
   }
 
   try {
-    const snapshot = await get(child(db, `Usuarios/${user.uid}/listaIniciativasMiembro`));
+    const usuarioRef = doc(firestore, "Usuarios", user.uid);
+    const docSnapshot = await getDoc(usuarioRef);
 
-    if (snapshot.exists()) {
-      const listaIniciativasMiembro = snapshot.val();
-      const iniciativasData = [];
+    const listaIniciativasMiembro = docSnapshot.data().listaIniciativasMiembro;
+    const iniciativasData = [];
 
-      await Promise.all(Object.values(listaIniciativasMiembro).map(async idIniciativa => {
-        const iniciativaSnapshot = await get(child(db, `Iniciativas/${idIniciativa}`));
+    for (const idIniciativa of listaIniciativasMiembro){
+      const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
+      const iniciativaSnapshot = await getDoc(iniciativaRef);
 
-        if (iniciativaSnapshot.exists()) {
-          iniciativasData.push(iniciativaSnapshot.val());
-        } else {
-          console.log(`Iniciativa ${idIniciativa} no encontrada`);
-        }
-      }));
-
-      return iniciativasData;
-    } else {
-      console.log("La lista de iniciativas miembro no existe");
-      return null;
+      if (iniciativaSnapshot.exists()) {
+        iniciativasData.push(iniciativaSnapshot.data());
+      } else {
+        console.log(`Iniciativa ${idIniciativa} no encontrada`);
+      }
     }
+
+    return iniciativasData;
   } catch (error) {
     console.error("Error obteniendo lista de iniciativas miembro:", error.message);
     return null;
@@ -47,29 +45,26 @@ export const getIniciativasAdmin = async () => {
   }
 
   try {
-    const snapshot = await get(child(db, `Usuarios/${user.uid}/listaIniciativasAdmin`));
+    const usuarioRef = doc(firestore, "Usuarios", user.uid);
+    const docSnapshot = await getDoc(usuarioRef);
 
-    if (snapshot.exists()) {
-      const listaIniciativasAdmin = snapshot.val();
-      const iniciativasData = [];
+    const listaIniciativasAdmin = docSnapshot.data().listaIniciativasAdmin;
+    const iniciativasData = [];
 
-      await Promise.all(Object.values(listaIniciativasAdmin).map(async idIniciativa => {
-        const iniciativaSnapshot = await get(child(db, `Iniciativas/${idIniciativa}`));
-        
-        if (iniciativaSnapshot.exists()) {
-          iniciativasData.push(iniciativaSnapshot.val());
-        } else {
-          console.log(`Iniciativa ${idIniciativa} no encontrada`);
-        }
-      }));
-
-      return iniciativasData;
-    } else {
-      console.log("La lista de iniciativas admin no existe");
-      return null;
+    for (const idIniciativa of listaIniciativasAdmin){
+      const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
+      const iniciativaSnapshot = await getDoc(iniciativaRef);
+      
+      if (iniciativaSnapshot.exists()) {
+        iniciativasData.push(iniciativaSnapshot.data());
+      } else {
+        console.log(`Iniciativa ${idIniciativa} no encontrada`);
+      }
     }
+
+    return iniciativasData;
   } catch (error) {
-    console.error("Error obteniendo lista de iniciativas admin:", error.message);
+    console.error("Error obteniendo lista de iniciativas miembro:", error.message);
     return null;
   }
 };

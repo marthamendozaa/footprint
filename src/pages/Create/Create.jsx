@@ -123,7 +123,7 @@ export const Create = () => {
   // Búsqueda regiones
   useEffect(() => {
     if (regiones) {
-      const resultados = regiones.filter(region =>
+      const resultados = Object.values(regiones).filter(region =>
         region.toLowerCase().includes(buscaRegion.toLowerCase())
       );
       setResultadosRegion(resultados);
@@ -151,10 +151,16 @@ export const Create = () => {
   const handleCerrarError = () => setModalError(false);
   const handleMostrarError = () => setModalError(true);
 
+  // Iniciativa creada
   const [idIniciativaCreada, setIdIniciativaCreada] = useState(null);
   const [modalCreada, setModalCreada] = useState(false);
   const handleCerrarCreada = () => setModalCreada(false);
   const handleMostrarCreada = () => setModalCreada(true);
+
+  // Error al crear iniciativa
+  const [modalErrorCreada, setModalErrorCreada] = useState(false);
+  const handleCerrarErrorCreada = () => setModalErrorCreada(false);
+  const handleMostrarErrorCreada = () => setModalErrorCreada(true);
 
   const handleCrearIniciativa = async () => {
     if (!titulo || !desc || region === "" || Object.keys(etiquetasIniciativa).length === 0 || !fechaInicio) {
@@ -169,8 +175,12 @@ export const Create = () => {
     console.log(infoIniciativa);
     
     const idIniciativa = await crearIniciativa(infoIniciativa);
-    setIdIniciativaCreada(idIniciativa);
-    handleMostrarCreada();
+    if (idIniciativa) {
+      setIdIniciativaCreada(idIniciativa);
+      handleMostrarCreada();
+    } else {
+      handleMostrarErrorCreada();
+    }
   };
 
 
@@ -212,8 +222,8 @@ export const Create = () => {
 
               {/* Agregar etiquetas */}
               <div className="c-etiquetas">
-                {etiquetas.map((etiqueta, idEtiqueta) => (
-                  <li key={idEtiqueta} className={`c-etiqueta-item ${etiquetasIniciativa.hasOwnProperty(idEtiqueta) ? "highlighted" : ""}`} onClick={() => seleccionaEtiqueta(etiqueta, idEtiqueta)}>
+                {Object.values(etiquetas).map((etiqueta, idEtiqueta) => (
+                  <li key={idEtiqueta} className={`c-etiqueta-item ${Object.values(etiquetasIniciativa).includes(etiqueta) ? "highlighted" : ""}`} onClick={() => seleccionaEtiqueta(etiqueta, idEtiqueta)}>
                     {etiqueta}
                   </li>
                 ))}
@@ -382,6 +392,16 @@ export const Create = () => {
               <Button onClick={handleCerrarCreada}>
                 <Link to={`/initiative/${idIniciativaCreada}`}>Ver Iniciativa</Link>
               </Button>
+            </Modal.Footer>
+          </Modal>
+
+          <Modal className="c-modal" show={modalErrorCreada} onHide={handleCerrarErrorCreada}>
+            <Modal.Header></Modal.Header>
+              <Modal.Body>
+                Error al crear iniciativa <span style={{fontWeight: 'bold'}}>{titulo}</span>
+              </Modal.Body>
+            <Modal.Footer>
+              <Button onClick={handleCerrarErrorCreada}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
         </div>
