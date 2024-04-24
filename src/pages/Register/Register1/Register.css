@@ -1,0 +1,144 @@
+.container-register {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+    flex-direction: column;
+}
+  
+.square-main {
+    height: 450px;
+    width: 450px;
+    background-color: #CEDDE2;
+    border-radius: 30px;
+}  
+
+.header-register {
+    padding: 10px;
+    text-align: center;
+    margin-top: 20px;
+}
+
+.container-email-register{
+    padding: 0px;
+    margin-left: 50px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.correo-texto-register{
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.correo-caja-register{
+    width: 350px;
+    height: 40px;
+    border-radius: 30px;
+    border-color: transparent;
+}
+
+.container-contrasena-register{
+    padding: 0px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 15px;
+}
+
+.contrasena-texto-register{
+    align-self: flex-start;
+    font-weight: bold;
+    margin-left: 50px;
+    font-size: 18px;
+}
+
+.ojo-contrasena-register{
+    width: 350px;
+    height: 40px;
+    border-radius: 30px;
+    border-color: transparent;
+}
+
+.ojo-contrasena-2-register{
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.flecha-register-container{
+    display: flex;
+    flex-direction: row;
+    position: relative;
+}
+
+.flecha-register-container-start{
+    padding: 10px;
+    display: flex;
+    position: absolute;
+    left: 0;
+}
+
+.flecha-register-container-end{
+    padding: 10px;
+    display: flex;
+    position: absolute;
+    right: 0;
+}
+
+.flecha-register-container button.btn {
+    color: #6b6b6b;
+    font-size: 40px;
+    background-color: transparent;
+    border: none;
+}
+
+.flecha-register-container button.btn:hover {
+    color: #000000;
+}
+
+.pop-up-register{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.pop-up-register-3 {
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    font-size: 20px;
+}
+
+.pop-up-register-3 button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 30px;
+    color: #000;
+    background-color: #A0C1BF;
+    padding: 10px 30px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+}
+
+.pop-up-register-3 button:hover{
+    background-color: #699AA0;
+}
+
+.politicas-contenedor{
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+}

@@ -10,6 +10,8 @@ import { Initiative } from '../pages/Initiative/Initiative.jsx';
 import { Profile } from '../pages/Profile/Profile.jsx';
 import { Create } from '../pages/Create/Create.jsx';
 import { Login } from '../pages/Login/Login.jsx';
+import { Register } from '../pages/Register/Register1/Register.jsx';
+import { Register2} from '../pages/Register/Register2/Register2.jsx';
 import { ExploreAdmin } from '../pages/ExploreAdmin/ExploreAdmin.jsx';
 import { ProfileAdmin } from '../pages/ProfileAdmin/ProfileAdmin.jsx';
 import { getEsAdmin } from '../pages/Login/Login-fb.js';
@@ -74,34 +76,37 @@ export const AppRouter = () => {
     return (
         <Routes>
             <Route path="/login" element={<Login />} />
-                {currentUser && esAdmin && (
-                  <>
-                      <Route path="/exploreAdmin" element={<PageWithNavbarAdmin component={<ExploreAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                      <Route path="/profileAdmin" element={<PageWithNavbarAdmin component={<ProfileAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                  </>
-                )}
-                {currentUser && (
-                  <>
-                      <Route path="/home" element={<PageWithNavbar component={<Home />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                      <Route path="/explore" element={<PageWithNavbar component={<Explore />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                      <Route path="/requests" element={<PageWithNavbar component={<Requests />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                      <Route path="/myInitiatives" element={<PageWithNavbar component={<MyInitiatives />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                      <Route path="/initiative/:idIniciativa" element={<PageWithNavbar component={<Initiative />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                      <Route path="/profile" element={<PageWithNavbar component={<Profile />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                      <Route path="/create" element={<PageWithNavbar component={<Create />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                  </>
-                )}
+            <Route path="/register" element={<Register />} />
+            <Route path="/register2" element={<Register2 />} />
 
-                {currentUser ? (
-                    <Route path="*" element={savedLocation ? (
-                        <Navigate to={savedLocation} />) : (
-                            esAdmin ? (<Navigate to="/exploreAdmin" />) : (
-                                <Navigate to="/home" />
-                            )
-                        )}
-                    />) : (
-                        <Route path="*" element={<Navigate to="/login" />} />
+            {currentUser && esAdmin && (
+                <>
+                    <Route path="/exploreAdmin" element={<PageWithNavbarAdmin component={<ExploreAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/profileAdmin" element={<PageWithNavbarAdmin component={<ProfileAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                </>
+            )}
+            {currentUser && (
+                <>
+                    <Route path="/home" element={<PageWithNavbar component={<Home />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/explore" element={<PageWithNavbar component={<Explore />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/requests" element={<PageWithNavbar component={<Requests />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/myInitiatives" element={<PageWithNavbar component={<MyInitiatives />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/initiative/:idIniciativa" element={<PageWithNavbar component={<Initiative />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/profile" element={<PageWithNavbar component={<Profile />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/create" element={<PageWithNavbar component={<Create />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                </>
+            )}
+
+            {currentUser ? (
+                <Route path="*" element={savedLocation ? (
+                    <Navigate to={savedLocation} />) : (
+                        esAdmin ? (<Navigate to="/exploreAdmin" />) : (
+                            <Navigate to="/home" />
+                        )
                     )}
+                />) : (
+                    <Route path="*" element={<Navigate to="/login" />} />
+            )}
         </Routes>
     );
 };
