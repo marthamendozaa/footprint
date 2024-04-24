@@ -1,19 +1,19 @@
-import { db, database } from "../../backend/firebase-config.js";
-import { child, get, set, ref} from "firebase/database";
+import { firestore } from "../../backend/firebase-config.js";
+import { collection, doc, getDoc, getDocs, updateDoc, deleteDoc, arrayRemove } from "firebase/firestore";
 
 // Explora Admin: todas las iniciativas
 export const getIniciativas = async () => {
   try {
-    const snapshot = await get(child(db, `Iniciativas`));
-    const listaIniciativas = snapshot.val();
+    const iniciativasRef = collection(firestore, "Iniciativas");
+    const querySnapshot = await getDocs(iniciativasRef);
+
     const iniciativas = [];
 
-    for (const idIniciativa in listaIniciativas){
-      const iniciativaSnapshot = await get(child(db, `Iniciativas/${idIniciativa}`));
-      iniciativas.push(iniciativaSnapshot.val());
-    };
-    return iniciativas;
+    querySnapshot.forEach((doc) => {
+      iniciativas.push({ id: doc.id, ...doc.data() });
+    });
 
+    return iniciativas;
   } catch (error) {
     console.error("Error obteniendo lista de iniciativas: ", error.message);
     return null;
@@ -23,27 +23,17 @@ export const getIniciativas = async () => {
 // Explora Admin: eliminar iniciativa
 export const eliminaIniciativa = async (idIniciativa) => {
   try {
-    const snapshot = await get(child(db, `Iniciativas`));
-    let listaIniciativas = snapshot.val();
+    const iniciativaDocRef = doc(firestore, "Iniciativas", idIniciativa);
+    const iniciativaDocSnapshot = await getDoc(iniciativaDocRef);
+    const idAdmin = iniciativaDocSnapshot.data().idAdmin;
 
-    const idAdmin = listaIniciativas[idIniciativa].idAdmin;
-    delete listaIniciativas[idIniciativa];
+    await deleteDoc(iniciativaDocRef);
+    const adminDocRef = doc(firestore, "Usuarios", idAdmin);
+    await updateDoc(adminDocRef, { listaIniciativasAdmin: arrayRemove(idIniciativa) });
 
-    const iniciativasRef = ref(database, `Iniciativas`);
-    await set(iniciativasRef, listaIniciativas);
-
-    try {
-      const snapshot = await get(child(db, `Usuarios/${idAdmin}/listaIniciativasAdmin`));
-      let listaIniciativasAdmin = snapshot.val();
-      listaIniciativasAdmin = listaIniciativasAdmin.filter(id => id !== idIniciativa);
-
-      const adminRef = ref(database, `Usuarios/${idAdmin}/listaIniciativasAdmin`);
-      await set(adminRef, listaIniciativasAdmin);
-
-    } catch (error) {
-      console.error("Error eliminando iniciativa de la lista del admin: ", error.message);
-    }
+    return true;
   } catch (error) {
     console.error("Error eliminando iniciativa: ", error.message);
+    return null;
   }
 };

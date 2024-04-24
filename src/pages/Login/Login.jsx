@@ -49,18 +49,22 @@ export const Login = () => {
     }
 
     try {
-      const user = await loginUsuario(email, password, setUser);
-      try {
+      await loginUsuario(email, password, setUser);
+
+      const user = JSON.parse(sessionStorage.getItem('user'));
+      if (user) {
         const esAdmin = await getEsAdmin(user);
-        const nextPage = esAdmin ? '/exploreAdmin' : '/home';
-        navigate(nextPage);
-      } catch {
-        console.error("Error al obtener si el usuario es admin");
+        if (esAdmin) {
+          navigate('/exploreAdmin');
+        } else {
+          navigate('/home');
+        }
       }
-    } catch {
+    } catch (error) {
+      console.error("Error al hacer login:", error.message);
       setError('Inicio de sesión fallido. Verifica tu correo y contraseña.');
       setShowModal(true);
-    }
+    }    
   };
 
   // Render

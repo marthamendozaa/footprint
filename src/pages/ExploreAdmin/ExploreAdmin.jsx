@@ -36,11 +36,12 @@ export const ExploreAdmin = () => {
 
   // Eliminar iniciativa
   const handleEliminaIniciativa = async () => {
-    try {
-      await eliminaIniciativa(idIniciativaEliminar);
-      handleCerrarEliminar();
+    console.log("Eliminando iniciativa con id: ", idIniciativaEliminar);
+    const eliminada = await eliminaIniciativa(idIniciativaEliminar);
+    handleCerrarEliminar();
+    if (eliminada) {
       handleMostrarEliminada();
-    } catch {
+    } else {
       handleMostrarError();
     }
   };
