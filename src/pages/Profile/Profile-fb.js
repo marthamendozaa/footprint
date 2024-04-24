@@ -1,18 +1,21 @@
 import { auth, firestore, storage } from "../../backend/firebase-config.js";
 import { reauthenticateWithCredential, updatePassword, EmailAuthProvider, signOut } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { uploadBytes, getDownloadURL } from "firebase/storage";
+import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
 
 //Imagen Perfil
 export const uploadProfileImage = async (file) => {
   try {
-    const storageRef = ref(storage, `profile-images/${file.name}`); // Referencia al archivo en Firebase Storage
-    await uploadBytes(storageRef, file); // Sube el archivo a Firebase Storage
+    // Referencia al almacenamiento en Firebase
+    const storageRef = ref(storage, `profile-images/${file.name}`);
+    
+    // Subir el archivo al almacenamiento
+    await uploadBytes(storageRef, file);
 
-    // Obtiene la URL de descarga del archivo
-    const url = await getDownloadURL(storageRef);
-    console.log("Imagen de perfil subida exitosamente:", url);
-    return url;
+    // Obtener la URL de descarga de la imagen subida
+    const imageUrl = await getDownloadURL(storageRef);
+    
+    return imageUrl;
   } catch (error) {
     console.error("Error al subir la imagen de perfil:", error.message);
     throw error;
@@ -27,10 +30,13 @@ export const updateUsuarioImage = async (imageUrl) => {
   }
 
   try {
-    await set(child(db, `Usuarios/${user.uid}/urlImagen`), imageUrl);
-    console.log("URL de la imagen del usuario actualizada exitosamente");
+    // Actualizar la URL de la imagen en la base de datos de Firestore
+    const usuarioRef = doc(firestore, "Usuarios", user.uid);
+    await updateDoc(usuarioRef, { urlImagen: imageUrl });
+    
+    console.log("URL de imagen de perfil actualizada exitosamente");
   } catch (error) {
-    console.error("Error al actualizar la URL de la imagen del usuario:", error.message);
+    console.error("Error al actualizar la URL de la imagen de perfil:", error.message);
     throw error;
   }
 };
