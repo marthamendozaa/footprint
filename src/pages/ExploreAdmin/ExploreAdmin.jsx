@@ -95,7 +95,7 @@ export const ExploreAdmin = () => {
             <div className='card-body'>
               <h5 className='card-title titles'>{item.titulo}</h5>
               <p className='card-text'>{item.descripcion}</p>
-              <Button onClick={() => handleMostrarEliminar(item.titulo, item.idIniciativa)}>Eliminar</Button>
+              <Button className="btn-eliminar-tarjeta-1" onClick={() => handleMostrarEliminar(item.titulo, item.idIniciativa)}>Eliminar</Button>
             </div>
           </div>
         </div>

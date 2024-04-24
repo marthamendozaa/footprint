@@ -173,7 +173,6 @@ export const Create = () => {
     handleMostrarCreada();
   };
 
-
   return (
     <div>
       {etiquetas && regiones ? (

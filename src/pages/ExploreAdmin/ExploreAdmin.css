@@ -74,6 +74,19 @@
   background-color: #f09e9e;
   
 }
+
 .ea-modal .eliminar.btn.btn-primary:hover {
   background-color: rgb(224, 99, 99);
+}
+
+.btn-eliminar-tarjeta-1 {
+  background-color: #A0C1BF;
+  color: #000;
+  font-weight: 600;
+  border: none;
+}
+
+.btn-eliminar-tarjeta-1:hover {
+  background-color: #699AA0;
+  color: #000;
 }
