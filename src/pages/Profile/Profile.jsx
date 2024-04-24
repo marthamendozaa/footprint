@@ -196,56 +196,31 @@ export const Profile = () => {
       {habilidades && habilidadesUsuario && intereses && interesesUsuario ? (
       <header className="Profile-header">
         <h1>Mi perfil</h1>
-        <div className="profile-info">
-        <div className="profile-info-left">
-        <div className="Foto-perfil position-relative">
-          <img src={informacionUsuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
-          <FaPen className="edit-icon" onClick={openModal} /> {/* Abrir el modal al hacer clic en el ícono */}
-        
-          {/* Modal */}
-          <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title className='p-modaltitle'>Foto de perfil</Modal.Title>
-                </Modal.Header>
-                <Modal.Body className='p-modalinfo'>
-                <input type="file" accept="image/*" onChange={(e) => setSelectedImage(e.target.files[0])} />
-                
-                    
-                </Modal.Body>
-                <Modal.Footer>
-                    <button variant="secondary" onClick={handleUploadProfileImage}>
-                        Guardar Imagen
-                    </button>
-                </Modal.Footer>
-            </Modal>
-        </div>
-    </div>
-          <div className="profile-info-right">
-          <div className="name-container">
-            <h2>
-                {editingNombre ? (
-                  <input
-                    type="text"
-                    value={nuevoNombre}
-                    onChange={handleNombreChange}
-                  />
-                ) : (
-                  informacionUsuario.nombre
-                )}
-                {!editingNombre && (
-                  <button className="edit-profile-btn" onClick={handleNombreEdit}>
-                    <FaPen />
-                  </button>
-                )}
-                {editingNombre && (
-                  <button className="edit-profile-btn guardar" onClick={handleNombreSubmit}>
-                    Guardar
-                  </button>
-                )}
-              </h2>
+          <div className="profile-info">
+            <div className="profile-info-left">
+              <div className="Foto-perfil position-relative">
+                <img src={informacionUsuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
+                <FaPen className="edit-icon" onClick={openModal} /> {/* Abrir el modal al hacer clic en el ícono */}
+              
+                {/* Modal */}
+                <Modal show={showModal} onHide={() => setShowModal(false)}>
+                      <Modal.Header closeButton>
+                          <Modal.Title className='p-modaltitle'>Foto de perfil</Modal.Title>
+                      </Modal.Header>
+                      <Modal.Body className='p-modalinfo'>
+                      <input type="file" accept="image/*" onChange={(e) => setSelectedImage(e.target.files[0])} />
+                      
+                          
+                      </Modal.Body>
+                      <Modal.Footer>
+                          <button variant="secondary" onClick={handleUploadProfileImage}>
+                              Guardar Imagen
+                          </button>
+                      </Modal.Footer>
+                  </Modal>
               </div>
-            </div>
-            <div className="profile-info-right">
+          </div>
+          <div className="profile-info-right">
             <div className="name-container">
               <h2>
                   {editingNombre ? (
