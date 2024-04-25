@@ -5,7 +5,6 @@ import { Spinner } from 'react-bootstrap';
 import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, actualizaHabilidades, getIntereses, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
 import Usuario from '../../backend/obj-Usuario.js';
 import Modal from 'react-bootstrap/Modal';
-import Compressor from 'compressorjs';
 import './Profile.css';
 
 export const Profile = () => {
