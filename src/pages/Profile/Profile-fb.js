@@ -1,7 +1,7 @@
 import { auth, firestore, storage } from "../../backend/firebase-config.js";
 import { reauthenticateWithCredential, updatePassword, EmailAuthProvider, signOut } from "firebase/auth";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
-import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
+import { uploadBytes, getDownloadURL, ref, deleteObject } from "firebase/storage";
 
 //Imagen Perfil
 export const uploadProfileImage = async (file) => {
@@ -41,6 +41,20 @@ export const updateUsuarioImage = async (imageUrl) => {
   }
 };
 
+//Borrar imagen anterior
+export const deleteProfileImage = async (imageUrl) => {
+  try {
+    // Obtener la referencia a la imagen en Firebase Storage
+    const imageRef = ref(storage, imageUrl);
+    // Eliminar la imagen
+    await deleteObject(imageRef);
+    console.log("Imagen de perfil antigua eliminada exitosamente");
+  } catch (error) {
+    console.error("Error al eliminar la imagen de perfil antigua:", error.message);
+    throw error;
+  }
+};
+
 // Perfil: información del usuario
 export const getUsuario = async () => {
   const user = JSON.parse(sessionStorage.getItem('user'));
@@ -64,7 +78,6 @@ export const getUsuario = async () => {
     return null;
   }
 };
-
 
 // Actualizar nombres del usuario
 export const updateUsuarioNombre = async (nuevoNombre) => {

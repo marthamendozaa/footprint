@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
-import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, actualizaHabilidades, getIntereses, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage } from './Profile-fb.js';
+import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, actualizaHabilidades, getIntereses, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
 import Usuario from '../../backend/obj-Usuario.js';
 import Modal from 'react-bootstrap/Modal';
 import Compressor from 'compressorjs';
@@ -188,25 +188,16 @@ export const Profile = () => {
       return;
     }
 
-    // Verificar el tamaño de la imagen seleccionada
-  if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
-    // Comprimir la imagen si excede los 2 MB
-    try {
-      const compressedImage = await compressImage(selectedImage);
-      setSelectedImage(compressedImage);
-    } catch (error) {
-      console.error("Error al comprimir la imagen:", error.message);
-      setErrorI('Error al comprimir la imagen');
-      return;
-    }
-  }
-
   if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
     setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
     return;
   }
   
     try {
+      if (informacionUsuario.urlImagen) {
+        await deleteProfileImage(informacionUsuario.urlImagen);
+      }
+
       const imageUrl = await uploadProfileImage(selectedImage);
       await updateUsuarioImage(imageUrl);
       const infoUsuario = await getUsuario();
@@ -216,24 +207,6 @@ export const Profile = () => {
       console.error("Error al subir la imagen de perfil:", error.message);
     }
   };
-
-  // Función para comprimir la imagen utilizando image-compressor
-const compressImage = async (image) => {
-  return new Promise((resolve, reject) => {
-    new Compressor(image, {
-      quality: 0.6, // Calidad de compresión
-      maxWidth: 1920, // Ancho máximo de la imagen
-      maxHeight: 1080, // Alto máximo de la imagen
-      mimeType: 'image/jpeg', // Tipo de imagen de salida
-      success(result) {
-        resolve(result);
-      },
-      error(error) {
-        reject(error);
-      },
-    });
-  });
-};
 
   return (
     <div className="profile-page">
