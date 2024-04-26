@@ -23,7 +23,7 @@ export const Create = () => {
 
 
   // Cambiar título
-  const [titulo, setTitulo] = useState(null);
+  const [titulo, setTitulo] = useState("");
   const [editandoTitulo, setEditandoTitulo] = useState(false);
 
   const handleCambioTitulo = (event) => {
@@ -47,7 +47,7 @@ export const Create = () => {
 
 
   // Cambiar descripción
-  const [desc, setDesc] = useState(null);
+  const [desc, setDesc] = useState("");
   const [editandoDesc, setEditandoDesc] = useState(false);
 
   const handleCambioDesc = (event) => {
@@ -193,9 +193,21 @@ export const Create = () => {
   const handleCerrarErrorCreada = () => setModalErrorCreada(false);
   const handleMostrarErrorCreada = () => setModalErrorCreada(true);
 
+  // Tiempo de espera
+  const [tiempoIniciativaCreada, setTiempoIniciativaCreada] = useState(0);
+  const [modalTiempoEspera, setModalTiempoEspera] = useState(false);
+  const handleCerrarTiempo = () => setModalTiempoEspera(false);
+  const handleMostrarTiempo = () => setModalTiempoEspera(true);
+
   const handleCrearIniciativa = async () => {
     if (!titulo || !desc || region === "" || Object.keys(etiquetasIniciativa).length === 0 || !fechaInicio) {
       handleMostrarError();
+      return;
+    }
+
+    const tiempoActual = Date.now();
+    if (tiempoActual - tiempoIniciativaCreada < 60000) {
+      handleMostrarTiempo();
       return;
     }
     
@@ -209,6 +221,7 @@ export const Create = () => {
     if (idIniciativa) {
       setIdIniciativaCreada(idIniciativa);
       handleMostrarCreada();
+      setTiempoIniciativaCreada(tiempoActual);
     } else {
       handleMostrarErrorCreada();
     }
@@ -442,7 +455,7 @@ export const Create = () => {
                 Iniciativa <span style={{fontWeight: 'bold'}}>{titulo}</span> creada exitosamente
               </div>
             <Modal.Footer>
-              <Button class="btn btn-primary" onClick={handleCerrarCreada}>
+              <Button className="btn btn-primary" onClick={handleCerrarCreada}>
                 <Link to={`/initiative/${idIniciativaCreada}`}>Ver Iniciativa</Link>
               </Button>
             </Modal.Footer>
@@ -456,6 +469,17 @@ export const Create = () => {
               </div>
             <Modal.Footer>
               <Button onClick={handleCerrarErrorCreada}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Tiempo de espera */}
+          <Modal className="c-modal" show={modalTiempoEspera} onHide={handleCerrarTiempo}>
+            <div className="c-modal-title">Error</div>
+              <div className="c-modal-body">
+                Debes esperar 1 minuto para poder crear una nueva iniciativa
+              </div>
+            <Modal.Footer>
+              <Button onClick={handleCerrarTiempo}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
         </div>

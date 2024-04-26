@@ -28,9 +28,11 @@ export const eliminaIniciativa = async (idIniciativa) => {
     const iniciativaDocSnapshot = await getDoc(iniciativaDocRef);
     const iniciativa = iniciativaDocSnapshot.data();
     const idAdmin = iniciativa.idAdmin;
-
-    const imagenRef = ref(storage, iniciativa.urlImagen);
-    await deleteObject(imagenRef);
+    
+    if (iniciativa.urlImagen.includes("firebasestorage.googleapis.com")) {
+      const imagenRef = ref(storage, iniciativa.urlImagen);
+      await deleteObject(imagenRef);
+    }
 
     await deleteDoc(iniciativaDocRef);
     const adminDocRef = doc(firestore, "Usuarios", idAdmin);

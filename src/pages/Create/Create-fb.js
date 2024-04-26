@@ -64,6 +64,10 @@ export const crearIniciativa = async (iniciativa, imagen) => {
     } 
   }
   
+  // Guardar fecha de creación
+  const timestamp = new Date();
+  iniciativa.fechaCreacion = timestamp;
+
   // Subir iniciativa a Firestore
   let idIniciativaNueva = null;
   try {

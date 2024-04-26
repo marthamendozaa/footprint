@@ -64,7 +64,7 @@ export const getIniciativasAdmin = async () => {
 
     return iniciativasData;
   } catch (error) {
-    console.error("Error obteniendo lista de iniciativas miembro:", error.message);
+    console.error("Error obteniendo lista de iniciativas creadas:", error.message);
     return null;
   }
 };
