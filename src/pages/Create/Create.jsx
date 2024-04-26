@@ -146,6 +146,37 @@ export const Create = () => {
   };
   
 
+  // Subir imagen
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
+  const [imagenIniciativa, setImagenIniciativa] = useState(null);
+  const [imagenPreview, setImagenPreview] = useState('https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg');
+  
+  const [modalImagen, setModalImagen] = useState(false);
+  const [errorImagen, setErrorImagen] = useState("");
+  const handleMostrarImagen = () => setModalImagen(true);
+  const handleCerrarImagen = () => {
+    setModalImagen(false);
+    setImagenSeleccionada(null);
+    setErrorImagen("");
+  };
+
+  const handleSubirImagen = () => {
+    if (!imagenSeleccionada) {
+      setErrorImagen("Por favor selecciona una imagen")
+      return;
+    }
+
+    if (imagenSeleccionada.size > 2 * 1024 * 1024) {
+      setErrorImagen("La imagen seleccionada supera el límite de tamaño de 2 MB")
+      return;
+    }
+
+    setImagenIniciativa(imagenSeleccionada);
+    setImagenPreview(URL.createObjectURL(imagenSeleccionada));
+    handleCerrarImagen();
+  };
+
+
   // Crear iniciativa
   const [modalError, setModalError] = useState(false);
   const handleCerrarError = () => setModalError(false);
@@ -174,7 +205,7 @@ export const Create = () => {
     const infoIniciativa = new Iniciativa(titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
     console.log(infoIniciativa);
     
-    const idIniciativa = await crearIniciativa(infoIniciativa);
+    const idIniciativa = await crearIniciativa(infoIniciativa, imagenIniciativa);
     if (idIniciativa) {
       setIdIniciativaCreada(idIniciativa);
       handleMostrarCreada();
@@ -183,13 +214,17 @@ export const Create = () => {
     }
   };
 
+
   return (
     <div>
       {etiquetas && regiones ? (
         <div className="c-container">
           <div className="c-iniciativa-container">
             {/* Foto de iniciativa */}
-            <div className="c-foto-iniciativa"></div>
+            <div className="c-foto-iniciativa" onClick={handleMostrarImagen}>
+              <img src={imagenPreview} className ="c-preview-imagen"/>
+              <FaPen className="c-editar-foto"/>
+            </div>
 
             <div className="c-info-container"> 
               {/* Cambiar título */}
@@ -363,6 +398,22 @@ export const Create = () => {
             </div>
           </div>
 
+          {/* Subir imagen */}
+          <Modal className="c-modal" show={modalImagen} onHide={handleCerrarImagen}>
+            <Modal.Header closeButton>
+              <div className="c-modal-title">Subir Imagen</div>
+            </Modal.Header>
+              <div className="c-input-body">
+                <input className="c-input-imagen" type="file" accept="image/*" onChange={(e) => setImagenSeleccionada(e.target.files[0])} />
+                {errorImagen && <span style={{ color: 'red' }}>{errorImagen}</span>}
+              </div>
+            <Modal.Footer>
+              <Button onClick={handleSubirImagen}>Guardar</Button>
+              <Button onClick={handleCerrarImagen}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+          
+          {/* Error campos vacíos */}
           <Modal className="c-modal" show={modalError} onHide={handleCerrarError}>
             <Modal.Header closeButton>
               <div className="c-modal-title">Error</div>
@@ -381,7 +432,8 @@ export const Create = () => {
               <Button onClick={handleCerrarError}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
-
+          
+          {/* Iniciativa creada */}
           <Modal className="c-modal" show={modalCreada} onHide={handleCerrarCreada}>
             <Modal.Header closeButton>
               <div className="c-modal-title">Éxito</div>
@@ -395,7 +447,8 @@ export const Create = () => {
               </Button>
             </Modal.Footer>
           </Modal>
-
+          
+          {/* Error creando inciativa */}
           <Modal className="c-modal" show={modalErrorCreada} onHide={handleCerrarErrorCreada}>
             <div className="c-modal-title">Error</div>
               <div className="c-modal-body">

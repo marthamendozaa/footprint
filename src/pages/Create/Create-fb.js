@@ -1,5 +1,6 @@
-import { firestore } from "../../backend/firebase-config.js";
+import { firestore, storage } from "../../backend/firebase-config.js";
 import { collection, doc, getDoc, updateDoc, addDoc, arrayUnion } from "firebase/firestore";
+import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
 
 
 // Crear iniciativa: mostrar etiquetas
@@ -33,7 +34,7 @@ export const getRegiones = async () => {
 
 
 // Crear iniciativa
-export const crearIniciativa = async (iniciativa) => {
+export const crearIniciativa = async (iniciativa, imagen) => {
   const user = JSON.parse(sessionStorage.getItem('user'));
   if (!user) {
     console.error("No hay usuario autenticado");
@@ -42,6 +43,13 @@ export const crearIniciativa = async (iniciativa) => {
   iniciativa.idAdmin = user.uid;
   
   try {
+    if (imagen) {
+      const storageRef = ref(storage, `initiative-images/${imagen.name}`);
+      await uploadBytes(storageRef, imagen);
+      const urlImagen = await getDownloadURL(storageRef);
+      iniciativa.urlImagen = urlImagen;
+    }
+
     const iniciativasRef = collection(firestore, "Iniciativas");
     const iniciativaDocRef = await addDoc(iniciativasRef, iniciativa.convertirAObjeto());
     const idIniciativaNueva = iniciativaDocRef.id;
