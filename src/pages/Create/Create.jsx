@@ -193,6 +193,11 @@ export const Create = () => {
   const handleCerrarErrorCreada = () => setModalErrorCreada(false);
   const handleMostrarErrorCreada = () => setModalErrorCreada(true);
 
+  // Error: iniciativa duplicada
+  const [modalErrorDuplicada, setModalErrorDuplicada] = useState(false);
+  const handleCerrarErrorDuplicada = () => setModalErrorDuplicada(false);
+  const handleMostrarErrorDuplicada = () => setModalErrorDuplicada(true);
+
   // Tiempo de espera
   const [tiempoIniciativaCreada, setTiempoIniciativaCreada] = useState(0);
   const [modalTiempoEspera, setModalTiempoEspera] = useState(false);
@@ -217,12 +222,15 @@ export const Create = () => {
     const infoIniciativa = new Iniciativa(titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
     console.log(infoIniciativa);
     
-    const idIniciativa = await crearIniciativa(infoIniciativa, imagenIniciativa);
+    const [errorDuplicada, idIniciativa] = await crearIniciativa(infoIniciativa, imagenIniciativa);
     if (idIniciativa) {
       setIdIniciativaCreada(idIniciativa);
       handleMostrarCreada();
       setTiempoIniciativaCreada(tiempoActual);
-    } else {
+    } else if (errorDuplicada) {
+      handleMostrarErrorDuplicada();
+    }
+    else {
       handleMostrarErrorCreada();
     }
   };
@@ -469,6 +477,17 @@ export const Create = () => {
               </div>
             <Modal.Footer>
               <Button onClick={handleCerrarErrorCreada}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Error iniciativa duplicada */}
+          <Modal className="c-modal" show={modalErrorDuplicada} onHide={handleCerrarErrorDuplicada}>
+            <div className="c-modal-title">Error</div>
+              <div className="c-modal-body">
+                La iniciativa con título <span style={{fontWeight: 'bold'}}>{titulo}</span> ya existe
+              </div>
+            <Modal.Footer>
+              <Button onClick={handleCerrarErrorDuplicada}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
 

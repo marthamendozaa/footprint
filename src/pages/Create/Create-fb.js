@@ -39,7 +39,7 @@ export const crearIniciativa = async (iniciativa, imagen) => {
   const user = JSON.parse(sessionStorage.getItem('user'));
   if (!user) {
     console.error("No hay usuario autenticado");
-    return null;
+    return [null, null];
   }
   iniciativa.idAdmin = user.uid;
 
@@ -48,7 +48,7 @@ export const crearIniciativa = async (iniciativa, imagen) => {
   const iniciativasSnapshot = await getDocs(iniciativasQuery);
   if (!iniciativasSnapshot.empty) {
     console.error("Ya existe una iniciativa con el mismo título");
-    return null;
+    return [true, null];
   }
 
   // Subir imagen a Firebase Storage
@@ -60,7 +60,7 @@ export const crearIniciativa = async (iniciativa, imagen) => {
       iniciativa.urlImagen = urlImagen;
     } catch (error) {
       console.error("Error subiendo imagen: ", error.message);
-      return null;
+      return [null, null];
     } 
   }
   
@@ -78,7 +78,7 @@ export const crearIniciativa = async (iniciativa, imagen) => {
     await updateDoc(iniciativaDocRef, { idIniciativa: idIniciativaNueva });
   } catch (error) {
     console.error("Error creando iniciativa: ", error.message);
-    return null;
+    return [null, null];
   }
 
   // Agregar iniciativa creada al usuario
@@ -87,8 +87,8 @@ export const crearIniciativa = async (iniciativa, imagen) => {
     await updateDoc(usuarioDocRef, { listaIniciativasAdmin: arrayUnion(idIniciativaNueva) });
   } catch (error) {
     console.error("Error agregando iniciativa creada al usuario: ", error.message);
-    return null;
+    return [null, null];
   }
 
-  return idIniciativaNueva;
+  return [null, idIniciativaNueva];
 };
