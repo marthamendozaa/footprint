@@ -1,5 +1,6 @@
-import { firestore } from "../../backend/firebase-config.js";
+import { firestore, storage } from "../../backend/firebase-config.js";
 import { collection, doc, getDoc, getDocs, updateDoc, deleteDoc, arrayRemove } from "firebase/firestore";
+import { ref, deleteObject } from "firebase/storage";
 
 // Explora Admin: todas las iniciativas
 export const getIniciativas = async () => {
@@ -25,7 +26,13 @@ export const eliminaIniciativa = async (idIniciativa) => {
   try {
     const iniciativaDocRef = doc(firestore, "Iniciativas", idIniciativa);
     const iniciativaDocSnapshot = await getDoc(iniciativaDocRef);
-    const idAdmin = iniciativaDocSnapshot.data().idAdmin;
+    const iniciativa = iniciativaDocSnapshot.data();
+    const idAdmin = iniciativa.idAdmin;
+    
+    if (iniciativa.urlImagen.includes("firebasestorage.googleapis.com")) {
+      const imagenRef = ref(storage, iniciativa.urlImagen);
+      await deleteObject(imagenRef);
+    }
 
     await deleteDoc(iniciativaDocRef);
     const adminDocRef = doc(firestore, "Usuarios", idAdmin);

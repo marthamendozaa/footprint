@@ -104,12 +104,12 @@ export const ExploreAdmin = () => {
 
       {/* Modal confirmar eliminar iniciativa*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
-        <Modal.Header>
-          <Modal.Title>Confirmar eliminación</Modal.Title>
+        <Modal.Header closeButton>
+          <div className="ea-modal-title">Confirmar eliminación</div>
         </Modal.Header>
-          <Modal.Body>
+          <div className="ea-modal-body">
             ¿Estás seguro que quieres eliminar la iniciativa <span style={{fontWeight:'bold'}}>{iniciativaEliminar}</span>?
-          </Modal.Body>
+          </div>
         <Modal.Footer>
           <Button className="eliminar" onClick={handleEliminaIniciativa}>Eliminar</Button>
           <Button onClick={handleCerrarEliminar}>Cerrar</Button>
@@ -118,10 +118,12 @@ export const ExploreAdmin = () => {
       
       {/* Modal iniciativa eliminada*/}
       <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
-        <Modal.Header></Modal.Header>
-          <Modal.Body>
+        <Modal.Header closeButton>
+          <div className="ea-modal-title">Éxito</div>
+        </Modal.Header>
+          <div className="ea-modal-body">
             Iniciativa <span style={{fontWeight:'bold'}}>{iniciativaEliminar}</span> eliminada exitosamente
-          </Modal.Body>
+          </div>
         <Modal.Footer>
           <Button onClick={handleCerrarEliminada}>Cerrar</Button>
         </Modal.Footer>
@@ -129,10 +131,12 @@ export const ExploreAdmin = () => {
       
       {/* Modal error eliminar*/}
       <Modal className="ea-modal" show={modalError} onHide={handleCerrarError}>
-        <Modal.Header></Modal.Header>
-          <Modal.Body>
+        <Modal.Header closeButton>
+        <div className="ea-modal-title">Error</div>
+        </Modal.Header>
+          <div className="ea-modal-body">
             Error al eliminar iniciativa <span style={{fontWeight:'bold'}}>{iniciativaEliminar}</span>
-          </Modal.Body>
+          </div>
         <Modal.Footer>
           <Button onClick={handleCerrarError}>Cerrar</Button>
         </Modal.Footer>

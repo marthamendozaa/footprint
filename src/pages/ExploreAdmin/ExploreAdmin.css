@@ -39,22 +39,31 @@
   text-align: center;
 }
 
+.ea-modal-body {
+  padding: 16px;
+  font-family: "Inter", sans-serif;
+}
+
 .ea-modal .modal-header,
 .ea-modal .modal-footer {
   border: none;
   padding: 0;
 }
 
-.ea-modal .modal-title.h4 {
-  font-weight: 600;
-  font-size: 30px;
-}
-
 .ea-modal .modal-footer {
-  display: flex;
   width: 100%;
   justify-content: space-evenly;
-  border: none;
+}
+
+.ea-modal .modal-header .btn-close {
+  position: absolute;
+  right: 5%;
+}
+
+.ea-modal-title {
+  font-weight: 600;
+  font-size: 30px;
+  font-family: "Inter", sans-serif;
 }
 
 .ea-modal .btn.btn-primary {
@@ -63,7 +72,7 @@
   padding: 10px 30px;
   font-weight: 600;
   border: none;
-  border-radius: 10px;
+  border-radius: 30px;
 }
 
 .ea-modal .btn.btn-primary:hover {

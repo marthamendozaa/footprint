@@ -10,6 +10,7 @@ export default class Iniciativa {
     this.listaEtiquetas = listaEtiquetas;
     this.fechaInicio = fechaInicio;
     this.fechaCierre = fechaCierre;
+    this.fechaCreacion = null;
   }
 
   convertirAObjeto() {
@@ -23,7 +24,8 @@ export default class Iniciativa {
       esPublica: this.esPublica,
       listaEtiquetas: this.listaEtiquetas,
       fechaInicio: this.fechaInicio,
-      fechaCierre: this.fechaCierre
+      fechaCierre: this.fechaCierre,
+      fechaCreacion: this.fechaCreacion
     };
   }
 }
