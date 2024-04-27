@@ -32,7 +32,7 @@ export const MyInitiatives = () => {
             ) : (
               <div className="m-iniciativas-container">
                 {iniciativasMiembro.map((iniciativa, index) => (
-                  <Link to={`/initiative/${iniciativa.idIniciativa}`}>
+                  <Link key={index} to={`/initiative/${iniciativa.idIniciativa}`}>
                     <div className="m-iniciativa" key={index}>
                         <div className="m-iniciativa-imagen">
                           <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
@@ -58,7 +58,7 @@ export const MyInitiatives = () => {
             ) : (
               <div className="m-iniciativas-container">
                 {iniciativasAdmin.map((iniciativa, index) => (
-                  <Link to={`/initiative/${iniciativa.idIniciativa}`}>
+                  <Link key={index} to={`/initiative/${iniciativa.idIniciativa}`}>
                     <div className="m-iniciativa" key={index}>
                         <div className="m-iniciativa-imagen">
                           <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
