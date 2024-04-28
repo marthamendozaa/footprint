@@ -2,11 +2,7 @@ import { useEffect, useState } from 'react';
 import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
-<<<<<<< Updated upstream
-import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, actualizaHabilidades, getIntereses, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
-=======
 import { getUsuario, updateUsuarioNombre, getHabilidadesUsuario, actualizaHabilidades, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
->>>>>>> Stashed changes
 import Usuario from '../../backend/obj-Usuario.js';
 import Modal from 'react-bootstrap/Modal';
 import './Profile.css';
@@ -122,15 +118,9 @@ export const Profile = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!sesionCerrada) {
-<<<<<<< Updated upstream
-        const interesesData = await getIntereses();
-        setIntereses(interesesData);
-  
-=======
         const getIntereses = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getIntereses");
         setIntereses(getIntereses.data.data);
 
->>>>>>> Stashed changes
         const interesesUsuarioData = await getInteresesUsuario();
         setInteresesUsuario(interesesUsuarioData);
       }
