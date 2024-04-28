@@ -1,21 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { loginUsuario, getEsAdmin } from './Login-fb.js';
+import { autentificaUsuario, getEsAdmin } from '../../api/api.js';
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
 import evertechImage from '../../assets/evertech.png';
 import './Login.css';
 
 export const Login = () => {
   // Variables
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
-  const { setUser } = useAuth();
-  const navigate = useNavigate();
 
   // Fondo de color
   useEffect(() => {
@@ -34,6 +30,12 @@ export const Login = () => {
     return re.test(String(email).toLowerCase());
   };
 
+  // Autentificación
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { setUser, setAdmin } = useAuth();
+  const navigate = useNavigate();
+
   const handleLogin = async (event) => {
     event.preventDefault();
 
@@ -49,22 +51,22 @@ export const Login = () => {
     }
 
     try {
-      await loginUsuario(email, password, setUser);
+      const user = await autentificaUsuario(email, password);
+      setUser(user);
 
-      const user = JSON.parse(sessionStorage.getItem('user'));
-      if (user) {
-        const esAdmin = await getEsAdmin(user);
-        if (esAdmin) {
-          navigate('/exploreAdmin');
-        } else {
-          navigate('/home');
-        }
+      const admin = await getEsAdmin(user);
+      setAdmin(admin);
+
+      if (admin) {
+        navigate('/exploreAdmin');
+      } else {
+        navigate('/home');
       }
     } catch (error) {
       console.error("Error al hacer login:", error.message);
       setError('Inicio de sesión fallido. Verifica tu correo y contraseña.');
       setShowModal(true);
-    }    
+    }
   };
 
   // Render

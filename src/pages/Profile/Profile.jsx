@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
+import { getHabilidades, getIntereses } from '../../api/api.js';
 import { getUsuario, updateUsuarioNombre, getHabilidadesUsuario, actualizaHabilidades, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
 import Usuario from '../../backend/obj-Usuario.js';
 import Modal from 'react-bootstrap/Modal';
 import './Profile.css';
-import axios from 'axios';
 
 
 export const Profile = () => {
@@ -30,6 +30,18 @@ export const Profile = () => {
         const infoUsuario = await getUsuario();
         const objUsuario = { ...informacionUsuario, ...infoUsuario };
         setinformacionUsuario(objUsuario);
+
+        const habilidadesData = await getHabilidades();
+        setHabilidades(habilidadesData);
+  
+        const habilidadesUsuarioData = await getHabilidadesUsuario();
+        setHabilidadesUsuario(habilidadesUsuarioData);
+
+        const interesesData = await getIntereses();
+        setIntereses(interesesData);
+
+        const interesesUsuarioData = await getInteresesUsuario();
+        setInteresesUsuario(interesesUsuarioData);
       }
     };
     fetchData();
@@ -79,19 +91,6 @@ export const Profile = () => {
     await actualizaHabilidades(habilidadesUsuarioNueva);
   };
   
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!sesionCerrada) {
-        const getHabilidades = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getHabilidades");
-        setHabilidades(getHabilidades.data.data);
-  
-        const habilidadesUsuarioData = await getHabilidadesUsuario();
-        setHabilidadesUsuario(habilidadesUsuarioData);
-      }
-    };
-    fetchData();
-  }, [sesionCerrada]);
-  
 
   // Intereses del usuario
   const [intereses, setIntereses] = useState(null);
@@ -114,19 +113,6 @@ export const Profile = () => {
     setInteresesUsuario(interesesUsuarioNueva);
     await actualizaIntereses(interesesUsuarioNueva);
   };
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!sesionCerrada) {
-        const getIntereses = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getIntereses");
-        setIntereses(getIntereses.data.data);
-
-        const interesesUsuarioData = await getInteresesUsuario();
-        setInteresesUsuario(interesesUsuarioData);
-      }
-    };
-    fetchData();
-  }, [sesionCerrada]);
 
 
   // Cambiar contraseña

@@ -5,19 +5,19 @@ import { Modal, Button, Spinner } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
+import { getIntereses, getRegiones } from '../../api/api.js';
 import { crearIniciativa } from './Create-fb.js';
 import Iniciativa from '../../backend/obj-Iniciativa.js';
 import './Create.css';
-import axios from 'axios';
 
 export const Create = () => {
   useEffect(() => {
     const fetchData = async () => {
-      const getEtiquetas = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getIntereses");
-      setEtiquetas(getEtiquetas.data.data);
+      const etiquetasData = await getIntereses();
+      setEtiquetas(etiquetasData);
 
-      const getRegiones = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getRegiones");
-      setRegiones(getRegiones.data.data);
+      const regionesData = await getRegiones();
+      setRegiones(regionesData);
     };
     fetchData();
   }, []);
