@@ -122,17 +122,17 @@ export const cambiarContrasena = async (contrasenaActual, nuevaContrasena) => {
 
 
 // Obtener lista de habilidades
-export const getHabilidades = async () => {
-  try {
-    const habilidadesRef = doc(firestore, "General", "Habilidades");
-    const habilidadesSnapshot = await getDoc(habilidadesRef);
+// export const getHabilidades = async () => {
+//   try {
+//     const habilidadesRef = doc(firestore, "General", "Habilidades");
+//     const habilidadesSnapshot = await getDoc(habilidadesRef);
     
-    return habilidadesSnapshot.data();
-  } catch (error) {
-    console.error("Error obteniendo lista de habilidades: ", error.message);
-    return null;
-  }
-};
+//     return habilidadesSnapshot.data();
+//   } catch (error) {
+//     console.error("Error obteniendo lista de habilidades: ", error.message);
+//     return null;
+//   }
+// };
 
 
 // Habilidades: habilidades del usuario
@@ -176,17 +176,17 @@ export const actualizaHabilidades = async (listaHabilidadesNueva) => {
 
 
 // Intereses: todos los intereses
-export const getIntereses = async () => {
-  try {
-    const interesesRef = doc(firestore, "General", "Intereses");
-    const interesesSnapshot = await getDoc(interesesRef);
+// export const getIntereses = async () => {
+//   try {
+//     const interesesRef = doc(firestore, "General", "Intereses");
+//     const interesesSnapshot = await getDoc(interesesRef);
 
-    return interesesSnapshot.data();
-  } catch (error) {
-    console.error("Error obteniendo lista de intereses: ", error.message);
-    return null;
-  }
-};
+//     return interesesSnapshot.data();
+//   } catch (error) {
+//     console.error("Error obteniendo lista de intereses: ", error.message);
+//     return null;
+//   }
+// };
 
 
 // Intereses: intereses del usuario

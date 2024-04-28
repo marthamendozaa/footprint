@@ -4,33 +4,33 @@ import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
 
 
 // Crear iniciativa: mostrar etiquetas
-export const getEtiquetas = async () => {
-  try {
-    const etiquetasDocRef = doc(firestore, "General", "Intereses");
-    const etiquetasDocSnapshot = await getDoc(etiquetasDocRef);
-    const etiquetas = etiquetasDocSnapshot.data();
+// export const getEtiquetas = async () => {
+//   try {
+//     const etiquetasDocRef = doc(firestore, "General", "Intereses");
+//     const etiquetasDocSnapshot = await getDoc(etiquetasDocRef);
+//     const etiquetas = etiquetasDocSnapshot.data();
     
-    return etiquetas;
-  } catch (error) {
-    console.error("Error obteniendo lista de etiquetas: ", error.message);
-    return null;
-  }
-};
+//     return etiquetas;
+//   } catch (error) {
+//     console.error("Error obteniendo lista de etiquetas: ", error.message);
+//     return null;
+//   }
+// };
 
 
 // Crear iniciativa: mostrar regiones
-export const getRegiones = async () => {
-  try {
-    const regionesDocRef = doc(firestore, "General", "Regiones");
-    const regionesDocSnapshot = await getDoc(regionesDocRef);
-    const regiones = regionesDocSnapshot.data();
+// export const getRegiones = async () => {
+//   try {
+//     const regionesDocRef = doc(firestore, "General", "Regiones");
+//     const regionesDocSnapshot = await getDoc(regionesDocRef);
+//     const regiones = regionesDocSnapshot.data();
     
-    return regiones;
-  } catch (error) {
-    console.error("Error obteniendo lista de regiones: ", error.message);
-    return null;
-  }
-};
+//     return regiones;
+//   } catch (error) {
+//     console.error("Error obteniendo lista de regiones: ", error.message);
+//     return null;
+//   }
+// };
 
 
 // Crear iniciativa

@@ -1,5 +1,9 @@
 {
   "projects": {
+<<<<<<< Updated upstream
     "default": "evertech-sprint1"
+=======
+    "default": "evertech-sprint2"
+>>>>>>> Stashed changes
   }
 }
