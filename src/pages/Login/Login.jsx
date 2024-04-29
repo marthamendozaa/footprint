@@ -86,7 +86,7 @@ export const Login = () => {
               <FaUser className="login-icons" />
               <div className="relative">
                 <input
-                  className={`correo-caja ${invalidEmail ? 'border-red-500' : ''}`}
+                  className={`correo-caja ${invalidEmail ? 'border-red-login' : ''}`}
                   type="correo"
                   placeholder="Ingresa el correo"
                   value={email}
@@ -99,8 +99,8 @@ export const Login = () => {
                 {/* Advertencia de correo */}
                 {invalidEmail && (
                 <div className="custom-alert bg-custom-color">
-                  <FaExclamationCircle className="text-red-500 text-base mr-2" />
-                  <span className="text-red-500 text-base">Formato de correo inválido</span>
+                  <FaExclamationCircle className='custom-alert-icon'/>
+                  <span>Formato de correo inválido</span>
                 </div>        
                 )}
 

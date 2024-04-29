@@ -7,6 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
 import { getIntereses, getRegiones } from '../../api/api.js';
 import { crearIniciativa } from './Create-fb.js';
+import es from 'date-fns/locale/es';
 import Iniciativa from '../../backend/obj-Iniciativa.js';
 import './Create.css';
 
@@ -297,10 +298,12 @@ export const Create = () => {
                         </div>
                       </div>
                       <DatePicker
+                        className='react-datepicker__input-container-create'
                         selected={fechaInicio}
                         onChange={(date) => setFechaInicio(date)}
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerInicio}
+                        locale={es}
                       />
                     </div>
                     
@@ -315,10 +318,12 @@ export const Create = () => {
                         </div>
                       </div>
                       <DatePicker
+                        className='react-datepicker__input-container-create'
                         selected={fechaCierre}
                         onChange={(date) => setFechaCierre(date)}
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerCierre}
+                        locale={es}
                       />
                     </div>
                   </div>

@@ -1,196 +1,190 @@
 .profile-page {
-    display: flex;
-    background-color: white;
-    color: black;
-    /*max-width: 1200px;*/
-   
-    text-align: left;
-  }
+  display: flex;
+  background-color: white;
+  color: black;
+  /*max-width: 1200px;*/
+  text-align: left;
+}
 
-  .Profile-header {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 5%;
-  }
-  
-  .Foto-perfil {
-    border-radius: 50%;
-    width: 150px; 
-    height: 150px;
-    object-fit: cover;
-    position: relative;
-    margin-top: 5%;
-  }
-  
-  .edit-icon {
-    margin-top: 5%;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* Centra el icono en la foto */
-    color: white;
-    opacity: 0; /* Inicialmente invisible */
-    transition: opacity 0.3s ease; /* Transición suave de la opacidad */
-    z-index: 1;
-  }
-  
-  .Foto-perfil:hover::after {
-    margin-top: 5%;
-    content: ''; /* Agrega un pseudo-elemento para el filtro gris */
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* Filtro gris con transparencia media */
-    border-radius: 50%; /* Mantiene la forma circular */
-  }
-    
-  .Foto-perfil:hover .edit-icon {
-    opacity: 1; /* Muestra el icono al pasar el mouse sobre la foto */
-  }
+.Profile-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 5%;
+}
 
-  .profile-info {
-    display: flex;
-    align-items: flex-start;
-    flex-direction: row;
-    width: 1000px;
-  }
-  
-  .profile-info-left {
-    display: flex;
-    width: 20%;
-    justify-content: space-around;
-  }
-  
-  .profile-info-right {
-    display: flex;
-    width: 80%;
-    flex-direction: column;
-  }
+.Foto-perfil {
+  border-radius: 50%;
+  width: 150px; 
+  height: 150px;
+  object-fit: cover;
+  position: relative;
+  margin-top: 5%;
+}
 
-  .name-container {
-    position: relative; /* Asegura que el contenedor del nombre tenga una posición relativa */
-    display: inline-block;
-  }
-  
-  .edit-profile-btn {
-    top: 20px; /* Coloca el botón en la parte superior del contenedor del nombre */
-    right: 25px; /* Ajusta el espaciado del botón desde el nombre */
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #A0C1BF;
-    font-size: 20px;
-  }
+.edit-icon {
+  margin-top: 5%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Centra el icono en la foto */
+  color: white;
+  opacity: 0; /* Inicialmente invisible */
+  transition: opacity 0.3s ease; /* Transición suave de la opacidad */
+  z-index: 1;
+}
 
-  .guardar{
-    top: 20px;
-    right: -35%;
-    color: black;
-    padding: 5px 10px;
-    border-radius: 10px;
-    margin-left: 5px;
-    background-color: rgb(206, 221, 226);
-  }
+.Foto-perfil:hover::after {
+  margin-top: 5%;
+  content: ''; /* Agrega un pseudo-elemento para el filtro gris */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Filtro gris con transparencia media */
+  border-radius: 50%; /* Mantiene la forma circular */
+}
   
-  
-  .change-password{
-    text-decoration: underline; 
-    cursor: pointer;
-  }
+.Foto-perfil:hover .edit-icon {
+  opacity: 1; /* Muestra el icono al pasar el mouse sobre la foto */
+}
 
-  .change-password-form {
-    margin-top: 5px;
-    width: 50%;
-  }
-  
-  .change-password-input {
-    margin-bottom: 10px;
-    width: 100%;
-    padding: 8px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    box-sizing: border-box;
-  }
-  
-  .change-password-submit {
-    margin-top: 10px;
-    padding: 8px 20px;
-    border: none;
-    border-radius: 18px;
-    cursor: pointer;
-  }
-  
-  .change-password-submit:hover {
-    background-color: #45a049;
-    color: white;
-  }
+.profile-info {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: row;
+  width: 1000px;
+}
 
-  .change-password-cancel {
-    margin-top: 10px;
-    margin-right: 5px;
-    padding: 8px 20px;
-    border: none;
-    border-radius: 18px;
-    cursor: pointer;
-  }
-  
-  .change-password-cancel:hover {
-    background-color: #cb3c3c;
-    color: white;
-  }
+.profile-info-left {
+  display: flex;
+  width: 20%;
+  justify-content: space-around;
+}
 
-  .subtitle {
-    margin-top: 20px;
-  }
-  
-  .skills-interests {
-    margin-top: 10px;
-  }
+.profile-info-right {
+  display: flex;
+  width: 80%;
+  flex-direction: column;
+}
 
-  .p-etiquetas {
-    display: flex;
-    height: 50px;
-    list-style-type: none;
-    overflow: overlay;
-    align-items: center;
-  }
-  
-  .p-etiquetas::-webkit-scrollbar {
-    display: none;
-  }
-  
-  .p-etiquetas li {
-    display: inline-block;
-    background-color: #f2f2f2;
-    padding: 5px 15px;
-    border-radius: 30px;
-    margin: 5px;
-  }
-  
-  li.p-etiquetas-item {
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 600;
-    text-align: center;
-    line-height: 30px;
-    user-select: none;
-  }
-  
-  li.p-etiquetas-item.highlighted {
-    background-color: #A0C1BF;
-  }
-  
-  li.p-etiquetas-item:hover {
-    box-shadow: 0 0 0 3px #A0C1BF;
-  }
-  
-  .perfil-logout {
-    margin-top: 10px;
-    border-radius: 18px;
-  }
+.name-container {
+  position: relative; /* Asegura que el contenedor del nombre tenga una posición relativa */
+  display: inline-block;
+}
 
-  
+.edit-profile-btn {
+  top: 20px; /* Coloca el botón en la parte superior del contenedor del nombre */
+  right: 25px; /* Ajusta el espaciado del botón desde el nombre */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #A0C1BF;
+  font-size: 20px;
+}
 
+.guardar{
+  top: 20px;
+  right: -35%;
+  color: black;
+  padding: 5px 10px;
+  border-radius: 10px;
+  margin-left: 5px;
+  background-color: rgb(206, 221, 226);
+}
 
+.change-password{
+  text-decoration: underline; 
+  cursor: pointer;
+}
+
+.change-password-form {
+  margin-top: 5px;
+  width: 50%;
+}
+
+.change-password-input {
+  margin-bottom: 10px;
+  width: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+.change-password-submit {
+  margin-top: 10px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+}
+
+.change-password-submit:hover {
+  background-color: #45a049;
+  color: white;
+}
+
+.change-password-cancel {
+  margin-top: 10px;
+  margin-right: 5px;
+  padding: 8px 20px;
+  border: none;
+  border-radius: 18px;
+  cursor: pointer;
+}
+
+.change-password-cancel:hover {
+  background-color: #cb3c3c;
+  color: white;
+}
+
+.subtitle {
+  margin-top: 20px;
+}
+
+.skills-interests {
+  margin-top: 10px;
+}
+
+.p-etiquetas {
+  display: flex;
+  height: 50px;
+  list-style-type: none;
+  overflow: overlay;
+  align-items: center;
+}
+
+.p-etiquetas::-webkit-scrollbar {
+  display: none;
+}
+
+.p-etiquetas li {
+  display: inline-block;
+  background-color: #f2f2f2;
+  padding: 5px 15px;
+  border-radius: 30px;
+  margin: 5px;
+}
+
+li.p-etiquetas-item {
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 30px;
+  user-select: none;
+}
+
+li.p-etiquetas-item.highlighted {
+  background-color: #A0C1BF;
+}
+
+li.p-etiquetas-item:hover {
+  box-shadow: 0 0 0 3px #A0C1BF;
+}
+
+.perfil-logout {
+  margin-top: 10px;
+  border-radius: 18px;
+}

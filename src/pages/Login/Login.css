@@ -68,28 +68,38 @@
     height: 45px;
     border-radius: 30px;
     border-color: #000000;
+    border-style: solid;
     padding-left: 50px;
     background-color: #ffffff;
 }
 
+.border-red-login {
+    border-color: #ff0000;
+}
+
 .bg-custom-color {
-    background-color: #ffffff;
-  }
+    background-color: transparent;
+}
   
 .custom-alert {
-    position: absolute;
-    left: 0;
-    margin-top: 3px;
-    padding: 5px;
-    background-color: rgba(255, 255, 255, 0.75);
-    border-radius: 20px;
     display: flex;
     align-items: center;
+    position: absolute;
+    border-radius: 30px;
+    margin-top: 3px;
+    padding: 5px;
 }
   
 .custom-alert span {
     color: #ff0000;
     font-size: 14px;
+    margin-left: 5px
+}
+
+.custom-alert-icon {
+    color: #ff0000;
+    font-size: 14px;
+    margin-left: 5px
 }
 
 .container-contrasena{
@@ -114,7 +124,8 @@
     width: 350px;
     height: 45px;
     border-radius: 30px;
-    border-color: #000000;;
+    border-color: #000000;
+    border-style: solid;
     padding-left: 50px;
     background-color: #ffffff;
 }
@@ -196,7 +207,7 @@
     font-weight: 600;
     background-color: transparent;
     border: none;
-    margin-bottom: 2px;
+    margin-bottom: 5px;
     text-decoration: underline;
 }
 

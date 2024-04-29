@@ -6,6 +6,7 @@ import { getIniciativas } from './Explore-fb.js';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { ModalHeader } from 'react-bootstrap';
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 export const Explore = () => {
     const [filter, setFilter] = useState('');
@@ -58,8 +59,9 @@ export const Explore = () => {
             {filteredIniciativas && filteredIniciativas.map((item, index) => (
                 <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item)}>
                     <div className='e-iniciativa-imagen'>
-                    <img src={item.urlImagen} alt = {item.titulo} />
+                        <img src={item.urlImagen} alt = {item.titulo} />
                     </div>
+
                     <div className='e-iniciativa-texto'>
                         <div className="e-titulo">{item.titulo}</div>
                         <div className="e-desc">{item.descripcion}</div>
