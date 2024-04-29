@@ -1,33 +1,70 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaExclamationCircle, FaEye, FaEyeSlash, FaArrowRight, FaArrowLeft } from 'react-icons/fa';
+import { FaEnvelope, FaArrowRight, FaArrowLeft, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
 import { PrivacyPolicy } from './PrivacyPolicy.jsx';
+import PasswordInfo from './PasswordInfo';
 import './Register.css';
 
 export const Register = () => {
-  {/* Variables */}
   const [email, setEmail] = useState('');
-  const [invalidEmail, setInvalidEmail] = useState(false);
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword2, setShowPassword2] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [invalidEmail, setInvalidEmail] = useState(false);
+  const [invalidPassword, setInvalidPasswordl] = useState(false);
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
   const navigate = useNavigate();
 
-  {/* Funciones */}
+  useEffect(() => {
+    document.body.classList.add('register-body');
+
+    return () => {
+      document.body.classList.remove('register-body');
+    };
+  }, []);
+
   const validateEmail = (email) => {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(String(email).toLowerCase());
   };
 
-  const handleRegister1 = async (event) => {
+  const validatePassword = (password) => {
+    // Verificar que la contraseña tenga al menos 8 caracteres
+    if (password.length < 8) {
+        return false;
+    }
+
+    // Verificar si la contraseña contiene al menos un carácter especial
+    const specialCharacters = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
+    if (!specialCharacters.test(password)) {
+        return false;
+    }
+
+    // Verificar si la contraseña contiene al menos un número
+    const numbers = /[0-9]/;
+    if (!numbers.test(password)) {
+        return false;
+    }
+
+    // Verificar si la contraseña contiene al menos una letra mayúscula
+    const upperCaseLetters = /[A-Z]/;
+    if (!upperCaseLetters.test(password)) {
+        return false;
+    }
+
+    // Si la contraseña pasa todas las validaciones, retorna true
+    return true;
+  };
+
+  const handleRegister = async (event) => {
     event.preventDefault();
 
     if (!email || !password || !confirmPassword) {
-      setError('Correo, contraseña, y confirmar contraseña no pueden ser campos vacíos');
+      setError('Por favor, llena todos los campos');
       setShowModal(true);
       return;
     }
@@ -37,81 +74,121 @@ export const Register = () => {
       return;
     }
 
+    if (!validatePassword(password)) {
+      setInvalidPasswordl(true);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setPasswordsMatch(false);
+      return;
+    }
+
     try {
       navigate('/register2');
     } catch {
-      setError('Registro fallido. Verifica tus datos.');
+      setError('Error al registrarse. Por favor, inténtalo de nuevo.');
       setShowModal(true);
     }
   };
 
   return (
-    <div className="container-register">
-      <div className="square-main">
+    <div className='container-register-1'>
+      <div className='container-register-2'>
         {/* Titulo */}
         <h2 className='header-register'>Registro</h2>
 
-        <form onSubmit={handleRegister1}>
-          {/* Email */}
-          <div className='container-email-register'>
-            <p className='correo-texto-register'>Correo</p>
+        <form onSubmit={handleRegister}>
+          <div className='container-register-3'>
 
-            {/* Caja de correo */}
-            <div className="relative">
-              <input
-                className={`correo-caja-register ${invalidEmail ? 'border-red-500' : ''}`}
-                type="correo"
-                placeholder="Ingresa el correo"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  setInvalidEmail(false);
-                }}
-              />
+            {/* Email */}
+            <div className='container-correo-register'>
+              <p className='correo-texto-register'>Correo</p>
 
-              {/* Advertencia de correo */}
-              {invalidEmail && (
-                <div className="absolute left-0 mt-1 bg-white bg-opacity-0 p-1 rounded flex items-center">
-                  <FaExclamationCircle className="text-red-500 text-base mr-2" />
-                  <span className="text-red-500 text-base">Formato de correo inválido</span>
-                </div>
-              )}
+              {/* Caja de correo */}
+              <FaEnvelope className="register-icons" />
+              <div className="relative">
+                <input
+                  className={`correo-caja-register ${invalidEmail ? 'border-red-register' : ''}`}
+                  type="correo"
+                  placeholder="Ingresa el correo"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    setInvalidEmail(false);
+                  }}
+                />
+
+                {/* Advertencia de correo */}
+                {invalidEmail && (
+                  <div className="custom-alert-register bg-custom-color-register" style={{ marginTop: '-5px' }}>
+                    <FaExclamationCircle className="custom-alert-icon-register" />
+                    <span>Formato de correo inválido</span>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Contraseña */}
-          <div className='container-contrasena-register'>
-            <p className='contrasena-texto-register'>Contraseña</p>
-            <div className="relative" style={{ marginLeft: "50px" }}>
+            {/* Contraseña */}
+            <div className='container-contrasena-register'>
+              <div className='container-contrasena-register-2'>
+                <p className='contrasena-texto-register'>Contraseña</p>
+                {/* Info de contraseña */}
+                <PasswordInfo />
+              </div>
+
               {/* Ojo */}
-              <input
-                className="ojo-contrasena-register"
+              <FaLock className="register-icons" />
+              <input 
+                className={`ojo-contrasena-register ${invalidPassword ? 'border-red-register' : ''}`}
                 type={showPassword ? 'text' : 'password'}
-                placeholder="Ingresa la contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)} 
+                placeholder="Ingresa la contraseña" 
+                value={password}  
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  setInvalidPasswordl(false);
+                }} 
               />
               <span className="ojo-contrasena-2-register" onClick={() => setShowPassword(!showPassword)}>
                 {showPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
-            </div>
-          </div>
 
-          {/* Confirmar contraseña */}
-          <div className='container-contrasena-register'>
-            <p className='contrasena-texto-register'>Confirmar Contraseña</p>
-            <div className="relative" style={{ marginLeft: "50px" }}>
+              {/* Advertencia de contraseña */}
+              {invalidPassword && (
+                <div className="custom-alert-register bg-custom-color-register" style={{ marginTop: '85px' }}>
+                  <FaExclamationCircle className="custom-alert-icon-register" />
+                  <span>Formato de contraseña inválido</span>
+                </div>
+              )}
+            </div>
+            
+            {/* Confirmar Contraseña */}
+            <div className='container-contrasena-register'>
+              <p className='contrasena-texto-register'>Confirmar Contraseña</p>
+              
               {/* Ojo */}
-              <input
-                className="ojo-contrasena-register"
-                type={showPassword2 ? 'text' : 'password'}
-                placeholder="Ingresa la contraseña de nuevo"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)} 
+              <FaLock className="register-icons" />
+              <input 
+                className={`ojo-contrasena-register ${!passwordsMatch ? 'border-red-register' : ''}`}
+                type={showConfirmPassword ? 'text' : 'password'}
+                placeholder="Confirma la contraseña" 
+                value={confirmPassword} 
+                onChange={(e) => {
+                  setConfirmPassword(e.target.value);
+                  setPasswordsMatch(true);
+                }} 
               />
-              <span className="ojo-contrasena-2-register" onClick={() => setShowPassword2(!showPassword2)}>
-                {showPassword2 ? <FaEyeSlash /> : <FaEye />}
+              <span className="ojo-contrasena-2-register" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
               </span>
+
+              {/* Advertencia de contraseñas no coinciden */}
+              {!passwordsMatch && (
+                <div className="custom-alert-register bg-custom-color-register" style={{ marginTop: '85px' }}>
+                  <FaExclamationCircle className="custom-alert-icon-register" />
+                  <span>Las contraseñas no coinciden</span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -135,29 +212,28 @@ export const Register = () => {
             </div>
       
           </div>
+
         </form>
       </div>
 
       {/* Botón de Políticas de Privacidad */}
       <div className='politicas-contenedor'> 
-        <button className='boton-politicas-privacidad' onClick={() => setShowPrivacyPolicy(true)}>Políticas de Privacidad</button>
+        <button className='boton-politicas-privacidad' onClick={() => setShowPrivacyPolicy(true)}>Políticas de privacidad y uso</button>
       </div>
       
-
       {/* Popup de Políticas de Privacidad */}
       {showPrivacyPolicy && <PrivacyPolicy onClose={() => setShowPrivacyPolicy(false)} />}
-
-      {/* Popup de Error */}
+      
+      {/* Pop-up de error */}
       {showModal && (
         <div className='pop-up-register'>
-          <div className='pop-up-register-3'>
+          <div className='pop-up-3-register'>
             <h2 style={{textAlign: 'center'}}>Error</h2>
             <p style={{textAlign: 'left', marginTop: '20px'}}>{error}</p>
             <button onClick={() => setShowModal(false)}>Cerrar</button>
           </div>
         </div>
       )}
-
     </div>
-  );
-};
+  )
+}

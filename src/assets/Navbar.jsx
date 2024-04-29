@@ -16,6 +16,7 @@ const Navbar = ({ isCreateOpen, toggleCreate }) => {
       }, delayDuration);
 
       return () => clearTimeout(timeoutId);
+
     } else {
       // Navbar cerrado oculta el texto
       setShowText(false);
@@ -72,8 +73,8 @@ const Navbar = ({ isCreateOpen, toggleCreate }) => {
       
       {/* Botón crear */}
       <Link to="/create" onClick={() => setSelectedTab('create')}>
-        <button type="button" className="btn" style={{ fontSize: "18px", width: isCreateOpen ? "130px" : "50px", backgroundColor: "#D9D9D9", borderRadius: "18px", height: "50px", fontWeight: "bold" }}>
-          {isCreateOpen ? 'Crear' : <FaPlus />}
+        <button type="button" className="btn" style={{ fontSize: "18px", width: isCreateOpen ? (showText && "130px") : "50px", backgroundColor: "#D9D9D9", borderRadius: "18px", height: "50px", fontWeight: "bold" }}>
+          {isCreateOpen ? (showText && 'Crear') : <FaPlus />}
         </button>
       </Link>
 

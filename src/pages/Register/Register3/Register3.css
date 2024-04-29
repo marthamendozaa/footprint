@@ -1,0 +1,165 @@
+.register3-body {
+    background-color: #CEDDE2;
+}
+
+.container-register3-1 {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    height: 100%;
+    width: 100vh;
+    justify-content: center;
+    align-items: center;
+}  
+
+.container-register3-2 {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    height: 475px;
+    width: 450px;
+    background-color: #ffffff;
+    border-radius: 30px;
+}
+
+.container-register3-3{
+    display: flex;
+    position: relative;
+    align-items: flex-start;
+    margin-left: 50px;
+    padding-top: 38px;
+    height: 60px;
+}
+
+.texto-register3 {
+    display: flex;
+    position: relative;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.header-register3 {
+    display:flex;
+    flex-direction: column;
+    text-align: center;
+    margin-top: 35px;
+}
+
+.intereses-register3 {
+    display: flex;
+    flex-direction: row;
+    margin-top: 20px;
+    margin-left: 35px;
+    margin-right: 35px;
+    height: 312px;
+    /*overflow-y: auto;*/
+}
+
+.intereses-register3::-webkit-scrollbar {
+    display: none;
+}
+
+.r3-etiquetas {
+    display: flex;
+    flex-wrap: wrap;
+    height: min-content;
+    gap: 15px;
+    justify-content: flex-start;
+}
+  
+.r3-etiquetas li {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #f2f2f2;
+    border: 3px solid transparent;
+    padding: 15px 15px;
+    border-radius: 35px;
+    margin: 5px;
+}
+  
+li.r3-etiquetas-item {
+    max-width: calc(47% - 8px);
+    min-width: calc(47% - 8px);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+}
+  
+li.r3-etiquetas-item.highlighted {
+    background-color: #bcd9e7;
+    border: 3px solid #000;
+}
+  
+li.r3-etiquetas-item:hover {
+    border: 3px solid #000;
+}
+
+.flecha-register3-container {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    height: 25%;
+    align-items: center
+}
+
+.flecha-register3-container-start {
+    padding: 10px;
+    display: flex;
+    position: absolute;
+    left: 0;
+}
+
+.flecha-register3-container-end {
+    padding: 10px;
+    display: flex;
+    position: absolute;
+    right: 0;
+}
+
+.flecha-register3-container button.btn {
+    color: #6b6b6b;
+    font-size: 40px;
+    background-color: transparent;
+    border: none;
+}
+
+.flecha-register3-container button.btn:hover {
+    color: #000000;
+}
+
+.pop-up-register3 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.pop-up-3-register3 {
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    font-size: 20px;
+}
+
+.pop-up-3-register3 button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 30px;
+    color: #000;
+    background-color: #A0C1BF;
+    padding: 10px 30px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+}
+
+.pop-up-3-register3 button:hover {
+    background-color: #699AA0;
+}

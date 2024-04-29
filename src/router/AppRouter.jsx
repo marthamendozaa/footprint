@@ -11,7 +11,9 @@ import { Profile } from '../pages/Profile/Profile.jsx';
 import { Create } from '../pages/Create/Create.jsx';
 import { Login } from '../pages/Login/Login.jsx';
 import { Register } from '../pages/Register/Register1/Register.jsx';
-import { Register2} from '../pages/Register/Register2/Register2.jsx';
+import { Register2 } from '../pages/Register/Register2/Register2.jsx';
+import { Register3 } from '../pages/Register/Register3/Register3.jsx';
+import { Register4} from '../pages/Register/Register4/Register4.jsx';
 import { ExploreAdmin } from '../pages/ExploreAdmin/ExploreAdmin.jsx';
 import { ProfileAdmin } from '../pages/ProfileAdmin/ProfileAdmin.jsx';
 import { getEsAdmin } from '../pages/Login/Login-fb.js';
@@ -78,6 +80,8 @@ export const AppRouter = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/register2" element={<Register2 />} />
+            <Route path="/register3" element={<Register3 />} />
+            <Route path="/register4" element={<Register4 />} />
 
             {currentUser && esAdmin && (
                 <>

@@ -16,6 +16,7 @@ const NavbarAdmin = ({ isCreateOpen, toggleCreate }) => {
       }, delayDuration);
       
       return () => clearTimeout(timeoutId);
+      
     } else {
       // Navbar cerrado oculta el texto
       setShowText(false);

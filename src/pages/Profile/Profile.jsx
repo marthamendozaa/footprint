@@ -209,35 +209,52 @@ export const Profile = () => {
 
   return (
     <div className="profile-page">
+      {/* Spinner */}
       {habilidades && habilidadesUsuario && intereses && interesesUsuario ? (
-      <header className="Profile-header">
-        <h1>Mi perfil</h1>
+        <header className="Profile-header">
+          {/* Titulo */}
+          <h1>Mi perfil</h1>
+
+          {/* Información del usuario */}
           <div className="profile-info">
+
+            {/* Info foto */}
             <div className="profile-info-left">
+              {/* Foto de perfil */}
               <div className="Foto-perfil position-relative">
                 <img src={informacionUsuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
-                <FaPen className="edit-icon" onClick={openModal} /> {/* Abrir el modal al hacer clic en el ícono */}
+                <FaPen className="edit-icon" onClick={openModal} />
               
-                {/* Modal */}
+                {/* Modal para subir imagen */}
                 <Modal show={showModal} onHide={() => setShowModal(false)}>
-                      <Modal.Header closeButton>
-                          <Modal.Title className='p-modaltitle'>Foto de perfil</Modal.Title>
-                      </Modal.Header>
-                      <Modal.Body className='p-modalinfo'>
-                      <input type="file" accept="image/*" onChange={(e) => setSelectedImage(e.target.files[0])} />
-                      {errorI && <p style={{ color: 'red' }}>{errorI}</p>}
-                      </Modal.Body>
-                      <Modal.Footer>
-                          <button variant="secondary" onClick={handleUploadProfileImage}>
-                              Guardar Imagen
-                          </button>
-                      </Modal.Footer>
-                  </Modal>
+                  {/* Botón para cerrar el modal + titulo */}
+                  <Modal.Header closeButton>
+                    <Modal.Title className='p-modaltitle'>Foto de perfil</Modal.Title>
+                  </Modal.Header>
+                  
+                  {/* Subir imagen */}
+                  <Modal.Body className='p-modalinfo'>
+                    <input type="file" accept="image/*" onChange={(e) => setSelectedImage(e.target.files[0])} />
+                    {errorI && <p style={{ color: 'red' }}>{errorI}</p>}
+                  </Modal.Body>
+                  
+                  {/* Botón para guardar la imagen */}
+                  <Modal.Footer>
+                    <button variant="secondary" onClick={handleUploadProfileImage}>
+                      Guardar Imagen
+                    </button>
+                  </Modal.Footer>
+                </Modal>
+
               </div>
-          </div>
-          <div className="profile-info-right">
-            <div className="name-container">
-              <h2>
+            </div>
+
+            {/* Información a lado de la foto */}
+            <div className="profile-info-right">
+              {/* Nombre del usuario */}
+              <div className="name-container">
+                <h2>
+                  {/* Nombre del usuario */}
                   {editingNombre ? (
                     <input
                       type="text"
@@ -247,50 +264,73 @@ export const Profile = () => {
                   ) : (
                     informacionUsuario.nombre
                   )}
+
+                  {/* Botón para editar el nombre */}
                   {!editingNombre && (
                     <button className="edit-profile-btn" onClick={handleNombreEdit}>
                       <FaPen />
                     </button>
                   )}
+
+                  {/* Botón para guardar el nombre */}
                   {editingNombre && (
                     <button className="edit-profile-btn guardar" onClick={handleNombreSubmit}>
                       Guardar
                     </button>
                   )}
                 </h2>
-                </div>
+              </div>
+              
+              {/* Edad */}
               <p>{informacionUsuario.edad} años</p>
+
+              {/* Usuario */}
               <h3>{informacionUsuario.nombreUsuario} </h3>
+
+              {/* Correo */}
               <p>{informacionUsuario.correo} </p>
+
+              {/* Cambiar contraseña */}
               <p className="change-password" onClick={handleChangePassword}>Cambiar contraseña</p>
               {cambiandoContrasena && (
                 <form className="change-password-form" onSubmit={handleSubmitPassword}>
+                  {/* Contraseña actual */}
                   <input
                     className='change-password-input' type="password"
                     placeholder="Contraseña actual"
                     value={contrasenaActual}
                     onChange={(e) => setContrasenaActual(e.target.value)}
                   />
+
+                  {/* Nueva contraseña */}
                   <input
                     className='change-password-input' type="password"
                     placeholder="Nueva contraseña"
                     value={nuevaContrasena}
                     onChange={(e) => setNuevaContrasena(e.target.value)}
                   />
+
+                  {/* Confirmar nueva contraseña */}
                   <input
                     className='change-password-input' type="password"
                     placeholder="Confirmar nueva contraseña"
                     value={confirmarContrasena}
                     onChange={(e) => setConfirmarContrasena(e.target.value)}
                   />
+
+                  {/* Botones para cancelar o guardar */}
                   <button className="change-password-cancel" type="button" onClick={handleCancelarCambioContrasena}>Cancelar</button>
                   <button className='change-password-submit' type="submit">Guardar</button>
+
+                  {/* Mensaje de error */}
                   {error && <p style={{ color: 'red' }}>{error}</p>}
                 </form>
               )}
-              </div>
-              
+
+            </div>
           </div>
+
+          {/* Habilidades */}
           <div className="subtitle skills-interests">
             <h3>Habilidades</h3>
             <div className='p-etiquetas'>
@@ -301,6 +341,8 @@ export const Profile = () => {
               ))}
             </div>
           </div>
+
+          {/* Intereses */}
           <div className="subtitle skills-interests">
             <h3>Temas de interés</h3> 
             <div className='p-etiquetas'>
@@ -311,15 +353,19 @@ export const Profile = () => {
               ))}
             </div>
           </div>
+
+          {/* Botón para cerrar sesión */}
           <div className="perfil-logout" style={{borderRadius: "18px"}}>
             <button onClick={botonCerrarSesion}>Cerrar Sesión</button>
-            </div>
+          </div>
         </header>
+      
       ) : (
         <div className="spinner">
           <Spinner animation="border" role="status"></Spinner>
         </div>
       )}
+
     </div>
   )
 }
