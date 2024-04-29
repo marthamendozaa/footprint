@@ -185,7 +185,7 @@ li.c-etiqueta-item:hover {
   height: 50px;
 }
 
-.react-datepicker__input-container input {
+.react-datepicker__input-container-create {
   width: 100px;
   font-family: "Inter", sans-serif;
   font-weight: 600;

@@ -5,6 +5,7 @@ import { Modal, Button, Spinner } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
+import es from 'date-fns/locale/es';
 import { getEtiquetas, getRegiones, crearIniciativa } from './Create-fb.js';
 import Iniciativa from '../../backend/obj-Iniciativa.js';
 import './Create.css';
@@ -296,10 +297,12 @@ export const Create = () => {
                         </div>
                       </div>
                       <DatePicker
+                        className='react-datepicker__input-container-create'
                         selected={fechaInicio}
                         onChange={(date) => setFechaInicio(date)}
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerInicio}
+                        locale={es}
                       />
                     </div>
                     
@@ -314,10 +317,12 @@ export const Create = () => {
                         </div>
                       </div>
                       <DatePicker
+                        className='react-datepicker__input-container-create'
                         selected={fechaCierre}
                         onChange={(date) => setFechaCierre(date)}
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerCierre}
+                        locale={es}
                       />
                     </div>
                   </div>

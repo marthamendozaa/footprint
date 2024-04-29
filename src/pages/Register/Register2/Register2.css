@@ -1,0 +1,238 @@
+.register2-body {
+    background-color: #CEDDE2;
+}
+
+.container-register2-1 {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    height: 100%;
+    width: 100vh;
+    justify-content: center;
+    align-items: center;
+}  
+
+.container-register2-2 {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    height: 475px;
+    width: 450px;
+    background-color: #ffffff;
+    border-radius: 30px;
+}
+
+.container-register2-3 {
+    display: flex;
+    position: relative;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 30px;
+    height: 389px;
+    justify-content: space-around;
+}
+
+.header-register2 {
+    display:flex;
+    flex-direction: column;
+    text-align: center;
+    margin-top: 35px
+}
+
+.register2-icons {
+    display: flex;
+    position: absolute;
+    margin-left: 20px;
+    margin-top: 61px;
+    z-index: 1;
+}
+
+.container-nombre-register2 {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0px;
+}
+
+.nombre-texto-register2 {
+    align-self: flex-start;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.nombre-caja-register2 {
+    display: flex;
+    position: relative;
+    align-items: center;
+    width: 350px;
+    height: 45px;
+    border-radius: 30px;
+    border-color: #000000;
+    border-style: solid;
+    padding-left: 50px;
+    background-color: #ffffff;
+}
+
+.border-red-register2 {
+    border-color: #ff0000 !important;
+}
+
+.bg-custom-color-register2 {
+    background-color: transparent;
+}
+  
+.custom-alert-register2 {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    border-radius: 30px;
+    margin-top: -2px;
+    padding: 5px;
+}
+  
+.custom-alert-register2 span {
+    color: #ff0000;
+    font-size: 14px;
+    margin-left: 5px
+}
+
+.custom-alert-icon-register2 {
+    color: #ff0000;
+    font-size: 14px;
+    margin-left: 5px
+}
+
+.container-usuario-register2 {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+.usuario-texto-register2 {
+    display: flex;
+    justify-content: start;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.usuario-caja-register2 {
+    display: flex;
+    position: relative;
+    align-items: center;
+    width: 350px;
+    height: 45px;
+    border-radius: 30px;
+    border-color: #000000;
+    border-style: solid;
+    padding-left: 50px;
+    background-color: #ffffff;
+}
+
+.container-fecha-register2 {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 20px;
+}
+
+.react-datepicker__input-container.input-register2 input {
+    font-family: "Inter", sans-serif;
+    font-size: 12px;
+    text-align: center;
+    background: none;
+    border: 2px solid #ff0000;
+    border-radius: 3px;
+}
+
+.fecha-texto-register2 {
+    display: flex;
+    justify-content: start;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.fecha-caja-register2 {
+    display: flex;
+    position: relative;
+    align-items: center;
+    width: 350px;
+    height: 45px;
+    border-radius: 30px;
+    border-color: #000000;
+    border-style: solid;
+    padding-left: 50px;
+    background-color: #ffffff;
+}
+
+.flecha-register2-container {
+    display: flex;
+    flex-direction: row;
+    position: relative;
+    height: 23%;
+    align-items: center
+}
+
+.flecha-register2-container-start {
+    padding: 10px;
+    display: flex;
+    position: absolute;
+    left: 0;
+}
+
+.flecha-register2-container-end {
+    padding: 10px;
+    display: flex;
+    position: absolute;
+    right: 0;
+}
+
+.flecha-register2-container button.btn {
+    color: #6b6b6b;
+    font-size: 40px;
+    background-color: transparent;
+    border: none;
+}
+
+.flecha-register2-container button.btn:hover {
+    color: #000000;
+}
+
+.pop-up-register2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.pop-up-3-register2 {
+    background: #fff;
+    padding: 20px;
+    border-radius: 20px;
+    font-size: 20px;
+}
+
+.pop-up-3-register2 button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 30px;
+    color: #000;
+    background-color: #A0C1BF;
+    padding: 10px 30px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+}
+
+.pop-up-3-register2 button:hover {
+    background-color: #699AA0;
+}
