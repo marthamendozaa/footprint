@@ -14,17 +14,16 @@ exports.autentificaUsuario = onRequest(async (req, res) => {
 
   try {
     const user = await auth.getUserByEmail(email);
-
     const userPassword = user.passwordHash.split('password=')[1];
-    const passwordMatch = (userPassword === password);
-
-    if (passwordMatch) {
+    if (userPassword === password) {
       res.json({ success: true, data: user.uid });
     } else {
+      logger.info("Contraseña incorrecta");
       res.status(401).json({ success: false, error: 'Authentication failed' });
     }
   } catch (error) {
-    res.status(401).json({ success: false, error: 'Authentication failed' });
+    logger.info("Error en autentificación: ", error.message);
+    res.status(401).json({ success: false, error: error.message });
   }
 });
 
@@ -36,10 +35,23 @@ exports.getUsuario = onRequest(async (req, res) => {
   try {
     const usuarioRef = await getFirestore().doc(`Usuarios/${user}`).get();
     const usuario = usuarioRef.data();
-    
     res.json({ success: true, data: usuario });
   } catch (error) {
-    console.error("Error obteniendo usuario: ", error.message);
+    logger.info("Error obteniendo usuario: ", error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
+// Actualiza información del usuario
+exports.actualizaUsuario = onRequest(async (req, res) => {
+  const { user, data } = req.body;
+
+  try {
+    await getFirestore().doc(`Usuarios/${user}`).update(data);
+    res.json({ success: true });
+  } catch (error) {
+    logger.info("Error actualizando usuario: ", error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -50,10 +62,9 @@ exports.getHabilidades = onRequest(async (req, res) => {
   try {
     const habilidadesRef = await getFirestore().doc("General/Habilidades").get();
     const habilidades = habilidadesRef.data();
-    
     res.json({ success: true, data: habilidades });
   } catch (error) {
-    console.error("Error obteniendo lista de habilidades: ", error.message);
+    logger.info("Error obteniendo lista de habilidades: ", error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -64,10 +75,9 @@ exports.getIntereses = onRequest(async (req, res) => {
   try {
     const interesesRef = await getFirestore().doc("General/Intereses").get();
     const intereses = interesesRef.data();
-    
     res.json({ success: true, data: intereses });
   } catch (error) {
-    console.error("Error obteniendo lista de intereses: ", error.message);
+    logger.info("Error obteniendo lista de intereses: ", error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -78,10 +88,9 @@ exports.getRegiones = onRequest(async (req, res) => {
   try {
     const regionesRef = await getFirestore().doc("General/Regiones").get();
     const regiones = regionesRef.data();
-    
     res.json({ success: true, data: regiones });
   } catch (error) {
-    console.error("Error obteniendo lista de regiones: ", error.message);
+    logger.info("Error obteniendo lista de regiones: ", error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });

@@ -18,15 +18,31 @@ export const autentificaUsuario = async (email, password) => {
 
 
 // Información del usuario
-export const getUsuario = async (id) => {
+export const getUsuario = async (user) => {
   const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/getUsuario", {
-    user: id
+    user: user
   });
   if (response.data.success) {
     console.log("Obtener usuario exitoso");
     return response.data.data;
   } else {
     console.log("Error obteniendo usuario");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Actualiza información del usuario
+export const actualizaUsuario = async (user, data) => {
+  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/actualizaUsuario", {
+    user: user,
+    data: data
+  });
+  if (response.data.success) {
+    console.log("Actualizando usuario exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error actualizando usuario");
     throw new Error(response.data.error);
   }
 };

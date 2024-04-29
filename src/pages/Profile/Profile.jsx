@@ -3,8 +3,8 @@ import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { getUsuario, getHabilidades, getIntereses } from '../../api/api.js';
-import { updateUsuarioNombre, actualizaHabilidades, actualizaIntereses, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
+import { getUsuario, actualizaUsuario, getHabilidades, getIntereses } from '../../api/api.js';
+import { cambiarContrasena, uploadProfileImage, deleteProfileImage } from './Profile-fb.js';
 import Usuario from '../../backend/obj-Usuario.js';
 import Modal from 'react-bootstrap/Modal';
 import './Profile.css';
@@ -25,22 +25,22 @@ export const Profile = () => {
 
 
   // Información del perfil
-  const [informacionUsuario, setinformacionUsuario] = useState(new Usuario());
+  const [usuario, setUsuario] = useState(new Usuario());
+  const [habilidades, setHabilidades] = useState(null);
+  const [intereses, setIntereses] = useState(null);
   
   useEffect(() => {
     const fetchData = async () => {
       if (!sesionCerrada) {
-        const infoUsuario = await getUsuario(user);
-        const objUsuario = { ...informacionUsuario, ...infoUsuario };
-        setinformacionUsuario(objUsuario);
-        setHabilidadesUsuario(objUsuario.listaHabilidades);
-        setInteresesUsuario(objUsuario.listaIntereses);
+        const usuarioData = await getUsuario(user);
+        const objUsuario = { ...usuario, ...usuarioData };
+        setUsuario(objUsuario);
 
         const habilidadesData = await getHabilidades();
         setHabilidades(habilidadesData);
 
         const interesesData = await getIntereses();
-        setIntereses(interesesData);        
+        setIntereses(interesesData);
       }
     };
     fetchData();
@@ -53,7 +53,7 @@ export const Profile = () => {
 
   const handleNombreEdit = () => {
     setEditingNombre(true);
-    setNuevoNombre(informacionUsuario.nombre);
+    setNuevoNombre(usuario.nombre);
   };
 
   const handleNombreChange = (event) => {
@@ -61,56 +61,48 @@ export const Profile = () => {
   };
 
   const handleNombreSubmit = async () => {
-    await updateUsuarioNombre(nuevoNombre);
+    const usuarioNuevo = { ...usuario, nombre: nuevoNombre };
+    setUsuario(usuarioNuevo);
     setEditingNombre(false);
-    const infoUsuario = await getUsuario();
-    setinformacionUsuario(infoUsuario);
+    await actualizaUsuario(user, usuarioNuevo);
   };
-
-
-  // Habilidades del usuario
-  const [habilidades, setHabilidades] = useState(null);
-  const [habilidadesUsuario, setHabilidadesUsuario] = useState(null);
   
+
   // Editar habilidades
   const toggleHabilidad = async (habilidad, idHabilidad) => {
-    const habilidadesUsuarioNueva = { ...habilidadesUsuario };
+    const usuarioNuevo = { ...usuario };
 
-    if (Object.keys(habilidadesUsuarioNueva).includes(`${idHabilidad}`)) {
-      if (Object.keys(habilidadesUsuarioNueva).length === 1) {
+    if (Object.keys(usuarioNuevo.listaHabilidades).includes(`${idHabilidad}`)) {
+      if (Object.keys(usuarioNuevo.listaHabilidades).length === 1) {
         alert("Debes tener al menos una habilidad");
         return;
       }
-      delete habilidadesUsuarioNueva[idHabilidad];
+      delete usuarioNuevo.listaHabilidades[idHabilidad];
     } else {
-      habilidadesUsuarioNueva[idHabilidad] = habilidad;
+      usuarioNuevo.listaHabilidades[idHabilidad] = habilidad;
     }
     
-    setHabilidadesUsuario(habilidadesUsuarioNueva);
-    await actualizaHabilidades(habilidadesUsuarioNueva);
+    setUsuario(usuarioNuevo);
+    await actualizaUsuario(user, usuarioNuevo);
   };
   
 
-  // Intereses del usuario
-  const [intereses, setIntereses] = useState(null);
-  const [interesesUsuario, setInteresesUsuario] = useState(null);
-  
   // Editar intereses
   const toggleInteres = async (interes, idInteres) => {
-    const interesesUsuarioNueva = { ...interesesUsuario };
+    const usuarioNuevo = { ...usuario };
 
-    if (Object.keys(interesesUsuarioNueva).includes(`${idInteres}`)) {
-      if (Object.keys(interesesUsuarioNueva).length === 1) {
+    if (Object.keys(usuarioNuevo.listaIntereses).includes(`${idInteres}`)) {
+      if (Object.keys(usuarioNuevo.listaIntereses).length === 1) {
         alert("Debes tener al menos un interés");
         return;
       }
-      delete interesesUsuarioNueva[idInteres];
+      delete usuarioNuevo.listaIntereses[idInteres];
     } else {
-      interesesUsuarioNueva[idInteres] = interes;
+      usuarioNuevo.listaIntereses[idInteres] = interes;
     }
   
-    setInteresesUsuario(interesesUsuarioNueva);
-    await actualizaIntereses(interesesUsuarioNueva);
+    setUsuario(usuarioNuevo);
+    await actualizaUsuario(user, usuarioNuevo);
   };
 
 
@@ -183,11 +175,10 @@ export const Profile = () => {
       if (informacionUsuario.urlImagen) {
         await deleteProfileImage(informacionUsuario.urlImagen);
       }
-
       const imageUrl = await uploadProfileImage(selectedImage);
-      await updateUsuarioImage(imageUrl);
-      const infoUsuario = await getUsuario();
-      setinformacionUsuario(infoUsuario);
+      const usuarioNuevo = { ...usuario, urlImagen: imageUrl };
+      setUsuario(usuarioNuevo);
+      await actualizaUsuario(user, usuarioNuevo);
       closeModal();
     } catch (error) {
       console.error("Error al subir la imagen de perfil:", error.message);
@@ -197,7 +188,7 @@ export const Profile = () => {
   return (
     <div className="profile-page">
       {/* Spinner */}
-      {habilidades && habilidadesUsuario && intereses && interesesUsuario ? (
+      {usuario && habilidades && intereses ? (
         <header className="Profile-header">
           {/* Titulo */}
           <h1>Mi perfil</h1>
@@ -209,7 +200,7 @@ export const Profile = () => {
             <div className="profile-info-left">
               {/* Foto de perfil */}
               <div className="Foto-perfil position-relative">
-                <img src={informacionUsuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
+                <img src={usuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
                 <FaPen className="edit-icon" onClick={openModal} />
               
                 {/* Modal para subir imagen */}
@@ -249,7 +240,7 @@ export const Profile = () => {
                       onChange={handleNombreChange}
                     />
                   ) : (
-                    informacionUsuario.nombre
+                    usuario.nombre
                   )}
 
                   {/* Botón para editar el nombre */}
@@ -269,13 +260,13 @@ export const Profile = () => {
               </div>
               
               {/* Edad */}
-              <p>{informacionUsuario.edad} años</p>
+              <p>{usuario.edad} años</p>
 
               {/* Usuario */}
-              <h3>{informacionUsuario.nombreUsuario} </h3>
+              <h3>{usuario.nombreUsuario} </h3>
 
               {/* Correo */}
-              <p>{informacionUsuario.correo} </p>
+              <p>{usuario.correo} </p>
 
               {/* Cambiar contraseña */}
               <p className="change-password" onClick={handleChangePassword}>Cambiar contraseña</p>
@@ -322,7 +313,7 @@ export const Profile = () => {
             <h3>Habilidades</h3>
             <div className='p-etiquetas'>
               {Object.values(habilidades).map((habilidad, idHabilidad) => (
-                <li key={idHabilidad} className={`p-etiquetas-item ${Object.values(habilidadesUsuario).includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
+                <li key={idHabilidad} className={`p-etiquetas-item ${Object.values(usuario.listaHabilidades).includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
                   {habilidad}
                 </li>
               ))}
@@ -334,7 +325,7 @@ export const Profile = () => {
             <h3>Temas de interés</h3> 
             <div className='p-etiquetas'>
               {Object.values(intereses).map((interes, idInteres) => (
-                <li key={idInteres} className={`p-etiquetas-item  ${Object.values(interesesUsuario).includes(interes) ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
+                <li key={idInteres} className={`p-etiquetas-item  ${Object.values(usuario.listaIntereses).includes(interes) ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
                   {interes}
                 </li>
               ))}
