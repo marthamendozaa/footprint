@@ -56,28 +56,28 @@ export const deleteProfileImage = async (imageUrl) => {
 };
 
 // Perfil: información del usuario
-export const getUsuario = async () => {
-  const user = JSON.parse(sessionStorage.getItem('user'));
-  if (!user) {
-    console.error("No hay usuario autenticado");
-    return null;
-  }
+// export const getUsuario = async () => {
+//   const user = JSON.parse(sessionStorage.getItem('user'));
+//   if (!user) {
+//     console.error("No hay usuario autenticado");
+//     return null;
+//   }
 
-  try {
-    const usuarioDocRef = doc(firestore, "Usuarios", user.uid);
-    const docSnapshot = await getDoc(usuarioDocRef);
+//   try {
+//     const usuarioDocRef = doc(firestore, "Usuarios", user.uid);
+//     const docSnapshot = await getDoc(usuarioDocRef);
 
-    if (docSnapshot.exists()) {
-      return docSnapshot.data();
-    } else {
-      console.log("El usuario no existe");
-      return null;
-    }
-  } catch (error) {
-    console.error("Error obteniendo usuario:", error.message);
-    return null;
-  }
-};
+//     if (docSnapshot.exists()) {
+//       return docSnapshot.data();
+//     } else {
+//       console.log("El usuario no existe");
+//       return null;
+//     }
+//   } catch (error) {
+//     console.error("Error obteniendo usuario:", error.message);
+//     return null;
+//   }
+// };
 
 // Actualizar nombres del usuario
 export const updateUsuarioNombre = async (nuevoNombre) => {
@@ -136,25 +136,25 @@ export const cambiarContrasena = async (contrasenaActual, nuevaContrasena) => {
 
 
 // Habilidades: habilidades del usuario
-export const getHabilidadesUsuario = async () => {
-  const user = JSON.parse(sessionStorage.getItem('user'));
-  if (!user) {
-    console.error("No hay usuario autenticado");
-    return null;
-  }
+// export const getHabilidadesUsuario = async () => {
+//   const user = JSON.parse(sessionStorage.getItem('user'));
+//   if (!user) {
+//     console.error("No hay usuario autenticado");
+//     return null;
+//   }
 
-  try {
-    const usuarioRef = doc(firestore, "Usuarios", user.uid);
-    const usuarioSnapshot = await getDoc(usuarioRef);
+//   try {
+//     const usuarioRef = doc(firestore, "Usuarios", user.uid);
+//     const usuarioSnapshot = await getDoc(usuarioRef);
 
-    const listaHabilidades = usuarioSnapshot.data().listaHabilidades;
+//     const listaHabilidades = usuarioSnapshot.data().listaHabilidades;
 
-    return listaHabilidades;
-  } catch (error) {
-    console.error("Error obteniendo lista de habilidades del usuario: ", error.message);
-    return null;
-  }
-};
+//     return listaHabilidades;
+//   } catch (error) {
+//     console.error("Error obteniendo lista de habilidades del usuario: ", error.message);
+//     return null;
+//   }
+// };
 
 
 // Habilidades: actualiza habilidades
@@ -190,25 +190,25 @@ export const actualizaHabilidades = async (listaHabilidadesNueva) => {
 
 
 // Intereses: intereses del usuario
-export const getInteresesUsuario = async () => {
-  const user = JSON.parse(sessionStorage.getItem('user'));
-  if (!user) {
-    console.error("No hay usuario autenticado");
-    return null;
-  }
+// export const getInteresesUsuario = async () => {
+//   const user = JSON.parse(sessionStorage.getItem('user'));
+//   if (!user) {
+//     console.error("No hay usuario autenticado");
+//     return null;
+//   }
 
-  try {
-    const usuarioRef = doc(firestore, "Usuarios", user.uid);
-    const usuarioSnapshot = await getDoc(usuarioRef);
+//   try {
+//     const usuarioRef = doc(firestore, "Usuarios", user.uid);
+//     const usuarioSnapshot = await getDoc(usuarioRef);
 
-    const listaIntereses = usuarioSnapshot.data().listaIntereses;
+//     const listaIntereses = usuarioSnapshot.data().listaIntereses;
 
-    return listaIntereses;
-  } catch (error) {
-    console.error("Error obteniendo lista de intereses del usuario: ", error.message);
-    return null;
-  }
-};
+//     return listaIntereses;
+//   } catch (error) {
+//     console.error("Error obteniendo lista de intereses del usuario: ", error.message);
+//     return null;
+//   }
+// };
 
 
 // Intereses: actualiza intereses
@@ -230,12 +230,12 @@ export const actualizaIntereses = async (listaInteresesNueva) => {
 
 
 // Cierra sesión: cierre de sesión del usuario
-export const cerrarSesion = async () => {
-  try {
-    await signOut(auth);
-    console.log("Sesión cerrada exitosamente");
-  } catch (error) {
-    console.error("Error al cerrar sesión:", error.message);
-    throw error;
-  }
-};
+// export const cerrarSesion = async () => {
+//   try {
+//     await signOut(auth);
+//     console.log("Sesión cerrada exitosamente");
+//   } catch (error) {
+//     console.error("Error al cerrar sesión:", error.message);
+//     throw error;
+//   }
+// };

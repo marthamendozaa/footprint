@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { autentificaUsuario, getEsAdmin } from '../../api/api.js';
+import { autentificaUsuario, getUsuario } from '../../api/api.js';
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
 import evertechImage from '../../assets/evertech.png';
 import './Login.css';
@@ -54,10 +54,10 @@ export const Login = () => {
       const user = await autentificaUsuario(email, password);
       setUser(user);
 
-      const admin = await getEsAdmin(user);
-      setAdmin(admin);
+      const admin = await getUsuario(user);
+      setAdmin(admin.esAdmin);
 
-      if (admin) {
+      if (admin.esAdmin) {
         navigate('/exploreAdmin');
       } else {
         navigate('/home');

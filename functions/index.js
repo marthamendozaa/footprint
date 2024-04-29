@@ -29,15 +29,15 @@ exports.autentificaUsuario = onRequest(async (req, res) => {
 });
 
 
-// Verifica si el usuario es administrador
-exports.getEsAdmin = onRequest(async (req, res) => {
+// Información del usuario
+exports.getUsuario = onRequest(async (req, res) => {
   const { user } = req.body;
 
   try {
     const usuarioRef = await getFirestore().doc(`Usuarios/${user}`).get();
     const usuario = usuarioRef.data();
     
-    res.json({ success: true, data: usuario.esAdmin });
+    res.json({ success: true, data: usuario });
   } catch (error) {
     console.error("Error obteniendo usuario: ", error.message);
     res.status(500).json({ success: false, error: error.message });

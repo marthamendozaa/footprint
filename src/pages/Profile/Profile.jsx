@@ -2,8 +2,9 @@ import { useEffect, useState } from 'react';
 import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
-import { getHabilidades, getIntereses } from '../../api/api.js';
-import { getUsuario, updateUsuarioNombre, getHabilidadesUsuario, actualizaHabilidades, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { getUsuario, getHabilidades, getIntereses } from '../../api/api.js';
+import { updateUsuarioNombre, actualizaHabilidades, actualizaIntereses, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
 import Usuario from '../../backend/obj-Usuario.js';
 import Modal from 'react-bootstrap/Modal';
 import './Profile.css';
@@ -12,10 +13,12 @@ import './Profile.css';
 export const Profile = () => {
   // Cerrar sesión
   const [sesionCerrada, setSesionCerrada] = useState(false);
+  const { user, setUser, setAdmin } = useAuth();
   const navigate = useNavigate();
 
   const botonCerrarSesion = async () => {
-    await cerrarSesion();
+    setUser(null);
+    setAdmin(null);
     setSesionCerrada(true);
     navigate('/login');
   };
@@ -27,21 +30,17 @@ export const Profile = () => {
   useEffect(() => {
     const fetchData = async () => {
       if (!sesionCerrada) {
-        const infoUsuario = await getUsuario();
+        const infoUsuario = await getUsuario(user);
         const objUsuario = { ...informacionUsuario, ...infoUsuario };
         setinformacionUsuario(objUsuario);
+        setHabilidadesUsuario(objUsuario.listaHabilidades);
+        setInteresesUsuario(objUsuario.listaIntereses);
 
         const habilidadesData = await getHabilidades();
         setHabilidades(habilidadesData);
-  
-        const habilidadesUsuarioData = await getHabilidadesUsuario();
-        setHabilidadesUsuario(habilidadesUsuarioData);
 
         const interesesData = await getIntereses();
-        setIntereses(interesesData);
-
-        const interesesUsuarioData = await getInteresesUsuario();
-        setInteresesUsuario(interesesUsuarioData);
+        setIntereses(interesesData);        
       }
     };
     fetchData();

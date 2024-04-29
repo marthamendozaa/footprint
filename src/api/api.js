@@ -17,16 +17,16 @@ export const autentificaUsuario = async (email, password) => {
 };
 
 
-// Verifica si el usuario es administrador
-export const getEsAdmin = async (id) => {
-  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/getEsAdmin", {
+// Información del usuario
+export const getUsuario = async (id) => {
+  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/getUsuario", {
     user: id
   });
   if (response.data.success) {
-    console.log("Obtener admin exitoso");
+    console.log("Obtener usuario exitoso");
     return response.data.data;
   } else {
-    console.log("Error obteniendo admin");
+    console.log("Error obteniendo usuario");
     throw new Error(response.data.error);
   }
 };
