@@ -5,6 +5,8 @@ import { AiOutlineSearch } from "react-icons/ai";
 import { getIniciativas } from './Explore-fb.js';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import { ModalHeader } from 'react-bootstrap';
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 
 export const Explore = () => {
     const [filter, setFilter] = useState('');
@@ -39,60 +41,86 @@ export const Explore = () => {
     }
 
     return (
-        <div className='row'>
-            <div className='col-12 mb-5'>
-                <form>
-                    <div className='relative'>
+        <div>
+            <div className='e-container'>
+            <div className='e-seccion-container'>
+                    <div className='e-searchBar'>
                         <input
                             type='search'
                             placeholder='¿Qué iniciativa buscas?'
                             value={filter}
                             onChange={searchText}
                             className='p-4 rounded-full color'
-                            style={{ width: '1000px' }}
+                            style={{ width: '100%' }}
                         />
-                        <button className='absolute right-1 top-0 -translate-y-0 p-4 bg-slate-300 rounded-full' style={{ backgroundColor: 'transparent', display: filter ? 'none' : 'block' }}>
-                            <AiOutlineSearch />
-                        </button>
                     </div>
-                </form>
-            </div>
 
+            <div className='e-iniciativas-container'>
             {filteredIniciativas && filteredIniciativas.map((item, index) => (
-                <div key={index} className='col-md-6 col-lg-3 mx-0 mb-4'>
-                    <div className='card p- overflow.hidden h-100 shadow'>
-                        <img src={item.urlImagen} className='card-img-top imagesize' alt={item.titulo} />
-                        <div className='card-body'>
-                            <h5 className='card-title titles'>{item.titulo}</h5>
-                            <p className='card-text'>{item.descripcion}</p>
-                            <Button onClick={() => handleButtonClick(item)} variant="primary">Más Información</Button>
-                        </div>
+                <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item)}>
+                    <div className='e-iniciativa-imagen'>
+                        <img src={item.urlImagen} alt = {item.titulo} />
+                    </div>
+
+                    <div className='e-iniciativa-texto'>
+                        <div className="e-titulo">{item.titulo}</div>
+                        <div className="e-desc">{item.descripcion}</div>
+                    
                     </div>
                 </div>
             ))}
+            </div>
 
             {/* Modal */}
-            <Modal show={showModal} onHide={() => setShowModal(false)}>
-                <Modal.Header closeButton>
-                    <Modal.Title className='modaltitle'>{selectedIniciativa && selectedIniciativa.titulo}</Modal.Title>
-                </Modal.Header>
-                <Modal.Body className='modalinfo'>
-                    {selectedIniciativa && (
-                        <>
-                            <img src={selectedIniciativa.urlImagen} alt={selectedIniciativa.titulo} className="img-fluid" />
-                            <p>{selectedIniciativa.descripcion}</p>
-                            <p>{selectedIniciativa.fechaInicio} - {selectedIniciativa.fechaCierre} </p>
-                            
-                        </>
-                    )}
+            <Modal show={showModal} onHide={() => setShowModal(false)} centered className='modal1'>
+                <div className=".modalcontainer">
                     
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowModal(false)}>
-                        Suscribirse
-                    </Button>
-                </Modal.Footer>
+                    <div className='modaliniciativa'>
+                        {selectedIniciativa && (
+                            <>
+                                <div class="modalhead">
+                                <div class="modalbutton">
+                                <button type="button" className="close" onClick={() => setShowModal(false)} aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                                </div>
+                                <img src={selectedIniciativa.urlImagen} alt={selectedIniciativa.titulo} className="modalimg" />
+                                </div>
+                                <div className='modalinfo'>
+                                    <div className='modaltitulo'>{selectedIniciativa.titulo}</div>
+                                    {/* Etiquetas */}
+                                    <div className="m-etiquetas">
+                                    {Object.values(selectedIniciativa.listaEtiquetas).map((etiqueta, idEtiqueta) => (
+                                        <li key={idEtiqueta} className={'m-etiqueta-item'}>
+                                        {etiqueta}
+                                        </li>
+                                    ))}
+                                    </div>
+                                    
+                                    <div className='modalregion'>{selectedIniciativa.region} </div>
+                                    <div className='modalpublica'>{selectedIniciativa.esPublica ? "Pública" : "Privada"} </div>
+                                    <div className='modalfecha'>{selectedIniciativa.fechaInicio} - {selectedIniciativa.fechaCierre ? selectedIniciativa.fechaCierre : 'S.F.'} </div>
+                                </div>
+                            </>
+                        )}
+                        
+                    </div>
+                    <div className = 'modaldesc'>
+                        {selectedIniciativa && (
+                                <>
+                                    <div className='modaltextodesc'>{selectedIniciativa.descripcion}</div>
+                                </>
+                        )}
+                    </div>
+                    <div className = 'modalsuscribir'>
+                        <div className='modalsusbotton'>
+                            Suscribirse
+                        </div>
+                    </div>
+                </div>
             </Modal>
+            </div>
+            </div>
         </div>
     );
 };

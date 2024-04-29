@@ -1,22 +1,18 @@
-import { db, database } from "../../backend/firebase-config.js";
-import { get, set, ref, child, push } from "firebase/database";
+import { firestore, storage } from "../../backend/firebase-config.js";
+import { collection, doc, getDoc, updateDoc, addDoc, arrayUnion, query, where, getDocs } from "firebase/firestore";
+import { uploadBytes, getDownloadURL, ref } from "firebase/storage";
 
 
 // Crear iniciativa: mostrar etiquetas
 export const getEtiquetas = async () => {
   try {
-    const snapshot = await get(child(db, `Intereses`));
-    const listaEtiquetas  = snapshot.val();
-    const etiquetas = [];
-
-    for (const idEtiqueta in listaEtiquetas){
-      const etiquetasSnapshot = await get(child(db, `Intereses/${idEtiqueta}`));
-      etiquetas.push(etiquetasSnapshot.val());
-    };
+    const etiquetasDocRef = doc(firestore, "General", "Intereses");
+    const etiquetasDocSnapshot = await getDoc(etiquetasDocRef);
+    const etiquetas = etiquetasDocSnapshot.data();
+    
     return etiquetas;
-
   } catch (error) {
-    console.error("Error obteniendo lista de intereses: ", error.message);
+    console.error("Error obteniendo lista de etiquetas: ", error.message);
     return null;
   }
 };
@@ -25,16 +21,11 @@ export const getEtiquetas = async () => {
 // Crear iniciativa: mostrar regiones
 export const getRegiones = async () => {
   try {
-    const snapshot = await get(child(db, `Regiones`));
-    const listaRegiones  = snapshot.val();
-    const regiones = [];
-
-    for (const idRegion in listaRegiones){
-      const regionesSnapshot = await get(child(db, `Regiones/${idRegion}`));
-      regiones.push(regionesSnapshot.val());
-    };
+    const regionesDocRef = doc(firestore, "General", "Regiones");
+    const regionesDocSnapshot = await getDoc(regionesDocRef);
+    const regiones = regionesDocSnapshot.data();
+    
     return regiones;
-
   } catch (error) {
     console.error("Error obteniendo lista de regiones: ", error.message);
     return null;
@@ -43,35 +34,61 @@ export const getRegiones = async () => {
 
 
 // Crear iniciativa
-export const crearIniciativa = async (iniciativa) => {
+export const crearIniciativa = async (iniciativa, imagen) => {
+  // Asignar id del usuario como administrador de la iniciativa
   const user = JSON.parse(sessionStorage.getItem('user'));
   if (!user) {
     console.error("No hay usuario autenticado");
-    return null;
+    return [null, null];
   }
   iniciativa.idAdmin = user.uid;
-  
-  try {
-    iniciativa.idIniciativa = push(child(ref(database), 'Iniciativa')).key;
-    
-    const iniciativaRef = ref(database, `Iniciativas/${iniciativa.idIniciativa}`);
-    await set(iniciativaRef, iniciativa);
-    console.log("Nueva iniciativa creada: ", iniciativa);
 
+  // Verificar que no exista una iniciativa con el mismo título
+  const iniciativasQuery = query(collection(firestore, "Iniciativas"), where("titulo", "==", iniciativa.titulo));
+  const iniciativasSnapshot = await getDocs(iniciativasQuery);
+  if (!iniciativasSnapshot.empty) {
+    console.error("Ya existe una iniciativa con el mismo título");
+    return [true, null];
+  }
+
+  // Subir imagen a Firebase Storage
+  if (imagen) {
     try {
-      const snapshot = await get(child(db, `Usuarios/${user.uid}/listaIniciativasAdmin`));
-      const listaIniciativasAdmin = snapshot.val();
-      listaIniciativasAdmin.push(iniciativa.idIniciativa);
-  
-      const usuarioRef = ref(database, `Usuarios/${user.uid}/listaIniciativasAdmin`);
-      await set(usuarioRef, listaIniciativasAdmin);
-      console.log("Iniciativa creada agregada a lista del usuario");
-
+      const storageRef = ref(storage, `initiative-images/${imagen.name}`);
+      await uploadBytes(storageRef, imagen);
+      const urlImagen = await getDownloadURL(storageRef);
+      iniciativa.urlImagen = urlImagen;
     } catch (error) {
-      console.error("Error agregando iniciativa creada al usuario: ", error.message);
-    }
+      console.error("Error subiendo imagen: ", error.message);
+      return [null, null];
+    } 
+  }
+  
+  // Guardar fecha de creación
+  const timestamp = new Date();
+  iniciativa.fechaCreacion = timestamp;
 
+  // Subir iniciativa a Firestore
+  let idIniciativaNueva = null;
+  try {
+    const iniciativasRef = collection(firestore, "Iniciativas");
+    const iniciativaDocRef = await addDoc(iniciativasRef, iniciativa.convertirAObjeto());
+    idIniciativaNueva = iniciativaDocRef.id;
+    
+    await updateDoc(iniciativaDocRef, { idIniciativa: idIniciativaNueva });
   } catch (error) {
     console.error("Error creando iniciativa: ", error.message);
+    return [null, null];
   }
+
+  // Agregar iniciativa creada al usuario
+  try {
+    const usuarioDocRef = doc(firestore, "Usuarios", user.uid);
+    await updateDoc(usuarioDocRef, { listaIniciativasAdmin: arrayUnion(idIniciativaNueva) });
+  } catch (error) {
+    console.error("Error agregando iniciativa creada al usuario: ", error.message);
+    return [null, null];
+  }
+
+  return [null, idIniciativaNueva];
 };

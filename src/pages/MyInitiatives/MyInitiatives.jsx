@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getIniciativasMiembro, getIniciativasAdmin } from './MyInitiatives-fb.js';
+import { Spinner } from 'react-bootstrap';
+import { getIniciativasMiembro, getIniciativasAdmin, getIniciativasFavoritas } from './MyInitiatives-fb.js';
 import './MyInitiatives.css';
 
 export const MyInitiatives = () => {
   const [iniciativasMiembro, setIniciativasMiembro] = useState(null);
   const [iniciativasAdmin, setIniciativasAdmin] = useState(null);
+  const [iniciativasFavoritas, setIniciativasFavoritas] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -13,49 +15,102 @@ export const MyInitiatives = () => {
       setIniciativasMiembro(dataMiembro);
       const dataAdmin = await getIniciativasAdmin();
       setIniciativasAdmin(dataAdmin);
+      const dataFavoritas = await getIniciativasFavoritas();
+      setIniciativasFavoritas(dataFavoritas);
     };
     fetchData();
   });
 
   return (
-    <div className="container">
     <div>
-      <h2>Iniciativas donde soy miembro</h2>
-      <div className="container-iniciativas">
-        {iniciativasMiembro && iniciativasMiembro.map((iniciativaMiembro, index) => (
-          <div key={index}>
-            <Link to={`/initiative/${iniciativaMiembro.idIniciativa}`}>
-              <button className="rounded-box-img">
-                <img src={iniciativaMiembro.urlImagen} alt={iniciativaMiembro.titulo} />
-              </button>
-            </Link>
-            <div className="rounded-box-txt">
-              <p1>{iniciativaMiembro.titulo}</p1>
-              <p2>{iniciativaMiembro.descripcion}</p2>
-            </div>
+      {iniciativasMiembro && iniciativasAdmin && iniciativasFavoritas ? (
+        <div className="m-container">
+          
+          <div className="m-seccion-container">
+            <div className="m-iniciativas-titulo">Iniciativas donde soy miembro</div>
+  
+            {iniciativasMiembro.length == 0 ? (
+              <div className="m-error">
+                Aún no eres miembro de una iniciativa.
+              </div>
+            ) : (
+              <div className="m-iniciativas-container">
+                {iniciativasMiembro.map((iniciativa, index) => (
+                  <Link key={index} to={`/initiative/${iniciativa.idIniciativa}`}>
+                    <div className="m-iniciativa" key={index}>
+                        <div className="m-iniciativa-imagen">
+                          <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
+                        </div>
+                      <div className="m-iniciativa-texto">
+                        <div className="m-titulo">{iniciativa.titulo}</div>
+                        <div className="m-desc">{iniciativa.descripcion}</div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
-    </div>
+  
+          <div className="m-seccion-container">
+            <div className="m-iniciativas-titulo">Iniciativas creadas</div>
+  
+            {iniciativasAdmin.length == 0 ? (
+              <div className="m-error">
+                Aún no has creado una iniciativa.
+              </div>
+            ) : (
+              <div className="m-iniciativas-container">
+                {iniciativasAdmin.map((iniciativa, index) => (
+                  <Link key={index} to={`/initiative/${iniciativa.idIniciativa}`}>
+                    <div className="m-iniciativa" key={index}>
+                        <div className="m-iniciativa-imagen">
+                          <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
+                        </div>
+                      <div className="m-iniciativa-texto">
+                        <div className="m-titulo">{iniciativa.titulo}</div>
+                        <div className="m-desc">{iniciativa.descripcion}</div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+          
+          <div className="m-seccion-container">
+            <div className="m-iniciativas-titulo">Iniciativas favoritas</div>
+  
+            {iniciativasFavoritas.length == 0 ? (
+              <div className="m-error">
+                No hay iniciativas favoritas
+              </div>
+            ) : (
+              <div className="m-iniciativas-container">
+                {iniciativasFavoritas.map((iniciativa, index) => (
+                  <Link to={`/initiative/${iniciativa.idIniciativa}`}>
+                    <div className="m-iniciativa" key={index}>
+                        <div className="m-iniciativa-imagen">
+                          <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
+                        </div>
+                      <div className="m-iniciativa-texto">
+                        <div className="m-titulo">{iniciativa.titulo}</div>
+                        <div className="m-desc">{iniciativa.descripcion}</div>
+                      </div>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+  
 
-    <div>
-      <h2>Iniciativas creadas</h2>
-      <div className="container-iniciativas">
-        {iniciativasAdmin && iniciativasAdmin.map((iniciativaAdmin, index) => (
-          <div key={index}>
-            <Link to={`/initiative/${iniciativaAdmin.idIniciativa}`}>
-              <button className="rounded-box-img">
-                <img src={iniciativaAdmin.urlImagen} alt={iniciativaAdmin.titulo} />
-              </button>
-            </Link>
-            <div className="rounded-box-txt">
-              <p1>{iniciativaAdmin.titulo}</p1>
-              <p2>{iniciativaAdmin.descripcion}</p2>
-            </div>
-          </div>
-        ))}
-      </div>
+        </div>
+      ) : (
+        <div className="spinner">
+          <Spinner animation="border" role="status"></Spinner>
+        </div>
+      )}
     </div>
-  </div>
-  );
+  );  
 }

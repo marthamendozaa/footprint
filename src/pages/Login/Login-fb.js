@@ -1,6 +1,6 @@
-import { auth, db } from "../../backend/firebase-config.js";
+import { auth, firestore } from "../../backend/firebase-config.js";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { child, get} from "firebase/database";
+import { doc, getDoc } from "firebase/firestore";
 
 
 // Login: autentificación del usuario
@@ -9,11 +9,8 @@ export const loginUsuario = async (email, password, setUser) => {
     const userCredential = await signInWithEmailAndPassword(auth, email, password);
     const user = userCredential.user;
     console.log("Login exitoso:", user);
-    sessionStorage.setItem('user', JSON.stringify(user));
     setUser(user);
-    return user;
-  }
-  catch (error) {
+  } catch (error) {
     console.error("Error al hacer login:", error.message);
     throw error;
   }
@@ -23,16 +20,18 @@ export const loginUsuario = async (email, password, setUser) => {
 // Login: verificar si el usuario es administrador
 export const getEsAdmin = async (user) => {
   try {
-    const snapshot = await get(child(db, `Usuarios/${user.uid}`));
-    if (snapshot.exists()) {
-      const esAdmin = snapshot.val().esAdmin;
+    const usuarioRef = doc(firestore, "Usuarios", user.uid);
+    const docSnapshot = await getDoc(usuarioRef);
+
+    if (docSnapshot.exists()) {
+      const esAdmin = docSnapshot.data().esAdmin;
       return esAdmin;
     } else {
       console.log("El usuario no existe");
       return null;
     }
   } catch (error) {
-    console.error("Error obteniendo usuario:", error.message);
+    console.error("Error obteniendo usuario:", error);
     return null;
   }
 };

@@ -1,21 +1,21 @@
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
-import { getDatabase, ref } from "firebase/database";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCadgVY4YYKAekxSJp9xPyfJw76b5kWEng",
-  authDomain: "evertech-sprint1.firebaseapp.com",
-  databaseURL: "https://evertech-sprint1-default-rtdb.firebaseio.com/",
-  projectId: "evertech-sprint1",
-  storageBucket: "evertech-sprint1.appspot.com",
-  messagingSenderId: "910018975332",
-  appId: "1:910018975332:web:ae986df6395636a6577171"
+  apiKey: "AIzaSyD0iR6PPEeDPELDoccOFu9MgIguZALUVgQ",
+  authDomain: "evertech-sprint2.firebaseapp.com",
+  projectId: "evertech-sprint2",
+  storageBucket: "evertech-sprint2.appspot.com",
+  messagingSenderId: "183811382302",
+  appId: "1:183811382302:web:fbeba06dfd22f97316e20f"
 };
 
 const app = initializeApp(firebaseConfig);
 
 const auth = getAuth(app);
-const database = getDatabase(app);
-const db = ref(database);
+const firestore = getFirestore(app);
+const storage = getStorage(app)
 
-export { auth, db, database };
+export { auth, firestore, storage };

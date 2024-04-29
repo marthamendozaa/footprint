@@ -1,156 +1,233 @@
+.c-container {
+  display: flex;
+  width: 1000px;
+  margin-bottom: 20px;
+  align-items: center;
+  flex-direction: column;
+}
+
+.c-iniciativa-container {
+  display: flex;
+  width: 100%;
+}
+
 /* Imagen de la iniciativa */
-.image {
-  margin-top: 30px;
+.c-foto-iniciativa {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
   height: 255px;
   width: 255px;
-  background-color: #699AA0;
+  margin: 15px;
+  margin-bottom: 0px;
   border-radius: 50%;
   float: left;
 }
 
-/* Título */
-.container {
+.c-foto-iniciativa:hover {
+  background-color: #000;
+}
+
+.c-preview-imagen {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.c-foto-iniciativa:hover .c-preview-imagen {
+  transition: opacity 0.3s ease;
+  opacity: 0.5;
+}
+
+.c-editar-foto {
+  opacity: 0;
+  position: absolute;
+  font-size: 40px;
+  color: white;
+}
+
+.c-foto-iniciativa:hover .c-editar-foto {
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+/* Información */
+.c-info-container {
   width: 700px;
-  float: left;
-  margin: 10px;
-  margin-bottom: 50px;
-}
-
-.titulo-container {
-  height: auto;
-  float: left;
-  text-align: left;
-  margin-bottom: 30px;
-}
-
-.titulo {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
+/* Título */
+.c-titulo {
+  display: flex;
   font-size: 70px;
   font-weight: 600;
-}
-
-.titulo-input {
-  height: 100%;
-  width: 100%;
-  background-color: transparent;
-  border-color: transparent;
-  float: left;
   text-align: left;
-  outline: none;
+  white-space: nowrap;
+  align-items: center;
 }
 
-.btn-lapiz {
+.c-titulo-texto,
+.c-titulo-input {
+  display: flex;
+  overflow: overlay;
+}
+
+.c-titulo-texto::-webkit-scrollbar,
+.c-titulo-input::-webkit-scrollbar {
+  display: none;
+}
+
+.c-titulo-input-texto {
+  width: 100%;
+  font-size: 70px;
+  font-weight: 600;
+  outline: none;
+  border: none;
+}
+
+.c-titulo-conteo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #A0C1BF;
+  margin-left: 10px;
+  margin-top: 20px;
+}
+
+.c-btn-editar-titulo {
   position: relative;
   background: none;
   border: none;
-  cursor: pointer;
   color: #A0C1BF;
   font-size: 20px;
+  bottom: 0;
+  right: 0;
 }
 
 /* Botones etiquetas */
-.etiquetas {
-  margin-top: 0px;
+.c-etiquetas {
+  display: flex;
   list-style-type: none;
-  padding: 0;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
-.etiquetas li {
+.c-etiquetas li {
   display: inline-block;
   background-color: #f2f2f2;
   padding: 5px 15px;
   border-radius: 30px;
-  height: 40px;
-  margin-right: 10px;
-  margin-top: 5px;
-  margin-bottom: 10px;
+  margin: 5px;
 }
 
-li.etiqueta-item.highlighted {
-  background-color: #A0C1BF;
-}
-
-li.etiqueta-item {
+li.c-etiqueta-item {
   cursor: pointer;
   font-size: 15px;
   font-weight: 600;
   text-align: center;
   line-height: 30px;
+  user-select: none;
 }
 
-li.etiqueta-item:hover {
+li.c-etiqueta-item.highlighted {
+  background-color: #A0C1BF;
+}
+
+li.c-etiqueta-item:hover {
   box-shadow: 0 0 0 3px #A0C1BF;
 }
 
-/* Fila */
-.container2 {
+/* Fila datos */
+.c-datos {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  height: 80px;
-  width: 680px;
-}
-
-.col {
-  flex: 1;
+  justify-content: space-between;
 }
 
 /* Fechas de inicio y cierre */
-.calendario-container {
+.c-calendarios-container {
+  height: 100%;
   display: flex;
   align-items: center;
+  flex-direction: column;
 }
 
-.calendario {
-  height: 50px;
+.c-calendarios {
+  display: flex;
+  align-items: flex-start;
+}
+
+.c-calendario-input {
+  height: 100%;
+}
+
+.c-calendario {
+  display: flex;
   width: 100px;
   font-size: 25px;
   background-color: #A0C1BF;
   border-radius: 25px;
   cursor: pointer;
+  flex-direction: column;
+  align-items: center;
 }
 
-.calendario:hover {
+.c-calendario:hover {
   box-shadow: 0 0 0 3px #699AA0;
 }
 
-.calendario-fecha .react-datepicker__input-container input {
+.c-icono-calendario {
+  width: 50px;
+  height: 50px;
+}
+
+.react-datepicker__input-container input {
   width: 100px;
   font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: 12px;
-  padding: 5px 10px;
   text-align: center;
+  background: none;
+  border: 2px solid #699AA0;
+  border-radius: 3px;
 }
 
-.calendario-separator {
+.c-calendario-separador {
   margin: 0 10px;
-  font-size: 50px;
-  line-height: 50px; 
+  font-size: 30px;
+  font-weight: 600;
 }
 
 /* Dropdown privacidad y ubicación */
-.selecciona-dropdown {
+.c-dropdown-container {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.c-selecciona-dropdown {
   position: relative;
   display: inline-flex;
-  justify-content: left;
-  height: 50px;
   width: 180px;
   padding: 8px 16px;
   font-size: 20px;
   font-weight: 600;
   background-color: #A0C1BF;
-  border-color: transparent;
+  border: none;
   border-radius: 25px;
   transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
 }
 
-.selecciona-dropdown:hover {
+.c-selecciona-dropdown:hover {
   box-shadow: 0 0 0 3px #699AA0;
 }
 
-.dropdown-arrow {
+.c-dropdown-arrow {
   position: absolute;
   top: 50%;
   right: 16px;
@@ -160,10 +237,10 @@ li.etiqueta-item:hover {
   fill: currentColor;
 }
 
-.dropdown {
+.c-dropdown {
   position: absolute;
+  margin-top: 50px;
   width: 180px;
-  margin-left: 20px;
   padding: 8px 16px;
   z-index: 10;
   border-radius: 6px;
@@ -172,7 +249,7 @@ li.etiqueta-item:hover {
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-.dropdown-item {
+.c-dropdown-item {
   display: block;
   padding: 8px 16px;
   color: #4a5568;
@@ -182,7 +259,7 @@ li.etiqueta-item:hover {
 }
 
 /* Búsqueda dropdown */
-.dropdown-input {
+.c-dropdown-input {
   width: 100%;
   padding: 8px 16px;
   font-size: 14px;
@@ -192,140 +269,249 @@ li.etiqueta-item:hover {
   outline: none;
 }
 
-.dropdown-input:focus,
-.dropdown-input:hover {
+.c-dropdown-input:focus,
+.c-dropdown-input:hover {
   border-color: #2563eb;
 }
 
-.container3 {
-  width: 1000px;
-  float: left;
-  margin-top: 10px;
+/* Descripción */
+.c-desc {
+  display: flex;
+  width: 100%;
+  margin-top: 30px;
 }
 
-.desc {
-  height: auto;
+.c-desc-texto {
+  position: relative;
+  width: 100%;
   background-color: #A0C1BF;
   border-radius: 25px;
-  float: left;
+  padding: 15px;
+  padding-bottom: 50px;
   text-align: left;
-  padding: 10px 15px;
   font-weight: 600;
   font-size: 20px;
+  color: #121212;
+  word-break: break-all;
 }
 
-.desc-input {
-  height: 100%;
+.c-desc-input {
   width: 100%;
-  padding: 10px 15px;
-  background-color: transparent;
-  border-color: transparent;
-  float: left;
-  text-align: left;
-  font-size: 20px;
-  outline: none;
 }
 
-.btn-lapiz-desc {
-  position: relative;
+.c-desc-input-texto {
+  width: 100%;
+  background-color: transparent;
+  font-weight: 600;
+  color: #121212;
+  border: none;
+  outline: none;
+  line-height: 1.5;
+  resize: none;
+}
+
+.c-desc-input-texto::-webkit-scrollbar {
+  display: none;
+}
+
+.c-desc-conteo {
+  font-size: 20px;
+  font-weight: 600;
+  color: #121212;
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+}
+
+.c-btn-editar-desc {
   background: none;
   border: none;
-  cursor: pointer;
-  color: #ffffff;
+  color: #121212;
+  position: absolute;
+  bottom: 4px;
+  right: 0px;
 }
 
-.container4 {
-  width: 1000px;
-  float: left;
+/* Botones agregar tareas y miembros */
+.c-tareas-miembros {
+  display: flex;
+  width: 100%;
   margin-top: 20px;
 }
 
-.agregarTarea {
+.c-seccion-tareas {
+  width: 80%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.c-seccion-miembros {
+  width: 20%;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.c-btn-agregar-tarea,
+.c-btn-invitar-miembro {
+  display: flex;
   background-color: #A0C1BF;
   border-radius: 25px;
   font-size: 17px;
-  float: left;
-  height: 40px;
-  padding: 5px 25px;
+  padding: 10px 25px;
   font-weight: 600;
 }
 
-.invitarMiembro {
-  background-color: #A0C1BF;
-  border-radius: 25px;
-  font-size: 17px;
-  float: right;
-  height: 40px;
-  padding: 5px 25px;
-  font-weight: 600;
+/* Tareas */
+.c-tareas-container {
+  display: flex;
+  width: 80%;
+  flex-direction: column;
 }
 
-.tarea {
+.c-tarea {
+  display: flex;
   height: 120px;
-  width: 600px;
+  width: 100%;
   background-color: #E2EBF1;
   border-radius: 25px;
-  float: left;
-  text-align: left;
-  margin-top: 15px;
-  padding: 10px 15px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px 25px;
+  align-items: flex-start;
+  font-weight: 600;
+  flex-direction: row;
 }
 
-.tareaTitle {
+.c-tarea-titulo {
   font-size: 25px;
-  margin-left: 15px;
-  font-weight: 600;
 }
 
-.tareaText {
+.c-tarea-texto {
   font-size: 14px;
-  margin-left: 15px;
-  font-weight: 600;
 }
 
-.btn-entrega {
-  height: 25px;
+.c-tarea-info {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  align-items: flex-start;
+}
+
+.c-tarea-botones {
+  display: flex;
+  height: 100%;
+  width: 20%;
+  justify-content: space-around;
+  flex-direction: column;
+}
+
+.c-tarea-boton {
   background-color: #A0C1BF;
   border-radius: 25px;
   font-size: 14px;
-  float: right;
-  margin-top: 10px;
-  margin-right: 10px;
   padding: 5px 10px;
   text-align: center;
-  line-height: 15px;
 }
 
-.edita-titulo {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #A0C1BF;
-  font-size: 20px;
-}
-
-.edita-desc {
-  background: none;
-  border: none;
-  cursor: pointer;
-  color: #ffffff;
-  font-size: 20px;
-}
-
-.container5 {
+/* Crear */
+.c-crear-container {
+  display: flex;
+  margin-top: 20px;
+  width: 100%;
+  height: 50px;
   position: relative;
-  width: 1000px;
-  float: left;
 }
 
-.btn-crear {
+.c-btn-crear-container {
+  display: flex;
   position: absolute;
-  top: 0;
   right: 0;
-  font-size: 30px;
+  bottom: 0;
+  width: 20%;
+  justify-content: space-around;
+}
+
+.c-btn-crear {
+  font-size: 25px;
   font-weight: 600;
-  padding: 12px;
-  width: 200px;
+  padding: 10px 30px;
   background-color: #A0C1BF;
   border-radius: 30px;
+}
+
+/* Modal subir imagen */
+.c-input-body {
+  display: flex;
+  padding: 20px;
+  width: 500px;
+  font-family: "Inter", sans-serif;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.c-input-imagen {
+  display: flex;
+  width: 60%;
+}
+
+/* Modal crear iniciativas */
+.fade.c-modal.modal.show {
+  display: flex !important;
+  align-items: center;
+}
+
+.c-modal .modal-content {
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  padding: 10px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.c-modal-body {
+  padding: 16px;
+  font-family: "Inter", sans-serif;
+}
+
+.c-modal .modal-header,
+.c-modal .modal-footer {
+  border: none;
+  padding: 0;
+}
+
+.c-modal .modal-footer {
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+.c-modal .modal-header .btn-close {
+  position: absolute;
+  right: 5%;
+}
+
+.c-modal-title {
+  font-weight: 600;
+  font-size: 30px;
+  font-family: "Inter", sans-serif;
+}
+
+.c-modal .btn.btn-primary {
+  color: #000;
+  background-color: #A0C1BF;
+  padding: 10px 30px;
+  font-weight: 600;
+  border: none;
+  border-radius: 30px;
+}
+
+.c-modal .btn.btn-primary:hover {
+  background-color: #699AA0;
+}
+
+.c-modal .btn.btn-primary a {
+  color: #000;
 }

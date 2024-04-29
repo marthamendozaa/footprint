@@ -1,32 +1,57 @@
+.login-body {
+    background-color: #CEDDE2;
+}
+
 .container-login-1 {
-    position: relative;
-    height: 100%;
-    width: 300px;
     display: flex;
+    position: relative;
     flex-direction: column;
+    height: 100%;
+    width: 100vh;
     justify-content: center;
     align-items: center;
 }  
 
 .container-login-2 {
-    height: 450px;
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    height: 475px;
     width: 450px;
-    background-color: #CEDDE2;
-    border-radius: 10px;
+    background-color: #ffffff;
+    border-radius: 30px;
+}
+
+.container-login-3{
+    display: flex;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
 }
 
 .header-login {
-    padding: 15px;
+    display:flex;
+    flex-direction: column;
     text-align: center;
+    padding: 15px;
     margin-top: 20px;
 }
 
-.container-correo{
-    padding: 0px;
-    margin-left: 50px;
+.login-icons{
     display: flex;
+    position: absolute;
+    margin-left: 20px;
+    margin-top: 61px;
+    z-index: 1;
+}
+
+.container-correo{
+    display: flex;
+    position: relative;
     flex-direction: column;
     align-items: flex-start;
+    padding: 0px;
 }
 
 .correo-texto{
@@ -36,58 +61,154 @@
 }
 
 .correo-caja{
+    display: flex;
+    position: relative;
+    align-items: center;
     width: 350px;
     height: 45px;
-    border-radius: 15px;
-    border-color: transparent;
+    border-radius: 30px;
+    border-color: #000000;
+    padding-left: 50px;
+    background-color: #ffffff;
+}
+
+.bg-custom-color {
+    background-color: #ffffff;
+  }
+  
+.custom-alert {
+    position: absolute;
+    left: 0;
+    margin-top: 3px;
+    padding: 5px;
+    background-color: rgba(255, 255, 255, 0.75);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+}
+  
+.custom-alert span {
+    color: #ff0000;
+    font-size: 14px;
 }
 
 .container-contrasena{
-    padding: 0px;
     display: flex;
+    position: relative;
     flex-direction: column;
     align-items: flex-start;
     margin-top: 35px;
 }
 
 .contrasena-texto{
-    align-self: flex-start;
+    display: flex;
+    justify-content: start;
     font-weight: bold;
-    margin-left: 50px;
     font-size: 20px;
 }
 
 .ojo-contrasena{
+    display: flex;
+    position: relative;
+    align-items: center;
     width: 350px;
     height: 45px;
-    border-radius: 15px;
-    border-color: transparent;
+    border-radius: 30px;
+    border-color: #000000;;
+    padding-left: 50px;
+    background-color: #ffffff;
 }
 
 .ojo-contrasena-2{
+    display: flex;
     position: absolute;
-    right: 20px;
-    top: 50%;
-    transform: translateY(-50%);
+    justify-content: flex-end;
+    align-items: center;
     cursor: pointer;
+    bottom: 0;
+    right: 0;
+    height: 50%;
+    padding-right: 15px;
 }
 
-.flecha-login{
-    padding: 10px;
+.login-container-final{
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    height: 45%;
+}
+
+.cambiar-contrasena-container {
     display: flex;
     justify-content: flex-end;
-    margin-top: 15px;
+    align-items: center;
+    width: 90%;
+    height: 30%;
 }
 
-.boton-politicas-privacidad{
+.cambiar-contrasena-container button.btn {
+    color: #000000;
+    font-size: 12px;
+    background-color: transparent;
+    text-decoration: underline;
     border: none;
-    background: transparent;
-    outline: none;
-    text-align: center;
-    padding: 10px;
-    font-size: 10px;
-    cursor: pointer;
 }
+
+.iniciar-sesion-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 40%;
+}
+
+.iniciar-sesion-container button.btn {
+    color: #000000;
+    font-size: 20px;
+    background-color: #A0C1BF;
+    padding: 10px 30px;
+    font-weight: 600;
+    border: none;
+    border-radius: 30px;
+}
+
+.iniciar-sesion-container button.btn:hover {
+    color: #ffffff;
+    background-color: #186279;
+}
+
+.registrarse-container {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    width: 100%;
+    height: 30%;
+}
+
+.register-texto-login{
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+.registrarse-container button.btn {
+    color: #000000;
+    font-size: 15px;
+    font-weight: 600;
+    background-color: transparent;
+    border: none;
+    margin-bottom: 2px;
+    text-decoration: underline;
+}
+
+.registrarse-container button.btn:hover {
+    color: #186279;
+}
+
+.evertech-login img {
+    width: 350px;
+    margin-top: 30px;
+    object-fit: contain;
+} 
 
 .pop-up{
     position: fixed;
@@ -99,33 +220,28 @@
     display: flex;
     justify-content: center;
     align-items: center;
-}
-
-.pop-up-2 {
-    background: #fff;
-    padding: 20px;
-    max-height: 80%;
-    overflow-y: auto;
-    width: 80%;
-    text-align: left;
-}
-
-.pop-up-2 button {
-    display: block;
-    margin: 0 auto;
-    margin-top: 30px;
-    background-color: #547B80;
+    z-index: 10;
 }
 
 .pop-up-3 {
     background: #fff;
     padding: 20px;
-    border-radius: 10px;
+    border-radius: 20px;
+    font-size: 20px;
 }
 
 .pop-up-3 button {
     display: block;
     margin: 0 auto;
     margin-top: 30px;
-    background-color: #547B80;
+    color: #000;
+    background-color: #A0C1BF;
+    padding: 10px 30px;
+    font-weight: 600;
+    border: none;
+    border-radius: 10px;
+}
+
+.pop-up-3 button:hover{
+    background-color: #699AA0;
 }
