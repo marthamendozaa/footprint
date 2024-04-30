@@ -18,11 +18,11 @@ exports.autentificaUsuario = onRequest(async (req, res) => {
       res.json({ success: true, data: user.uid });
     } else {
       logger.info("Contraseña incorrecta");
-      res.status(401).json({ success: false, error: 'Authentication failed' });
+      res.json({ success: false, error: 'Authentication failed' });
     }
   } catch (error) {
     logger.info("Error en autentificación: ", error.message);
-    res.status(401).json({ success: false, error: error.message });
+    res.json({ success: false, error: error.message });
   }
 });
 
@@ -37,7 +37,7 @@ exports.getUsuario = onRequest(async (req, res) => {
     res.json({ success: true, data: usuario });
   } catch (error) {
     logger.info("Error obteniendo usuario: ", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: false, error: error.message });
   }
 });
 
@@ -51,7 +51,21 @@ exports.actualizaUsuario = onRequest(async (req, res) => {
     res.json({ success: true });
   } catch (error) {
     logger.info("Error actualizando usuario: ", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: false, error: error.message });
+  }
+});
+
+
+// Actualiza contraseña del usuario
+exports.actualizaContrasena = onRequest(async (req, res) => {
+  const { user, data } = req.body;
+
+  try {
+    await getAuth().updateUser(user, {password: data});
+    res.json({ success: true });
+  } catch (error) {
+    logger.info("Error actualizando contraseña: ", error.message);
+    res.json({ success: false, error: error.message });
   }
 });
 
@@ -64,7 +78,7 @@ exports.getHabilidades = onRequest(async (req, res) => {
     res.json({ success: true, data: habilidades });
   } catch (error) {
     logger.info("Error obteniendo lista de habilidades: ", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: false, error: error.message });
   }
 });
 
@@ -77,7 +91,7 @@ exports.getIntereses = onRequest(async (req, res) => {
     res.json({ success: true, data: intereses });
   } catch (error) {
     logger.info("Error obteniendo lista de intereses: ", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: false, error: error.message });
   }
 });
 
@@ -90,9 +104,12 @@ exports.getRegiones = onRequest(async (req, res) => {
     res.json({ success: true, data: regiones });
   } catch (error) {
     logger.info("Error obteniendo lista de regiones: ", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: false, error: error.message });
   }
 });
+
+
+
 
 
 // Información de la iniciativa
@@ -105,7 +122,7 @@ exports.getIniciativa = onRequest(async (req, res) => {
     res.json({ success: true, data: iniciativa });
   } catch (error) {
     logger.info("Error obteniendo iniciativa: ", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: false, error: error.message });
   }
 });
 
@@ -127,18 +144,19 @@ exports.crearIniciativa = onRequest(async (req, res) => {
     res.json({ success: true, data: iniciativa });
   } catch (error) {
     logger.info("Error obteniendo iniciativa: ", error.message);
-    res.status(500).json({ success: false, error: error.message });
+    res.json({ success: false, error: error.message });
   }
 });
 
 
+// Subir imágenes a Storage
 const { Storage } = require("@google-cloud/storage");
 const { v4: uuid } = require("uuid");
 const formidable = require("formidable-serverless");
 
-const storage = new Storage({});
-
 exports.subirImagen = onRequest(async (req, res) => {
+  const storage = new Storage({});
+  const bucket = storage.bucket("gs://evertech-sprint2.appspot.com");
   const form = new formidable.IncomingForm({ multiples: true, keepExtensions: true });
 
   form.parse(req, async (err, fields, files) => {
@@ -146,19 +164,31 @@ exports.subirImagen = onRequest(async (req, res) => {
       logger.info("Error parsing the files", err);
       return res.status(400).json({ success: false, error: "There was an error parsing the files"});
     }
-    const profileImage = files.profileImage;
-    const bucket = storage.bucket("gs://evertech-sprint2.appspot.com");
-    await bucket.upload(profileImage.path, {
-      destination: `users/${profileImage.name}`,
-      resumable: true,
-      metadata: {
+    const imagen = files.imagen;
+    const path = fields.path;
+
+    // Elimina archivos en el folder si ya existen
+    const [filesInFolder] = await bucket.getFiles({ prefix: path });
+    if (filesInFolder.length > 0) {
+      await Promise.all(filesInFolder.map(file => file.delete()));
+    }
+    
+    // Sube la imagen a Storage
+    try {
+      await bucket.upload(imagen.path, {
+        destination: `${path}/${imagen.name}`,
+        resumable: true,
         metadata: {
-          firebaseStorageDownloadTokens: uuid,
+          metadata: {
+            firebaseStorageDownloadTokens: uuid,
+          },
         },
-      },
-    });
-    const storageHost = "http://localhost:9199";
-    const imageUrl = `${storageHost}/evertech-sprint2.appspot.com/users/${profileImage.name}`;
-    res.status(200).json({ success: true, data: imageUrl });
+      });
+      const imageUrl = `http://localhost:9199/evertech-sprint2.appspot.com/${path}/${imagen.name}`;
+      res.json({ success: true, data: imageUrl });
+    } catch (error) {
+      logger.info("Error subiendo imagen: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
   });
 });

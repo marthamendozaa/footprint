@@ -8,10 +8,10 @@ export const autentificaUsuario = async (email, password) => {
     password: password
   });
   if (response.data.success) {
-    console.log("Login exitoso");
+    console.log("Autentificación exitosa");
     return response.data.data;
   } else {
-    console.log("Error en login");
+    console.log("Error en autentificación");
     throw new Error(response.data.error);
   }
 };
@@ -43,6 +43,22 @@ export const actualizaUsuario = async (user, data) => {
     return;
   } else {
     console.log("Error actualizando usuario");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Actualiza contraseña del usuario
+export const actualizaContrasena = async (user, data) => {
+  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/actualizaContrasena", {
+    user: user,
+    data: data
+  });
+  if (response.data.success) {
+    console.log("Actualizando contraseña exitoso");
+    return;
+  } else {
+    console.log("Error actualizando contraseña");
     throw new Error(response.data.error);
   }
 };
@@ -96,10 +112,11 @@ export const getIniciativa = async (idIniciativa) => {
 };
 
 
-// Subir imagen de perfil
-export const subirImagen = async (imageData) => {
+// Subir imágenes a Storage
+export const subirImagen = async (imagen, path) => {
   const formData = new FormData();
-  formData.append('profileImage', imageData);
+  formData.append('imagen', imagen);
+  formData.append('path', path);
 
   const response = await axios.post('http://127.0.0.1:5001/evertech-sprint2/us-central1/subirImagen', formData, {
     headers: {

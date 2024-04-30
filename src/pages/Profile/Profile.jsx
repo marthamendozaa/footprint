@@ -3,8 +3,7 @@ import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { getUsuario, actualizaUsuario, getHabilidades, getIntereses, subirImagen } from '../../api/api.js';
-import { cambiarContrasena, } from './Profile-fb.js';
+import { autentificaUsuario, getUsuario, actualizaUsuario, actualizaContrasena, getHabilidades, getIntereses, subirImagen } from '../../api/api.js';
 import Usuario from '../../classes/Usuario.js';
 import Modal from 'react-bootstrap/Modal';
 import './Profile.css';
@@ -132,7 +131,8 @@ export const Profile = () => {
 
     // Validar que la contraseña actual sea correcta
     try {
-      await cambiarContrasena(contrasenaActual, nuevaContrasena);
+      await autentificaUsuario(usuario.correo, contrasenaActual);
+      await actualizaContrasena(user, nuevaContrasena);
       // Si la contraseña se cambió con éxito, limpiar los campos y el estado de error
       setContrasenaActual('');
       setNuevaContrasena('');
@@ -141,7 +141,8 @@ export const Profile = () => {
       // Indicar que se ha completado el cambio de contraseña
       setCambiandoContrasena(false);
     } catch (error) {
-      setError(error.message);
+      setError('Contraseña actual incorrecta');
+      return;
     }
   };
 
@@ -173,12 +174,7 @@ export const Profile = () => {
     
     
     try {
-      const imageUrl = await subirImagen(selectedImage);
-
-
-
-
-      console.log("Imagen subida con éxito:", imageUrl)
+      const imageUrl = await subirImagen(selectedImage, `Usuarios/${user}`);
       const usuarioNuevo = { ...usuario, urlImagen: imageUrl };
       setUsuario(usuarioNuevo);
       await actualizaUsuario(user, usuarioNuevo);
