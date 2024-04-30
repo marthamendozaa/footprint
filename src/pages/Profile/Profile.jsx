@@ -3,8 +3,8 @@ import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { getUsuario, actualizaUsuario, getHabilidades, getIntereses } from '../../api/api.js';
-import { cambiarContrasena, uploadProfileImage, deleteProfileImage } from './Profile-fb.js';
+import { getUsuario, actualizaUsuario, getHabilidades, getIntereses, subirImagen } from '../../api/api.js';
+import { cambiarContrasena, } from './Profile-fb.js';
 import Usuario from '../../classes/Usuario.js';
 import Modal from 'react-bootstrap/Modal';
 import './Profile.css';
@@ -166,16 +166,19 @@ export const Profile = () => {
       return;
     }
 
-  if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
-    setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
-    return;
-  }
-  
+    if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
+      setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
+      return;
+    }
+    
+    
     try {
-      if (informacionUsuario.urlImagen) {
-        await deleteProfileImage(informacionUsuario.urlImagen);
-      }
-      const imageUrl = await uploadProfileImage(selectedImage);
+      const imageUrl = await subirImagen(selectedImage);
+
+
+
+
+      console.log("Imagen subida con éxito:", imageUrl)
       const usuarioNuevo = { ...usuario, urlImagen: imageUrl };
       setUsuario(usuarioNuevo);
       await actualizaUsuario(user, usuarioNuevo);

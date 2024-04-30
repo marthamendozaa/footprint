@@ -10,7 +10,7 @@ export const crearIniciativa = async (iniciativa, imagen) => {
     console.error("No hay usuario autenticado");
     return [null, null];
   }
-  iniciativa.idAdmin = user.uid;
+  iniciativa.idAdmin = user;
 
   // Verificar que no exista una iniciativa con el mismo título
   const iniciativasQuery = query(collection(firestore, "Iniciativas"), where("titulo", "==", iniciativa.titulo));

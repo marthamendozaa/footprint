@@ -40,7 +40,7 @@ export const actualizaUsuario = async (user, data) => {
   });
   if (response.data.success) {
     console.log("Actualizando usuario exitoso");
-    return response.data.data;
+    return;
   } else {
     console.log("Error actualizando usuario");
     throw new Error(response.data.error);
@@ -91,6 +91,27 @@ export const getIniciativa = async (idIniciativa) => {
     return response.data.data;
   } else {
     console.log("Error obteniendo iniciativa");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Subir imagen de perfil
+export const subirImagen = async (imageData) => {
+  const formData = new FormData();
+  formData.append('profileImage', imageData);
+
+  const response = await axios.post('http://127.0.0.1:5001/evertech-sprint2/us-central1/subirImagen', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+
+  if (response.data.success) {
+    console.log("Subir imagen exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error subiendo imagen");
     throw new Error(response.data.error);
   }
 };

@@ -5,7 +5,6 @@ const { getFirestore } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
 
 initializeApp();
-const auth = getAuth();
 
 
 // Autentificación del usuario
@@ -13,7 +12,7 @@ exports.autentificaUsuario = onRequest(async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await auth.getUserByEmail(email);
+    const user = await getAuth().getUserByEmail(email);
     const userPassword = user.passwordHash.split('password=')[1];
     if (userPassword === password) {
       res.json({ success: true, data: user.uid });
@@ -108,4 +107,58 @@ exports.getIniciativa = onRequest(async (req, res) => {
     logger.info("Error obteniendo iniciativa: ", error.message);
     res.status(500).json({ success: false, error: error.message });
   }
+});
+
+
+// Crear una iniciativa
+exports.crearIniciativa = onRequest(async (req, res) => {
+  const { data } = req.body;
+
+  try {
+    const iniciativasQuery = await getFirestore().collection('Iniciativas')
+      .where('titulo', '==', data.titulo)
+      .get();
+
+    if (!iniciativasQuery.empty) {
+      logger.info("Ya existe una iniciativa con el mismo título");
+      res.json({ success: false, error: "Ya existe una iniciativa con el mismo título" });
+    }
+    
+    res.json({ success: true, data: iniciativa });
+  } catch (error) {
+    logger.info("Error obteniendo iniciativa: ", error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
+const { Storage } = require("@google-cloud/storage");
+const { v4: uuid } = require("uuid");
+const formidable = require("formidable-serverless");
+
+const storage = new Storage({});
+
+exports.subirImagen = onRequest(async (req, res) => {
+  const form = new formidable.IncomingForm({ multiples: true, keepExtensions: true });
+
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      logger.info("Error parsing the files", err);
+      return res.status(400).json({ success: false, error: "There was an error parsing the files"});
+    }
+    const profileImage = files.profileImage;
+    const bucket = storage.bucket("gs://evertech-sprint2.appspot.com");
+    await bucket.upload(profileImage.path, {
+      destination: `users/${profileImage.name}`,
+      resumable: true,
+      metadata: {
+        metadata: {
+          firebaseStorageDownloadTokens: uuid,
+        },
+      },
+    });
+    const storageHost = "http://localhost:9199";
+    const imageUrl = `${storageHost}/evertech-sprint2.appspot.com/users/${profileImage.name}`;
+    res.status(200).json({ success: true, data: imageUrl });
+  });
 });
