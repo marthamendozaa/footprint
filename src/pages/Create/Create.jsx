@@ -8,7 +8,7 @@ import { format } from 'date-fns';
 import { getIntereses, getRegiones } from '../../api/api.js';
 import { crearIniciativa } from './Create-fb.js';
 import es from 'date-fns/locale/es';
-import Iniciativa from '../../backend/obj-Iniciativa.js';
+import Iniciativa from '../../classes/Iniciativa.js';
 import './Create.css';
 
 export const Create = () => {

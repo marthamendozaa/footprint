@@ -94,3 +94,18 @@ exports.getRegiones = onRequest(async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+
+// Información de la iniciativa
+exports.getIniciativa = onRequest(async (req, res) => {
+  const { idIniciativa } = req.body;
+
+  try {
+    const iniciativaRef = await getFirestore().doc(`Iniciativas/${idIniciativa}`).get();
+    const iniciativa = iniciativaRef.data();
+    res.json({ success: true, data: iniciativa });
+  } catch (error) {
+    logger.info("Error obteniendo iniciativa: ", error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});

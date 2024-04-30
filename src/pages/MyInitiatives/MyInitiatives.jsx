@@ -1,25 +1,52 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
-import { getIniciativasMiembro, getIniciativasAdmin, getIniciativasFavoritas } from './MyInitiatives-fb.js';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { getUsuario, getIniciativa } from '../../api/api.js';
+import Usuario from '../../classes/Usuario.js';
 import './MyInitiatives.css';
 
 export const MyInitiatives = () => {
+  const { user } = useAuth();
+  const [ usuario ] = useState(new Usuario());
+  
+  // Información de iniciativas del usuario
   const [iniciativasMiembro, setIniciativasMiembro] = useState(null);
   const [iniciativasAdmin, setIniciativasAdmin] = useState(null);
   const [iniciativasFavoritas, setIniciativasFavoritas] = useState(null);
-
+  
   useEffect(() => {
     const fetchData = async () => {
-      const dataMiembro = await getIniciativasMiembro();
-      setIniciativasMiembro(dataMiembro);
-      const dataAdmin = await getIniciativasAdmin();
-      setIniciativasAdmin(dataAdmin);
-      const dataFavoritas = await getIniciativasFavoritas();
-      setIniciativasFavoritas(dataFavoritas);
+      const usuarioData = await getUsuario(user);
+      const objUsuario = { ...usuario, ...usuarioData };
+      
+      // Obtiene información de iniciativas suscritas
+      const iniciativasMiembroData = [];
+      for (const idIniciativa of objUsuario.listaIniciativasMiembro) {
+        const iniciativaData = await getIniciativa(idIniciativa);
+        iniciativasMiembroData.push(iniciativaData);
+      }
+      setIniciativasMiembro(iniciativasMiembroData);
+      
+      // Obtiene información de iniciativas creadas
+      const iniciativasAdminData = [];
+      for (const idIniciativa of objUsuario.listaIniciativasAdmin) {
+        const iniciativaData = await getIniciativa(idIniciativa);
+        iniciativasAdminData.push(iniciativaData);
+      }
+      setIniciativasAdmin(iniciativasAdminData);
+      
+      // Obtiene información de iniciativas favoritas
+      const iniciativasFavoritasData = [];
+      for (const idIniciativa of objUsuario.listaIniciativasFavoritas) {
+        const iniciativasFavoritasData = await getIniciativa(idIniciativa);
+        iniciativasAdminData.push(iniciativasFavoritasData);
+      }
+      setIniciativasFavoritas(iniciativasFavoritasData);
     };
     fetchData();
-  });
+  }, []);
+
 
   return (
     <div>

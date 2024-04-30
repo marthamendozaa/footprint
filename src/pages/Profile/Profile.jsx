@@ -5,7 +5,7 @@ import { Spinner } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { getUsuario, actualizaUsuario, getHabilidades, getIntereses } from '../../api/api.js';
 import { cambiarContrasena, uploadProfileImage, deleteProfileImage } from './Profile-fb.js';
-import Usuario from '../../backend/obj-Usuario.js';
+import Usuario from '../../classes/Usuario.js';
 import Modal from 'react-bootstrap/Modal';
 import './Profile.css';
 

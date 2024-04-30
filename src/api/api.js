@@ -79,3 +79,18 @@ export const getRegiones = async () => {
     throw new Error(response.data.error);
   }
 };
+
+
+// Información de la iniciativa
+export const getIniciativa = async (idIniciativa) => {
+  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/getIniciativa", {
+    idIniciativa: idIniciativa
+  });
+  if (response.data.success) {
+    console.log("Obtener iniciativa exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error obteniendo iniciativa");
+    throw new Error(response.data.error);
+  }
+};
