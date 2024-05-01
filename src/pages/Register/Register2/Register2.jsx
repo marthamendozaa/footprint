@@ -10,10 +10,11 @@ import './Register2.css';
 export const Register2 = ({ onPrev, onNext }) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
+  const [invalidName, setInvalidName] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const today = new Date();
   const maxDate = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
-  const [invalidDate, setInvalidDate] = useState(false);
+  const [invalidUsername, setInvalidUsername] = useState(false);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showResponsiveLetter, setShowResponsiveLetter] = useState(false);
@@ -26,6 +27,10 @@ export const Register2 = ({ onPrev, onNext }) => {
       document.body.classList.remove('register2-body');
     };
   }, []);
+
+  const onlyLetters = (text) => {
+    return /^[a-zA-Z\s]+$/.test(text);
+  };
 
   const validateUsername = (username) => {
     const numbers = /[0-9]/;
@@ -40,10 +45,8 @@ export const Register2 = ({ onPrev, onNext }) => {
     const currentDate = new Date();
     const birthDate = new Date(birthday);
     
-    // Calculate the difference in milliseconds
     let ageDiff = currentDate - birthDate;
   
-    // Convert the age difference from milliseconds to years
     let ageDate = new Date(ageDiff); 
     let calculatedAge = Math.abs(ageDate.getUTCFullYear() - 1970);
   
@@ -59,8 +62,14 @@ export const Register2 = ({ onPrev, onNext }) => {
       return;
     }
 
+    if (!onlyLetters(name)) {
+      setInvalidName(true);
+      return;
+    }
+      
+
     if (!validateUsername(username)) {
-        setInvalidDate(true);
+        setInvalidUsername(true);
         return;
     }
 
@@ -100,13 +109,26 @@ export const Register2 = ({ onPrev, onNext }) => {
               <FaIdCard className="register2-icons" />
               <div className="relative">
                 <input
-                  className={"nombre-caja-register2"}
+                  className={`nombre-caja-register2 ${invalidName ? 'border-red-register2' : ''}`}
                   type="nombre"
                   placeholder="Ingresa tu nombre completo"
                   value={name}
-                  onChange={(e) => { setName(e.target.value) }}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 35) {
+                      setName(e.target.value);
+                    }
+                    setInvalidName(false);
+                  }} 
                 />
               </div>
+
+              {/* Advertencia de usuario */}
+              {invalidName && (
+                <div className="custom-alert-register2 bg-custom-color-register2" style={{ marginTop: '85px' }}>
+                  <FaExclamationCircle className="custom-alert-icon-register2" />
+                  <span>Formato de nombre inválido</span>
+                </div>
+              )}
             </div>
 
             {/* Usuario */}
@@ -116,18 +138,20 @@ export const Register2 = ({ onPrev, onNext }) => {
               {/* Caja usuario */}
               <FaUser className="register2-icons" />
               <input 
-                className={`usuario-caja-register2 ${invalidDate ? 'border-red-register2' : ''}`}
+                className={`usuario-caja-register2 ${invalidUsername ? 'border-red-register2' : ''}`}
                 type="usuario"
                 placeholder="Ingresa tu usuario" 
                 value={username}  
                 onChange={(e) => {
-                  setUsername(e.target.value)
-                  setInvalidDate(false);
+                  if (e.target.value.length <= 20) {
+                    setUsername(e.target.value);
+                  }
+                  setInvalidUsername(false);
                 }} 
               />
 
               {/* Advertencia de usuario */}
-              {invalidDate && (
+              {invalidUsername && (
                 <div className="custom-alert-register2 bg-custom-color-register2" style={{ marginTop: '85px' }}>
                   <FaExclamationCircle className="custom-alert-icon-register2" />
                   <span>El usuario ya existe</span>
