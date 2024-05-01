@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
-import { getHabilidades, actualizaHabilidades } from './Register4-fb';
+import { getHabilidades, actualizaHabilidades } from '../../../api/api.js';
 import './Register4.css';
 
 export const Register4 = () => {

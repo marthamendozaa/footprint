@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ExploreAdmin.css';
 import { AiOutlineSearch } from "react-icons/ai";
-import { getIniciativas } from '../../api/api.js';
-import { eliminaIniciativa } from './ExploreAdmin-fb.js';
+import { getIniciativas, eliminaIniciativa } from '../../api/api.js';
 import { Modal, Button } from 'react-bootstrap';
 
 export const ExploreAdmin = () => {
@@ -38,11 +37,11 @@ export const ExploreAdmin = () => {
   // Eliminar iniciativa
   const handleEliminaIniciativa = async () => {
     console.log("Eliminando iniciativa con id: ", idIniciativaEliminar);
-    const eliminada = await eliminaIniciativa(idIniciativaEliminar);
     handleCerrarEliminar();
-    if (eliminada) {
+    try {
+      await eliminaIniciativa(idIniciativaEliminar);
       handleMostrarEliminada();
-    } else {
+    } catch(error) {
       handleMostrarError();
     }
   };

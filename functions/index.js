@@ -3,6 +3,9 @@ const { onRequest } = require("firebase-functions/v2/https");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
+const { Storage } = require("@google-cloud/storage");
+const { v4: uuid } = require("uuid");
+const formidable = require("formidable-serverless");
 
 initializeApp();
 
@@ -145,6 +148,7 @@ exports.crearIniciativa = onRequest(async (req, res) => {
   const { data } = req.body;
 
   try {
+    // Verifica existencia de iniciativas duplicadas
     const iniciativasQuery = await getFirestore().collection('Iniciativas')
       .where('titulo', '==', data.titulo)
       .get();
@@ -154,8 +158,16 @@ exports.crearIniciativa = onRequest(async (req, res) => {
       return res.json({ success: false, error: 409 });
     }
 
-    const iniciativaRef = await getFirestore().collection('Iniciativas').add(data);
-    res.json({ success: true, data: iniciativaRef.id });
+    // Crea iniciativa en Firestore
+    const iniciativaData = await getFirestore().collection('Iniciativas').add(data);
+
+    // Actualiza lista de iniciativas del admin
+    const usuarioRef = await getFirestore().doc(`Usuarios/${data.idAdmin}`).get();
+    const usuario = usuarioRef.data();
+    const usuarioNuevo = { ...usuario, listaIniciativasAdmin: [...usuario.listaIniciativasAdmin, iniciativaData.id] };
+    await getFirestore().doc(`Usuarios/${data.idAdmin}`).update(usuarioNuevo);
+
+    res.json({ success: true, data: iniciativaData.id });
   } catch (error) {
     logger.info("Error creando iniciativa: ", error.message);
     res.json({ success: false, error: 500 });
@@ -177,11 +189,40 @@ exports.actualizaIniciativa = onRequest(async (req, res) => {
 });
 
 
-// Subir imágenes a Storage
-const { Storage } = require("@google-cloud/storage");
-const { v4: uuid } = require("uuid");
-const formidable = require("formidable-serverless");
+// Elimina iniciativa
+exports.eliminaIniciativa = onRequest(async (req, res) => {
+  const storage = new Storage({});
+  const bucket = storage.bucket("gs://evertech-sprint2.appspot.com");
+  const { iniciativa } = req.body;
 
+  try {
+    // Borrar iniciativa de Firestore
+    const iniciativaRef = await getFirestore().doc(`Iniciativas/${iniciativa}`);
+    const iniciativaData = await getFirestore().doc(`Iniciativas/${iniciativa}`).get();
+    const user = iniciativaData.data().idAdmin;
+    await iniciativaRef.delete();
+
+    // Elimina archivos en el folder
+    const [files] = await bucket.getFiles({ prefix: `Iniciativas/${iniciativa}` });
+    if (files.length > 0) {
+      await Promise.all(files.map(file => file.delete()));
+    }
+
+    // Borrar iniciativa de lista de iniciativas del admin
+    const usuarioRef = await getFirestore().doc(`Usuarios/${user}`).get();
+    const usuario = usuarioRef.data();
+    const usuarioNuevo = { ...usuario, listaIniciativasAdmin: usuario.listaIniciativasAdmin.filter(id => id !== iniciativa) };
+    await getFirestore().doc(`Usuarios/${user}`).update(usuarioNuevo);
+    
+    res.json({ success: true });
+  } catch (error) {
+    logger.info("Error eliminando iniciativa: ", error.message);
+    res.json({ success: false, error: error.message });
+  }
+});
+
+
+// Subir imágenes a Storage
 exports.subirImagen = onRequest(async (req, res) => {
   const storage = new Storage({});
   const bucket = storage.bucket("gs://evertech-sprint2.appspot.com");

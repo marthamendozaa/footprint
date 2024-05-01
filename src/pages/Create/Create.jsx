@@ -245,11 +245,6 @@ export const Create = () => {
     const iniciativaNueva = { ...iniciativa, urlImagen: urlImagen, idIniciativa: idIniciativa};
     await actualizaIniciativa(idIniciativa, iniciativaNueva);
 
-    // Actualizar lista iniciativas creadas del usuario
-    const usuario = await getUsuario(user);
-    const usuarioNuevo = { ...usuario, listaIniciativasAdmin: [...usuario.listaIniciativasAdmin, idIniciativa] };
-    await actualizaUsuario(user, usuarioNuevo);
-
     setIdIniciativaCreada(idIniciativa);
     handleMostrarCreada();
     setTiempoIniciativaCreada(tiempoActual);

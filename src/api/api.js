@@ -156,7 +156,22 @@ export const actualizaIniciativa = async (iniciativa, data) => {
     console.log("Actualizar iniciativa exitoso");
     return response.data.data;
   } else {
-    console.log("Error actualizar iniciativa");
+    console.log("Error actualizando iniciativa");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Eliminar una iniciativa
+export const eliminaIniciativa = async (iniciativa) => {
+  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/eliminaIniciativa", {
+    iniciativa: iniciativa,
+  });
+  if (response.data.success) {
+    console.log("Eliminar iniciativa exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error eliminando iniciativa");
     throw new Error(response.data.error);
   }
 };
