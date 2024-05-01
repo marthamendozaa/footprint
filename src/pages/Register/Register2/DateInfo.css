@@ -1,8 +1,8 @@
-.password-info-container {
+.date-info-container {
     position: relative; 
 }
   
-.password-info-popover {
+.date-info-popover {
     display: flex;
     align-items: center;
     position: absolute;
@@ -21,23 +21,20 @@
     border-radius: 10px;
 }  
 
-.fa-info-icon{
+.d-fa-info-icon{
     margin-top: -5px;
     margin-left: 10px;
 }
 
-.password-info-styles h2 {
+.date-info-styles h2 {
     font-size: 20px;
     font-weight: bold;
 }
 
-.password-info-styles p {
+.date-info-styles p {
     display: flex;
     align-items: flex-start;
     margin-top: 20px;
     margin-bottom: 5px;
-}
-
-.password-info-styles li {
-    text-align: left;
+    text-align: justify;
 }

@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
-import { getIntereses, actualizaIntereses } from '../../../api/api.js';
+import { getIntereses } from '../../../api/api.js';
+import { Spinner } from 'react-bootstrap';
 import './Register3.css';
 
-export const Register3 = () => {
+export const Register3 = ({ onPrev, onNext }) => {
     const [error, setError] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [intereses, setIntereses] = useState(null);
     const [interesesUsuario, setInteresesUsuario] = useState({});
-    const navigate = useNavigate();
 
     useEffect(() => {
         document.body.classList.add('register2-body');
@@ -33,22 +32,27 @@ export const Register3 = () => {
     }, []);
 
     // Manejar cambios en los intereses del usuario
-    const toggleInteres = (idInteres) => {
+    const toggleInteres = (interes, idInteres) => {
         const nuevosInteresesUsuario = { ...interesesUsuario };
-    
-        nuevosInteresesUsuario[idInteres] = !nuevosInteresesUsuario[idInteres];
-    
-        setInteresesUsuario(nuevosInteresesUsuario);  
         
-        console.log("Intereses Usuario:", nuevosInteresesUsuario);
+        if (Object.keys(nuevosInteresesUsuario).includes(`${idInteres}`)) {
+            if (Object.keys(nuevosInteresesUsuario).length === 1) {
+                setError('Por favor, selecciona al menos un interés');
+                setShowModal(true);
+                return;
+            }
+            delete nuevosInteresesUsuario[idInteres];
+          } else {
+            nuevosInteresesUsuario[idInteres] = interes;
+          }
+        
+          setInteresesUsuario(nuevosInteresesUsuario);          
     };   
 
     // Manejar registro
     const handleRegister = async (event) => {
         event.preventDefault();
 
-        // Validar que se hayan seleccionado al menos un interés
-        console.log("Condicion que se esta revisando:", Object.keys(interesesUsuario).length);
         if (Object.keys(interesesUsuario).length === 0) {
             setError('Por favor, selecciona al menos un interés');
             setShowModal(true);
@@ -56,11 +60,7 @@ export const Register3 = () => {
         }
 
         try {
-            // Guardar los intereses del usuario en la base de datos
-            await actualizaIntereses(interesesUsuario);
-            
-            // Navegar a la siguiente página de registro o a donde corresponda
-            navigate('/register3');
+            onNext();
         } catch (error) {
             setError('Error al registrar intereses. Por favor, inténtalo de nuevo.');
             setShowModal(true);
@@ -75,52 +75,55 @@ export const Register3 = () => {
                     <p className='texto-register3'>Selecciona tus intereses</p>
                 </div>
 
-                <form onSubmit={handleRegister}>
-                    {/* Mostrar la lista de intereses */}
-                    <div className="intereses-register3">
-                        <div className='r3-etiquetas'>
-                            {intereses && Object.values(intereses).map((interes, idInteres) => (
-                                <li key={idInteres} className={`r3-etiquetas-item  ${interesesUsuario[idInteres] ? "highlighted" : ""}`} onClick={() => toggleInteres(idInteres)}>
+                {intereses === null ? (
+                    <div className="spinner-container">
+                        <Spinner animation="border" role="status"></Spinner>
+                    </div>
+                ) : (
+                    <form onSubmit={handleRegister}>
+                        {/* Mostrar la lista de intereses */}
+                        <div className="intereses-register3">
+                            <div className='r3-etiquetas'>
+                            {Object.entries(intereses).map(([idInteres, interes]) => (
+                                <li key={idInteres} className={`r3-etiquetas-item ${interesesUsuario[idInteres] ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
                                     {interes}
                                 </li>
                             ))}
+                            </div>
                         </div>
-                        
-                    </div>
 
-                    {/* Flechas */}
-                    <div className='flecha-register3-container'>
-                        {/* Regreso */}
-                        <div className='flecha-register3-container-start'>
-                            <Link to="/register2">
-                                <button type="button" className="btn flecha-btn">
+                        {/* Flechas */}
+                        <div className='flecha-register3-container'>
+                            {/* Regreso */}
+                            <div className='flecha-register3-container-start'>
+                                <button type="button" className="btn flecha-btn" onClick={onPrev}>
                                     <FaArrowLeft />
                                 </button>
-                            </Link>
+                            </div>
+
+                            {/* Continuar con registro */}
+                            <div className='flecha-register3-container-end'>
+                                <button type="submit" className="btn flecha-btn">
+                                    <FaArrowRight />
+                                </button>
+                            </div>
+
                         </div>
 
-                        {/* Continuar con registro */}
-                        <div className='flecha-register3-container-end'>
-                            <button type="submit" className="btn flecha-btn">
-                                <FaArrowRight />
-                            </button>
-                        </div>
+                    </form>
+                )}
 
+                {/* Pop-up de error */}
+                {showModal && (
+                    <div className='pop-up-register3'>
+                        <div className='pop-up-3-register3'>
+                            <h2 style={{ textAlign: 'center' }}>Error</h2>
+                            <p style={{ textAlign: 'left', marginTop: '20px' }}>{error}</p>
+                            <button onClick={() => setShowModal(false)}>Cerrar</button>
+                        </div>
                     </div>
-
-                </form>
+                )}
             </div>
-
-            {/* Pop-up de error */}
-            {showModal && (
-                <div className='pop-up-register3'>
-                    <div className='pop-up-3-register3'>
-                        <h2 style={{ textAlign: 'center' }}>Error</h2>
-                        <p style={{ textAlign: 'left', marginTop: '20px' }}>{error}</p>
-                        <button onClick={() => setShowModal(false)}>Cerrar</button>
-                    </div>
-                </div>
-            )}
         </div>
     );
 };

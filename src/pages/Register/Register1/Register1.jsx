@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { FaEnvelope, FaArrowRight, FaArrowLeft, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
 import { PrivacyPolicy } from './PrivacyPolicy.jsx';
-import PasswordInfo from './PasswordInfo';
-import './Register.css';
+import PasswordInfo from './PasswordInfo.jsx';
+import './Register1.css';
 
-export const Register = () => {
+export const Register1 = ({ onNext }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -17,7 +17,6 @@ export const Register = () => {
   const [invalidPassword, setInvalidPasswordl] = useState(false);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     document.body.classList.add('register-body');
@@ -85,7 +84,7 @@ export const Register = () => {
     }
 
     try {
-      navigate('/register2');
+      onNext();
     } catch {
       setError('Error al registrarse. Por favor, inténtalo de nuevo.');
       setShowModal(true);
@@ -218,7 +217,8 @@ export const Register = () => {
 
       {/* Botón de Políticas de Privacidad */}
       <div className='politicas-contenedor'> 
-        <button className='boton-politicas-privacidad' onClick={() => setShowPrivacyPolicy(true)}>Políticas de privacidad y uso</button>
+        <p>Al registrarte aceptas nuestras</p>
+        <button className='boton-politicas-privacidad' onClick={() => setShowPrivacyPolicy(true)}>políticas de privacidad y uso</button>
       </div>
       
       {/* Popup de Políticas de Privacidad */}
