@@ -1,0 +1,126 @@
+.rl-pop-up{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+.rl-pop-up-2 {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    max-height: 80%;
+    overflow-y: auto;
+    width: 80%;
+    text-align: left;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.rl-pop-up-2::-webkit-scrollbar {
+    display: none;
+}
+
+.agree-checkbox {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    align-items: center;
+}
+
+.agree-checkbox input[type="checkbox"] {
+    border-color: #000;
+    width: 20px;
+    height: 20px;
+}
+
+.agree-checkbox label {
+    margin-left: 10px;
+}
+  
+.rl-pop-up-2 button {
+    display: block;
+    margin: 0 auto;
+    margin-top: 30px;
+    color: #000;
+    background-color: #A0C1BF;
+    padding: 10px 30px;
+    font-weight: 600;
+    border: none;
+    border-radius: 30px;
+}
+
+.rl-pop-up-2 button:hover{
+    background-color: #699AA0;
+}
+
+.rl-pop-up-2 input{
+    border-radius: 30px;
+    border: 1px solid #000;
+    margin-left: 10px;
+    padding-left: 15px;
+}
+
+.rl-boton-politicas-privacidad{
+    border: none;
+    background: transparent;
+    outline: none;
+    text-align: center;
+    padding: 10px;
+    padding-left: unset;
+    font-size: 10px;
+    cursor: pointer;
+}
+
+.rl-input-with-error {
+    flex-direction: row;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+}
+  
+.rl-input-with-error label {
+    margin-right: 10px;
+}
+
+.rl-error-message-1 {
+    display: flex;
+    margin-left: 20px;
+    margin-bottom: 0px;
+    color: red;
+    align-items: baseline;
+}
+
+.rl-error-message-2 {
+    display: flex;
+    margin-left: 20px;
+    margin-bottom: 0px;
+    color: red;
+    align-items: baseline;
+}
+
+.rl-error-message-3 {
+    display: flex;
+    color: red;
+    margin-left: 20px;
+    margin-bottom: 0px;
+    align-items: baseline;
+}
+
+.error-input {
+    border-color: red !important;
+}
+
+.rl-icon-error {
+    display: flex;
+    color: #ff0000;
+    font-size: 15px;
+    align-items: baseline;
+    margin-right: 7px;
+}

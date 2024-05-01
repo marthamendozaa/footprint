@@ -1,19 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowRight, FaArrowLeft, FaUser, FaIdCard, FaCalendar, FaExclamationCircle } from 'react-icons/fa';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import es from 'date-fns/locale/es';
+import DateInfo from './DateInfo.jsx';
+import { ResponsiveLetter } from './ResponsiveLetter.jsx';
 import './Register2.css';
 
-export const Register2 = () => {
+export const Register2 = ({ onPrev, onNext }) => {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
-  const [selectedDate, setSelectedDate] = useState(null)
+  const [selectedDate, setSelectedDate] = useState(null);
+  const today = new Date();
+  const maxDate = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
   const [invalidDate, setInvalidDate] = useState(false);
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
+  const [showResponsiveLetter, setShowResponsiveLetter] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('register2-body');
@@ -32,6 +36,20 @@ export const Register2 = () => {
     return true;
   };
 
+  const calculateAge = (birthday) => {
+    const currentDate = new Date();
+    const birthDate = new Date(birthday);
+    
+    // Calculate the difference in milliseconds
+    let ageDiff = currentDate - birthDate;
+  
+    // Convert the age difference from milliseconds to years
+    let ageDate = new Date(ageDiff); 
+    let calculatedAge = Math.abs(ageDate.getUTCFullYear() - 1970);
+  
+    return calculatedAge;
+  };
+
   const handleRegister = async (event) => {
     event.preventDefault();
 
@@ -47,7 +65,21 @@ export const Register2 = () => {
     }
 
     try {
-        navigate('/register3');
+        const userAge = calculateAge(selectedDate);
+
+        if (isChecked==true) {  
+          onNext();
+        }
+
+        if (userAge<18) {
+            setShowResponsiveLetter(true)
+            return;
+        }
+
+        else {
+            onNext();
+        }
+        
       } catch {
         setError('Error al registrarse. Por favor, inténtalo de nuevo.');
         setShowModal(true);
@@ -105,7 +137,11 @@ export const Register2 = () => {
             
             {/* Fecha */}
             <div className='container-fecha-register2'>
-              <p className='fecha-texto-register2'>Fecha de nacimiento</p>
+              <div className='container-fecha-register2-2'>
+                <p className='fecha-texto-register2'>Fecha de nacimiento</p>
+                {/* Info de fecha */}
+                <DateInfo />
+              </div>
 
               {/* Caja de fecha */}
               <FaCalendar className="register2-icons" />
@@ -119,9 +155,10 @@ export const Register2 = () => {
                 showYearDropdown
                 scrollableYearDropdown 
                 yearDropdownItemNumber={66}
+                showMonthDropdown
                 locale={es}
+                maxDate={maxDate}
               />
-              
             </div>
 
           </div>
@@ -131,11 +168,9 @@ export const Register2 = () => {
 
             {/* Regreso */}
             <div className='flecha-register2-container-start'>
-              <Link to="/register">
-                <button type="button" className="btn flecha-btn">
-                  <FaArrowLeft />
-                </button>
-              </Link>
+              <button type="button" className="btn flecha-btn" onClick={onPrev}>
+                <FaArrowLeft />
+              </button>
             </div>
 
             {/* Continuar con registro */}
@@ -149,6 +184,9 @@ export const Register2 = () => {
 
         </form>
       </div>
+
+      {/* Popup de Carta Resonsiva */}
+      {showResponsiveLetter && <ResponsiveLetter isChecked={isChecked} setIsChecked={setIsChecked} onClose={() => setShowResponsiveLetter(false)} />}
       
       {/* Pop-up de error */}
       {showModal && (

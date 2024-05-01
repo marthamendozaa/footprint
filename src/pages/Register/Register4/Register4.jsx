@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
-import { getHabilidades, actualizaHabilidades } from './Register4-fb';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
+import { Spinner } from 'react-bootstrap';
+import { getHabilidades } from './Register4-fb';
 import './Register4.css';
 
-export const Register4 = () => {
+export const Register4 = ({ onPrev }) => {
     const [error, setError] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [habilidades, setHabilidades] = useState(null);
@@ -33,21 +34,27 @@ export const Register4 = () => {
     }, []);
 
     // Manejar cambios en las habilidades del usuario
-    const toggleHabilidad = (idHabilidad) => {
+    const toggleHabilidad = (habilidad, idHabilidad) => {
         const nuevasHabilidadesUsuario = { ...habilidadesUsuario };
 
-        nuevasHabilidadesUsuario[idHabilidad] = !nuevasHabilidadesUsuario[idHabilidad];
-
-        setHabilidadesUsuario(nuevasHabilidadesUsuario);
+        if (Object.keys(nuevasHabilidadesUsuario).includes(`${idHabilidad}`)) {
+            if (Object.keys(nuevasHabilidadesUsuario).length === 1) {
+                setError('Por favor, selecciona al menos una habilidad');
+                setShowModal(true);
+                return;
+            }
+            delete nuevasHabilidadesUsuario[idHabilidad];
+          } else {
+            nuevasHabilidadesUsuario[idHabilidad] = habilidad;
+          }
         
-        console.log("Habilidades Usuario:", nuevasHabilidadesUsuario);
+          setHabilidadesUsuario(nuevasHabilidadesUsuario); 
     };   
 
     // Manejar registro
     const handleRegister = async (event) => {
         event.preventDefault();
         
-        // Validar que se hayan seleccionado al menos una habilidad
         if (Object.keys(habilidadesUsuario).length === 0) {
             setError('Por favor, selecciona al menos una habilidad');
             setShowModal(true);
@@ -55,10 +62,6 @@ export const Register4 = () => {
         }
 
         try {
-            // Guardar las habilidades del usuario en la base de datos
-            await actualizaHabilidades(habilidadesUsuario);
-            
-            // Navegar a la siguiente página de registro o a donde corresponda
             navigate('/login'); 
         } catch (error) {
             setError('Error al registrar habilidades. Por favor, inténtalo de nuevo.');
@@ -74,52 +77,56 @@ export const Register4 = () => {
                     <p className='texto-register4'>Selecciona tus habilidades</p>
                 </div>
                 
-                <form onSubmit={handleRegister}>
-                    {/* Mostrar la lista de habilidades */}
-                    <div className="habilidades-register4">
-                        <div className='r4-etiquetas'>
-                            {habilidades && Object.values(habilidades).map((habilidad, idHabilidad) => (
-                                <li key={idHabilidad} className={`r4-etiquetas-item ${habilidadesUsuario[idHabilidad] ? "highlighted" : ""}`} onClick={() => toggleHabilidad(idHabilidad)}>
+                {habilidades === null ? (
+                    <div className="spinner-container">
+                        <Spinner animation="border" role="status"></Spinner>
+                    </div>
+                ) : (
+                    <form onSubmit={handleRegister}>
+                        {/* Mostrar la lista de habilidades */}
+                        <div className="habilidades-register4">
+                            <div className='r4-etiquetas'>
+                            {Object.entries(habilidades).map(([idHabilidad, habilidad]) => (
+                                <li key={idHabilidad} className={`r4-etiquetas-item ${habilidadesUsuario[idHabilidad] ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
                                     {habilidad}
                                 </li>
                             ))}
+                            </div>
                         </div>
-                    </div>
-                    
-                    {/* Flechas */}
-                    <div className='flecha-register4-container'>
-                        {/* Regreso */}
-                        <div className='flecha-register4-container-start'>
-                            <Link to="/register3">
-                                <button type="button" className="btn flecha-btn">
+                        
+                        {/* Flechas */}
+                        <div className='flecha-register4-container'>
+                            {/* Regreso */}
+                            <div className='flecha-register4-container-start'>
+                                <button type="button" className="btn flecha-btn" onClick={onPrev}>
                                     <FaArrowLeft />
                                 </button>
-                            </Link>
+                            </div>
+                            
+                            {/* Terminar con registro */}
+                            <div className='flecha-register4-container-end'>
+                                <button type="submit" className="btn flecha-btn">
+                                    {/*<FaArrowRight />*/}
+                                    Terminar
+                                </button>
+                            </div>
+                            
                         </div>
-                        
-                        {/* Terminar con registro */}
-                        <div className='flecha-register4-container-end'>
-                            <button type="submit" className="btn flecha-btn">
-                                {/*<FaArrowRight />*/}
-                                Terminar
-                            </button>
-                        </div>
-                        
-                    </div>
 
-                </form>
-            </div>
-            
-            {/* Pop-up de error */}
-            {showModal && (
-                <div className='pop-up-register4'>
-                    <div className='pop-up-4-register4'>
-                        <h2 style={{ textAlign: 'center' }}>Error</h2>
-                        <p style={{ textAlign: 'left', marginTop: '20px' }}>{error}</p>
-                        <button onClick={() => setShowModal(false)}>Cerrar</button>
+                    </form>
+                )}
+
+                {/* Pop-up de error */}
+                {showModal && (
+                    <div className='pop-up-register4'>
+                        <div className='pop-up-4-register4'>
+                            <h2 style={{ textAlign: 'center' }}>Error</h2>
+                            <p style={{ textAlign: 'left', marginTop: '20px' }}>{error}</p>
+                            <button onClick={() => setShowModal(false)}>Cerrar</button>
+                        </div>
                     </div>
-                </div>
-            )}
+                )}
+            </div>
         </div>
     );
 };

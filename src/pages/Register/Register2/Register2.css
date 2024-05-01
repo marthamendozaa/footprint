@@ -139,6 +139,13 @@
     margin-top: 20px;
 }
 
+.container-fecha-register2-2 {
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    align-items: baseline;
+}
+
 .react-datepicker__input-container.input-register2 input {
     font-family: "Inter", sans-serif;
     font-size: 12px;

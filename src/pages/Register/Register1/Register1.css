@@ -8,7 +8,6 @@
     flex-direction: column;
     height: 100%;
     width: 100vh;
-    justify-content: center;
     align-items: center;
 }  
 
@@ -215,4 +214,27 @@
 
 .pop-up-3-register button:hover {
     background-color: #699AA0;
+}
+
+.politicas-contenedor{
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    align-items: baseline;
+    margin-top: 5px;
+}
+
+.politicas-contenedor p {
+    font-size: 10px;
+    color: #000;
+    font-weight: 500;
+    padding-right: 3px;
+}
+
+.politicas-contenedor button {
+    text-decoration: underline;
+}
+
+.politicas-contenedor button:hover{
+    color: #186279;
 }
