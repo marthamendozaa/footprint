@@ -30,7 +30,7 @@ export const Login = () => {
 
   // Funciones
   const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const re = /^[a-zA-Z0-9._-]+@[a-zA-Z-]{3,10}\.[a-zA-Z]{2,3}(?:\.[a-zA-Z]{2,3})?$/;
     return re.test(String(email).toLowerCase());
   };
 
