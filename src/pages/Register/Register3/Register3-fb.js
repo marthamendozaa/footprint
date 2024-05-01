@@ -13,21 +13,3 @@ export const getIntereses = async () => {
     return null;
   }
 };
-
-
-// Intereses: actualiza intereses
-export const actualizaIntereses = async (listaInteresesNueva) => {
-  const user = JSON.parse(sessionStorage.getItem('user'));
-  if (!user) {
-    console.error("No hay usuario autenticado");
-    return null;
-  }
-
-  try {
-    const usuarioRef = doc(firestore, "Usuarios", user.uid);
-    await updateDoc(usuarioRef, {listaIntereses: listaInteresesNueva});
-  } catch (error) {
-    console.error("Error actualizando intereses del usuario: ", error.message);
-    return null;
-  }
-};

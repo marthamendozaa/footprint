@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { FaEnvelope, FaArrowRight, FaArrowLeft, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
 import { PrivacyPolicy } from './PrivacyPolicy.jsx';
-import PasswordInfo from './PasswordInfo';
-import './Register.css';
+import PasswordInfo from './PasswordInfo.jsx';
+import './Register1.css';
 
-export const Register = () => {
+export const Register1 = ({ onNext }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -14,10 +14,10 @@ export const Register = () => {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
+  const [duplicatEmail, setDuplicatEmail] = useState(false);
   const [invalidPassword, setInvalidPasswordl] = useState(false);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     document.body.classList.add('register-body');
@@ -28,9 +28,16 @@ export const Register = () => {
   }, []);
 
   const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const re = /^[a-zA-Z0-9._-]+@[a-zA-Z-]{3,10}\.[a-zA-Z]{2,3}(?:\.[a-zA-Z]{2,3})?$/;
     return re.test(String(email).toLowerCase());
   };
+
+  const validateEmail2 = (email) => {
+    if (email.length < 8) {
+      return false;
+    }
+    return true;
+  }
 
   const validatePassword = (password) => {
     // Verificar que la contraseña tenga al menos 8 caracteres
@@ -74,6 +81,11 @@ export const Register = () => {
       return;
     }
 
+    if (!validateEmail2(email)) {
+      setDuplicatEmail(true);
+      return;
+    }
+
     if (!validatePassword(password)) {
       setInvalidPasswordl(true);
       return;
@@ -85,7 +97,7 @@ export const Register = () => {
     }
 
     try {
-      navigate('/register2');
+      onNext();
     } catch {
       setError('Error al registrarse. Por favor, inténtalo de nuevo.');
       setShowModal(true);
@@ -109,21 +121,27 @@ export const Register = () => {
               <FaEnvelope className="register-icons" />
               <div className="relative">
                 <input
-                  className={`correo-caja-register ${invalidEmail ? 'border-red-register' : ''}`}
+                  className={`correo-caja-register ${invalidEmail || duplicatEmail ? 'border-red-register' : ''}`}
                   type="correo"
                   placeholder="Ingresa el correo"
                   value={email}
                   onChange={(e) => {
-                    setEmail(e.target.value);
+                    if (e.target.value.length <= 40) {
+                      setEmail(e.target.value);
+                    }
                     setInvalidEmail(false);
+                    setDuplicatEmail(false);
                   }}
                 />
 
                 {/* Advertencia de correo */}
-                {invalidEmail && (
+                {(invalidEmail || duplicatEmail) && (
                   <div className="custom-alert-register bg-custom-color-register" style={{ marginTop: '-5px' }}>
                     <FaExclamationCircle className="custom-alert-icon-register" />
-                    <span>Formato de correo inválido</span>
+                    <span>
+                      {invalidEmail ? 'Formato de correo inválido' : ''}
+                      {duplicatEmail ? 'Correo duplicado' : ''}
+                    </span>
                   </div>
                 )}
               </div>
@@ -145,7 +163,9 @@ export const Register = () => {
                 placeholder="Ingresa la contraseña" 
                 value={password}  
                 onChange={(e) => {
-                  setPassword(e.target.value)
+                  if (e.target.value.length <= 20) {
+                    setPassword(e.target.value);
+                  }
                   setInvalidPasswordl(false);
                 }} 
               />
@@ -174,7 +194,9 @@ export const Register = () => {
                 placeholder="Confirma la contraseña" 
                 value={confirmPassword} 
                 onChange={(e) => {
-                  setConfirmPassword(e.target.value);
+                  if (e.target.value.length <= 20) {
+                    setConfirmPassword(e.target.value);
+                  }
                   setPasswordsMatch(true);
                 }} 
               />
@@ -197,9 +219,10 @@ export const Register = () => {
 
             {/* Regreso */}
             <div className='flecha-register-container-start'>
+              <p className='register1-texto-login'>¿Ya tienes cuenta?</p>
               <Link to="/login">
                 <button type="button" className="btn flecha-btn">
-                  <FaArrowLeft />
+                  Inicia sesión
                 </button>
               </Link>
             </div>
@@ -218,7 +241,8 @@ export const Register = () => {
 
       {/* Botón de Políticas de Privacidad */}
       <div className='politicas-contenedor'> 
-        <button className='boton-politicas-privacidad' onClick={() => setShowPrivacyPolicy(true)}>Políticas de privacidad y uso</button>
+        <p>Al registrarte aceptas nuestras</p>
+        <button className='boton-politicas-privacidad' onClick={() => setShowPrivacyPolicy(true)}>políticas de privacidad y uso</button>
       </div>
       
       {/* Popup de Políticas de Privacidad */}
