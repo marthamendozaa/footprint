@@ -1,7 +1,7 @@
 export default class Iniciativa {
-  constructor(titulo, descripcion, region, esPublica, listaEtiquetas, fechaInicio, fechaCierre) {
+  constructor(idAdmin, titulo, descripcion, region, esPublica, listaEtiquetas, fechaInicio, fechaCierre) {
     this.idIniciativa = null;
-    this.idAdmin = null;
+    this.idAdmin = idAdmin;
     this.titulo = titulo;
     this.descripcion = descripcion;
     this.region = region;
@@ -10,7 +10,7 @@ export default class Iniciativa {
     this.listaEtiquetas = listaEtiquetas;
     this.fechaInicio = fechaInicio;
     this.fechaCierre = fechaCierre;
-    this.fechaCreacion = null;
+    this.fechaCreacion = new Date();
   }
 
   convertirAObjeto() {

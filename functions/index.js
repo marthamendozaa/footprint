@@ -109,7 +109,20 @@ exports.getRegiones = onRequest(async (req, res) => {
 });
 
 
-
+// Información de todas las iniciativas
+exports.getIniciativas = onRequest(async (req, res) => {
+  try {
+    const iniciativasRef = await getFirestore().collection(`Iniciativas`).get();
+    const iniciativasData = [];
+    iniciativasRef.forEach(doc => {
+      iniciativasData.push(doc.data());
+    });
+    res.json({ success: true, data: iniciativasData });
+  } catch (error) {
+    logger.info("Error obteniendo iniciativas: ", error.message);
+    res.json({ success: false, error: error.message });
+  }
+});
 
 
 // Información de la iniciativa
@@ -127,7 +140,7 @@ exports.getIniciativa = onRequest(async (req, res) => {
 });
 
 
-// Crear una iniciativa
+// Crea una iniciativa
 exports.crearIniciativa = onRequest(async (req, res) => {
   const { data } = req.body;
 
@@ -138,12 +151,27 @@ exports.crearIniciativa = onRequest(async (req, res) => {
 
     if (!iniciativasQuery.empty) {
       logger.info("Ya existe una iniciativa con el mismo título");
-      res.json({ success: false, error: "Ya existe una iniciativa con el mismo título" });
+      return res.json({ success: false, error: 409 });
     }
-    
-    res.json({ success: true, data: iniciativa });
+
+    const iniciativaRef = await getFirestore().collection('Iniciativas').add(data);
+    res.json({ success: true, data: iniciativaRef.id });
   } catch (error) {
-    logger.info("Error obteniendo iniciativa: ", error.message);
+    logger.info("Error creando iniciativa: ", error.message);
+    res.json({ success: false, error: 500 });
+  }
+});
+
+
+// Actualiza información de iniciativa
+exports.actualizaIniciativa = onRequest(async (req, res) => {
+  const { iniciativa, data } = req.body;
+
+  try {
+    await getFirestore().doc(`Iniciativas/${iniciativa}`).update(data);
+    res.json({ success: true });
+  } catch (error) {
+    logger.info("Error actualizando iniciativa: ", error.message);
     res.json({ success: false, error: error.message });
   }
 });

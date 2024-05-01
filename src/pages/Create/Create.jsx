@@ -5,9 +5,9 @@ import { Modal, Button, Spinner } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
-import { getIntereses, getRegiones } from '../../api/api.js';
-import { crearIniciativa } from './Create-fb.js';
 import es from 'date-fns/locale/es';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { getUsuario, actualizaUsuario, getIntereses, getRegiones, crearIniciativa, actualizaIniciativa, subirImagen } from '../../api/api.js';
 import Iniciativa from '../../classes/Iniciativa.js';
 import './Create.css';
 
@@ -206,6 +206,8 @@ export const Create = () => {
   const handleCerrarTiempo = () => setModalTiempoEspera(false);
   const handleMostrarTiempo = () => setModalTiempoEspera(true);
 
+  const { user } = useAuth();
+
   const handleCrearIniciativa = async () => {
     if (!titulo || !desc || region === "" || Object.keys(etiquetasIniciativa).length === 0 || !fechaInicio) {
       handleMostrarError();
@@ -221,20 +223,36 @@ export const Create = () => {
     const fechaInicioMini = format(fechaInicio, 'dd/MM/yyyy');
     const fechaCierreMini = fechaCierre ? format(fechaCierre, 'dd/MM/yyyy') : null;
 
-    const infoIniciativa = new Iniciativa(titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
-    console.log(infoIniciativa);
-    
-    const [errorDuplicada, idIniciativa] = await crearIniciativa(infoIniciativa, imagenIniciativa);
-    if (idIniciativa) {
-      setIdIniciativaCreada(idIniciativa);
-      handleMostrarCreada();
-      setTiempoIniciativaCreada(tiempoActual);
-    } else if (errorDuplicada) {
+    // Crear iniciativa
+    const iniciativa = new Iniciativa(user, titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
+    const idIniciativa = await crearIniciativa(iniciativa);
+
+    // Manejar errores
+    if (idIniciativa === 409) {
       handleMostrarErrorDuplicada();
-    }
-    else {
+      return;
+    } else if (idIniciativa === 500) {
       handleMostrarErrorCreada();
+      return;
     }
+
+    // Subir imagen de la iniciativa y actualizar información
+    let urlImagen = iniciativa.urlImagen;
+    if (imagenIniciativa) {
+      const url = await subirImagen(imagenIniciativa, `Iniciativas/${idIniciativa}`);
+      urlImagen = url;
+    }
+    const iniciativaNueva = { ...iniciativa, urlImagen: urlImagen, idIniciativa: idIniciativa};
+    await actualizaIniciativa(idIniciativa, iniciativaNueva);
+
+    // Actualizar lista iniciativas creadas del usuario
+    const usuario = await getUsuario(user);
+    const usuarioNuevo = { ...usuario, listaIniciativasAdmin: [...usuario.listaIniciativasAdmin, idIniciativa] };
+    await actualizaUsuario(user, usuarioNuevo);
+
+    setIdIniciativaCreada(idIniciativa);
+    handleMostrarCreada();
+    setTiempoIniciativaCreada(tiempoActual);
   };
 
 

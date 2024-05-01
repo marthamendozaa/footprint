@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ExploreAdmin.css';
 import { AiOutlineSearch } from "react-icons/ai";
-import { getIniciativas, eliminaIniciativa } from './ExploreAdmin-fb.js';
+import { getIniciativas } from '../../api/api.js';
+import { eliminaIniciativa } from './ExploreAdmin-fb.js';
 import { Modal, Button } from 'react-bootstrap';
 
 export const ExploreAdmin = () => {

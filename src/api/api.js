@@ -68,8 +68,10 @@ export const actualizaContrasena = async (user, data) => {
 export const getHabilidades = async () => {
   const response = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getHabilidades");
   if (response.data.success) {
+    console.log("Obtener habilidades exitoso");
     return response.data.data;
   } else {
+    console.log("Error obteniendo habilidades");
     throw new Error(response.data.error);
   }
 };
@@ -79,8 +81,10 @@ export const getHabilidades = async () => {
 export const getIntereses = async () => {
   const response = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getIntereses");
   if (response.data.success) {
+    console.log("Obtener intereses exitoso");
     return response.data.data;
   } else {
+    console.log("Error obteniendo intereses");
     throw new Error(response.data.error);
   }
 };
@@ -90,8 +94,23 @@ export const getIntereses = async () => {
 export const getRegiones = async () => {
   const response = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getRegiones");
   if (response.data.success) {
+    console.log("Obtener regiones exitoso");
     return response.data.data;
   } else {
+    console.log("Error obteniendo regiones");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Información de todas las iniciativas
+export const getIniciativas = async () => {
+  const response = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getIniciativas");
+  if (response.data.success) {
+    console.log("Obtener iniciativas exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error obteniendo iniciativas");
     throw new Error(response.data.error);
   }
 };
@@ -107,6 +126,37 @@ export const getIniciativa = async (idIniciativa) => {
     return response.data.data;
   } else {
     console.log("Error obteniendo iniciativa");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Crear una iniciativa
+export const crearIniciativa = async (data) => {
+  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/crearIniciativa", {
+    data: data
+  });
+  if (response.data.success) {
+    console.log("Crear iniciativa exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error creando iniciativa");
+    return response.data.error;
+  }
+};
+
+
+// Actualizar una iniciativa
+export const actualizaIniciativa = async (iniciativa, data) => {
+  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/actualizaIniciativa", {
+    iniciativa: iniciativa,
+    data: data
+  });
+  if (response.data.success) {
+    console.log("Actualizar iniciativa exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error actualizar iniciativa");
     throw new Error(response.data.error);
   }
 };
