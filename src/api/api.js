@@ -1,11 +1,16 @@
 import axios from 'axios';
 
+// URL para pruebas locales
+const isEmulator = JSON.parse(import.meta.env.VITE_EMULATOR);
+const functionsURL = isEmulator ? 'http://127.0.0.1:5001/evertech-sprint2/us-central1' : 'https://us-central1-evertech-sprint2.cloudfunctions.net';
+
 
 // Autentificación del usuario
 export const autentificaUsuario = async (email, password) => {
-  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/autentificaUsuario", {
+  const response = await axios.post(`${functionsURL}/autentificaUsuario`, {
     email: email,
-    password: password
+    password: password,
+    isEmulator: isEmulator
   });
   if (response.data.success) {
     console.log("Autentificación exitosa");
@@ -19,7 +24,7 @@ export const autentificaUsuario = async (email, password) => {
 
 // Información del usuario
 export const getUsuario = async (user) => {
-  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/getUsuario", {
+  const response = await axios.post(`${functionsURL}/getUsuario`, {
     user: user
   });
   if (response.data.success) {
@@ -34,7 +39,7 @@ export const getUsuario = async (user) => {
 
 // Actualiza información del usuario
 export const actualizaUsuario = async (user, data) => {
-  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/actualizaUsuario", {
+  const response = await axios.post(`${functionsURL}/actualizaUsuario`, {
     user: user,
     data: data
   });
@@ -50,7 +55,7 @@ export const actualizaUsuario = async (user, data) => {
 
 // Actualiza contraseña del usuario
 export const actualizaContrasena = async (user, data) => {
-  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/actualizaContrasena", {
+  const response = await axios.post(`${functionsURL}/actualizaContrasena`, {
     user: user,
     data: data
   });
@@ -66,7 +71,7 @@ export const actualizaContrasena = async (user, data) => {
 
 // Obtener lista de habilidades
 export const getHabilidades = async () => {
-  const response = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getHabilidades");
+  const response = await axios.get(`${functionsURL}/getHabilidades`);
   if (response.data.success) {
     console.log("Obtener habilidades exitoso");
     return response.data.data;
@@ -79,7 +84,7 @@ export const getHabilidades = async () => {
 
 // Obtener lista de intereses
 export const getIntereses = async () => {
-  const response = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getIntereses");
+  const response = await axios.get(`${functionsURL}/getIntereses`);
   if (response.data.success) {
     console.log("Obtener intereses exitoso");
     return response.data.data;
@@ -92,7 +97,7 @@ export const getIntereses = async () => {
 
 // Obtener lista de regiones
 export const getRegiones = async () => {
-  const response = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getRegiones");
+  const response = await axios.get(`${functionsURL}/getRegiones`);
   if (response.data.success) {
     console.log("Obtener regiones exitoso");
     return response.data.data;
@@ -105,7 +110,7 @@ export const getRegiones = async () => {
 
 // Información de todas las iniciativas
 export const getIniciativas = async () => {
-  const response = await axios.get("http://127.0.0.1:5001/evertech-sprint2/us-central1/getIniciativas");
+  const response = await axios.get(`${functionsURL}/getIniciativas`);
   if (response.data.success) {
     console.log("Obtener iniciativas exitoso");
     return response.data.data;
@@ -118,7 +123,7 @@ export const getIniciativas = async () => {
 
 // Información de la iniciativa
 export const getIniciativa = async (idIniciativa) => {
-  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/getIniciativa", {
+  const response = await axios.post(`${functionsURL}/getIniciativa`, {
     idIniciativa: idIniciativa
   });
   if (response.data.success) {
@@ -133,7 +138,7 @@ export const getIniciativa = async (idIniciativa) => {
 
 // Crear una iniciativa
 export const crearIniciativa = async (data) => {
-  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/crearIniciativa", {
+  const response = await axios.post(`${functionsURL}/crearIniciativa`, {
     data: data
   });
   if (response.data.success) {
@@ -148,7 +153,7 @@ export const crearIniciativa = async (data) => {
 
 // Actualizar una iniciativa
 export const actualizaIniciativa = async (iniciativa, data) => {
-  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/actualizaIniciativa", {
+  const response = await axios.post(`${functionsURL}/actualizaIniciativa`, {
     iniciativa: iniciativa,
     data: data
   });
@@ -164,7 +169,7 @@ export const actualizaIniciativa = async (iniciativa, data) => {
 
 // Eliminar una iniciativa
 export const eliminaIniciativa = async (iniciativa) => {
-  const response = await axios.post("http://127.0.0.1:5001/evertech-sprint2/us-central1/eliminaIniciativa", {
+  const response = await axios.post(`${functionsURL}/eliminaIniciativa`, {
     iniciativa: iniciativa,
   });
   if (response.data.success) {
@@ -182,8 +187,9 @@ export const subirImagen = async (imagen, path) => {
   const formData = new FormData();
   formData.append('imagen', imagen);
   formData.append('path', path);
+  formData.append('isEmulator', isEmulator);
 
-  const response = await axios.post('http://127.0.0.1:5001/evertech-sprint2/us-central1/subirImagen', formData, {
+  const response = await axios.post(`${functionsURL}/subirImagen`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },

@@ -7,7 +7,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
 import es from 'date-fns/locale/es';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { getUsuario, actualizaUsuario, getIntereses, getRegiones, crearIniciativa, actualizaIniciativa, subirImagen } from '../../api/api.js';
+import { getIntereses, getRegiones, crearIniciativa, actualizaIniciativa, subirImagen } from '../../api/api.js';
 import Iniciativa from '../../classes/Iniciativa.js';
 import './Create.css';
 
@@ -230,24 +230,22 @@ export const Create = () => {
     // Manejar errores
     if (idIniciativa === 409) {
       handleMostrarErrorDuplicada();
-      return;
     } else if (idIniciativa === 500) {
       handleMostrarErrorCreada();
-      return;
-    }
+    } else {
+      // Subir imagen de la iniciativa y actualizar información
+      let urlImagen = iniciativa.urlImagen;
+      if (imagenIniciativa) {
+        const url = await subirImagen(imagenIniciativa, `Iniciativas/${idIniciativa}`);
+        urlImagen = url;
+      }
+      const iniciativaNueva = { ...iniciativa, urlImagen: urlImagen, idIniciativa: idIniciativa};
+      await actualizaIniciativa(idIniciativa, iniciativaNueva);
 
-    // Subir imagen de la iniciativa y actualizar información
-    let urlImagen = iniciativa.urlImagen;
-    if (imagenIniciativa) {
-      const url = await subirImagen(imagenIniciativa, `Iniciativas/${idIniciativa}`);
-      urlImagen = url;
+      setIdIniciativaCreada(idIniciativa);
+      handleMostrarCreada();
+      setTiempoIniciativaCreada(tiempoActual);
     }
-    const iniciativaNueva = { ...iniciativa, urlImagen: urlImagen, idIniciativa: idIniciativa};
-    await actualizaIniciativa(idIniciativa, iniciativaNueva);
-
-    setIdIniciativaCreada(idIniciativa);
-    handleMostrarCreada();
-    setTiempoIniciativaCreada(tiempoActual);
   };
 
 
