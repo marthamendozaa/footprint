@@ -261,7 +261,7 @@ export const Create = () => {
                       onBlur={handleGuardarTitulo}
                       onKeyDown={handleOnKeyDown}
                       autoFocus
-                      maxLength={30}
+                      maxLength={35}
                     />
                     <div className="c-titulo-conteo">
                       {titulo ? `${titulo.length}/30` : `0/30`}
@@ -426,7 +426,7 @@ export const Create = () => {
 
           {/* Subir imagen */}
           <Modal className="c-modal" show={modalImagen} onHide={handleCerrarImagen}>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <div className="c-modal-title">Subir Imagen</div>
             </Modal.Header>
               <div className="c-input-body">

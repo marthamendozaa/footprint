@@ -29,8 +29,8 @@ export const Register2 = ({ onPrev, onNext }) => {
   }, []);
 
   const onlyLetters = (text) => {
-    return /^[a-zA-Z\s]+$/.test(text);
-  };
+    return /^[a-zA-ZñÑáéíóúüÁÉÍÓÚ\s]+$/.test(text);
+  };  
 
   const validateUsername = (username) => {
     const numbers = /[0-9]/;
@@ -114,7 +114,7 @@ export const Register2 = ({ onPrev, onNext }) => {
                   placeholder="Ingresa tu nombre completo"
                   value={name}
                   onChange={(e) => {
-                    if (e.target.value.length <= 35) {
+                    if (e.target.value.length <= 30) {
                       setName(e.target.value);
                     }
                     setInvalidName(false);
