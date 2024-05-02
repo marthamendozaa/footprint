@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { AiOutlineSearch } from "react-icons/ai";
-import { getIniciativas } from './Explore-fb.js';
+import { getIniciativas, suscribirseAIniciativa } from './Explore-fb.js';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { ModalHeader } from 'react-bootstrap';
@@ -37,6 +37,19 @@ export const Explore = () => {
     const handleButtonClick = (iniciativa) => {
         setSelectedIniciativa(iniciativa);
         setShowModal(true);
+    }
+
+    const handleSuscribirse = async () => {
+        if (selectedIniciativa) {
+            const idIniciativa = selectedIniciativa.id; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
+            const resultado = await suscribirseAIniciativa(idIniciativa);
+            if (resultado) {
+                console.log("Suscripción exitosa a la iniciativa con ID:", resultado);
+                setShowModal(false);
+            } else {
+                console.error("Error al suscribirse a la iniciativa");
+            }
+        }
     }
 
     return (
@@ -76,8 +89,8 @@ export const Explore = () => {
                     <div className='modaliniciativa'>
                         {selectedIniciativa && (
                             <>
-                                <div class="modalhead">
-                                <div class="modalbutton">
+                                <div className="modalhead">
+                                <div className="modalbutton">
                                 <button type="button" className="close" onClick={() => setShowModal(false)} aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -111,7 +124,7 @@ export const Explore = () => {
                         )}
                     </div>
                     <div className = 'modalsuscribir'>
-                        <div className='modalsusbotton'>
+                        <div className='modalsusbotton' onClick={handleSuscribirse}>
                             Suscribirse
                         </div>
                     </div>

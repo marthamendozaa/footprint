@@ -189,6 +189,7 @@ export const Profile = () => {
 
   if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
     setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
+    setSelectedImage(null)
     return;
   }
   
