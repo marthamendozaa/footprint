@@ -33,6 +33,34 @@ export const getRegiones = async () => {
 };
 
 
+export const crearTarea = async (tarea) => { //quite idIniciativa
+  // Asignar id del usuario como administrador de la iniciativa
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  if (!user) {
+    console.error("No hay usuario autenticado");
+    return [null, null];
+  }
+  tarea.idAdmin = user.uid;
+
+  // Guardar fecha de creación (NECESARIA?)
+  const timestamp = new Date();
+  tarea.fechaCreacion = timestamp;
+  
+  let idTareaNueva = null;
+
+  try {
+    const tareasRef = collection(firestore, "Tareas");
+    const tareaDocRef = await addDoc(tareasRef, tarea.convertirAObjeto()); //no se que hace convertirAObjeto
+    idTareaNueva = tareaDocRef.id;
+
+    await updateDoc(tareaDocRef, {idTarea: idTareaNueva});
+  } catch (error) {
+    console.error("Error creando tarea: ", error.message);
+    return [null, null];
+  }
+
+};
+
 // Crear iniciativa
 export const crearIniciativa = async (iniciativa, imagen) => {
   // Asignar id del usuario como administrador de la iniciativa
@@ -90,5 +118,21 @@ export const crearIniciativa = async (iniciativa, imagen) => {
     return [null, null];
   }
 
+
+  // Crear tareas asociadas a la iniciativa
+  const listaTareasIds = []; // Guardar los IDs de las tareas creadas
+  if (iniciativa.listaTareas && iniciativa.listaTareas.length > 0) {
+    for (const tarea of iniciativa.listaTareas) {
+      const tareaId = await crearTarea(idIniciativaNueva, tarea);
+      if (tareaId) {
+        listaTareasIds.push(tareaId);
+      } else {
+        // Manejar el error si la tarea no se pudo crear
+        console.error("Error al crear tarea asociada a la iniciativa");
+      }
+    }
+  }
+
   return [null, idIniciativaNueva];
 };
+
