@@ -204,12 +204,53 @@ export const Profile = () => {
 
   const closeModalContrasena = () => {
     setShowModalContrasena(false);
+    setContrasenaActual('');
+    setNuevaContrasena('');
+    setConfirmarContrasena('');
+    setShowPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+    setError('');
+  };
+
+  const validatePassword = (password) => {
+    if (password.length < 8) {
+        return false;
+    }
+
+    const specialCharacters = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
+    if (!specialCharacters.test(password)) {
+        return false;
+    }
+
+    const numbers = /[0-9]/;
+    if (!numbers.test(password)) {
+        return false;
+    }
+
+    const upperCaseLetters = /[A-Z]/;
+    if (!upperCaseLetters.test(password)) {
+        return false;
+    }
+
+    return true;
   };
 
   const handleSubmitPassword = async () => {
     event.preventDefault();
+
+    if (contrasenaActual.trim() === '' || nuevaContrasena.trim() === '' || confirmarContrasena.trim() === '') {
+      setError('Por favor, llena todos los campos');
+      return;
+    }
+
+    if (!validatePassword(nuevaContrasena)) {
+      setError('Formato de contraseña inválido');
+      return;
+    }
+
     if (nuevaContrasena !== confirmarContrasena) {
-      setError('Las nuevas contraseñas no coinciden');
+      setError('Las contraseñas no coincidenn');
       return;
     }
 
@@ -220,8 +261,9 @@ export const Profile = () => {
       setConfirmarContrasena('');
       setError('');
       setShowModalContrasena(false);
+
     } catch (error) {
-      setError(error.message);
+      setError('Error al cambiar contraseña. Por favor, inténtalo de nuevo.');
     }
   };
 
@@ -397,8 +439,16 @@ export const Profile = () => {
             </Modal.Header>
             
             <div className="p-input-body">
-              <input className="p-input-imagen" type="file" accept="image/*" onChange={(e) => setSelectedImage(e.target.files[0])} />
-              {errorI && <span style={{ color: 'red' }}>{errorI}</span>}
+              <input 
+                className="p-input-imagen" 
+                type="file" 
+                accept="image/*" 
+                onChange={(e) => {
+                  setSelectedImage(e.target.files[0]);
+                  setErrorI('');
+                  }} 
+                />
+                {errorI && <span className='p-error-imagen'>{errorI}</span>}
             </div>
             
             <Modal.Footer>
@@ -438,6 +488,7 @@ export const Profile = () => {
                     if (e.target.value.length <= 20) {
                       setContrasenaActual(e.target.value);
                     }
+                    setError('');
                   }} 
                 />
                 <span className="p-ojo-contrasena" onClick={() => setShowPassword(!showPassword)}>
@@ -456,6 +507,7 @@ export const Profile = () => {
                     if (e.target.value.length <= 20) {
                       setNuevaContrasena(e.target.value);
                     }
+                    setError('');
                   }} 
                 />
                 <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
@@ -474,6 +526,7 @@ export const Profile = () => {
                     if (e.target.value.length <= 20) {
                       setConfirmarContrasena(e.target.value);
                     }
+                    setError('');
                   }}
                 />
                 <span className="p-ojo-contrasena" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>

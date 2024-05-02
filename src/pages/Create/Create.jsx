@@ -430,8 +430,15 @@ export const Create = () => {
               <div className="c-modal-title">Subir Imagen</div>
             </Modal.Header>
               <div className="c-input-body">
-                <input className="c-input-imagen" type="file" accept="image/*" onChange={(e) => setImagenSeleccionada(e.target.files[0])} />
-                {errorImagen && <span style={{ color: 'red' }}>{errorImagen}</span>}
+                <input 
+                  className="c-input-imagen" 
+                  type="file" accept="image/*" 
+                  onChange={(e) => {
+                    setImagenSeleccionada(e.target.files[0])
+                    setErrorImagen('');
+                    }} 
+                />
+                {errorImagen && <span className="c-error-imagen">{errorImagen}</span>}
               </div>
             <Modal.Footer>
               <Button onClick={handleSubirImagen}>Guardar</Button>
