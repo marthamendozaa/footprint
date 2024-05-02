@@ -28,10 +28,11 @@
 }
 
 .modalimg {
-  width: 200px;
-  height: 200px;
-  border-radius: 50%; /* Make the container circular */
-  overflow: hidden;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%; /* Make the container circular */
+    overflow: hidden;
+    object-fit: cover;
 }
 
 .modalimg img {
