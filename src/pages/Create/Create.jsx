@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaFolder, FaPen } from 'react-icons/fa';
+import { FaCalendar, FaFolder, FaPen, FaExclamationCircle } from 'react-icons/fa';
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -438,7 +438,7 @@ export const Create = () => {
                     setErrorImagen('');
                     }} 
                 />
-                {errorImagen && <span className="c-error-imagen">{errorImagen}</span>}
+                {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
               </div>
             <Modal.Footer>
               <Button onClick={handleSubirImagen}>Guardar</Button>

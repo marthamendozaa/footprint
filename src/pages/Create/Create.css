@@ -459,8 +459,16 @@ li.c-etiqueta-item:hover {
 
 .c-error-imagen {
   color: red;
+  font-size: 18px;
+  font-weight: 500;
   margin-top: 25px;
   margin-bottom: 15px;
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+.c-fa-ec{
+  margin-right: 5px;
 }
 
 /* Modal crear iniciativas */

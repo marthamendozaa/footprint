@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Button, Modal } from 'react-bootstrap';
-import { FaEye, FaEyeSlash, FaUser, FaEnvelope } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
 import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, actualizaHabilidades, getIntereses, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
 import Usuario from '../../backend/obj-Usuario.js';
 import './Profile.css';
@@ -427,7 +427,7 @@ export const Profile = () => {
 
           {/* Botón para cerrar sesión */}
           <div className="perfil-logout" style={{borderRadius: "18px"}}>
-            <button onClick={openModalSesionCerrada}>Cerrar Sesión</button>
+            <button onClick={openModalSesionCerrada}> <FaCog className='p-fa-gear' /> Cerrar Sesión</button>
           </div>
 
           {/* ----- Modales ----- */}
@@ -448,7 +448,7 @@ export const Profile = () => {
                   setErrorI('');
                   }} 
                 />
-                {errorI && <span className='p-error-imagen'>{errorI}</span>}
+                {errorI && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
             </div>
             
             <Modal.Footer>
