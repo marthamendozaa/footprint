@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
-import { AiOutlineSearch } from "react-icons/ai";
 import { getIniciativas } from './Explore-fb.js';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
