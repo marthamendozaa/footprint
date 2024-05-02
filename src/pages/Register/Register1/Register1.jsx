@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaEnvelope, FaArrowRight, FaArrowLeft, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
 import { PrivacyPolicy } from './PrivacyPolicy.jsx';
 import PasswordInfo from './PasswordInfo.jsx';
+import { existeCorreo } from '../../../api/api.js';
 import './Register1.css';
 
 export const Register1 = ({ onNext }) => {
@@ -14,7 +15,7 @@ export const Register1 = ({ onNext }) => {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
-  const [duplicatEmail, setDuplicatEmail] = useState(false);
+  const [duplicateEmail, setDuplicateEmail] = useState(false);
   const [invalidPassword, setInvalidPasswordl] = useState(false);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
   const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
@@ -28,16 +29,12 @@ export const Register1 = ({ onNext }) => {
   }, []);
 
   const validateEmail = (email) => {
-    const re = /^[a-zA-Z0-9._-]+@[a-zA-Z-]{3,10}\.[a-zA-Z]{2,3}(?:\.[a-zA-Z]{2,3})?$/;
-    return re.test(String(email).toLowerCase());
-  };
-
-  const validateEmail2 = (email) => {
     if (email.length < 8) {
       return false;
     }
-    return true;
-  }
+    const re = /^[a-zA-Z0-9._-]+@[a-zA-Z-]{3,10}\.[a-zA-Z]{2,3}(?:\.[a-zA-Z]{2,3})?$/;
+    return re.test(String(email).toLowerCase());
+  };
 
   const validatePassword = (password) => {
     // Verificar que la contraseña tenga al menos 8 caracteres
@@ -81,8 +78,9 @@ export const Register1 = ({ onNext }) => {
       return;
     }
 
-    if (!validateEmail2(email)) {
-      setDuplicatEmail(true);
+    const response = await existeCorreo(email);
+    if (response) {
+      setDuplicateEmail(true);
       return;
     }
 
@@ -121,7 +119,7 @@ export const Register1 = ({ onNext }) => {
               <FaEnvelope className="register-icons" />
               <div className="relative">
                 <input
-                  className={`correo-caja-register ${invalidEmail || duplicatEmail ? 'border-red-register' : ''}`}
+                  className={`correo-caja-register ${invalidEmail || duplicateEmail ? 'border-red-register' : ''}`}
                   type="correo"
                   placeholder="Ingresa el correo"
                   value={email}
@@ -130,17 +128,17 @@ export const Register1 = ({ onNext }) => {
                       setEmail(e.target.value);
                     }
                     setInvalidEmail(false);
-                    setDuplicatEmail(false);
+                    setDuplicateEmail(false);
                   }}
                 />
 
                 {/* Advertencia de correo */}
-                {(invalidEmail || duplicatEmail) && (
+                {(invalidEmail || duplicateEmail) && (
                   <div className="custom-alert-register bg-custom-color-register" style={{ marginTop: '-5px' }}>
                     <FaExclamationCircle className="custom-alert-icon-register" />
                     <span>
                       {invalidEmail ? 'Formato de correo inválido' : ''}
-                      {duplicatEmail ? 'Correo duplicado' : ''}
+                      {duplicateEmail ? 'El correo ya está en uso' : ''}
                     </span>
                   </div>
                 )}

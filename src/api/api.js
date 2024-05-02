@@ -5,6 +5,36 @@ const isEmulator = JSON.parse(import.meta.env.VITE_EMULATOR);
 const functionsURL = isEmulator ? 'http://127.0.0.1:5001/evertech-sprint2/us-central1' : 'https://us-central1-evertech-sprint2.cloudfunctions.net';
 
 
+// Verifica correo duplicado
+export const existeCorreo = async (correo) => {
+  const response = await axios.post(`${functionsURL}/existeCorreo`, {
+    correo: correo
+  });
+  if (response.data.success) {
+    console.log("Verifica correo exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error verificando correo");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Verifica nombre de usuario duplicado
+export const existeNombreUsuario = async (nombreUsuario) => {
+  const response = await axios.post(`${functionsURL}/existeNombreUsuario`, {
+    nombreUsuario: nombreUsuario
+  });
+  if (response.data.success) {
+    console.log("Verifica nombre usuario exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error verificando nombre usuario");
+    throw new Error(response.data.error);
+  }
+};
+
+
 // Autentificación del usuario
 export const autentificaUsuario = async (email, password) => {
   const response = await axios.post(`${functionsURL}/autentificaUsuario`, {

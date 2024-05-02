@@ -59,7 +59,7 @@ export const ResponsiveLetter = ({ isChecked, setIsChecked, onClose }) => {
   };
 
   const onlyLetters = (text) => {
-    return /^[a-zA-Z\s]+$/.test(text);
+    return /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(text);
   };
 
   useEffect(() => {

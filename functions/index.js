@@ -8,8 +8,49 @@ const { v4: uuid } = require("uuid");
 const formidable = require("formidable-serverless");
 const axios = require('axios');
 const cors = require('cors')({ origin: true });
+const config = require('./config');
 
 initializeApp();
+
+
+// Verifica correo duplicado
+exports.existeCorreo = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { correo } = req.body;
+
+    try {
+      const correosData = await getFirestore().collection('Usuarios').where('correo', '==', correo).get();
+      if (!correosData.empty) {
+        res.json({ success: true, data: true });
+      } else {
+        res.json({ success: true, data: false });
+      }
+    } catch (error) {
+      logger.info("Error verificando correo: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+
+// Verifica nombre de usuario duplicado
+exports.existeNombreUsuario = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { nombreUsuario } = req.body;
+
+    try {
+      const nombresData = await getFirestore().collection('Usuarios').where('nombreUsuario', '==', nombreUsuario).get();
+      if (!nombresData.empty) {
+        res.json({ success: true, data: true });
+      } else {
+        res.json({ success: true, data: false });
+      }
+    } catch (error) {
+      logger.info("Error verificando nombre de usuario: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
 
 
 // Autentificación del usuario
@@ -19,7 +60,7 @@ exports.autentificaUsuario = onRequest(async (req, res) => {
 
     try {
       const url = isEmulator ? 'http://127.0.0.1:9099' : 'https:/';
-      const response = await axios.post(`${url}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyD0iR6PPEeDPELDoccOFu9MgIguZALUVgQ`, {
+      const response = await axios.post(`${url}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${config.apiKey}`, {
         email,
         password,
         returnSecureToken: true
