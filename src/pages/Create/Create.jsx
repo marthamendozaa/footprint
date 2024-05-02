@@ -6,8 +6,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
 import es from 'date-fns/locale/es';
-import { getEtiquetas, getRegiones, crearIniciativa } from './Create-fb.js';
+import { getEtiquetas, getRegiones, crearIniciativa, crearTarea } from './Create-fb.js';
 import Iniciativa from '../../backend/obj-Iniciativa.js';
+import Tarea from '../../backend/obj-Tarea.js';
 import './Create.css';
 
 export const Create = () => {
@@ -46,6 +47,29 @@ export const Create = () => {
     }
   };
 
+  // Cambiar título Tarea
+  const [tituloT, setTituloT] = useState("");
+  const [editandoTituloT, setEditandoTituloT] = useState(false);
+
+  const handleCambioTituloT = (event) => {
+    setTituloT(event.target.value);
+  };
+
+  const handleEditarTituloT = () => {
+    setEditandoTituloT(true);
+  };
+
+  const handleGuardarTituloT = () => {
+    setEditandoTituloT(false);
+  };
+
+  const handleOnKeyDownT = (event) => {
+    if (event.key === 'Enter') {
+      setEditandoTituloT(false);
+      setEditandoDescT(false);
+    }
+  };
+
 
   // Cambiar descripción
   const [desc, setDesc] = useState("");
@@ -61,6 +85,22 @@ export const Create = () => {
 
   const handleGuardarDesc = () => {
     setEditandoDesc(false);
+  };
+
+  // Cambiar descripción Tarea
+  const [descT, setDescT] = useState("");
+  const [editandoDescT, setEditandoDescT] = useState(false);
+
+  const handleCambioDescT = (event) => {
+    setDescT(event.target.value);
+  };
+
+  const handleEditarDescT = () => {
+    setEditandoDescT(true);
+  };
+
+  const handleGuardarDescT = () => {
+    setEditandoDescT(false);
   };
 
 
@@ -83,8 +123,10 @@ export const Create = () => {
   // Cambiar fechas
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [fechaCierre, setFechaCierre] = useState(new Date());
+  const [fechaEntrega, setFechaEntrega] = useState(new Date());
   const datePickerInicio = useRef(null);
   const datePickerCierre = useRef(null);
+  const datePickerEntrega = useRef(null);
 
   const handleCambioFechaInicio = () => {
     if (datePickerInicio.current) {
@@ -95,6 +137,12 @@ export const Create = () => {
   const handleCambioFechaCierre = () => {
     if (datePickerCierre.current) {
       datePickerCierre.current.setOpen(true);
+    }
+  };
+
+  const handleCambioFechaEntrega = () => {
+    if (datePickerEntrega.current) {
+      datePickerEntrega.current.setOpen(true);
     }
   };
 
@@ -185,6 +233,7 @@ export const Create = () => {
 
   // Iniciativa creada
   const [idIniciativaCreada, setIdIniciativaCreada] = useState(null);
+  const [idTareaCreada, setIdTareaCreada] = useState(null);
   const [modalCreada, setModalCreada] = useState(false);
   const handleCerrarCreada = () => setModalCreada(false);
   const handleMostrarCreada = () => setModalCreada(true);
@@ -201,9 +250,39 @@ export const Create = () => {
 
   // Tiempo de espera
   const [tiempoIniciativaCreada, setTiempoIniciativaCreada] = useState(0);
+  const [tiempoTareaCreada, setTiempoTareaCreada] = useState(0);
   const [modalTiempoEspera, setModalTiempoEspera] = useState(false);
   const handleCerrarTiempo = () => setModalTiempoEspera(false);
   const handleMostrarTiempo = () => setModalTiempoEspera(true);
+
+
+  const handleCrearTarea = async () => {
+    if (!tituloT || !descT || !fechaEntrega) {
+      handleMostrarError();
+      return;
+    }
+
+    const tiempoActual = Date.now();
+    if (tiempoActual - tiempoIniciativaCreada < 60000) {
+      handleMostrarTiempo();
+      return;
+    }
+    
+    const fechaEntregaMini = format(fechaEntrega, 'dd/MM/yyyy');
+
+    const infoTarea = new Tarea(tituloT, descT, fechaEntregaMini);
+    console.log(infoTarea);
+
+    const [errorDuplicada, idTarea] = await crearTarea(infoTarea);
+    if (idTarea) {
+      setIdTareaCreada(idTarea);
+      setTiempoTareaCreada(tiempoActual);
+    }
+    else {
+      handleMostrarErrorCreada();
+    }
+  };
+
 
   const handleCrearIniciativa = async () => {
     if (!titulo || !desc || region === "" || Object.keys(etiquetasIniciativa).length === 0 || !fechaInicio) {
@@ -395,16 +474,59 @@ export const Create = () => {
           {/* Tareas y Miembros*/}
           <div className="c-tareas-miembros">
             <div className="c-seccion-tareas">
-              <div className="c-btn-agregar-tarea">Añadir tarea</div>
-
+              <button type="button" className="c-btn-agregar-tarea" onClick={handleCrearTarea}> Añadir tarea </button>
               <div className="c-tareas-container">
                 <div className="c-tarea">
                   <div className="c-tarea-info">
-                    <div className="c-tarea-titulo">Nombre de tarea</div>
-                    <div className="c-tarea-texto">Instrucciones...</div>
+                    
+                    <div className="c-tarea-titulo">
+                    { editandoTituloT ? (
+                    <input
+                      type="text"
+                      className="c-tarea-titulo"
+                      value={tituloT}
+                      onChange={handleCambioTituloT}
+                      onBlur={handleGuardarTituloT}
+                      onKeyDown={handleOnKeyDownT}
+                      autoFocus
+                      maxLength={30}
+                    />) : (
+                      <div className="c-titulo-texto">
+                      {tituloT ? tituloT : "Título2"}
+                      <button className="c-btn-editar-titulo" onClick={handleEditarTituloT}>
+                        <FaPen />
+                      </button>
+                    </div>
+                    )}
+                    </div>
+                    {editandoDescT ? (
+                    <div className="c-tarea-texto">
+                    <textarea className="c-desc-input-texto"
+                    value={descT}
+                    onChange={handleCambioDescT}
+                    onBlur={handleGuardarDescT}
+                    onKeyDown={handleOnKeyDownT}
+                    autoFocus
+                    maxLength={200} />
+                    </div> ) : (
+                      <div style={desc ? {} : { color: '#677D7C' }}>
+                      {descT ? descT : "Agrega tu descripción aquí..."}
+                    </div>
+
+                    )}
+                    {!editandoDescT && (<button className="c-btn-editar-titulo" onClick={handleEditarDescT}><FaPen /></button>)}
                   </div>
                   <div className="c-tarea-botones">
-                    <div className="c-tarea-boton"><FaCalendar /> Fecha</div>
+                    <div className="c-tarea-boton"><FaCalendar /> Fecha
+                    <DatePicker
+                        className='react-datepicker__input-container-create'
+                        selected={fechaEntrega}
+                        onChange={(date) => setFechaEntrega(date)}
+                        dateFormat="dd/MM/yyyy"
+                        ref={datePickerEntrega}
+                        locale={es}
+                    />
+                    </div>
                     <div className="c-tarea-boton"><FaFolder /> Documento</div>
                   </div>
                 </div>
