@@ -152,6 +152,7 @@ li.m-etiqueta-item {
   display: flex;
   width: 100%;
   flex-wrap:wrap;
+  overflow: overlay;
 }
 
 .e-iniciativa {
@@ -166,6 +167,7 @@ li.m-etiqueta-item {
   border:rgba(0, 0, 0, 0.176) 1.2px solid;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 16px 0px;
   position: relative;
+  max-width: 240px;
 }
 
 .e-iniciativa:hover {
