@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { AiOutlineSearch } from "react-icons/ai";
-import { getIniciativas } from './Explore-fb.js';
+import { getIniciativas, suscribirseAIniciativa } from './Explore-fb.js';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { ModalHeader } from 'react-bootstrap';
-import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
+import Fuse from 'fuse.js';
+
 
 export const Explore = () => {
     const [filter, setFilter] = useState('');
@@ -24,6 +26,7 @@ export const Explore = () => {
         fetchData();
     }, []);
 
+    /*
     const searchText = (event) => {
         const searchTerm = event.target.value;
         console.log("Search Term:", searchTerm);
@@ -34,10 +37,48 @@ export const Explore = () => {
         );
         setFilteredIniciativas(filtered);
     }
+    */
+
+
+    const searchText = (event) => {
+        const searchTerm = event.target.value;
+        console.log("Search Term:", searchTerm);
+        setFilter(searchTerm);
+    
+        if (!searchTerm) {
+            // If the search term is empty, show all iniciativas
+            setFilteredIniciativas(iniciativas);
+            return;
+        }
+    
+        const fuse = new Fuse(iniciativas, {
+            keys: ['titulo','descripcion'], // Specify the keys you want to search in
+            includeScore: true,
+            threshold: 0.4, // Adjust the threshold as needed
+        });
+    
+        const result = fuse.search(searchTerm);
+        const filtered = result.map((item) => item.item); // Extract the actual items from Fuse.js result
+        setFilteredIniciativas(filtered);
+    };
+    
 
     const handleButtonClick = (iniciativa) => {
         setSelectedIniciativa(iniciativa);
         setShowModal(true);
+    }
+
+    const handleSuscribirse = async () => {
+        if (selectedIniciativa) {
+            const idIniciativa = selectedIniciativa.id; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
+            const resultado = await suscribirseAIniciativa(idIniciativa);
+            if (resultado) {
+                console.log("Suscripción exitosa a la iniciativa con ID:", resultado);
+                setShowModal(false);
+            } else {
+                console.error("Error al suscribirse a la iniciativa");
+            }
+        }
     }
 
     return (
@@ -45,13 +86,13 @@ export const Explore = () => {
             <div className='e-container'>
             <div className='e-seccion-container'>
                     <div className='e-searchBar'>
+                        <FaSearch className="e-icons"/>
                         <input
                             type='search'
                             placeholder='¿Qué iniciativa buscas?'
                             value={filter}
                             onChange={searchText}
-                            className='p-4 rounded-full color'
-                            style={{ width: '100%' }}
+                            className='e-searchBarCaja'
                         />
                     </div>
 
@@ -78,8 +119,8 @@ export const Explore = () => {
                     <div className='modaliniciativa'>
                         {selectedIniciativa && (
                             <>
-                                <div class="modalhead">
-                                <div class="modalbutton">
+                                <div className="modalhead">
+                                <div className="modalbutton">
                                 <button type="button" className="close" onClick={() => setShowModal(false)} aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -113,7 +154,7 @@ export const Explore = () => {
                         )}
                     </div>
                     <div className = 'modalsuscribir'>
-                        <div className='modalsusbotton'>
+                        <div className='modalsusbotton' onClick={handleSuscribirse}>
                             Suscribirse
                         </div>
                     </div>
