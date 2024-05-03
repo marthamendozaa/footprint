@@ -31,15 +31,6 @@ export const Register2 = ({ onPrev, onNext }) => {
 
   const onlyLetters = (text) => {
     return /^[a-zA-ZñÑáéíóúüÁÉÍÓÚ\s]+$/.test(text);
-  };  
-
-  const validateUsername = (username) => {
-    const numbers = /[0-9]/;
-    if (!numbers.test(username)) {
-        return false;
-    }
-
-    return true;
   };
 
   const calculateAge = (birthday) => {
@@ -66,12 +57,6 @@ export const Register2 = ({ onPrev, onNext }) => {
     if (!onlyLetters(name)) {
       setInvalidName(true);
       return;
-    }
-      
-
-    if (!validateUsername(username)) {
-        setInvalidUsername(true);
-        return;
     }
 
     const response = await existeNombreUsuario(username);

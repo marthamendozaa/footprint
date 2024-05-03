@@ -39,7 +39,7 @@ exports.existeNombreUsuario = onRequest(async (req, res) => {
     const { nombreUsuario } = req.body;
 
     try {
-      const nombresData = await getFirestore().collection('Usuarios').where('nombreUsuario', '==', nombreUsuario).get();
+      const nombresData = await getFirestore().collection('Usuarios').where('nombreUsuario', '==', `@${nombreUsuario}`).get();
       if (!nombresData.empty) {
         res.json({ success: true, data: true });
       } else {
