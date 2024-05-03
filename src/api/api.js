@@ -3,6 +3,7 @@ import axios from 'axios';
 // URL para pruebas locales
 const isEmulator = JSON.parse(import.meta.env.VITE_EMULATOR);
 const functionsURL = isEmulator ? 'http://127.0.0.1:5001/evertech-sprint2/us-central1' : 'https://us-central1-evertech-sprint2.cloudfunctions.net';
+console.log(functionsURL);
 
 
 // Verifica correo duplicado
