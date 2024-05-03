@@ -1,19 +1,29 @@
 import { useEffect, useState } from 'react';
 import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
-import { Spinner } from 'react-bootstrap';
+import { Spinner, Button, Modal } from 'react-bootstrap';
+import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { autentificaUsuario, getUsuario, actualizaUsuario, actualizaContrasena, getHabilidades, getIntereses, subirImagen } from '../../api/api.js';
 import Usuario from '../../classes/Usuario.js';
-import Modal from 'react-bootstrap/Modal';
+import PasswordInfo2 from './PasswordInfo2.jsx';
 import './Profile.css';
 
 
 export const Profile = () => {
   // Cerrar sesión
   const [sesionCerrada, setSesionCerrada] = useState(false);
+  const [showModalSesionCerrada, setShowModalSesionCerrada] = useState(false);
   const { user, setUser, setAdmin } = useAuth();
   const navigate = useNavigate();
+  
+  const openModalSesionCerrada = () => {
+    setShowModalSesionCerrada(true);
+  };
+
+  const closeModalSesionCerrada = () => {
+    setShowModalSesionCerrada(false);
+  };
 
   const botonCerrarSesion = async () => {
     setUser(null);
@@ -46,9 +56,26 @@ export const Profile = () => {
   }, [sesionCerrada]);
 
 
+  // Modal de erroes
+  const [showModalError, setShowModalError] = useState(false);
+  const [errorMensaje, setErrorMensaje] = useState('');
+  
+  const openModalError = (errorMessage) => {
+    setShowModalError(true);
+    setErrorMensaje(errorMessage);
+  };
+
+  const closeModalError = () => {
+    setShowModalError(false);
+  };
+
+
   // Cambiar nombre del perfil
   const [editingNombre, setEditingNombre] = useState(false);
   const [nuevoNombre, setNuevoNombre] = useState('');
+  const onlyLetters = (text) => {
+    return /^[a-zA-ZñÑáéíóúüÁÉÍÓÚ\s]+$/.test(text);
+  };  
 
   const handleNombreEdit = () => {
     setEditingNombre(true);
@@ -59,13 +86,45 @@ export const Profile = () => {
     setNuevoNombre(event.target.value);
   };
 
-  const handleNombreSubmit = async () => {
+  const handleGuardarNombre = async () => {
+    if (nuevoNombre.trim() === '') {
+      const errorMessage = 'El nombre no puede estar vacío';
+      openModalError(errorMessage);
+      return;
+    }
+  
+    if (!onlyLetters(nuevoNombre)) {
+      const errorMessage = 'El nombre solo puede contener letras';
+      openModalError(errorMessage);
+      return;
+    }
+    
     const usuarioNuevo = { ...usuario, nombre: nuevoNombre };
     setUsuario(usuarioNuevo);
     setEditingNombre(false);
     await actualizaUsuario(user, usuarioNuevo);
   };
-  
+
+  const handleNombreSubmit = async (event) => {
+    if (event.key === 'Enter') {
+      if (nuevoNombre.trim() === '') {
+        const errorMessage = 'El nombre no puede estar vacío';
+        openModalError(errorMessage);
+        return;
+      }
+    
+      if (!onlyLetters(nuevoNombre)) {
+        const errorMessage = 'El nombre solo puede contener letras';
+        openModalError(errorMessage);
+        return;
+      }
+
+      const usuarioNuevo = { ...usuario, nombre: nuevoNombre };
+      setUsuario(usuarioNuevo);
+      setEditingNombre(false);
+      await actualizaUsuario(user, usuarioNuevo);
+    }
+  };  
 
   // Editar habilidades
   const toggleHabilidad = async (habilidad, idHabilidad) => {
@@ -73,7 +132,8 @@ export const Profile = () => {
 
     if (Object.keys(usuarioNuevo.listaHabilidades).includes(`${idHabilidad}`)) {
       if (Object.keys(usuarioNuevo.listaHabilidades).length === 1) {
-        alert("Debes tener al menos una habilidad");
+        const errorMessage = 'Debes tener al menos una habilidad';
+        openModalError(errorMessage);
         return;
       }
       delete usuarioNuevo.listaHabilidades[idHabilidad];
@@ -92,7 +152,8 @@ export const Profile = () => {
 
     if (Object.keys(usuarioNuevo.listaIntereses).includes(`${idInteres}`)) {
       if (Object.keys(usuarioNuevo.listaIntereses).length === 1) {
-        alert("Debes tener al menos un interés");
+        const errorMessage = 'Debes tener al menos un interés';
+        openModalError(errorMessage);
         return;
       }
       delete usuarioNuevo.listaIntereses[idInteres];
@@ -106,43 +167,89 @@ export const Profile = () => {
 
 
   // Cambiar contraseña
-  const [cambiandoContrasena, setCambiandoContrasena] = useState(false); // Estado para controlar si se está cambiando la contraseña
+  const [showModalContrasena, setShowModalContrasena] = useState(false);
   const [contrasenaActual, setContrasenaActual] = useState('');
   const [nuevaContrasena, setNuevaContrasena] = useState('');
   const [confirmarContrasena, setConfirmarContrasena] = useState('');
+  const [errorNuevaContraseña, setErrorNuevaContraseña] = useState('');
+  const [errorConfirmarContraseña, setErrorConfirmarContraseña] = useState('');
   const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleCancelarCambioContrasena = () => {
-    setCambiandoContrasena(false); // Al hacer click en Cancelar, se vuelve a false
+  const openModalContrasena = () => {
+    setShowModalContrasena(true);
   };
 
-  const handleChangePassword = () => {
-    setCambiandoContrasena(true);
-    setError('')
+  const closeModalContrasena = () => {
+    setShowModalContrasena(false);
+    setContrasenaActual('');
+    setNuevaContrasena('');
+    setConfirmarContrasena('');
+    setShowPassword(false);
+    setShowNewPassword(false);
+    setShowConfirmPassword(false);
+    setErrorNuevaContraseña('');
+    setErrorConfirmarContraseña('');
+    setError('');
   };
 
-  // Función para manejar el submit del cambio de contraseña
-  const handleSubmitPassword = async (event) => {
+  const validatePassword = (password) => {
+    if (password.length < 8) {
+        return false;
+    }
+
+    const specialCharacters = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
+    if (!specialCharacters.test(password)) {
+        return false;
+    }
+
+    const numbers = /[0-9]/;
+    if (!numbers.test(password)) {
+        return false;
+    }
+
+    const upperCaseLetters = /[A-Z]/;
+    if (!upperCaseLetters.test(password)) {
+        return false;
+    }
+
+    return true;
+  };
+
+  const handleSubmitPassword = async () => {
     event.preventDefault();
-    if (nuevaContrasena !== confirmarContrasena) {
-      setError('Las nuevas contraseñas no coinciden');
+
+    if (contrasenaActual.trim() === '' || nuevaContrasena.trim() === '' || confirmarContrasena.trim() === '') {
+      setError('Por favor, llena todos los campos');
       return;
     }
 
-    // Validar que la contraseña actual sea correcta
+    if (!validatePassword(nuevaContrasena)) {
+      setErrorNuevaContraseña('Formato de contraseña inválido');
+      return;
+    }
+
+    if (nuevaContrasena !== confirmarContrasena) {
+      setErrorConfirmarContraseña('Las contraseñas no coinciden');
+      return;
+    }
+
     try {
+      // Si la contraseña se cambió con éxito, limpiar los campos y el estado de error
       await autentificaUsuario(usuario.correo, contrasenaActual);
       await actualizaContrasena(user, nuevaContrasena);
-      // Si la contraseña se cambió con éxito, limpiar los campos y el estado de error
       setContrasenaActual('');
       setNuevaContrasena('');
       setConfirmarContrasena('');
+      setErrorNuevaContraseña('');
+      setErrorConfirmarContraseña('');
       setError('');
-      // Indicar que se ha completado el cambio de contraseña
-      setCambiandoContrasena(false);
+      setShowModalContrasena(false);
+
     } catch (error) {
-      setError('Contraseña actual incorrecta');
-      return;
+      setError('Error: Contraseña no cambiada');
     }
   };
 
@@ -159,6 +266,13 @@ export const Profile = () => {
 
   const closeModal = () => {
     setShowModal(false);
+  };
+
+  const handleImageClick = (e) => {
+    e.stopPropagation();
+    if (!showModal) {
+      openModal();
+    }
   };
 
   const handleUploadProfileImage = async () => {
@@ -188,7 +302,7 @@ export const Profile = () => {
     <div className="profile-page">
       {/* Spinner */}
       {usuario && habilidades && intereses ? (
-        <header className="Profile-header">
+        <header className="profile-header">
           {/* Titulo */}
           <h1>Mi perfil</h1>
 
@@ -198,31 +312,9 @@ export const Profile = () => {
             {/* Info foto */}
             <div className="profile-info-left">
               {/* Foto de perfil */}
-              <div className="Foto-perfil position-relative">
-                <img src={usuario.urlImagen} className="Foto-perfil img-fluid rounded-circle" alt="perfil" />
-                <FaPen className="edit-icon" onClick={openModal} />
-              
-                {/* Modal para subir imagen */}
-                <Modal show={showModal} onHide={() => setShowModal(false)}>
-                  {/* Botón para cerrar el modal + titulo */}
-                  <Modal.Header closeButton>
-                    <Modal.Title className='p-modaltitle'>Foto de perfil</Modal.Title>
-                  </Modal.Header>
-                  
-                  {/* Subir imagen */}
-                  <Modal.Body className='p-modalinfo'>
-                    <input type="file" accept="image/*" onChange={(e) => setSelectedImage(e.target.files[0])} />
-                    {errorI && <p style={{ color: 'red' }}>{errorI}</p>}
-                  </Modal.Body>
-                  
-                  {/* Botón para guardar la imagen */}
-                  <Modal.Footer>
-                    <button variant="secondary" onClick={handleUploadProfileImage}>
-                      Guardar Imagen
-                    </button>
-                  </Modal.Footer>
-                </Modal>
-
+              <div className="p-foto" onClick={handleImageClick}>
+                <img src={usuario.urlImagen} className="p-preview-imagen"/>
+                <FaPen className="p-editar-foto"/>
               </div>
             </div>
 
@@ -233,11 +325,21 @@ export const Profile = () => {
                 <h2>
                   {/* Nombre del usuario */}
                   {editingNombre ? (
-                    <input
-                      type="text"
-                      value={nuevoNombre}
-                      onChange={handleNombreChange}
-                    />
+                    <>
+                      <input
+                        type="text"
+                        className="edit-name-box"
+                        value={nuevoNombre}
+                        onChange={handleNombreChange}
+                        onBlur={handleGuardarNombre}
+                        onKeyDown={handleNombreSubmit}
+                        autoFocus
+                        maxLength={30}
+                      />
+                      <div className="p-titulo-conteo">
+                        {nuevoNombre ? `${nuevoNombre.length}/30` : `0/30`}
+                      </div>
+                    </>
                   ) : (
                     usuario.nombre
                   )}
@@ -248,79 +350,42 @@ export const Profile = () => {
                       <FaPen />
                     </button>
                   )}
-
-                  {/* Botón para guardar el nombre */}
-                  {editingNombre && (
-                    <button className="edit-profile-btn guardar" onClick={handleNombreSubmit}>
-                      Guardar
-                    </button>
-                  )}
                 </h2>
               </div>
               
-              {/* Edad */}
-              <p>{usuario.edad} años</p>
+              <div className="p-info">
+                {/* Edad */}
+                <div className="profile-icons-text">
+                  <p> <span> Edad: </span> {usuario.edad} años</p>
+                </div>
 
-              {/* Usuario */}
-              <h3>{usuario.nombreUsuario} </h3>
+                {/* Usuario */}
+                <div className="profile-icons-text">
+                  <FaUser className="profile-icons-text-icon"/> 
+                  <span> Usuario: </span> 
+                  <p> 
+                    {usuario.nombreUsuario} 
+                  </p>
+                </div>
+                
+                {/* Correo */}
+                <div className="profile-icons-text">
+                  <FaEnvelope className="profile-icons-text-icon"/> 
+                  <span> Correo: </span> 
+                  <p className='p-correo'> 
+                    {usuario.correo}
+                  </p>
+                </div>
 
-              {/* Correo */}
-              <p>{usuario.correo} </p>
+                {/* Cambiar contraseña */}
+                <button className="change-password" onClick={openModalContrasena}>Cambiar contraseña</button>
+              </div>
 
-              {/* Cambiar contraseña */}
-              <p className="change-password" onClick={handleChangePassword}>Cambiar contraseña</p>
-              {cambiandoContrasena && (
-                <form className="change-password-form" onSubmit={handleSubmitPassword}>
-                  {/* Contraseña actual */}
-                  <input
-                    className='change-password-input' type="password"
-                    placeholder="Contraseña actual"
-                    value={contrasenaActual}
-                    onChange={(e) => setContrasenaActual(e.target.value)}
-                  />
-
-                  {/* Nueva contraseña */}
-                  <input
-                    className='change-password-input' type="password"
-                    placeholder="Nueva contraseña"
-                    value={nuevaContrasena}
-                    onChange={(e) => setNuevaContrasena(e.target.value)}
-                  />
-
-                  {/* Confirmar nueva contraseña */}
-                  <input
-                    className='change-password-input' type="password"
-                    placeholder="Confirmar nueva contraseña"
-                    value={confirmarContrasena}
-                    onChange={(e) => setConfirmarContrasena(e.target.value)}
-                  />
-
-                  {/* Botones para cancelar o guardar */}
-                  <button className="change-password-cancel" type="button" onClick={handleCancelarCambioContrasena}>Cancelar</button>
-                  <button className='change-password-submit' type="submit">Guardar</button>
-
-                  {/* Mensaje de error */}
-                  {error && <p style={{ color: 'red' }}>{error}</p>}
-                </form>
-              )}
-
-            </div>
-          </div>
-
-          {/* Habilidades */}
-          <div className="subtitle skills-interests">
-            <h3>Habilidades</h3>
-            <div className='p-etiquetas'>
-              {Object.values(habilidades).map((habilidad, idHabilidad) => (
-                <li key={idHabilidad} className={`p-etiquetas-item ${Object.values(usuario.listaHabilidades).includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
-                  {habilidad}
-                </li>
-              ))}
             </div>
           </div>
 
           {/* Intereses */}
-          <div className="subtitle skills-interests">
+          <div className="intereses-container">
             <h3>Temas de interés</h3> 
             <div className='p-etiquetas'>
               {Object.values(intereses).map((interes, idInteres) => (
@@ -331,10 +396,158 @@ export const Profile = () => {
             </div>
           </div>
 
+          {/* Habilidades */}
+          <div className="habilidades-container">
+            <h3>Habilidades</h3>
+            <div className='p-etiquetas'>
+              {Object.values(habilidades).map((habilidad, idHabilidad) => (
+                <li key={idHabilidad} className={`p-etiquetas-item ${Object.values(usuario.listaHabilidades).includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
+                  {habilidad}
+                </li>
+              ))}
+            </div>
+          </div>
+
           {/* Botón para cerrar sesión */}
           <div className="perfil-logout" style={{borderRadius: "18px"}}>
-            <button onClick={botonCerrarSesion}>Cerrar Sesión</button>
+            <button onClick={openModalSesionCerrada}> <FaCog className='p-fa-gear' /> Cerrar Sesión</button>
           </div>
+
+          {/* ----- Modales ----- */}
+          
+          {/* Modal para subir imagen */}
+          <Modal className="p-modal" show={showModal} onHide={closeModal}>
+            <Modal.Header>
+              <div className='p-modal-title'>Foto de perfil</div>
+            </Modal.Header>
+            
+            <div className="p-input-body">
+              <input 
+                className="p-input-imagen" 
+                type="file" 
+                accept="image/*" 
+                onChange={(e) => {
+                  setSelectedImage(e.target.files[0]);
+                  setErrorI('');
+                  }} 
+                />
+                {errorI && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
+            </div>
+            
+            <Modal.Footer>
+              <Button onClick={handleUploadProfileImage}>Guardar</Button>
+              <Button onClick={closeModal}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Modal mensaje de error */} 
+          <Modal className="p-modal" show={showModalError} onHide={closeModalError}>
+            <Modal.Header>
+              <Modal.Title className='p-modal-title'>Error</Modal.Title>
+            </Modal.Header>
+            
+            <p className='p-modal-body'>{errorMensaje}</p>
+            
+            <Modal.Footer>
+              <Button onClick={closeModalError}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Modal cambiar contraseña */} 
+          <Modal className="p-modal" show={showModalContrasena} onHide={closeModalContrasena}>
+            <Modal.Header>
+              <Modal.Title className='p-modal-title'>Cambiar contraseña</Modal.Title>
+            </Modal.Header>
+           
+            <div className="change-password-form">
+              {/* Contraseña actual */}
+              <div className="caja-con-cojo">
+                <input
+                  className={`change-password-input ${contrasenaActual.trim() === '' && error ? 'p-borde-rojo' : ''}`}
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Contraseña actual"
+                  value={contrasenaActual}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 20) {
+                      setContrasenaActual(e.target.value);
+                    }
+                    setError('');
+                  }} 
+                />
+                <span className="p-ojo-contrasena" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
+
+              {/* Nueva contraseña */}
+              <div className="caja-con-cojo">
+                <input
+                  className={`change-password-input ${((nuevaContrasena.trim() === '' && error) || errorNuevaContraseña) ? 'p-borde-rojo' : ''}`}
+                  type={showNewPassword ? 'text' : 'password'}
+                  placeholder="Nueva contraseña"
+                  value={nuevaContrasena}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 20) {
+                      setNuevaContrasena(e.target.value);
+                    }
+                    setErrorNuevaContraseña('');
+                    setError('');
+                  }} 
+                />
+                
+                <div className="p-row-dos-iconos">
+                  <PasswordInfo2 className="p-p-i"/>
+                  <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
+                      {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
+                </div>
+
+              </div>
+              {errorNuevaContraseña && <p className='p-error-cc' style={{marginTop: '-40px'}}><FaExclamationCircle className='p-fa-ec-2'/>{errorNuevaContraseña}</p>}
+
+              {/* Confirmar nueva contraseña */}
+              <div className="caja-con-cojo">
+                <input
+                  className={`change-password-input ${((confirmarContrasena.trim() === '' && error) || errorConfirmarContraseña) ? 'p-borde-rojo' : ''}`}
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Confirmar nueva contraseña"
+                  value={confirmarContrasena}
+                  onChange={(e) => {
+                    if (e.target.value.length <= 20) {
+                      setConfirmarContrasena(e.target.value);
+                    }
+                    setErrorConfirmarContraseña('');
+                    setError('');
+                  }}
+                />
+                <span className="p-ojo-contrasena" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
+                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
+              {errorConfirmarContraseña && <p className='p-error-cc' style={{marginTop: '-40px'}}><FaExclamationCircle className='p-fa-ec-2'/>{errorConfirmarContraseña}</p>}
+            </div>
+            {error && <p className='p-error-cc' style={{marginTop: '310px'}}><FaExclamationCircle className='p-fa-ec-2'/>{error}</p>}
+            
+            <Modal.Footer>
+              <Button onClick={handleSubmitPassword}>Guardar</Button>
+              <Button onClick={closeModalContrasena}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Modal para cerrar sesión */} 
+          <Modal className="p-modal" show={showModalSesionCerrada} onHide={closeModalSesionCerrada}>
+            <Modal.Header>
+              <Modal.Title className='p-modal-title'>Cerrar Sesión</Modal.Title>
+            </Modal.Header>
+            
+            <p className='p-modal-body'>Si deseas salir has clic en Cerrar Sesión o en Cancelar para continuar trabajando</p>
+            
+            <Modal.Footer>
+              <Button className="btn-salir-sesion" onClick={botonCerrarSesion}>Cerrar Sesión</Button>
+              <Button onClick={closeModalSesionCerrada}>Cancelar</Button>
+            </Modal.Footer>
+          </Modal>
+
         </header>
       
       ) : (

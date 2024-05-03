@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaFolder, FaPen } from 'react-icons/fa';
+import { FaCalendar, FaFolder, FaPen, FaExclamationCircle } from 'react-icons/fa';
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -376,7 +376,7 @@ export const Create = () => {
                       onBlur={handleGuardarTitulo}
                       onKeyDown={handleOnKeyDown}
                       autoFocus
-                      maxLength={30}
+                      maxLength={35}
                     />
                     <div className="c-titulo-conteo">
                       {titulo ? `${titulo.length}/30` : `0/30`}
@@ -597,12 +597,19 @@ export const Create = () => {
 
           {/* Subir imagen */}
           <Modal className="c-modal" show={modalImagen} onHide={handleCerrarImagen}>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <div className="c-modal-title">Subir Imagen</div>
             </Modal.Header>
               <div className="c-input-body">
-                <input className="c-input-imagen" type="file" accept="image/*" onChange={(e) => setImagenSeleccionada(e.target.files[0])} />
-                {errorImagen && <span style={{ color: 'red' }}>{errorImagen}</span>}
+                <input 
+                  className="c-input-imagen" 
+                  type="file" accept="image/*" 
+                  onChange={(e) => {
+                    setImagenSeleccionada(e.target.files[0])
+                    setErrorImagen('');
+                    }} 
+                />
+                {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
               </div>
             <Modal.Footer>
               <Button onClick={handleSubirImagen}>Guardar</Button>

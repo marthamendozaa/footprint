@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FaEnvelope, FaArrowRight, FaArrowLeft, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
+import { FaEnvelope, FaArrowRight, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
 import { PrivacyPolicy } from './PrivacyPolicy.jsx';
 import PasswordInfo from './PasswordInfo.jsx';
 import { existeCorreo } from '../../../api/api.js';
