@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { AiOutlineSearch } from "react-icons/ai";
-import { getIniciativas } from './Explore-fb.js';
+import { getIniciativas, addFavoritas } from './Explore-fb.js';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { ModalHeader } from 'react-bootstrap';
 import { FaHeart, FaRegHeart } from "react-icons/fa";
+import { getIniciativasFavoritas } from '../MyInitiatives/MyInitiatives-fb.js';
 
 export const Explore = () => {
     const [filter, setFilter] = useState('');
@@ -14,12 +15,15 @@ export const Explore = () => {
     const [filteredIniciativas, setFilteredIniciativas] = useState(null);
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
     const [selectedIniciativa, setSelectedIniciativa] = useState(null); // State to store the selected iniciativa
+    const [iniciativasFavoritas, setIniciativasFavoritas] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
             const dataIniciativa = await getIniciativas();
             setIniciativas(dataIniciativa);
             setFilteredIniciativas(dataIniciativa); // Initialize filteredIniciativas with all iniciativas
+            //const dataFavoritas = await getIniciativasFavoritas();
+            //setIniciativasFavoritas(dataFavoritas);
         };
         fetchData();
     }, []);
@@ -57,12 +61,15 @@ export const Explore = () => {
 
             <div className='e-iniciativas-container'>
             {filteredIniciativas && filteredIniciativas.map((item, index) => (
-                <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item)}>
-                    <div className='e-iniciativa-imagen'>
+                <div key={index} className='e-iniciativa'>
+                    <div className='meGusta' onClick={() => addFavoritas(item.idIniciativa)}>
+                        <FaRegHeart/>
+                    </div>
+                    <div className='e-iniciativa-imagen' onClick={() => handleButtonClick(item)}>
                         <img src={item.urlImagen} alt = {item.titulo} />
                     </div>
 
-                    <div className='e-iniciativa-texto'>
+                    <div className='e-iniciativa-texto' onClick={() => handleButtonClick(item)}>
                         <div className="e-titulo">{item.titulo}</div>
                         <div className="e-desc">{item.descripcion}</div>
                     

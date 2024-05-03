@@ -19,7 +19,7 @@ export const MyInitiatives = () => {
       setIniciativasFavoritas(dataFavoritas);
     };
     fetchData();
-  });
+  },[]);
 
   return (
     <div>

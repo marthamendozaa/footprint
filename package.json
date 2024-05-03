@@ -7,21 +7,26 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "email": "email dev"
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.0",
+    "@react-email/components": "0.0.17",
+    "@react-email/render": "^0.0.13",
     "bootstrap": "^5.3.3",
     "compressorjs": "^1.2.1",
     "date-fns": "^3.6.0",
     "firebase": "^10.11.0",
     "image-compressor": "^2.0.3",
+    "mailersend": "^2.2.0",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.2",
     "react-datepicker": "^6.8.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",
+    "react-email": "2.1.2",
     "react-icons": "^5.0.1",
     "react-router-dom": "^6.22.3"
   },
