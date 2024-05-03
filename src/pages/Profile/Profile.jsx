@@ -5,8 +5,8 @@ import { Spinner, Button, Modal } from 'react-bootstrap';
 import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
 import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, actualizaHabilidades, getIntereses, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
 import Usuario from '../../backend/obj-Usuario.js';
+import PasswordInfo2 from './PasswordInfo2.jsx';
 import './Profile.css';
-import { FaU } from 'react-icons/fa6';
 
 export const Profile = () => {
   // Cerrar sesión
@@ -193,6 +193,8 @@ export const Profile = () => {
   const [contrasenaActual, setContrasenaActual] = useState('');
   const [nuevaContrasena, setNuevaContrasena] = useState('');
   const [confirmarContrasena, setConfirmarContrasena] = useState('');
+  const [errorNuevaContraseña, setErrorNuevaContraseña] = useState('');
+  const [errorConfirmarContraseña, setErrorConfirmarContraseña] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -210,6 +212,8 @@ export const Profile = () => {
     setShowPassword(false);
     setShowNewPassword(false);
     setShowConfirmPassword(false);
+    setErrorNuevaContraseña('');
+    setErrorConfirmarContraseña('');
     setError('');
   };
 
@@ -245,12 +249,12 @@ export const Profile = () => {
     }
 
     if (!validatePassword(nuevaContrasena)) {
-      setError('Formato de contraseña inválido');
+      setErrorNuevaContraseña('Formato de contraseña inválido');
       return;
     }
 
     if (nuevaContrasena !== confirmarContrasena) {
-      setError('Las contraseñas no coincidenn');
+      setErrorConfirmarContraseña('Las contraseñas no coinciden');
       return;
     }
 
@@ -259,11 +263,13 @@ export const Profile = () => {
       setContrasenaActual('');
       setNuevaContrasena('');
       setConfirmarContrasena('');
+      setErrorNuevaContraseña('');
+      setErrorConfirmarContraseña('');
       setError('');
       setShowModalContrasena(false);
 
     } catch (error) {
-      setError('Error al cambiar contraseña. Por favor, inténtalo de nuevo.');
+      setError('Error: Contraseña no cambiada');
     }
   };
 
@@ -480,7 +486,7 @@ export const Profile = () => {
               {/* Contraseña actual */}
               <div className="caja-con-cojo">
                 <input
-                  className='change-password-input' 
+                  className={`change-password-input ${contrasenaActual.trim() === '' && error ? 'p-borde-rojo' : ''}`}
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Contraseña actual"
                   value={contrasenaActual}
@@ -499,7 +505,7 @@ export const Profile = () => {
               {/* Nueva contraseña */}
               <div className="caja-con-cojo">
                 <input
-                  className='change-password-input' 
+                  className={`change-password-input ${((nuevaContrasena.trim() === '' && error) || errorNuevaContraseña) ? 'p-borde-rojo' : ''}`}
                   type={showNewPassword ? 'text' : 'password'}
                   placeholder="Nueva contraseña"
                   value={nuevaContrasena}
@@ -507,18 +513,25 @@ export const Profile = () => {
                     if (e.target.value.length <= 20) {
                       setNuevaContrasena(e.target.value);
                     }
+                    setErrorNuevaContraseña('');
                     setError('');
                   }} 
                 />
-                <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
-                    {showNewPassword ? <FaEyeSlash /> : <FaEye />}
-                </span>
+                
+                <div className="p-row-dos-iconos">
+                  <PasswordInfo2 className="p-p-i"/>
+                  <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
+                      {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                  </span>
+                </div>
+
               </div>
+              {errorNuevaContraseña && <p className='p-error-cc' style={{marginTop: '-40px'}}><FaExclamationCircle className='p-fa-ec-2'/>{errorNuevaContraseña}</p>}
 
               {/* Confirmar nueva contraseña */}
               <div className="caja-con-cojo">
                 <input
-                  className='change-password-input' 
+                  className={`change-password-input ${((confirmarContrasena.trim() === '' && error) || errorConfirmarContraseña) ? 'p-borde-rojo' : ''}`}
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirmar nueva contraseña"
                   value={confirmarContrasena}
@@ -526,6 +539,7 @@ export const Profile = () => {
                     if (e.target.value.length <= 20) {
                       setConfirmarContrasena(e.target.value);
                     }
+                    setErrorConfirmarContraseña('');
                     setError('');
                   }}
                 />
@@ -533,10 +547,9 @@ export const Profile = () => {
                     {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
-
-              {/* Mensaje de error */}
-              {error && <p style={{ color: 'red' }}>{error}</p>}
+              {errorConfirmarContraseña && <p className='p-error-cc' style={{marginTop: '-40px'}}><FaExclamationCircle className='p-fa-ec-2'/>{errorConfirmarContraseña}</p>}
             </div>
+            {error && <p className='p-error-cc' style={{marginTop: '310px'}}><FaExclamationCircle className='p-fa-ec-2'/>{error}</p>}
             
             <Modal.Footer>
               <Button onClick={handleSubmitPassword}>Guardar</Button>

@@ -213,11 +213,17 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  margin-bottom: 10px;
 }
 
 .profile-icons-text-icon {
   margin-right: 10px;
+}
+
+.p-info {
+  display: flex;
+  height: 130px;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .p-info p {
@@ -230,6 +236,7 @@
   font-size: 16px;
   margin-right: 3px;
   font-weight: 600;
+  font-family: "Inter", sans-serif;
 }
 
 .p-correo {
@@ -264,7 +271,11 @@
   display: flex;
   position: relative;
   flex-direction: row;
-  margin-bottom: 30px;
+  margin-bottom: 20px
+}
+
+.p-borde-rojo {
+  border: 2px solid red !important;
 }
 
 .p-ojo-contrasena {
@@ -275,6 +286,36 @@
   margin: 14px;
 }
 
+.p-row-dos-iconos {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  cursor: pointer;
+  right: 0;
+}
+
+.p-p-icono {
+  display: flex;
+  position: absolute;
+}
+
+.p-error-cc {
+  display: flex;
+  position: absolute;
+  align-items: center;
+  color: red;
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  margin-left: 25px;
+  margin-right: 100px;
+}
+
+.p-fa-ec-2{
+  margin-right: 5px;
+}
+
 .change-password-input {
   margin-bottom: 25px;
   width: 100%;
@@ -282,7 +323,7 @@
   border-radius: 30px;
   padding-left: 25px;
   padding-right: 50px;
-  border: 1px solid #ccc;
+  border: 2px solid #ccc;
   box-sizing: border-box;
 }
 
