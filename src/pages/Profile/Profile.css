@@ -1,81 +1,197 @@
+/* Perfil pagina */
 .profile-page {
   display: flex;
   background-color: white;
   color: black;
-  /*max-width: 1200px;*/
   text-align: left;
 }
 
-.Profile-header {
+.profile-header {
   display: flex;
   flex-direction: column;
-  margin-bottom: 5%;
 }
 
-.Foto-perfil {
-  border-radius: 50%;
-  width: 150px; 
-  height: 150px;
-  object-fit: cover;
-  position: relative;
-  margin-top: 5%;
-}
-
-.edit-icon {
-  margin-top: 5%;
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%); /* Centra el icono en la foto */
-  color: white;
-  opacity: 0; /* Inicialmente invisible */
-  transition: opacity 0.3s ease; /* Transición suave de la opacidad */
-  z-index: 1;
-}
-
-.Foto-perfil:hover::after {
-  margin-top: 5%;
-  content: ''; /* Agrega un pseudo-elemento para el filtro gris */
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Filtro gris con transparencia media */
-  border-radius: 50%; /* Mantiene la forma circular */
-}
-  
-.Foto-perfil:hover .edit-icon {
-  opacity: 1; /* Muestra el icono al pasar el mouse sobre la foto */
+.Profile-header h1 {
+  font-size: 45px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-family: "Inter", sans-serif;
 }
 
 .profile-info {
   display: flex;
-  align-items: flex-start;
   flex-direction: row;
-  width: 1000px;
+  margin-bottom: 25px;
 }
 
+/* Foto de perfil */
 .profile-info-left {
   display: flex;
-  width: 20%;
-  justify-content: space-around;
+  justify-content: flex-start;
 }
 
-.profile-info-right {
+.p-foto {
   display: flex;
-  width: 80%;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  height: 200px;
+  width: 200px;
+  margin: 15px;
+  margin-bottom: 0px;
+  border-radius: 50%;
+  float: left;
+}
+
+.p-foto:hover {
+  background-color: #000;
+}
+
+.p-preview-imagen {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.p-foto:hover .p-preview-imagen {
+  transition: opacity 0.3s ease;
+  opacity: 0.5;
+}
+
+.p-editar-foto {
+  opacity: 0;
+  position: absolute;
+  font-size: 40px;
+  color: white;
+}
+
+.p-foto:hover .p-editar-foto {
+  transition: opacity 0.3s ease;
+  opacity: 1;
+}
+
+/* Modal subir imgen */
+.p-input-body {
+  display: flex;
+  padding: 20px;
+  width: 500px;
+  font-family: "Inter", sans-serif;
+  justify-content: center;
+  align-items: center;
   flex-direction: column;
 }
 
+.p-error-imagen {
+  color: red;
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  margin-left: 25px;
+  margin-right: 25px;
+}
+
+.p-fa-ec{
+  margin-right: 5px;
+}
+
+.p-input-imagen {
+  display: flex;
+  width: 60%;
+}
+
+.fade.p-modal.modal.show {
+  display: flex !important;
+  align-items: center;
+}
+
+.p-modal .modal-content {
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  padding: 10px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.p-modal-body {
+  padding: 16px;
+  font-family: "Inter", sans-serif;
+}
+
+.p-modal .modal-header,
+.p-modal .modal-footer {
+  border: none;
+  padding: 0;
+}
+
+.p-modal .modal-footer {
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+.p-modal .modal-header .btn-close {
+  position: absolute;
+  right: 5%;
+}
+
+.p-modal-title {
+  font-weight: 600;
+  font-size: 30px;
+  font-family: "Inter", sans-serif;
+}
+
+.p-modal .btn.btn-primary {
+  color: #000;
+  background-color: #A0C1BF;
+  padding: 10px 30px;
+  font-weight: 600;
+  border: none;
+  border-radius: 30px;
+}
+
+.p-modal .btn.btn-primary:hover {
+  background-color: #699AA0;
+}
+
+.p-modal .btn.btn-primary a {
+  color: #000;
+}
+
+/* Info del usuario */
+.profile-info-right {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin-left: 25px;
+  margin-top: 15px;
+}
+
 .name-container {
-  position: relative; /* Asegura que el contenedor del nombre tenga una posición relativa */
+  position: relative;
   display: inline-block;
 }
 
+.name-container h2 {
+  font-size: 30px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  font-family: "Inter", sans-serif;
+}
+
+.edit-name-box {
+  margin-bottom: 10px;
+  width: 100%;
+  font-size: 30px;
+  font-weight: 600;
+  outline: none;
+  border: none;
+}
+
 .edit-profile-btn {
-  top: 20px; /* Coloca el botón en la parte superior del contenedor del nombre */
-  right: 25px; /* Ajusta el espaciado del botón desde el nombre */
+  top: 20px;
+  right: 25px;
   background: none;
   border: none;
   cursor: pointer;
@@ -83,33 +199,137 @@
   font-size: 20px;
 }
 
-.guardar{
-  top: 20px;
-  right: -35%;
-  color: black;
-  padding: 5px 10px;
-  border-radius: 10px;
-  margin-left: 5px;
-  background-color: rgb(206, 221, 226);
+.p-titulo-conteo {
+  position: absolute;
+  font-size: 15px;
+  font-weight: 600;
+  color: #A0C1BF;
+  margin-right: auto;
+  margin-top: -52px;
+  padding-left: 500px;
 }
 
-.change-password{
+.profile-icons-text {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.profile-icons-text-icon {
+  margin-right: 10px;
+}
+
+.p-info {
+  display: flex;
+  height: 130px;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.p-info p {
+  font-size: 16px;
+  font-weight: 400;
+  margin-bottom: 0px;
+}
+
+.p-info span {
+  font-size: 16px;
+  margin-right: 3px;
+  font-weight: 600;
+  font-family: "Inter", sans-serif;
+}
+
+.p-correo {
   text-decoration: underline; 
+  color: #2200ff
+}
+
+/* Cambiar contraseña */
+.p-info button{
+  font-size: 13px;
+  background-color: #f2f2f2;
+  padding: 0px 0px;
+  width: 147px;
+  height: 27px;
+  font-weight: 600;
   cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.change-password:hover {
+  border: 2px solid #000;
 }
 
 .change-password-form {
-  margin-top: 5px;
-  width: 50%;
+  margin-top: 20px;
+  margin-left: 20px;
+  margin-right: 20px;
+  width: 400px;
+}
+
+.caja-con-cojo {
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  margin-bottom: 20px
+}
+
+.p-borde-rojo {
+  border: 2px solid red !important;
+}
+
+.p-ojo-contrasena {
+  display: flex;
+  position: absolute;
+  cursor: pointer;
+  right: 0;
+  margin: 14px;
+}
+
+.p-row-dos-iconos {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  cursor: pointer;
+  right: 0;
+}
+
+.p-p-icono {
+  display: flex;
+  position: absolute;
+}
+
+.p-error-cc {
+  display: flex;
+  position: absolute;
+  align-items: center;
+  color: red;
+  font-size: 18px;
+  font-weight: 500;
+  margin-top: 25px;
+  margin-bottom: 15px;
+  margin-left: 25px;
+  margin-right: 100px;
+}
+
+.p-fa-ec-2{
+  margin-right: 5px;
 }
 
 .change-password-input {
-  margin-bottom: 10px;
+  margin-bottom: 25px;
   width: 100%;
   padding: 8px;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  border-radius: 30px;
+  padding-left: 25px;
+  padding-right: 50px;
+  border: 2px solid #ccc;
   box-sizing: border-box;
+}
+
+.change-password-form p {
+  margin: 10px;
+  margin-bottom: 25px;
 }
 
 .change-password-submit {
@@ -118,11 +338,6 @@
   border: none;
   border-radius: 18px;
   cursor: pointer;
-}
-
-.change-password-submit:hover {
-  background-color: #45a049;
-  color: white;
 }
 
 .change-password-cancel {
@@ -139,24 +354,31 @@
   color: white;
 }
 
-.subtitle {
-  margin-top: 20px;
+/* Información */
+.intereses-container {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  width: 100%;
 }
 
-.skills-interests {
-  margin-top: 10px;
+.habilidades-container {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  width: 100%;
+  padding-top: 25px;
+}
+
+.profile-header h3{
+  font-size: 25px;
+  font-weight: 600;
 }
 
 .p-etiquetas {
   display: flex;
-  height: 50px;
-  list-style-type: none;
-  overflow: overlay;
-  align-items: center;
-}
-
-.p-etiquetas::-webkit-scrollbar {
-  display: none;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
 .p-etiquetas li {
@@ -184,7 +406,37 @@ li.p-etiquetas-item:hover {
   box-shadow: 0 0 0 3px #A0C1BF;
 }
 
+/* Boton cerrar sersión */
 .perfil-logout {
-  margin-top: 10px;
-  border-radius: 18px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 25px;
+}
+
+.p-fa-gear {
+  font-size: 25px;
+  margin-right: 5px;
+}
+
+.perfil-logout button {
+  color: #000000;
+  font-size: 16px;
+  background-color: #A0C1BF;
+  padding: 10px 20px;
+  font-weight: 600;
+  border: none;
+  border-radius: 30px;
+}
+
+.perfil-logout button:hover {
+  color: #ffffff;
+  background-color: #186279;
+}
+
+.btn-salir-sesion {
+  background-color: #f09e9e !important;
+}
+
+.btn-salir-sesion:hover {
+  background-color: rgb(224, 99, 99) !important;
 }
