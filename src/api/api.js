@@ -233,3 +233,34 @@ export const subirImagen = async (imagen, path) => {
     throw new Error(response.data.error);
   }
 };
+
+
+// Suscribe el usuario a una iniciativa
+export const suscribirseAIniciativa = async (user, iniciativa) => {
+  const response = await axios.post(`${functionsURL}/suscribirseAIniciativa`, {
+    user: user,
+    iniciativa: iniciativa
+  });
+  if (response.data.success) {
+    console.log("Suscribir usuario a iniciativa exitoso");
+    return response.data.success;
+  } else {
+    console.log("Error suscribiendo usuario a iniciativa");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Crea las tareas de la iniciativa
+export const crearTareas = async (data) => {
+  const response = await axios.post(`${functionsURL}/crearTareas`, {
+    data: data
+  });
+  if (response.data.success) {
+    console.log("Crear tareas exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error creando tareas");
+    return response.data.error;
+  }
+};

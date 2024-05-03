@@ -341,3 +341,43 @@ exports.subirImagen = onRequest(async (req, res) => {
     });
   });
 });
+
+
+// Suscribe el usuario a una iniciativa
+exports.suscribirseAIniciativa = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { user, iniciativa } = req.body;
+
+    try {
+      const usuarioRef = await getFirestore().doc(`Usuarios/${user}`).get();
+      const usuario = usuarioRef.data();
+      const usuarioNuevo = { ...usuario, listaIniciativasMiembro: [...usuario.listaIniciativasMiembro, iniciativa] };
+      await getFirestore().doc(`Usuarios/${user}`).update(usuarioNuevo);
+
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error suscribiéndose a la iniciativa como miembro: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+
+// Crea las tareas de la iniciativa
+exports.crearTareas = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { data } = req.body;
+
+    try {
+      for (const tarea of data) {
+        const tareaData = await getFirestore().collection('Tareas').add(tarea);
+        await getFirestore().doc(`Tareas/${tareaData.id}`).update({ idTarea: tareaData.id });
+      }
+      
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error creando tareas: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
