@@ -2,10 +2,8 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { AiOutlineSearch } from "react-icons/ai";
-import { getIniciativas, suscribirseAIniciativa } from './Explore-fb.js';
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import { ModalHeader } from 'react-bootstrap';
+import { getIniciativas, suscribirseAIniciativa, verificarRolUsuario } from './Explore-fb.js';
+import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 
 export const Explore = () => {
     const [filter, setFilter] = useState('');
@@ -13,6 +11,9 @@ export const Explore = () => {
     const [filteredIniciativas, setFilteredIniciativas] = useState(null);
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
     const [selectedIniciativa, setSelectedIniciativa] = useState(null); // State to store the selected iniciativa
+    const [esAdmin, setEsAdmin] = useState(false);
+    const [esMiembro, setEsMiembro] = useState(false);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -34,14 +35,25 @@ export const Explore = () => {
         setFilteredIniciativas(filtered);
     }
 
-    const handleButtonClick = (iniciativa) => {
+    const handleButtonClick = async (iniciativa) => {
+        const user = JSON.parse(sessionStorage.getItem('user'));
+        if (!user) return;
+
+        const rol = await verificarRolUsuario(user.uid, iniciativa.id);
+        if (rol === "admin" || rol === "miembro") {
+            if (rol === "admin") setEsAdmin(true);
+            if (rol === "miembro") setEsMiembro(true);
+        } else {
+            setEsAdmin(false);
+            setEsMiembro(false);
+        }
         setSelectedIniciativa(iniciativa);
         setShowModal(true);
     }
 
     const handleSuscribirse = async () => {
         if (selectedIniciativa) {
-            const idIniciativa = selectedIniciativa.id; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
+            const idIniciativa = selectedIniciativa.id;
             const resultado = await suscribirseAIniciativa(idIniciativa);
             if (resultado) {
                 console.log("Suscripción exitosa a la iniciativa con ID:", resultado);
@@ -83,53 +95,14 @@ export const Explore = () => {
             </div>
 
             {/* Modal */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered className='modal1'>
-                <div className=".modalcontainer">
-                    
-                    <div className='modaliniciativa'>
-                        {selectedIniciativa && (
-                            <>
-                                <div className="modalhead">
-                                <div className="modalbutton">
-                                <button type="button" className="close" onClick={() => setShowModal(false)} aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                </div>
-                                <img src={selectedIniciativa.urlImagen} alt={selectedIniciativa.titulo} className="modalimg" />
-                                </div>
-                                <div className='modalinfo'>
-                                    <div className='modaltitulo'>{selectedIniciativa.titulo}</div>
-                                    {/* Etiquetas */}
-                                    <div className="m-etiquetas">
-                                    {Object.values(selectedIniciativa.listaEtiquetas).map((etiqueta, idEtiqueta) => (
-                                        <li key={idEtiqueta} className={'m-etiqueta-item'}>
-                                        {etiqueta}
-                                        </li>
-                                    ))}
-                                    </div>
-                                    
-                                    <div className='modalregion'>{selectedIniciativa.region} </div>
-                                    <div className='modalpublica'>{selectedIniciativa.esPublica ? "Pública" : "Privada"} </div>
-                                    <div className='modalfecha'>{selectedIniciativa.fechaInicio} - {selectedIniciativa.fechaCierre ? selectedIniciativa.fechaCierre : 'S.F.'} </div>
-                                </div>
-                            </>
-                        )}
-                        
-                    </div>
-                    <div className = 'modaldesc'>
-                        {selectedIniciativa && (
-                                <>
-                                    <div className='modaltextodesc'>{selectedIniciativa.descripcion}</div>
-                                </>
-                        )}
-                    </div>
-                    <div className = 'modalsuscribir'>
-                        <div className='modalsusbotton' onClick={handleSuscribirse}>
-                            Suscribirse
-                        </div>
-                    </div>
-                </div>
-            </Modal>
+            <ModalIniciativa
+                        showModal={showModal}
+                        setShowModal={setShowModal}
+                        selectedIniciativa={selectedIniciativa}
+                        handleSuscribirse={handleSuscribirse}
+                        esAdmin={esAdmin}
+                        esMiembro={esMiembro}
+                    />
             </div>
             </div>
         </div>
