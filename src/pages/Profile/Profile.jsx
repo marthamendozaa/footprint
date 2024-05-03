@@ -167,12 +167,12 @@ export const Profile = () => {
       return;
     }
 
-    if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
-      setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
-      return;
-    }
-    
-    
+  if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
+    setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
+    setSelectedImage(null);
+    return;
+  }
+  
     try {
       const imageUrl = await subirImagen(selectedImage, `Usuarios/${user}`);
       const usuarioNuevo = { ...usuario, urlImagen: imageUrl };
