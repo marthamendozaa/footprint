@@ -318,16 +318,20 @@ export const Create = () => {
     const fechaInicioMini = format(fechaInicio, 'dd/MM/yyyy');
     const fechaCierreMini = fechaCierre ? format(fechaCierre, 'dd/MM/yyyy') : null;
 
-    // Crear iniciativa
-    const iniciativa = new Iniciativa(user, titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
-    const idIniciativa = await crearIniciativa(iniciativa);
-
-    // Manejar errores
-    if (idIniciativa === 409) {
-      handleMostrarErrorDuplicada();
-    } else if (idIniciativa === 500) {
-      handleMostrarErrorCreada();
-    } else {
+    try {
+      // Crear iniciativa
+      const iniciativa = new Iniciativa(user, titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
+      const idIniciativa = await crearIniciativa(iniciativa);
+  
+      // Manejar errores
+      if (idIniciativa === 409) {
+        handleMostrarErrorDuplicada();
+        return;
+      } else if (idIniciativa === 500) {
+        handleMostrarErrorCreada();
+        return;
+      }
+      
       // Subir imagen de la iniciativa y actualizar información
       let urlImagen = iniciativa.urlImagen;
       if (imagenIniciativa) {
@@ -348,6 +352,8 @@ export const Create = () => {
       setIdIniciativaCreada(idIniciativa);
       handleMostrarCreada();
       setTiempoIniciativaCreada(tiempoActual);
+    } catch (error) {
+      handleMostrarErrorCreada();
     }
   };
 

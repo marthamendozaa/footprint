@@ -408,12 +408,15 @@ exports.crearTareas = onRequest(async (req, res) => {
   cors(req, res, async () => {
     const { data } = req.body;
 
+    let tareas = [];
+    let idIniciativa = data[0].idIniciativa;
     try {
       for (const tarea of data) {
         const tareaData = await getFirestore().collection('Tareas').add(tarea);
         await getFirestore().doc(`Tareas/${tareaData.id}`).update({ idTarea: tareaData.id });
+        tareas.push(tareaData.id);
       }
-      
+      await getFirestore().doc(`Iniciativas/${idIniciativa}`).update({ listaTareas: tareas });
       res.json({ success: true });
     } catch (error) {
       logger.info("Error creando tareas: ", error.message);
