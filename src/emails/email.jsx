@@ -11,3 +11,6 @@ export function Email(props) {
     </Html>
   );
 }
+<div className='meGusta2' onClick={() => addFavoritas(item.idIniciativa)}>
+                        <FaHeart/>
+                    </div>

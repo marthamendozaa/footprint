@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
-import { getIniciativasMiembro, getIniciativasAdmin, getIniciativasFavoritas } from './MyInitiatives-fb.js';
+import { getIniciativasMiembro, getIniciativasAdmin, getIniciativasFavoritas, eliminarFavoritas } from './MyInitiatives-fb.js';
+import { FaHeart} from "react-icons/fa";
 import './MyInitiatives.css';
 
 export const MyInitiatives = () => {
@@ -20,6 +21,12 @@ export const MyInitiatives = () => {
     };
     fetchData();
   },[]);
+
+  const handleFavoritas = async (idIniciativa) => {
+    eliminarFavoritas(idIniciativa);
+    const newDatos = await getIniciativasFavoritas();
+    setIniciativasFavoritas(newDatos);
+  };
 
   return (
     <div>
@@ -88,17 +95,21 @@ export const MyInitiatives = () => {
             ) : (
               <div className="m-iniciativas-container">
                 {iniciativasFavoritas.map((iniciativa, index) => (
-                  <Link to={`/initiative/${iniciativa.idIniciativa}`}>
-                    <div className="m-iniciativa" key={index}>
-                        <div className="m-iniciativa-imagen">
-                          <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
-                        </div>
-                      <div className="m-iniciativa-texto">
-                        <div className="m-titulo">{iniciativa.titulo}</div>
-                        <div className="m-desc">{iniciativa.descripcion}</div>
-                      </div>
+                  <div className="m-iniciativa" key={index}>
+                    
+                    <div className="meGusta2">
+                      <FaHeart onClick={() => handleFavoritas(iniciativa.idIniciativa)} style={{ cursor: "pointer" }} />
                     </div>
-                  </Link>
+                    <Link to={`/initiative/${iniciativa.idIniciativa}`}>
+                    <div className="m-iniciativa-imagen">
+                      <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
+                    </div>
+                    <div className="m-iniciativa-texto">
+                      <div className="m-titulo">{iniciativa.titulo}</div>
+                      <div className="m-desc">{iniciativa.descripcion}</div>
+                    </div>
+                    </Link>  
+                  </div>  
                 ))}
               </div>
             )}

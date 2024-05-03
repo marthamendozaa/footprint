@@ -1,5 +1,5 @@
 import { firestore } from "../../backend/firebase-config.js";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayRemove } from "firebase/firestore";
 
 
 // Mis Iniciativas: iniciativas donde es miembro
@@ -101,4 +101,40 @@ export const getIniciativasFavoritas = async () => {
     console.error("Error obteniendo lista de iniciativas favoritas:", error.message);
     return null;
   }
+};
+
+// Agregar iniciativa a lista de favoritos
+export const eliminarFavoritas = async (idIniciativa) => {
+  console.log("Sí se presionó el botón");
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  if (!user) {
+    console.error("No hay usuario autenticado");
+    return null;
+  }
+
+  const idIniciativaFavoritaNueva = idIniciativa;
+  const usuarioDocRef = doc(firestore, "Usuarios", user.uid);
+
+  // Obtener el documento del usuario de Firestore
+  const usuarioDocSnap = await getDoc(usuarioDocRef);
+  if (!usuarioDocSnap.exists()) {
+    console.error("El documento del usuario no existe");
+    return null;
+  }
+
+  // Acceder a los datos del documento del usuario
+  const usuarioData = usuarioDocSnap.data();
+  if (!usuarioData.listaIniciativasFavoritas) {
+    console.error("La lista de iniciativas favoritas no está definida en el documento del usuario.");
+    return null;
+  }
+
+  const listaIniciativasFavoritas = usuarioData.listaIniciativasFavoritas;
+
+  // Eliminar iniciativa de lista de favoritos del usuario
+  if (listaIniciativasFavoritas.includes(idIniciativaFavoritaNueva)){
+    await updateDoc(usuarioDocRef, { listaIniciativasFavoritas: arrayRemove(idIniciativaFavoritaNueva) });
+    console.log("Iniciativa eliminada");
+  }
+
 };

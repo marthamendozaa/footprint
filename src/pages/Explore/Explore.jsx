@@ -2,31 +2,40 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { AiOutlineSearch } from "react-icons/ai";
-import { getIniciativas, addFavoritas } from './Explore-fb.js';
+import { getIniciativas, addFavoritas, isFavorito } from './Explore-fb.js';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
 import { ModalHeader } from 'react-bootstrap';
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { getIniciativasFavoritas } from '../MyInitiatives/MyInitiatives-fb.js';
 
-export const Explore = () => {
+export const Explore = ({ userId, idIniciativa }) => {
     const [filter, setFilter] = useState('');
     const [iniciativas, setIniciativas] = useState(null);
     const [filteredIniciativas, setFilteredIniciativas] = useState(null);
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
     const [selectedIniciativa, setSelectedIniciativa] = useState(null); // State to store the selected iniciativa
-    const [iniciativasFavoritas, setIniciativasFavoritas] = useState(null);
+    const [esFavorita, setEsFavorita] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
             const dataIniciativa = await getIniciativas();
             setIniciativas(dataIniciativa);
             setFilteredIniciativas(dataIniciativa); // Initialize filteredIniciativas with all iniciativas
-            //const dataFavoritas = await getIniciativasFavoritas();
-            //setIniciativasFavoritas(dataFavoritas);
         };
         fetchData();
-    }, []);
+
+        const verificarFavorito = async () => {
+            try {
+              const estaEnLista = await isFavorito(userId, idIniciativa);
+              setEsFavorita(estaEnLista);
+            } catch (error) {
+              console.error("Error al verificar si la iniciativa está en la lista de favoritos: ", error);
+            }
+        };
+        verificarFavorito();
+        
+    }, [userId, idIniciativa]);
 
     const searchText = (event) => {
         const searchTerm = event.target.value;
@@ -43,6 +52,11 @@ export const Explore = () => {
         setSelectedIniciativa(iniciativa);
         setShowModal(true);
     }
+
+    // Toggle de icono de favoritos
+    const handleToggleFavorita = () => {        
+        //setEsFavorita((esFavorita) => !esFavorita);
+    };
 
     return (
         <div>
@@ -62,8 +76,12 @@ export const Explore = () => {
             <div className='e-iniciativas-container'>
             {filteredIniciativas && filteredIniciativas.map((item, index) => (
                 <div key={index} className='e-iniciativa'>
-                    <div className='meGusta' onClick={() => addFavoritas(item.idIniciativa)}>
-                        <FaRegHeart/>
+                    <div className='meGusta' >
+                    {esFavorita ? (
+                        <FaHeart onClick={() => {addFavoritas(item.idIniciativa); handleToggleFavorita()}} style={{ cursor: "pointer" }} />
+                    ) : (
+                        <FaRegHeart onClick={() => {addFavoritas(item.idIniciativa); handleToggleFavorita()}} style={{ cursor: "pointer" }} />
+                    )}
                     </div>
                     <div className='e-iniciativa-imagen' onClick={() => handleButtonClick(item)}>
                         <img src={item.urlImagen} alt = {item.titulo} />
