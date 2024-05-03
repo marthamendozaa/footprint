@@ -190,6 +190,46 @@ exports.getIniciativas = onRequest(async (req, res) => {
 });
 
 
+// Información de todas las iniciativas del usuario
+exports.getMisIniciativas = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    try {
+      const { user } = req.body;
+
+      const usuarioRef = await getFirestore().doc(`Usuarios/${user}`).get();
+      const usuario = usuarioRef.data();
+
+      // Iniciativas donde es miembro
+      const iniciativasMiembro = [];
+      for (const idIniciativa of usuario.listaIniciativasMiembro) {
+        const iniciativaRef = await getFirestore().doc(`Iniciativas/${idIniciativa}`).get();
+        iniciativasMiembro.push(iniciativaRef.data());
+      }
+
+      // Iniciativas creadas
+      const iniciativasAdmin = [];
+      for (const idIniciativa of usuario.listaIniciativasAdmin) {
+        const iniciativaRef = await getFirestore().doc(`Iniciativas/${idIniciativa}`).get();
+        iniciativasAdmin.push(iniciativaRef.data());
+      }
+
+      // Iniciativas favoritas
+      const iniciativasFavoritas = [];
+      for (const idIniciativa of usuario.listaIniciativasFavoritas) {
+        const iniciativaRef = await getFirestore().doc(`Iniciativas/${idIniciativa}`).get();
+        iniciativasFavoritas.push(iniciativaRef.data());
+      }
+
+      const iniciativasData = { iniciativasMiembro, iniciativasAdmin, iniciativasFavoritas };
+      res.json({ success: true, data: iniciativasData });
+    } catch (error) {
+      logger.info("Error obteniendo mis iniciativas: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+
 // Información de la iniciativa
 exports.getIniciativa = onRequest(async (req, res) => {
   cors(req, res, async () => {

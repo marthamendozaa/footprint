@@ -2,13 +2,11 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { getUsuario, getIniciativa } from '../../api/api.js';
-import Usuario from '../../classes/Usuario.js';
+import { getMisIniciativas } from '../../api/api.js';
 import './MyInitiatives.css';
 
 export const MyInitiatives = () => {
   const { user } = useAuth();
-  const [ usuario ] = useState(new Usuario());
   
   // Información de iniciativas del usuario
   const [iniciativasMiembro, setIniciativasMiembro] = useState(null);
@@ -17,32 +15,10 @@ export const MyInitiatives = () => {
   
   useEffect(() => {
     const fetchData = async () => {
-      const usuarioData = await getUsuario(user);
-      const objUsuario = { ...usuario, ...usuarioData };
-      
-      // Obtiene información de iniciativas suscritas
-      const iniciativasMiembroData = [];
-      for (const idIniciativa of objUsuario.listaIniciativasMiembro) {
-        const iniciativaData = await getIniciativa(idIniciativa);
-        iniciativasMiembroData.push(iniciativaData);
-      }
-      setIniciativasMiembro(iniciativasMiembroData);
-      
-      // Obtiene información de iniciativas creadas
-      const iniciativasAdminData = [];
-      for (const idIniciativa of objUsuario.listaIniciativasAdmin) {
-        const iniciativaData = await getIniciativa(idIniciativa);
-        iniciativasAdminData.push(iniciativaData);
-      }
-      setIniciativasAdmin(iniciativasAdminData);
-      
-      // Obtiene información de iniciativas favoritas
-      const iniciativasFavoritasData = [];
-      for (const idIniciativa of objUsuario.listaIniciativasFavoritas) {
-        const iniciativasFavoritasData = await getIniciativa(idIniciativa);
-        iniciativasAdminData.push(iniciativasFavoritasData);
-      }
-      setIniciativasFavoritas(iniciativasFavoritasData);
+      const iniciativasData = await getMisIniciativas(user);
+      setIniciativasMiembro(iniciativasData.iniciativasMiembro);
+      setIniciativasAdmin(iniciativasData.iniciativasAdmin);
+      setIniciativasFavoritas(iniciativasData.iniciativasFavoritas);
     };
     fetchData();
   }, []);

@@ -151,6 +151,21 @@ export const getIniciativas = async () => {
 };
 
 
+// Información de todas las iniciativas del usuario
+export const getMisIniciativas = async (user) => {
+  const response = await axios.post(`${functionsURL}/getMisIniciativas`, {
+    user: user
+  });
+  if (response.data.success) {
+    console.log("Obtener mis iniciativas exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error obteniendo mis iniciativas");
+    throw new Error(response.data.error);
+  }
+};
+
+
 // Información de la iniciativa
 export const getIniciativa = async (idIniciativa) => {
   const response = await axios.post(`${functionsURL}/getIniciativa`, {
