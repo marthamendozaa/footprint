@@ -5,7 +5,7 @@ import { BsPeopleFill } from "react-icons/bs";
 import { MdUpload } from "react-icons/md"
 import { Spinner } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa } from './Initiative-fb.js';
+import { getIniciativa } from '../../api/api.js';
 import './Initiative.css';
 
 export const Initiative = () => {

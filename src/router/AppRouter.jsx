@@ -13,8 +13,7 @@ import { Login } from '../pages/Login/Login.jsx';
 import { Register } from '../pages/Register/Register.jsx';
 import { ExploreAdmin } from '../pages/ExploreAdmin/ExploreAdmin.jsx';
 import { ProfileAdmin } from '../pages/ProfileAdmin/ProfileAdmin.jsx';
-import { getEsAdmin } from '../pages/Login/Login-fb.js';
-import { auth } from '../backend/firebase-config.js';
+import { useAuth } from '../contexts/AuthContext.jsx';
 
 export const AppRouter = () => {
     const [isCreateOpen, setIsCreateOpen] = useState(true);
@@ -24,41 +23,7 @@ export const AppRouter = () => {
     };
 
     {/* Obtiene usuario y estado de administrador */}
-    const [currentUser, setCurrentUser] = useState(() => {
-        const user = sessionStorage.getItem('user');
-        return user ? JSON.parse(user) : null;
-    });
-    const [esAdmin, setEsAdmin] = useState(() => {
-        const admin = sessionStorage.getItem('esAdmin');
-        return admin ? JSON.parse(admin) : false;
-    });
-  
-    useEffect(() => {
-        {/* Firebase detecta cambios en autentificación del usuario */}
-        const unsubscribe = auth.onAuthStateChanged(user => {
-            if (user) {
-              {/* Almacena información del usuario al hacer login */}
-              sessionStorage.setItem('user', JSON.stringify(user));
-              setCurrentUser(user);
-              getEsAdmin(user)
-                  .then(admin => {
-                      sessionStorage.setItem('esAdmin', JSON.stringify(admin));
-                      setEsAdmin(admin);
-                  })
-                  .catch(error => {
-                      console.error("Error obteniendo estado de administrador:", error.message);
-                  });
-            } else {
-                {/* Elimina información del usuario al cerrar sesión */}
-                sessionStorage.removeItem('user');
-                sessionStorage.removeItem('esAdmin');
-                setCurrentUser(null);
-                setEsAdmin(false);
-            }
-      });
-  
-        return unsubscribe;
-    }, []);
+    const { user, admin } = useAuth();
     
     {/* Obtiene información de su última ventana abierta */}
     const location = useLocation();
@@ -77,13 +42,13 @@ export const AppRouter = () => {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
-            {currentUser && esAdmin && (
+            {user && admin && (
                 <>
                     <Route path="/exploreAdmin" element={<PageWithNavbarAdmin component={<ExploreAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
                     <Route path="/profileAdmin" element={<PageWithNavbarAdmin component={<ProfileAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
                 </>
             )}
-            {currentUser && !esAdmin &&(
+            {user && !admin &&(
                 <>
                     <Route path="/home" element={<PageWithNavbar component={<Home />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
                     <Route path="/explore" element={<PageWithNavbar component={<Explore />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
@@ -95,10 +60,10 @@ export const AppRouter = () => {
                 </>
             )}
 
-            {currentUser ? (
+            {user ? (
                 <Route path="*" element={savedLocation ? (
                     <Navigate to={savedLocation} />) : (
-                        esAdmin ? (<Navigate to="/exploreAdmin" />) : (
+                        admin ? (<Navigate to="/exploreAdmin" />) : (
                             <Navigate to="/home" />
                         )
                     )}

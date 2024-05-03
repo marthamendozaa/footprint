@@ -3,15 +3,18 @@ import { FaPen } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Button, Modal } from 'react-bootstrap';
 import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
-import { getUsuario, updateUsuarioNombre, getHabilidades, getHabilidadesUsuario, actualizaHabilidades, getIntereses, getInteresesUsuario, actualizaIntereses, cerrarSesion, cambiarContrasena, uploadProfileImage, updateUsuarioImage, deleteProfileImage } from './Profile-fb.js';
-import Usuario from '../../backend/obj-Usuario.js';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { autentificaUsuario, getUsuario, actualizaUsuario, actualizaContrasena, getHabilidades, getIntereses, subirImagen } from '../../api/api.js';
+import Usuario from '../../classes/Usuario.js';
 import PasswordInfo2 from './PasswordInfo2.jsx';
 import './Profile.css';
+
 
 export const Profile = () => {
   // Cerrar sesión
   const [sesionCerrada, setSesionCerrada] = useState(false);
   const [showModalSesionCerrada, setShowModalSesionCerrada] = useState(false);
+  const { user, setUser, setAdmin } = useAuth();
   const navigate = useNavigate();
   
   const openModalSesionCerrada = () => {
@@ -23,21 +26,30 @@ export const Profile = () => {
   };
 
   const botonCerrarSesion = async () => {
-    await cerrarSesion();
+    setUser(null);
+    setAdmin(null);
     setSesionCerrada(true);
     navigate('/login');
   };
 
 
   // Información del perfil
-  const [informacionUsuario, setinformacionUsuario] = useState(new Usuario());
+  const [usuario, setUsuario] = useState(new Usuario());
+  const [habilidades, setHabilidades] = useState(null);
+  const [intereses, setIntereses] = useState(null);
   
   useEffect(() => {
     const fetchData = async () => {
       if (!sesionCerrada) {
-        const infoUsuario = await getUsuario();
-        const objUsuario = { ...informacionUsuario, ...infoUsuario };
-        setinformacionUsuario(objUsuario);
+        const usuarioData = await getUsuario(user);
+        const objUsuario = { ...usuario, ...usuarioData };
+        setUsuario(objUsuario);
+
+        const habilidadesData = await getHabilidades();
+        setHabilidades(habilidadesData);
+
+        const interesesData = await getIntereses();
+        setIntereses(interesesData);
       }
     };
     fetchData();
@@ -67,7 +79,7 @@ export const Profile = () => {
 
   const handleNombreEdit = () => {
     setEditingNombre(true);
-    setNuevoNombre(informacionUsuario.nombre);
+    setNuevoNombre(usuario.nombre);
   };
 
   const handleNombreChange = (event) => {
@@ -87,10 +99,10 @@ export const Profile = () => {
       return;
     }
     
-    await updateUsuarioNombre(nuevoNombre);
+    const usuarioNuevo = { ...usuario, nombre: nuevoNombre };
+    setUsuario(usuarioNuevo);
     setEditingNombre(false);
-    const infoUsuario = await getUsuario();
-    setinformacionUsuario(infoUsuario);
+    await actualizaUsuario(user, usuarioNuevo);
   };
 
   const handleNombreSubmit = async (event) => {
@@ -107,85 +119,51 @@ export const Profile = () => {
         return;
       }
 
-      await updateUsuarioNombre(nuevoNombre);
+      const usuarioNuevo = { ...usuario, nombre: nuevoNombre };
+      setUsuario(usuarioNuevo);
       setEditingNombre(false);
-      const infoUsuario = await getUsuario();
-      setinformacionUsuario(infoUsuario);
+      await actualizaUsuario(user, usuarioNuevo);
     }
   };  
 
-  // Habilidades del usuario
-  const [habilidades, setHabilidades] = useState(null);
-  const [habilidadesUsuario, setHabilidadesUsuario] = useState(null);
-  
   // Editar habilidades
   const toggleHabilidad = async (habilidad, idHabilidad) => {
-    const habilidadesUsuarioNueva = { ...habilidadesUsuario };
+    const usuarioNuevo = { ...usuario };
 
-    if (Object.keys(habilidadesUsuarioNueva).includes(`${idHabilidad}`)) {
-      if (Object.keys(habilidadesUsuarioNueva).length === 1) {
+    if (Object.keys(usuarioNuevo.listaHabilidades).includes(`${idHabilidad}`)) {
+      if (Object.keys(usuarioNuevo.listaHabilidades).length === 1) {
         const errorMessage = 'Debes tener al menos una habilidad';
         openModalError(errorMessage);
         return;
       }
-      delete habilidadesUsuarioNueva[idHabilidad];
+      delete usuarioNuevo.listaHabilidades[idHabilidad];
     } else {
-      habilidadesUsuarioNueva[idHabilidad] = habilidad;
+      usuarioNuevo.listaHabilidades[idHabilidad] = habilidad;
     }
     
-    setHabilidadesUsuario(habilidadesUsuarioNueva);
-    await actualizaHabilidades(habilidadesUsuarioNueva);
+    setUsuario(usuarioNuevo);
+    await actualizaUsuario(user, usuarioNuevo);
   };
   
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!sesionCerrada) {
-        const habilidadesData = await getHabilidades();
-        setHabilidades(habilidadesData);
-  
-        const habilidadesUsuarioData = await getHabilidadesUsuario();
-        setHabilidadesUsuario(habilidadesUsuarioData);
-      }
-    };
-    fetchData();
-  }, [sesionCerrada]);
-  
 
-  // Intereses del usuario
-  const [intereses, setIntereses] = useState(null);
-  const [interesesUsuario, setInteresesUsuario] = useState(null);
-  
-  // Editar habilidades
+  // Editar intereses
   const toggleInteres = async (interes, idInteres) => {
-    const interesesUsuarioNueva = { ...interesesUsuario };
+    const usuarioNuevo = { ...usuario };
 
-    if (Object.keys(interesesUsuarioNueva).includes(`${idInteres}`)) {
-      if (Object.keys(interesesUsuarioNueva).length === 1) {
+    if (Object.keys(usuarioNuevo.listaIntereses).includes(`${idInteres}`)) {
+      if (Object.keys(usuarioNuevo.listaIntereses).length === 1) {
         const errorMessage = 'Debes tener al menos un interés';
         openModalError(errorMessage);
         return;
       }
-      delete interesesUsuarioNueva[idInteres];
+      delete usuarioNuevo.listaIntereses[idInteres];
     } else {
-      interesesUsuarioNueva[idInteres] = interes;
+      usuarioNuevo.listaIntereses[idInteres] = interes;
     }
   
-    setInteresesUsuario(interesesUsuarioNueva);
-    await actualizaIntereses(interesesUsuarioNueva);
+    setUsuario(usuarioNuevo);
+    await actualizaUsuario(user, usuarioNuevo);
   };
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!sesionCerrada) {
-        const interesesData = await getIntereses();
-        setIntereses(interesesData);
-  
-        const interesesUsuarioData = await getInteresesUsuario();
-        setInteresesUsuario(interesesUsuarioData);
-      }
-    };
-    fetchData();
-  }, [sesionCerrada]);
 
 
   // Cambiar contraseña
@@ -259,7 +237,9 @@ export const Profile = () => {
     }
 
     try {
-      await cambiarContrasena(contrasenaActual, nuevaContrasena);
+      // Si la contraseña se cambió con éxito, limpiar los campos y el estado de error
+      await autentificaUsuario(usuario.correo, contrasenaActual);
+      await actualizaContrasena(user, nuevaContrasena);
       setContrasenaActual('');
       setNuevaContrasena('');
       setConfirmarContrasena('');
@@ -303,19 +283,15 @@ export const Profile = () => {
 
   if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
     setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
-    setSelectedImage(null)
+    setSelectedImage(null);
     return;
   }
   
     try {
-      if (informacionUsuario.urlImagen) {
-        await deleteProfileImage(informacionUsuario.urlImagen);
-      }
-
-      const imageUrl = await uploadProfileImage(selectedImage);
-      await updateUsuarioImage(imageUrl);
-      const infoUsuario = await getUsuario();
-      setinformacionUsuario(infoUsuario);
+      const imageUrl = await subirImagen(selectedImage, `Usuarios/${user}`);
+      const usuarioNuevo = { ...usuario, urlImagen: imageUrl };
+      setUsuario(usuarioNuevo);
+      await actualizaUsuario(user, usuarioNuevo);
       closeModal();
     } catch (error) {
       console.error("Error al subir la imagen de perfil:", error.message);
@@ -325,7 +301,7 @@ export const Profile = () => {
   return (
     <div className="profile-page">
       {/* Spinner */}
-      {habilidades && habilidadesUsuario && intereses && interesesUsuario ? (
+      {usuario && habilidades && intereses ? (
         <header className="profile-header">
           {/* Titulo */}
           <h1>Mi perfil</h1>
@@ -337,7 +313,7 @@ export const Profile = () => {
             <div className="profile-info-left">
               {/* Foto de perfil */}
               <div className="p-foto" onClick={handleImageClick}>
-                <img src={informacionUsuario.urlImagen} className="p-preview-imagen"/>
+                <img src={usuario.urlImagen} className="p-preview-imagen"/>
                 <FaPen className="p-editar-foto"/>
               </div>
             </div>
@@ -365,7 +341,7 @@ export const Profile = () => {
                       </div>
                     </>
                   ) : (
-                    informacionUsuario.nombre
+                    usuario.nombre
                   )}
 
                   {/* Botón para editar el nombre */}
@@ -380,7 +356,7 @@ export const Profile = () => {
               <div className="p-info">
                 {/* Edad */}
                 <div className="profile-icons-text">
-                  <p> <span> Edad: </span> {informacionUsuario.edad} años</p>
+                  <p> <span> Edad: </span> {usuario.edad} años</p>
                 </div>
 
                 {/* Usuario */}
@@ -388,7 +364,7 @@ export const Profile = () => {
                   <FaUser className="profile-icons-text-icon"/> 
                   <span> Usuario: </span> 
                   <p> 
-                    {informacionUsuario.nombreUsuario} 
+                    {usuario.nombreUsuario} 
                   </p>
                 </div>
                 
@@ -397,7 +373,7 @@ export const Profile = () => {
                   <FaEnvelope className="profile-icons-text-icon"/> 
                   <span> Correo: </span> 
                   <p className='p-correo'> 
-                    {informacionUsuario.correo}
+                    {usuario.correo}
                   </p>
                 </div>
 
@@ -413,7 +389,7 @@ export const Profile = () => {
             <h3>Temas de interés</h3> 
             <div className='p-etiquetas'>
               {Object.values(intereses).map((interes, idInteres) => (
-                <li key={idInteres} className={`p-etiquetas-item  ${Object.values(interesesUsuario).includes(interes) ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
+                <li key={idInteres} className={`p-etiquetas-item  ${Object.values(usuario.listaIntereses).includes(interes) ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
                   {interes}
                 </li>
               ))}
@@ -425,7 +401,7 @@ export const Profile = () => {
             <h3>Habilidades</h3>
             <div className='p-etiquetas'>
               {Object.values(habilidades).map((habilidad, idHabilidad) => (
-                <li key={idHabilidad} className={`p-etiquetas-item ${Object.values(habilidadesUsuario).includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
+                <li key={idHabilidad} className={`p-etiquetas-item ${Object.values(usuario.listaHabilidades).includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
                   {habilidad}
                 </li>
               ))}

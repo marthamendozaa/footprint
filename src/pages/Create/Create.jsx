@@ -6,22 +6,116 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
 import es from 'date-fns/locale/es';
-import { getEtiquetas, getRegiones, crearIniciativa, crearTarea } from './Create-fb.js';
-import Iniciativa from '../../backend/obj-Iniciativa.js';
-import Tarea from '../../backend/obj-Tarea.js';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { getIntereses, getRegiones, crearIniciativa, actualizaIniciativa, subirImagen, crearTareas } from '../../api/api.js';
+import Iniciativa from '../../classes/Iniciativa.js';
+import Tarea from '../../classes/Tarea.js';
 import './Create.css';
 
 export const Create = () => {
+  class ItemTarea {
+    constructor() {
+      this.titulo = "";
+      this.descripcion = "";
+      this.editandoTitulo = false;
+      this.editandoDesc = false;
+      this.datePickerEntrega = React.createRef();
+      this.fechaEntrega = new Date();
+    }
+  };
+
   useEffect(() => {
     const fetchData = async () => {
+      const etiquetasData = await getIntereses();
+      setEtiquetas(etiquetasData);
+
       const regionesData = await getRegiones();
       setRegiones(regionesData);
-
-      const etiquetasData = await getEtiquetas();
-      setEtiquetas(etiquetasData);
     };
     fetchData();
   }, []);
+
+
+  // Lista de tareas
+  const [tareas, setTareas] = useState([new ItemTarea()]);
+
+
+  // Cambiar título Tarea
+  const handleCambioTituloTarea = (event, idTarea) => {
+    const { value } = event.target;
+    const tareasNuevo = [...tareas];
+    tareasNuevo[idTarea].titulo = value;
+    setTareas(tareasNuevo);
+  };
+
+  const handleEditarTituloTarea = (idTarea) => {
+    const tareasNuevo = [...tareas];
+    tareasNuevo[idTarea].editandoTitulo = true;
+    setTareas(tareasNuevo);
+  };
+
+  const handleGuardarTituloTarea = (idTarea) => {
+    const tareasNuevo = [...tareas];
+    tareasNuevo[idTarea].editandoTitulo = false;
+    setTareas(tareasNuevo);
+  };
+
+  const handleOnKeyDownTarea = (event, idTarea) => {
+    if (event.key === 'Enter') {
+      const tareasNuevo = [...tareas];
+      tareasNuevo[idTarea].editandoTitulo = false;
+      tareasNuevo[idTarea].editandoDesc = false;
+      setTareas(tareasNuevo);
+    }
+  };
+
+
+  // Cambiar descripción Tarea
+  const handleCambioDescTarea = (event, idTarea) => {
+    const { value } = event.target;
+    const tareasNuevo = [...tareas];
+    tareasNuevo[idTarea].descripcion = value;
+    setTareas(tareasNuevo);
+  };
+
+  const handleEditarDescTarea = (idTarea) => {
+    const tareasNuevo = [...tareas];
+    tareasNuevo[idTarea].editandoDesc = true;
+    setTareas(tareasNuevo);
+  };
+
+  const handleGuardarDescTarea = (idTarea) => {
+    const tareasNuevo = [...tareas];
+    tareasNuevo[idTarea].editandoDesc = false;
+    setTareas(tareasNuevo);
+  };
+
+
+  // Cambiar fecha entrega Tarea
+  const handleCambioFechaEntrega = (date, idTarea) => {
+    const tareasNuevo = [...tareas];
+    tareasNuevo[idTarea].fechaEntrega = date;
+    setTareas(tareasNuevo);
+
+    if (tareas[idTarea].datePickerEntrega.current) {
+      tareas[idTarea].datePickerEntrega.current.setOpen(true);
+    }
+  };
+
+
+  // Crear tarea
+  const [modalTarea, setModalTarea] = useState(false);
+  const handleCerrarTarea = () => setModalTarea(false);
+  const handleMostrarTarea = () => setModalTarea(true);
+
+  const handleCrearTarea = async () => {  
+    if (tareas.find(tarea => !tarea.titulo || !tarea.descripcion || !tarea.fechaEntrega)) {
+      handleMostrarTarea();
+      return;
+    }
+    const tareasNuevo = [...tareas, new ItemTarea()];
+    setTareas(tareasNuevo);
+  };
 
 
   // Cambiar título
@@ -47,29 +141,6 @@ export const Create = () => {
     }
   };
 
-  // Cambiar título Tarea
-  const [tituloT, setTituloT] = useState("");
-  const [editandoTituloT, setEditandoTituloT] = useState(false);
-
-  const handleCambioTituloT = (event) => {
-    setTituloT(event.target.value);
-  };
-
-  const handleEditarTituloT = () => {
-    setEditandoTituloT(true);
-  };
-
-  const handleGuardarTituloT = () => {
-    setEditandoTituloT(false);
-  };
-
-  const handleOnKeyDownT = (event) => {
-    if (event.key === 'Enter') {
-      setEditandoTituloT(false);
-      setEditandoDescT(false);
-    }
-  };
-
 
   // Cambiar descripción
   const [desc, setDesc] = useState("");
@@ -85,22 +156,6 @@ export const Create = () => {
 
   const handleGuardarDesc = () => {
     setEditandoDesc(false);
-  };
-
-  // Cambiar descripción Tarea
-  const [descT, setDescT] = useState("");
-  const [editandoDescT, setEditandoDescT] = useState(false);
-
-  const handleCambioDescT = (event) => {
-    setDescT(event.target.value);
-  };
-
-  const handleEditarDescT = () => {
-    setEditandoDescT(true);
-  };
-
-  const handleGuardarDescT = () => {
-    setEditandoDescT(false);
   };
 
 
@@ -123,10 +178,8 @@ export const Create = () => {
   // Cambiar fechas
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [fechaCierre, setFechaCierre] = useState(new Date());
-  const [fechaEntrega, setFechaEntrega] = useState(new Date());
   const datePickerInicio = useRef(null);
   const datePickerCierre = useRef(null);
-  const datePickerEntrega = useRef(null);
 
   const handleCambioFechaInicio = () => {
     if (datePickerInicio.current) {
@@ -137,12 +190,6 @@ export const Create = () => {
   const handleCambioFechaCierre = () => {
     if (datePickerCierre.current) {
       datePickerCierre.current.setOpen(true);
-    }
-  };
-
-  const handleCambioFechaEntrega = () => {
-    if (datePickerEntrega.current) {
-      datePickerEntrega.current.setOpen(true);
     }
   };
 
@@ -233,7 +280,6 @@ export const Create = () => {
 
   // Iniciativa creada
   const [idIniciativaCreada, setIdIniciativaCreada] = useState(null);
-  const [idTareaCreada, setIdTareaCreada] = useState(null);
   const [modalCreada, setModalCreada] = useState(false);
   const handleCerrarCreada = () => setModalCreada(false);
   const handleMostrarCreada = () => setModalCreada(true);
@@ -250,40 +296,13 @@ export const Create = () => {
 
   // Tiempo de espera
   const [tiempoIniciativaCreada, setTiempoIniciativaCreada] = useState(0);
-  const [tiempoTareaCreada, setTiempoTareaCreada] = useState(0);
   const [modalTiempoEspera, setModalTiempoEspera] = useState(false);
   const handleCerrarTiempo = () => setModalTiempoEspera(false);
   const handleMostrarTiempo = () => setModalTiempoEspera(true);
 
 
-  const handleCrearTarea = async () => {
-    if (!tituloT || !descT || !fechaEntrega) {
-      handleMostrarError();
-      return;
-    }
-
-    const tiempoActual = Date.now();
-    if (tiempoActual - tiempoIniciativaCreada < 60000) {
-      handleMostrarTiempo();
-      return;
-    }
-    
-    const fechaEntregaMini = format(fechaEntrega, 'dd/MM/yyyy');
-
-    const infoTarea = new Tarea(tituloT, descT, fechaEntregaMini);
-    console.log(infoTarea);
-
-    const [errorDuplicada, idTarea] = await crearTarea(infoTarea);
-    if (idTarea) {
-      setIdTareaCreada(idTarea);
-      setTiempoTareaCreada(tiempoActual);
-    }
-    else {
-      handleMostrarErrorCreada();
-    }
-  };
-
-
+  // Crear iniciativa
+  const { user } = useAuth();
   const handleCrearIniciativa = async () => {
     if (!titulo || !desc || region === "" || Object.keys(etiquetasIniciativa).length === 0 || !fechaInicio) {
       handleMostrarError();
@@ -299,18 +318,41 @@ export const Create = () => {
     const fechaInicioMini = format(fechaInicio, 'dd/MM/yyyy');
     const fechaCierreMini = fechaCierre ? format(fechaCierre, 'dd/MM/yyyy') : null;
 
-    const infoIniciativa = new Iniciativa(titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
-    console.log(infoIniciativa);
-    
-    const [errorDuplicada, idIniciativa] = await crearIniciativa(infoIniciativa, imagenIniciativa);
-    if (idIniciativa) {
+    try {
+      // Crear iniciativa
+      const iniciativa = new Iniciativa(user, titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
+      const idIniciativa = await crearIniciativa(iniciativa);
+  
+      // Manejar errores
+      if (idIniciativa === 409) {
+        handleMostrarErrorDuplicada();
+        return;
+      } else if (idIniciativa === 500) {
+        handleMostrarErrorCreada();
+        return;
+      }
+      
+      // Subir imagen de la iniciativa y actualizar información
+      let urlImagen = iniciativa.urlImagen;
+      if (imagenIniciativa) {
+        const url = await subirImagen(imagenIniciativa, `Iniciativas/${idIniciativa}`);
+        urlImagen = url;
+      }
+      const iniciativaNueva = { ...iniciativa, urlImagen: urlImagen, idIniciativa: idIniciativa};
+      await actualizaIniciativa(idIniciativa, iniciativaNueva);
+
+      // Crear tareas
+      const tareasIniciativa = [];
+      for (const tarea of tareas) {
+        const nuevaTarea = new Tarea(idIniciativa, user, tarea.titulo, tarea.descripcion, tarea.fechaEntrega);
+        tareasIniciativa.push(nuevaTarea);
+      }
+      await crearTareas(tareasIniciativa);
+
       setIdIniciativaCreada(idIniciativa);
       handleMostrarCreada();
       setTiempoIniciativaCreada(tiempoActual);
-    } else if (errorDuplicada) {
-      handleMostrarErrorDuplicada();
-    }
-    else {
+    } catch (error) {
       handleMostrarErrorCreada();
     }
   };
@@ -474,64 +516,77 @@ export const Create = () => {
           {/* Tareas y Miembros*/}
           <div className="c-tareas-miembros">
             <div className="c-seccion-tareas">
-              <button type="button" className="c-btn-agregar-tarea" onClick={handleCrearTarea}> Añadir tarea </button>
+              <button type="button" className="c-btn-agregar-tarea" onClick={handleCrearTarea}>
+                Añadir tarea
+              </button>
               <div className="c-tareas-container">
-                <div className="c-tarea">
-                  <div className="c-tarea-info">
-                    
-                    <div className="c-tarea-titulo">
-                    { editandoTituloT ? (
-                    <input
-                      type="text"
-                      className="c-tarea-titulo"
-                      value={tituloT}
-                      onChange={handleCambioTituloT}
-                      onBlur={handleGuardarTituloT}
-                      onKeyDown={handleOnKeyDownT}
-                      autoFocus
-                      maxLength={30}
-                    />) : (
-                      <div className="c-titulo-texto">
-                      {tituloT ? tituloT : "Título2"}
-                      <button className="c-btn-editar-titulo" onClick={handleEditarTituloT}>
-                        <FaPen />
-                      </button>
+                {tareas.map((tarea, idTarea) => (
+                  <div className="c-tarea" key={idTarea}>
+                    <div className="c-tarea-info">
+                      <div className="c-tarea-titulo">
+                        {tarea.editandoTitulo ? (
+                          <input
+                            type="text"
+                            className="c-tarea-titulo"
+                            value={tarea.titulo}
+                            onChange={(e) => handleCambioTituloTarea(e, idTarea)}
+                            onBlur={() => handleGuardarTituloTarea(idTarea)}
+                            onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
+                            autoFocus
+                            maxLength={30}
+                          />
+                        ) : (
+                          <div className="c-titulo-texto">
+                            {tarea.titulo ? tarea.titulo : "Título"}
+                            <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
+                              <FaPen />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                      <div className="c-tarea-desc">
+                        {tarea.editandoDesc ? (
+                          <div className="c-tarea-texto">
+                            <textarea
+                              className="c-desc-input-texto"
+                              value={tarea.descripcion}
+                              onChange={(e) => handleCambioDescTarea(e, idTarea)}
+                              onBlur={() => handleGuardarDescTarea(idTarea)}
+                              onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
+                              autoFocus
+                              maxLength={200}
+                            />
+                          </div>
+                        ) : (
+                          <div style={tarea.descripcion ? {} : { color: '#677D7C' }}>
+                            {tarea.descripcion ? tarea.descripcion : "Agrega tu descripción aquí..."}
+                          </div>
+                        )}
+                        {!tarea.editandoDesc && (
+                          <button className="c-btn-editar-tarea" onClick={() => handleEditarDescTarea(idTarea)}>
+                            <FaPen />
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    )}
+                    <div className="c-tarea-botones">
+                      <div className="c-tarea-boton"><FaCalendar /> Fecha
+                        <DatePicker
+                          className='react-datepicker__input-container-create'
+                          selected={tarea.fechaEntrega}
+                          onChange={(date) => handleCambioFechaEntrega(date, idTarea)}
+                          dateFormat="dd/MM/yyyy"
+                          ref={tarea.datePickerEntrega}
+                          locale={es}
+                        />
+                      </div>
+                      <div className="c-tarea-boton"><FaFolder /> Documento</div>
                     </div>
-                    {editandoDescT ? (
-                    <div className="c-tarea-texto">
-                    <textarea className="c-desc-input-texto"
-                    value={descT}
-                    onChange={handleCambioDescT}
-                    onBlur={handleGuardarDescT}
-                    onKeyDown={handleOnKeyDownT}
-                    autoFocus
-                    maxLength={200} />
-                    </div> ) : (
-                      <div style={desc ? {} : { color: '#677D7C' }}>
-                      {descT ? descT : "Agrega tu descripción aquí..."}
-                    </div>
-
-                    )}
-                    {!editandoDescT && (<button className="c-btn-editar-titulo" onClick={handleEditarDescT}><FaPen /></button>)}
                   </div>
-                  <div className="c-tarea-botones">
-                    <div className="c-tarea-boton"><FaCalendar /> Fecha
-                    <DatePicker
-                        className='react-datepicker__input-container-create'
-                        selected={fechaEntrega}
-                        onChange={(date) => setFechaEntrega(date)}
-                        dateFormat="dd/MM/yyyy"
-                        ref={datePickerEntrega}
-                        locale={es}
-                    />
-                    </div>
-                    <div className="c-tarea-boton"><FaFolder /> Documento</div>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
+
 
             <div className="c-seccion-miembros">
               <div className="c-btn-invitar-miembro">Invitar miembro</div>
@@ -581,10 +636,24 @@ export const Create = () => {
                   {(region === "" && <li>Región</li>)}
                   {Object.keys(etiquetasIniciativa).length === 0 && <li>Etiquetas</li>}
                   {!fechaInicio && <li>Fecha de inicio</li>}
+                  {tareas.find(tarea => !tarea.titulo || !tarea.descripcion || !tarea.fechaEntrega) && <li>Tareas</li>}
                 </ul>
               </div>
             <Modal.Footer>
               <Button onClick={handleCerrarError}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Tarea campos vacíos */}
+          <Modal className="c-modal" show={modalTarea} onHide={handleCerrarTarea}>
+            <Modal.Header closeButton>
+              <div className="c-modal-title">Error</div>
+            </Modal.Header>
+              <div className="c-modal-body" style={{textAlign:'left'}}>
+                No se pueden dejar tareas con campos vacíos
+              </div>
+            <Modal.Footer>
+              <Button onClick={handleCerrarTarea}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
           

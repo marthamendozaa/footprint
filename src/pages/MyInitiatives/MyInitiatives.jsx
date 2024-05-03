@@ -1,25 +1,28 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
-import { getIniciativasMiembro, getIniciativasAdmin, getIniciativasFavoritas } from './MyInitiatives-fb.js';
+import { useAuth } from '../../contexts/AuthContext.jsx';
+import { getMisIniciativas } from '../../api/api.js';
 import './MyInitiatives.css';
 
 export const MyInitiatives = () => {
+  const { user } = useAuth();
+  
+  // Información de iniciativas del usuario
   const [iniciativasMiembro, setIniciativasMiembro] = useState(null);
   const [iniciativasAdmin, setIniciativasAdmin] = useState(null);
   const [iniciativasFavoritas, setIniciativasFavoritas] = useState(null);
-
+  
   useEffect(() => {
     const fetchData = async () => {
-      const dataMiembro = await getIniciativasMiembro();
-      setIniciativasMiembro(dataMiembro);
-      const dataAdmin = await getIniciativasAdmin();
-      setIniciativasAdmin(dataAdmin);
-      const dataFavoritas = await getIniciativasFavoritas();
-      setIniciativasFavoritas(dataFavoritas);
+      const iniciativasData = await getMisIniciativas(user);
+      setIniciativasMiembro(iniciativasData.iniciativasMiembro);
+      setIniciativasAdmin(iniciativasData.iniciativasAdmin);
+      setIniciativasFavoritas(iniciativasData.iniciativasFavoritas);
     };
     fetchData();
-  });
+  }, []);
+
 
   return (
     <div>

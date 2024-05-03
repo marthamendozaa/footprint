@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
-import { AiOutlineSearch } from "react-icons/ai";
-import { getIniciativas, suscribirseAIniciativa } from './Explore-fb.js';
+import { useAuth } from '../../contexts/AuthContext';
+import { getIniciativas, suscribirseAIniciativa } from '../../api/api.js';
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import { ModalHeader } from 'react-bootstrap';
 import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
 import Fuse from 'fuse.js';
 
@@ -68,15 +66,13 @@ export const Explore = () => {
         setShowModal(true);
     }
 
+    const { user } = useAuth();
     const handleSuscribirse = async () => {
         if (selectedIniciativa) {
             const idIniciativa = selectedIniciativa.id; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
-            const resultado = await suscribirseAIniciativa(idIniciativa);
+            const resultado = await suscribirseAIniciativa(user, idIniciativa);
             if (resultado) {
-                console.log("Suscripción exitosa a la iniciativa con ID:", resultado);
                 setShowModal(false);
-            } else {
-                console.error("Error al suscribirse a la iniciativa");
             }
         }
     }

@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { cerrarSesion } from '../Profile/Profile-fb.js';
+import { useAuth } from '../../contexts/AuthContext.jsx';
 
 export const ProfileAdmin = () => {
     const [sesionCerrada, setSesionCerrada] = useState(false);
+    const { setUser, setAdmin } = useAuth();
     const navigate = useNavigate();
 
     const botonCerrarSesion = async () => {
-        await cerrarSesion();
+        setUser(null);
+        setAdmin(null);
         setSesionCerrada(true);
         navigate('/login');
     };
