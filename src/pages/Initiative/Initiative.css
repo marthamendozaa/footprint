@@ -20,6 +20,7 @@
   background-color: #699AA0;
   border-radius: 50%;
   float: left;
+  object-fit: cover;
 }
   
 /* Información */

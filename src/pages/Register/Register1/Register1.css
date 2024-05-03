@@ -1,8 +1,8 @@
-.register2-body {
+.register-body {
     background-color: #CEDDE2;
 }
 
-.container-register2-1 {
+.container-register-1 {
     display: flex;
     position: relative;
     flex-direction: column;
@@ -12,7 +12,7 @@
     align-items: center;
 }  
 
-.container-register2-2 {
+.container-register-2 {
     display: flex;
     position: relative;
     flex-direction: column;
@@ -22,24 +22,22 @@
     border-radius: 30px;
 }
 
-.container-register2-3 {
+.container-register-3 {
     display: flex;
     position: relative;
+    justify-content: center;
     align-items: center;
     flex-direction: column;
-    padding-top: 30px;
-    height: 389px;
-    justify-content: space-around;
 }
 
-.header-register2 {
+.header-register {
     display:flex;
     flex-direction: column;
     text-align: center;
     margin-top: 35px
 }
 
-.register2-icons {
+.register-icons {
     display: flex;
     position: absolute;
     margin-left: 20px;
@@ -47,7 +45,7 @@
     z-index: 1;
 }
 
-.container-nombre-register2 {
+.container-correo-register {
     display: flex;
     position: relative;
     flex-direction: column;
@@ -55,13 +53,13 @@
     padding: 0px;
 }
 
-.nombre-texto-register2 {
+.correo-texto-register {
     align-self: flex-start;
     font-weight: bold;
     font-size: 20px;
 }
 
-.nombre-caja-register2 {
+.correo-caja-register {
     display: flex;
     position: relative;
     align-items: center;
@@ -74,15 +72,15 @@
     background-color: #ffffff;
 }
 
-.border-red-register2 {
+.border-red-register {
     border-color: #ff0000 !important;
 }
 
-.bg-custom-color-register2 {
+.bg-custom-color-register {
     background-color: transparent;
 }
   
-.custom-alert-register2 {
+.custom-alert-register {
     display: flex;
     align-items: center;
     position: absolute;
@@ -91,19 +89,19 @@
     padding: 5px;
 }
   
-.custom-alert-register2 span {
+.custom-alert-register span {
     color: #ff0000;
     font-size: 14px;
     margin-left: 5px
 }
 
-.custom-alert-icon-register2 {
+.custom-alert-icon-register {
     color: #ff0000;
     font-size: 14px;
     margin-left: 5px
 }
 
-.container-usuario-register2 {
+.container-contrasena-register {
     display: flex;
     position: relative;
     flex-direction: column;
@@ -111,58 +109,21 @@
     margin-top: 20px;
 }
 
-.usuario-texto-register2 {
-    display: flex;
-    justify-content: start;
-    font-weight: bold;
-    font-size: 20px;
-}
-
-.usuario-caja-register2 {
-    display: flex;
-    position: relative;
-    align-items: center;
-    width: 350px;
-    height: 45px;
-    border-radius: 30px;
-    border-color: #000000;
-    border-style: solid;
-    padding-left: 50px;
-    background-color: #ffffff;
-}
-
-.container-fecha-register2 {
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: 20px;
-}
-
-.container-fecha-register2-2 {
+.container-contrasena-register-2{
     display: flex;
     position: relative;
     flex-direction: row;
     align-items: baseline;
 }
 
-.react-datepicker__input-container.input-register2 input {
-    font-family: "Inter", sans-serif;
-    font-size: 12px;
-    text-align: center;
-    background: none;
-    border: 2px solid #ff0000;
-    border-radius: 3px;
-}
-
-.fecha-texto-register2 {
+.contrasena-texto-register {
     display: flex;
     justify-content: start;
     font-weight: bold;
     font-size: 20px;
 }
 
-.fecha-caja-register2 {
+.ojo-contrasena-register {
     display: flex;
     position: relative;
     align-items: center;
@@ -175,40 +136,75 @@
     background-color: #ffffff;
 }
 
-.flecha-register2-container {
+.ojo-contrasena-2-register {
+    display: flex;
+    position: absolute;
+    justify-content: flex-end;
+    align-items: center;
+    cursor: pointer;
+    bottom: 0;
+    right: 0;
+    height: 50%;
+    padding-right: 15px;
+}
+
+.flecha-register-container{
     display: flex;
     flex-direction: row;
     position: relative;
-    height: 23%;
+    height: 25%;
     align-items: center
 }
 
-.flecha-register2-container-start {
+.register1-texto-login {
+    font-size: 15px;
+    display: flex;
+    margin-bottom: 0px;
+    align-items: center;
+    margin-left: 15px;
+}
+
+.flecha-register-container-start button.btn {
+    color: #000000;
+    font-size: 15px;
+    font-weight: 600;
+    background-color: transparent;
+    border: none;
+    text-decoration: underline;
+    padding-left: 5px;
+}
+
+.flecha-register-container-start button.btn:hover {
+    color: #186279;
+}
+
+.flecha-register-container-start{
     padding: 10px;
     display: flex;
     position: absolute;
     left: 0;
+    margin-top: 10px;
 }
 
-.flecha-register2-container-end {
+.flecha-register-container-end{
     padding: 10px;
     display: flex;
     position: absolute;
     right: 0;
 }
 
-.flecha-register2-container button.btn {
+.flecha-register-container-end button.btn {
     color: #6b6b6b;
     font-size: 40px;
     background-color: transparent;
     border: none;
 }
 
-.flecha-register2-container button.btn:hover {
+.flecha-register-container-end button.btn:hover {
     color: #000000;
 }
 
-.pop-up-register2 {
+.pop-up-register {
     position: fixed;
     top: 0;
     left: 0;
@@ -221,14 +217,14 @@
     z-index: 10;
 }
 
-.pop-up-3-register2 {
+.pop-up-3-register {
     background: #fff;
     padding: 20px;
     border-radius: 20px;
     font-size: 20px;
 }
 
-.pop-up-3-register2 button {
+.pop-up-3-register button {
     display: block;
     margin: 0 auto;
     margin-top: 30px;
@@ -240,6 +236,29 @@
     border-radius: 10px;
 }
 
-.pop-up-3-register2 button:hover {
+.pop-up-3-register button:hover {
     background-color: #699AA0;
+}
+
+.politicas-contenedor{
+    display: flex;
+    position: relative;
+    flex-direction: row;
+    align-items: baseline;
+    margin-top: 5px;
+}
+
+.politicas-contenedor p {
+    font-size: 10px;
+    color: #000;
+    font-weight: 500;
+    padding-right: 3px;
+}
+
+.politicas-contenedor button {
+    text-decoration: underline;
+}
+
+.politicas-contenedor button:hover{
+    color: #186279;
 }

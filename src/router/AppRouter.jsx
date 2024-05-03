@@ -10,8 +10,7 @@ import { Initiative } from '../pages/Initiative/Initiative.jsx';
 import { Profile } from '../pages/Profile/Profile.jsx';
 import { Create } from '../pages/Create/Create.jsx';
 import { Login } from '../pages/Login/Login.jsx';
-import { Register } from '../pages/Register/Register1/Register.jsx';
-import { Register2} from '../pages/Register/Register2/Register2.jsx';
+import { Register } from '../pages/Register/Register.jsx';
 import { ExploreAdmin } from '../pages/ExploreAdmin/ExploreAdmin.jsx';
 import { ProfileAdmin } from '../pages/ProfileAdmin/ProfileAdmin.jsx';
 import { getEsAdmin } from '../pages/Login/Login-fb.js';
@@ -77,7 +76,6 @@ export const AppRouter = () => {
         <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
-            <Route path="/register2" element={<Register2 />} />
 
             {currentUser && esAdmin && (
                 <>
@@ -85,7 +83,7 @@ export const AppRouter = () => {
                     <Route path="/profileAdmin" element={<PageWithNavbarAdmin component={<ProfileAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
                 </>
             )}
-            {currentUser && (
+            {currentUser && !esAdmin &&(
                 <>
                     <Route path="/home" element={<PageWithNavbar component={<Home />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
                     <Route path="/explore" element={<PageWithNavbar component={<Explore />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />

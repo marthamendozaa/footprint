@@ -1,5 +1,5 @@
 export default class Iniciativa {
-  constructor(titulo, descripcion, region, esPublica, listaEtiquetas, fechaInicio, fechaCierre) {
+  constructor(titulo, descripcion, region, esPublica, listaEtiquetas, listaTareas, fechaInicio, fechaCierre) {
     this.idIniciativa = null;
     this.idAdmin = null;
     this.titulo = titulo;
@@ -8,8 +8,10 @@ export default class Iniciativa {
     this.urlImagen = "https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg";
     this.esPublica = esPublica;
     this.listaEtiquetas = listaEtiquetas;
+    this.listaTareas = listaTareas;
     this.fechaInicio = fechaInicio;
     this.fechaCierre = fechaCierre;
+    this.fechaCreacion = null;
   }
 
   convertirAObjeto() {
@@ -22,8 +24,10 @@ export default class Iniciativa {
       urlImagen: this.urlImagen,
       esPublica: this.esPublica,
       listaEtiquetas: this.listaEtiquetas,
+      listaTareas: this.listaTareas,
       fechaInicio: this.fechaInicio,
-      fechaCierre: this.fechaCierre
+      fechaCierre: this.fechaCierre,
+      fechaCreacion: this.fechaCreacion
     };
   }
 }

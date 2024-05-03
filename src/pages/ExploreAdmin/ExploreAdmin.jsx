@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ExploreAdmin.css';
-import { AiOutlineSearch } from "react-icons/ai";
 import { getIniciativas, eliminaIniciativa } from './ExploreAdmin-fb.js';
 import { Modal, Button } from 'react-bootstrap';
+import { FaSearch } from "react-icons/fa";
+import Fuse from 'fuse.js';
 
 export const ExploreAdmin = () => {
   // Iniciativa seleccionada a eliminar
@@ -59,6 +60,7 @@ export const ExploreAdmin = () => {
     fetchData();
   }, []);
 
+  /*
   const searchText = (event) => {
     const searchTerm = event.target.value.toLowerCase();
     setFilter(searchTerm);
@@ -69,47 +71,74 @@ export const ExploreAdmin = () => {
     setFilteredIniciativas(filtered);
   };
 
+  */
+
+  const searchText = (event) => {
+    const searchTerm = event.target.value;
+    console.log("Search Term:", searchTerm);
+    setFilter(searchTerm);
+
+    if (!searchTerm) {
+        // If the search term is empty, show all iniciativas
+        setFilteredIniciativas(iniciativas);
+        return;
+    }
+
+    const fuse = new Fuse(iniciativas, {
+        keys: ['titulo','descripcion'], // Specify the keys you want to search in
+        includeScore: true,
+        threshold: 0.4, // Adjust the threshold as needed
+    });
+
+    const result = fuse.search(searchTerm);
+    const filtered = result.map((item) => item.item); // Extract the actual items from Fuse.js result
+    setFilteredIniciativas(filtered);
+  };
+
   return (
-    <div className='row'>
-      <div className='col-12 mb-5'>
-        <form>
-          <div className='relative'>
+    <div className='ea-container'>
+      <div className='ea-seccion-container'>
+          <div className='ea-searchBar'>
+            <FaSearch className="ea-icons"/>
             <input
               type='search'
               placeholder='¿Qué iniciativa buscas?'
               value={filter}
               onChange={searchText}
-              className='p-4 rounded-full color'
-              style={{ width: '1000px' }}
+              className='ea-searchBarCaja'
             />
-            <button className='absolute right-1 top-0 -translate-y-0 p-4 bg-slate-300 rounded-full' style={{ backgroundColor: 'transparent', display: filter ? 'none' : 'block' }}>
-              <AiOutlineSearch />
-            </button>
+            
           </div>
-        </form>
       </div>
 
+      <div className='ea-iniciativas-container'>
       {filteredIniciativas && filteredIniciativas.map((item, index) => (
-        <div key={index} className='col-md-6 col-lg-3 mx-0 mb-4'>
-          <div className='card p- overflow.hidden h-100 shadow'>
-            <img src={item.urlImagen} className='card-img-top imagesize' alt={item.titulo} />
-            <div className='card-body'>
-              <h5 className='card-title titles'>{item.titulo}</h5>
-              <p className='card-text'>{item.descripcion}</p>
-              <Button className="btn-eliminar-tarjeta-1" onClick={() => handleMostrarEliminar(item.titulo, item.idIniciativa)}>Eliminar</Button>
+        <div key={index} className='ea-iniciativa'>
+
+          <div className='ea-iniciativa-imagen'>
+            <img src={item.urlImagen} alt={item.titulo} />
+          </div>
+
+          <div className='ea-iniciativa-texto'>
+            <div className="ea-titulo">{item.titulo}</div>
+            <div className="ea-desc">{item.descripcion}</div>
+            <div className='ea-boton'>
+            <Button className="btn-eliminar-tarjeta-1" onClick={() => handleMostrarEliminar(item.titulo, item.idIniciativa)}>Eliminar</Button>
             </div>
           </div>
+
         </div>
       ))}
+      </div>
 
       {/* Modal confirmar eliminar iniciativa*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
-        <Modal.Header>
-          <Modal.Title>Confirmar eliminación</Modal.Title>
+        <Modal.Header closeButton>
+          <div className="ea-modal-title">Confirmar eliminación</div>
         </Modal.Header>
-          <Modal.Body>
+          <div className="ea-modal-body">
             ¿Estás seguro que quieres eliminar la iniciativa <span style={{fontWeight:'bold'}}>{iniciativaEliminar}</span>?
-          </Modal.Body>
+          </div>
         <Modal.Footer>
           <Button className="eliminar" onClick={handleEliminaIniciativa}>Eliminar</Button>
           <Button onClick={handleCerrarEliminar}>Cerrar</Button>
@@ -118,10 +147,12 @@ export const ExploreAdmin = () => {
       
       {/* Modal iniciativa eliminada*/}
       <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
-        <Modal.Header></Modal.Header>
-          <Modal.Body>
+        <Modal.Header closeButton>
+          <div className="ea-modal-title">Éxito</div>
+        </Modal.Header>
+          <div className="ea-modal-body">
             Iniciativa <span style={{fontWeight:'bold'}}>{iniciativaEliminar}</span> eliminada exitosamente
-          </Modal.Body>
+          </div>
         <Modal.Footer>
           <Button onClick={handleCerrarEliminada}>Cerrar</Button>
         </Modal.Footer>
@@ -129,14 +160,17 @@ export const ExploreAdmin = () => {
       
       {/* Modal error eliminar*/}
       <Modal className="ea-modal" show={modalError} onHide={handleCerrarError}>
-        <Modal.Header></Modal.Header>
-          <Modal.Body>
+        <Modal.Header closeButton>
+        <div className="ea-modal-title">Error</div>
+        </Modal.Header>
+          <div className="ea-modal-body">
             Error al eliminar iniciativa <span style={{fontWeight:'bold'}}>{iniciativaEliminar}</span>
-          </Modal.Body>
+          </div>
         <Modal.Footer>
           <Button onClick={handleCerrarError}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
     </div>
+    
   );
 };

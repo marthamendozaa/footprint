@@ -5,8 +5,10 @@ import { Modal, Button, Spinner } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
-import { getEtiquetas, getRegiones, crearIniciativa } from './Create-fb.js';
+import es from 'date-fns/locale/es';
+import { getEtiquetas, getRegiones, crearIniciativa, crearTarea } from './Create-fb.js';
 import Iniciativa from '../../backend/obj-Iniciativa.js';
+import Tarea from '../../backend/obj-Tarea.js';
 import './Create.css';
 
 export const Create = () => {
@@ -23,7 +25,7 @@ export const Create = () => {
 
 
   // Cambiar título
-  const [titulo, setTitulo] = useState(null);
+  const [titulo, setTitulo] = useState("");
   const [editandoTitulo, setEditandoTitulo] = useState(false);
 
   const handleCambioTitulo = (event) => {
@@ -45,9 +47,32 @@ export const Create = () => {
     }
   };
 
+  // Cambiar título Tarea
+  const [tituloT, setTituloT] = useState("");
+  const [editandoTituloT, setEditandoTituloT] = useState(false);
+
+  const handleCambioTituloT = (event) => {
+    setTituloT(event.target.value);
+  };
+
+  const handleEditarTituloT = () => {
+    setEditandoTituloT(true);
+  };
+
+  const handleGuardarTituloT = () => {
+    setEditandoTituloT(false);
+  };
+
+  const handleOnKeyDownT = (event) => {
+    if (event.key === 'Enter') {
+      setEditandoTituloT(false);
+      setEditandoDescT(false);
+    }
+  };
+
 
   // Cambiar descripción
-  const [desc, setDesc] = useState(null);
+  const [desc, setDesc] = useState("");
   const [editandoDesc, setEditandoDesc] = useState(false);
 
   const handleCambioDesc = (event) => {
@@ -60,6 +85,22 @@ export const Create = () => {
 
   const handleGuardarDesc = () => {
     setEditandoDesc(false);
+  };
+
+  // Cambiar descripción Tarea
+  const [descT, setDescT] = useState("");
+  const [editandoDescT, setEditandoDescT] = useState(false);
+
+  const handleCambioDescT = (event) => {
+    setDescT(event.target.value);
+  };
+
+  const handleEditarDescT = () => {
+    setEditandoDescT(true);
+  };
+
+  const handleGuardarDescT = () => {
+    setEditandoDescT(false);
   };
 
 
@@ -82,8 +123,10 @@ export const Create = () => {
   // Cambiar fechas
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [fechaCierre, setFechaCierre] = useState(new Date());
+  const [fechaEntrega, setFechaEntrega] = useState(new Date());
   const datePickerInicio = useRef(null);
   const datePickerCierre = useRef(null);
+  const datePickerEntrega = useRef(null);
 
   const handleCambioFechaInicio = () => {
     if (datePickerInicio.current) {
@@ -94,6 +137,12 @@ export const Create = () => {
   const handleCambioFechaCierre = () => {
     if (datePickerCierre.current) {
       datePickerCierre.current.setOpen(true);
+    }
+  };
+
+  const handleCambioFechaEntrega = () => {
+    if (datePickerEntrega.current) {
+      datePickerEntrega.current.setOpen(true);
     }
   };
 
@@ -146,6 +195,37 @@ export const Create = () => {
   };
   
 
+  // Subir imagen
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
+  const [imagenIniciativa, setImagenIniciativa] = useState(null);
+  const [imagenPreview, setImagenPreview] = useState('https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg');
+  
+  const [modalImagen, setModalImagen] = useState(false);
+  const [errorImagen, setErrorImagen] = useState("");
+  const handleMostrarImagen = () => setModalImagen(true);
+  const handleCerrarImagen = () => {
+    setModalImagen(false);
+    setImagenSeleccionada(null);
+    setErrorImagen("");
+  };
+
+  const handleSubirImagen = () => {
+    if (!imagenSeleccionada) {
+      setErrorImagen("Por favor selecciona una imagen")
+      return;
+    }
+
+    if (imagenSeleccionada.size > 2 * 1024 * 1024) {
+      setErrorImagen("La imagen seleccionada supera el límite de tamaño de 2 MB")
+      return;
+    }
+
+    setImagenIniciativa(imagenSeleccionada);
+    setImagenPreview(URL.createObjectURL(imagenSeleccionada));
+    handleCerrarImagen();
+  };
+
+
   // Crear iniciativa
   const [modalError, setModalError] = useState(false);
   const handleCerrarError = () => setModalError(false);
@@ -153,6 +233,7 @@ export const Create = () => {
 
   // Iniciativa creada
   const [idIniciativaCreada, setIdIniciativaCreada] = useState(null);
+  const [idTareaCreada, setIdTareaCreada] = useState(null);
   const [modalCreada, setModalCreada] = useState(false);
   const handleCerrarCreada = () => setModalCreada(false);
   const handleMostrarCreada = () => setModalCreada(true);
@@ -162,9 +243,56 @@ export const Create = () => {
   const handleCerrarErrorCreada = () => setModalErrorCreada(false);
   const handleMostrarErrorCreada = () => setModalErrorCreada(true);
 
+  // Error: iniciativa duplicada
+  const [modalErrorDuplicada, setModalErrorDuplicada] = useState(false);
+  const handleCerrarErrorDuplicada = () => setModalErrorDuplicada(false);
+  const handleMostrarErrorDuplicada = () => setModalErrorDuplicada(true);
+
+  // Tiempo de espera
+  const [tiempoIniciativaCreada, setTiempoIniciativaCreada] = useState(0);
+  const [tiempoTareaCreada, setTiempoTareaCreada] = useState(0);
+  const [modalTiempoEspera, setModalTiempoEspera] = useState(false);
+  const handleCerrarTiempo = () => setModalTiempoEspera(false);
+  const handleMostrarTiempo = () => setModalTiempoEspera(true);
+
+
+  const handleCrearTarea = async () => {
+    if (!tituloT || !descT || !fechaEntrega) {
+      handleMostrarError();
+      return;
+    }
+
+    const tiempoActual = Date.now();
+    if (tiempoActual - tiempoIniciativaCreada < 60000) {
+      handleMostrarTiempo();
+      return;
+    }
+    
+    const fechaEntregaMini = format(fechaEntrega, 'dd/MM/yyyy');
+
+    const infoTarea = new Tarea(tituloT, descT, fechaEntregaMini);
+    console.log(infoTarea);
+
+    const [errorDuplicada, idTarea] = await crearTarea(infoTarea);
+    if (idTarea) {
+      setIdTareaCreada(idTarea);
+      setTiempoTareaCreada(tiempoActual);
+    }
+    else {
+      handleMostrarErrorCreada();
+    }
+  };
+
+
   const handleCrearIniciativa = async () => {
     if (!titulo || !desc || region === "" || Object.keys(etiquetasIniciativa).length === 0 || !fechaInicio) {
       handleMostrarError();
+      return;
+    }
+
+    const tiempoActual = Date.now();
+    if (tiempoActual - tiempoIniciativaCreada < 60000) {
+      handleMostrarTiempo();
       return;
     }
     
@@ -174,14 +302,19 @@ export const Create = () => {
     const infoIniciativa = new Iniciativa(titulo, desc, region, esPublica, etiquetasIniciativa, fechaInicioMini, fechaCierreMini);
     console.log(infoIniciativa);
     
-    const idIniciativa = await crearIniciativa(infoIniciativa);
+    const [errorDuplicada, idIniciativa] = await crearIniciativa(infoIniciativa, imagenIniciativa);
     if (idIniciativa) {
       setIdIniciativaCreada(idIniciativa);
       handleMostrarCreada();
-    } else {
+      setTiempoIniciativaCreada(tiempoActual);
+    } else if (errorDuplicada) {
+      handleMostrarErrorDuplicada();
+    }
+    else {
       handleMostrarErrorCreada();
     }
   };
+
 
   return (
     <div>
@@ -189,7 +322,10 @@ export const Create = () => {
         <div className="c-container">
           <div className="c-iniciativa-container">
             {/* Foto de iniciativa */}
-            <div className="c-foto-iniciativa"></div>
+            <div className="c-foto-iniciativa" onClick={handleMostrarImagen}>
+              <img src={imagenPreview} className ="c-preview-imagen"/>
+              <FaPen className="c-editar-foto"/>
+            </div>
 
             <div className="c-info-container"> 
               {/* Cambiar título */}
@@ -240,10 +376,12 @@ export const Create = () => {
                         </div>
                       </div>
                       <DatePicker
+                        className='react-datepicker__input-container-create'
                         selected={fechaInicio}
                         onChange={(date) => setFechaInicio(date)}
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerInicio}
+                        locale={es}
                       />
                     </div>
                     
@@ -258,10 +396,12 @@ export const Create = () => {
                         </div>
                       </div>
                       <DatePicker
+                        className='react-datepicker__input-container-create'
                         selected={fechaCierre}
                         onChange={(date) => setFechaCierre(date)}
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerCierre}
+                        locale={es}
                       />
                     </div>
                   </div>
@@ -334,16 +474,59 @@ export const Create = () => {
           {/* Tareas y Miembros*/}
           <div className="c-tareas-miembros">
             <div className="c-seccion-tareas">
-              <div className="c-btn-agregar-tarea">Añadir tarea</div>
-
+              <button type="button" className="c-btn-agregar-tarea" onClick={handleCrearTarea}> Añadir tarea </button>
               <div className="c-tareas-container">
                 <div className="c-tarea">
                   <div className="c-tarea-info">
-                    <div className="c-tarea-titulo">Nombre de tarea</div>
-                    <div className="c-tarea-texto">Instrucciones...</div>
+                    
+                    <div className="c-tarea-titulo">
+                    { editandoTituloT ? (
+                    <input
+                      type="text"
+                      className="c-tarea-titulo"
+                      value={tituloT}
+                      onChange={handleCambioTituloT}
+                      onBlur={handleGuardarTituloT}
+                      onKeyDown={handleOnKeyDownT}
+                      autoFocus
+                      maxLength={30}
+                    />) : (
+                      <div className="c-titulo-texto">
+                      {tituloT ? tituloT : "Título2"}
+                      <button className="c-btn-editar-titulo" onClick={handleEditarTituloT}>
+                        <FaPen />
+                      </button>
+                    </div>
+                    )}
+                    </div>
+                    {editandoDescT ? (
+                    <div className="c-tarea-texto">
+                    <textarea className="c-desc-input-texto"
+                    value={descT}
+                    onChange={handleCambioDescT}
+                    onBlur={handleGuardarDescT}
+                    onKeyDown={handleOnKeyDownT}
+                    autoFocus
+                    maxLength={200} />
+                    </div> ) : (
+                      <div style={desc ? {} : { color: '#677D7C' }}>
+                      {descT ? descT : "Agrega tu descripción aquí..."}
+                    </div>
+
+                    )}
+                    {!editandoDescT && (<button className="c-btn-editar-titulo" onClick={handleEditarDescT}><FaPen /></button>)}
                   </div>
                   <div className="c-tarea-botones">
-                    <div className="c-tarea-boton"><FaCalendar /> Fecha</div>
+                    <div className="c-tarea-boton"><FaCalendar /> Fecha
+                    <DatePicker
+                        className='react-datepicker__input-container-create'
+                        selected={fechaEntrega}
+                        onChange={(date) => setFechaEntrega(date)}
+                        dateFormat="dd/MM/yyyy"
+                        ref={datePickerEntrega}
+                        locale={es}
+                    />
+                    </div>
                     <div className="c-tarea-boton"><FaFolder /> Documento</div>
                   </div>
                 </div>
@@ -363,6 +546,22 @@ export const Create = () => {
             </div>
           </div>
 
+          {/* Subir imagen */}
+          <Modal className="c-modal" show={modalImagen} onHide={handleCerrarImagen}>
+            <Modal.Header closeButton>
+              <div className="c-modal-title">Subir Imagen</div>
+            </Modal.Header>
+              <div className="c-input-body">
+                <input className="c-input-imagen" type="file" accept="image/*" onChange={(e) => setImagenSeleccionada(e.target.files[0])} />
+                {errorImagen && <span style={{ color: 'red' }}>{errorImagen}</span>}
+              </div>
+            <Modal.Footer>
+              <Button onClick={handleSubirImagen}>Guardar</Button>
+              <Button onClick={handleCerrarImagen}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+          
+          {/* Error campos vacíos */}
           <Modal className="c-modal" show={modalError} onHide={handleCerrarError}>
             <Modal.Header closeButton>
               <div className="c-modal-title">Error</div>
@@ -381,7 +580,8 @@ export const Create = () => {
               <Button onClick={handleCerrarError}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
-
+          
+          {/* Iniciativa creada */}
           <Modal className="c-modal" show={modalCreada} onHide={handleCerrarCreada}>
             <Modal.Header closeButton>
               <div className="c-modal-title">Éxito</div>
@@ -390,12 +590,13 @@ export const Create = () => {
                 Iniciativa <span style={{fontWeight: 'bold'}}>{titulo}</span> creada exitosamente
               </div>
             <Modal.Footer>
-              <Button class="btn btn-primary" onClick={handleCerrarCreada}>
+              <Button className="btn btn-primary" onClick={handleCerrarCreada}>
                 <Link to={`/initiative/${idIniciativaCreada}`}>Ver Iniciativa</Link>
               </Button>
             </Modal.Footer>
           </Modal>
-
+          
+          {/* Error creando inciativa */}
           <Modal className="c-modal" show={modalErrorCreada} onHide={handleCerrarErrorCreada}>
             <div className="c-modal-title">Error</div>
               <div className="c-modal-body">
@@ -403,6 +604,28 @@ export const Create = () => {
               </div>
             <Modal.Footer>
               <Button onClick={handleCerrarErrorCreada}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Error iniciativa duplicada */}
+          <Modal className="c-modal" show={modalErrorDuplicada} onHide={handleCerrarErrorDuplicada}>
+            <div className="c-modal-title">Error</div>
+              <div className="c-modal-body">
+                La iniciativa con título <span style={{fontWeight: 'bold'}}>{titulo}</span> ya existe
+              </div>
+            <Modal.Footer>
+              <Button onClick={handleCerrarErrorDuplicada}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Tiempo de espera */}
+          <Modal className="c-modal" show={modalTiempoEspera} onHide={handleCerrarTiempo}>
+            <div className="c-modal-title">Error</div>
+              <div className="c-modal-body">
+                Debes esperar 1 minuto para poder crear una nueva iniciativa
+              </div>
+            <Modal.Footer>
+              <Button onClick={handleCerrarTiempo}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
         </div>
