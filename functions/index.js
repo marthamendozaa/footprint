@@ -394,6 +394,11 @@ exports.suscribirseAIniciativa = onRequest(async (req, res) => {
       const usuarioNuevo = { ...usuario, listaIniciativasMiembro: [...usuario.listaIniciativasMiembro, iniciativa] };
       await getFirestore().doc(`Usuarios/${user}`).update(usuarioNuevo);
 
+      const iniciativaRef = await getFirestore().doc(`Iniciativas/${iniciativa}`).get();
+      const iniciativaData = iniciativaRef.data();
+      const iniciativaNueva = { ...iniciativaData, listaMiembros: [...iniciativaData.listaMiembros, user] };
+      await getFirestore().doc(`Iniciativas/${iniciativa}`).update(iniciativaNueva);
+
       res.json({ success: true });
     } catch (error) {
       logger.info("Error suscribiéndose a la iniciativa como miembro: ", error.message);

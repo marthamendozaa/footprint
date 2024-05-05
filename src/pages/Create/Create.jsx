@@ -303,6 +303,8 @@ export const Create = () => {
 
   // Crear iniciativa
   const { user } = useAuth();
+  const [crearDesactivado, setCrearDesactivado] = useState(false);
+
   const handleCrearIniciativa = async () => {
     if (!titulo || !desc || region === "" || Object.keys(etiquetasIniciativa).length === 0 || !fechaInicio) {
       handleMostrarError();
@@ -317,6 +319,8 @@ export const Create = () => {
     
     const fechaInicioMini = format(fechaInicio, 'dd/MM/yyyy');
     const fechaCierreMini = fechaCierre ? format(fechaCierre, 'dd/MM/yyyy') : null;
+    
+    setCrearDesactivado(true);
 
     try {
       // Crear iniciativa
@@ -354,6 +358,8 @@ export const Create = () => {
       setTiempoIniciativaCreada(tiempoActual);
     } catch (error) {
       handleMostrarErrorCreada();
+    } finally {
+      setCrearDesactivado(false);
     }
   };
 
@@ -597,7 +603,7 @@ export const Create = () => {
           {/* Botón crear */}
           <div className="c-crear-container">
             <div className="c-btn-crear-container">
-              <button type="button" className="c-btn-crear" onClick={handleCrearIniciativa}> Crear </button>
+              <button type="button" className="c-btn-crear" onClick={handleCrearIniciativa} disabled={crearDesactivado}> Crear </button>
             </div>
           </div>
 
