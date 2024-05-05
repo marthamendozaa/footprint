@@ -87,10 +87,11 @@ export const Explore = () => {
               if (resultado) {
                   setShowModal(false);
                   alert("Te has suscrito a la iniciativa");
+                  
+                  const iniciativasNuevo = [...iniciativas];
+                  iniciativasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
+                  setIniciativas(iniciativasNuevo);
               }
-              const iniciativasNuevo = [...iniciativas];
-              iniciativasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
-              setIniciativas(iniciativasNuevo); 
             } catch (error) {
               alert("Error al suscribirse a la iniciativa");
             } finally {
