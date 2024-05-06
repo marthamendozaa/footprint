@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { useAuth } from '../../contexts/AuthContext';
 import { getIniciativas, suscribirseAIniciativa } from '../../api/api.js';
-import Modal from 'react-bootstrap/Modal';
+import { Modal, Spinner } from 'react-bootstrap';
 import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
 import Fuse from 'fuse.js';
 
@@ -115,20 +115,26 @@ export const Explore = () => {
                         />
                     </div>
 
-            <div className='e-iniciativas-container'>
-            {filteredIniciativas && filteredIniciativas.map((item, index) => (
-                <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item, index)}>
-                    <div className='e-iniciativa-imagen'>
-                        <img src={item.urlImagen} alt = {item.titulo} />
-                    </div>
+            <div className='e-iniciativas-container' style={!filteredIniciativas ? {justifyContent: "center"} : {}}>
+              {filteredIniciativas ? (
+                filteredIniciativas.map((item, index) => (
+                  <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item, index)}>
+                      <div className='e-iniciativa-imagen'>
+                          <img src={item.urlImagen} alt = {item.titulo} />
+                      </div>
 
-                    <div className='e-iniciativa-texto'>
-                        <div className="e-titulo">{item.titulo}</div>
-                        <div className="e-desc">{item.descripcion}</div>
-                    
-                    </div>
+                      <div className='e-iniciativa-texto'>
+                          <div className="e-titulo">{item.titulo}</div>
+                          <div className="e-desc">{item.descripcion}</div>
+                      
+                      </div>
+                  </div>
+                ))
+              ) : (
+                <div className="spinner">
+                  <Spinner animation="border" role="status"></Spinner>
                 </div>
-            ))}
+              )}
             </div>
 
             {/* Modal */}

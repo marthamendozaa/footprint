@@ -297,6 +297,7 @@ exports.actualizaIniciativa = onRequest(async (req, res) => {
 });
 
 
+// DEPLOY
 // Elimina iniciativa
 exports.eliminaIniciativa = onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -310,6 +311,11 @@ exports.eliminaIniciativa = onRequest(async (req, res) => {
       const iniciativaData = await getFirestore().doc(`Iniciativas/${iniciativa}`).get();
       const user = iniciativaData.data().idAdmin;
       await iniciativaRef.delete();
+
+      // Elimina tareas de la iniciativa
+      for (const tarea of iniciativaData.data().listaTareas) {
+        await getFirestore().doc(`Tareas/${tarea}`).delete();
+      }
   
       // Elimina archivos en el folder
       const [files] = await bucket.getFiles({ prefix: `Iniciativas/${iniciativa}` });
@@ -383,6 +389,7 @@ exports.subirImagen = onRequest(async (req, res) => {
 });
 
 
+// DEPLOY
 // Suscribe el usuario a una iniciativa
 exports.suscribirseAIniciativa = onRequest(async (req, res) => {
   cors(req, res, async () => {
