@@ -422,8 +422,12 @@ export const Profile = () => {
             </Modal.Header>
             
             <div className="p-input-body">
+              <label htmlFor="file-upload" className="p-custom-file-button">
+                Subir foto
+              </label>
               <input 
-                className="p-input-imagen" 
+                id="file-upload"
+                className="p-input-imagen p-custom-file-input" 
                 type="file" 
                 accept="image/*" 
                 onChange={(e) => {
@@ -431,8 +435,9 @@ export const Profile = () => {
                   setErrorI('');
                   }} 
                 />
-                {errorI && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
+                <span className="p-custom-file-text">{selectedImage ? selectedImage.name : "Ninguna imagen seleccionada"}</span>
             </div>
+            {errorI && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
             
             <Modal.Footer>
               <Button onClick={handleUploadProfileImage}>Guardar</Button>

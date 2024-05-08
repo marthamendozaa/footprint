@@ -473,7 +473,19 @@ input.c-tarea-titulo {
   font-family: "Inter", sans-serif;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  flex-direction: row;
+}
+
+.c-custom-file-button {
+  border: 2px solid #ccc;
+  background-color: #f2f2f2;
+  border-radius: 15px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.c-custom-file-button:hover {
+  background-color: #d4d4d4;
 }
 
 .c-input-imagen {
@@ -481,11 +493,20 @@ input.c-tarea-titulo {
   width: 60%;
 }
 
+.c-custom-file-input {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}
+
+.c-custom-file-text {
+  margin-left: 10px;
+}
+
 .c-error-imagen {
   color: red;
   font-size: 18px;
   font-weight: 500;
-  margin-top: 25px;
   margin-bottom: 15px;
   margin-left: 25px;
   margin-right: 25px;
