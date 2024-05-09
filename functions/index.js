@@ -11,6 +11,7 @@ const cors = require('cors')({ origin: true });
 const config = require('./config');
 
 initializeApp();
+const auth = getAuth();
 
 
 // Verifica correo duplicado
@@ -73,6 +74,26 @@ exports.autentificaUsuario = onRequest(async (req, res) => {
     } catch (error) {
       logger.info("Error en autentificación: ", error.message);
       res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+
+// DEPLOY
+// Registro de usuario
+exports.crearUsuario = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { data } = req.body;
+
+    try {
+      const user = await auth.createUser({ email: data.correo, password: data.contrasena });
+      data.idUsuario = user.uid;
+      const { contrasena, ...usuario } = data;
+      await getFirestore().doc(`Usuarios/${user.uid}`).set(usuario);
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error registrando usuario: ", error.message);
+      res.json({ success: false });
     }
   });
 });

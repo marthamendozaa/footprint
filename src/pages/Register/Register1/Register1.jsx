@@ -6,10 +6,10 @@ import PasswordInfo from './PasswordInfo.jsx';
 import { existeCorreo } from '../../../api/api.js';
 import './Register1.css';
 
-export const Register1 = ({ onNext }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+export const Register1 = ({ onNext, usuario }) => {
+  const [email, setEmail] = useState(usuario.correo ? usuario.correo : '');
+  const [password, setPassword] = useState(usuario.contrasena ? usuario.contrasena : '');
+  const [confirmPassword, setConfirmPassword] = useState(usuario.contrasena ? usuario.contrasena : '');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
@@ -95,7 +95,9 @@ export const Register1 = ({ onNext }) => {
     }
 
     try {
-      onNext();
+      usuario.correo = email;
+      usuario.contrasena = password;
+      onNext(usuario);
     } catch {
       setError('Error al registrarse. Por favor, inténtalo de nuevo.');
       setShowModal(true);
@@ -159,7 +161,7 @@ export const Register1 = ({ onNext }) => {
                 className={`ojo-contrasena-register ${invalidPassword ? 'border-red-register' : ''}`}
                 type={showPassword ? 'text' : 'password'}
                 placeholder="Ingresa la contraseña" 
-                value={password}  
+                value={password}
                 onChange={(e) => {
                   if (e.target.value.length <= 20) {
                     setPassword(e.target.value);

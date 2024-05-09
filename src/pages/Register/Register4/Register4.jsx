@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
-import { getHabilidades } from '../../../api/api.js';
+import { getHabilidades, crearUsuario } from '../../../api/api.js';
 import { Spinner } from 'react-bootstrap';
 import './Register4.css';
 
-export const Register4 = ({ onPrev }) => {
+export const Register4 = ({ onPrev, usuario }) => {
     const [error, setError] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [habilidades, setHabilidades] = useState(null);
-    const [habilidadesUsuario, setHabilidadesUsuario] = useState({});
+    const [habilidadesUsuario, setHabilidadesUsuario] = useState(usuario.listaHabilidades ? usuario.listaHabilidades : {});
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -52,6 +52,8 @@ export const Register4 = ({ onPrev }) => {
     };   
 
     // Manejar registro
+    const [terminarDesactivado, setTerminarDesactivado] = useState(false);
+
     const handleRegister = async (event) => {
         event.preventDefault();
         
@@ -60,14 +62,35 @@ export const Register4 = ({ onPrev }) => {
             setShowModal(true);
             return;
         }
-
+        
+        setTerminarDesactivado(true);
         try {
-            navigate('/login'); 
+            usuario.listaHabilidades = habilidadesUsuario;
+
+            // Calcular la edad
+            const edadMs = Date.now() - usuario.fechaNacimiento.getTime();
+            const edadFecha = new Date(edadMs);
+            usuario.edad = Math.abs(edadFecha.getUTCFullYear() - 1970);
+
+            const response = await crearUsuario(usuario);
+            if (response) {
+                navigate('/login');
+            } else {
+                setError('Error al registrar usuario.');
+                setShowModal(true);
+            }
         } catch (error) {
             setError('Error al registrar habilidades. Por favor, inténtalo de nuevo.');
             setShowModal(true);
+        } finally {
+            setTerminarDesactivado(false);
         }
     };
+
+    const handlePrev = () => {
+      usuario.listaHabilidades = habilidadesUsuario;
+      onPrev(usuario);
+    }
 
     return (
         <div className='container-register4-1'>
@@ -98,14 +121,14 @@ export const Register4 = ({ onPrev }) => {
                         <div className='flecha-register4-container'>
                             {/* Regreso */}
                             <div className='flecha-register4-container-start'>
-                                <button type="button" className="btn flecha-btn" onClick={onPrev}>
+                                <button type="button" className="btn flecha-btn" onClick={handlePrev}>
                                     <FaArrowLeft />
                                 </button>
                             </div>
                             
                             {/* Terminar con registro */}
                             <div className='flecha-register4-container-end'>
-                                <button type="submit" className="btn flecha-btn">
+                                <button type="submit" className="btn flecha-btn" disabled={terminarDesactivado}>
                                     {/*<FaArrowRight />*/}
                                     Terminar
                                 </button>
