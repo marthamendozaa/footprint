@@ -79,14 +79,40 @@
   font-family: "Inter", sans-serif;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
+  flex-direction: row;
+}
+
+.p-custom-file-button {
+  border: 2px solid #ccc;
+  background-color: #f2f2f2;
+  border-radius: 30px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.p-custom-file-button:hover {
+  background-color: #d4d4d4;
+}
+
+.p-input-imagen {
+  display: flex;
+  width: 60%;
+}
+
+.p-custom-file-input {
+  width: 0;
+  height: 0;
+  visibility: hidden;
+}
+
+.p-custom-file-text {
+  margin-left: 10px;
 }
 
 .p-error-imagen {
   color: red;
   font-size: 18px;
   font-weight: 500;
-  margin-top: 25px;
   margin-bottom: 15px;
   margin-left: 25px;
   margin-right: 25px;
@@ -94,11 +120,6 @@
 
 .p-fa-ec{
   margin-right: 5px;
-}
-
-.p-input-imagen {
-  display: flex;
-  width: 60%;
 }
 
 .fade.p-modal.modal.show {
