@@ -422,8 +422,12 @@ export const Profile = () => {
             </Modal.Header>
             
             <div className="p-input-body">
+              <label htmlFor="file-upload" className="p-custom-file-button">
+                Subir foto
+              </label>
               <input 
-                className="p-input-imagen" 
+                id="file-upload"
+                className="p-input-imagen p-custom-file-input" 
                 type="file" 
                 accept="image/*" 
                 onChange={(e) => {
@@ -431,8 +435,9 @@ export const Profile = () => {
                   setErrorI('');
                   }} 
                 />
-                {errorI && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
+                <span className="p-custom-file-text">{selectedImage ? selectedImage.name : "Ninguna imagen seleccionada"}</span>
             </div>
+            {errorI && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
             
             <Modal.Footer>
               <Button onClick={handleUploadProfileImage}>Guardar</Button>
@@ -475,7 +480,7 @@ export const Profile = () => {
                   }} 
                 />
                 <span className="p-ojo-contrasena" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  {contrasenaActual !== '' && (showPassword ? <FaEyeSlash /> : <FaEye />)}
                 </span>
               </div>
 
@@ -498,7 +503,7 @@ export const Profile = () => {
                 <div className="p-row-dos-iconos">
                   <PasswordInfo2 className="p-p-i"/>
                   <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
-                      {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                      {nuevaContrasena !== '' && (showNewPassword ? <FaEyeSlash /> : <FaEye />)}
                   </span>
                 </div>
 
@@ -521,7 +526,7 @@ export const Profile = () => {
                   }}
                 />
                 <span className="p-ojo-contrasena" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    {confirmarContrasena !== '' && (showConfirmPassword ? <FaEyeSlash /> : <FaEye />)}
                 </span>
               </div>
               {errorConfirmarContraseña && <p className='p-error-cc' style={{marginTop: '-40px'}}><FaExclamationCircle className='p-fa-ec-2'/>{errorConfirmarContraseña}</p>}

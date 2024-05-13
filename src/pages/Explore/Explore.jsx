@@ -4,7 +4,7 @@ import './Explore.css';
 import { useAuth } from '../../contexts/AuthContext';
 import { getIniciativas, suscribirseAIniciativa } from '../../api/api.js';
 import { Modal, Spinner } from 'react-bootstrap';
-import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
+import { FaHeart, FaRegHeart, FaSearch, FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
 import Fuse from 'fuse.js';
 
 
@@ -25,6 +25,7 @@ export const Explore = () => {
         fetchData();
     }, []);
 
+
     /*
     const searchText = (event) => {
         const searchTerm = event.target.value;
@@ -38,7 +39,7 @@ export const Explore = () => {
     }
     */
 
-
+    
     const searchText = (event) => {
         const searchTerm = event.target.value;
         console.log("Search Term:", searchTerm);
@@ -102,92 +103,96 @@ export const Explore = () => {
 
     return (
         <div>
-            <div className='e-container'>
-            <div className='e-seccion-container'>
-                    <div className='e-searchBar'>
-                        <FaSearch className="e-icons"/>
-                        <input
-                            type='search'
-                            placeholder='¿Qué iniciativa buscas?'
-                            value={filter}
-                            onChange={searchText}
-                            className='e-searchBarCaja'
-                        />
-                    </div>
-
-            <div className='e-iniciativas-container' style={!filteredIniciativas ? {justifyContent: "center"} : {}}>
-              {filteredIniciativas ? (
-                filteredIniciativas.map((item, index) => (
-                  <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item, index)}>
-                      <div className='e-iniciativa-imagen'>
-                          <img src={item.urlImagen} alt = {item.titulo} />
-                      </div>
-
-                      <div className='e-iniciativa-texto'>
-                          <div className="e-titulo">{item.titulo}</div>
-                          <div className="e-desc">{item.descripcion}</div>
-                      
-                      </div>
-                  </div>
-                ))
-              ) : (
-                <div className="spinner">
-                  <Spinner animation="border" role="status"></Spinner>
-                </div>
-              )}
-            </div>
-
-            {/* Modal */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered className='modal1'>
-                <div className=".modalcontainer">
-                    
-                    <div className='modaliniciativa'>
-                        {selectedIniciativa && (
-                            <>
-                                <div className="modalhead">
-                                <div className="modalbutton">
-                                <button type="button" className="close" onClick={() => setShowModal(false)} aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                                </div>
-                                <img src={selectedIniciativa.urlImagen} alt={selectedIniciativa.titulo} className="modalimg" />
-                                </div>
-                                <div className='modalinfo'>
-                                    <div className='modaltitulo'>{selectedIniciativa.titulo}</div>
-                                    {/* Etiquetas */}
-                                    <div className="m-etiquetas">
-                                    {Object.values(selectedIniciativa.listaEtiquetas).map((etiqueta, idEtiqueta) => (
-                                        <li key={idEtiqueta} className={'m-etiqueta-item'}>
-                                        {etiqueta}
-                                        </li>
-                                    ))}
-                                    </div>
-                                    
-                                    <div className='modalregion'>{selectedIniciativa.region} </div>
-                                    <div className='modalpublica'>{selectedIniciativa.esPublica ? "Pública" : "Privada"} </div>
-                                    <div className='modalfecha'>{selectedIniciativa.fechaInicio} - {selectedIniciativa.fechaCierre ? selectedIniciativa.fechaCierre : 'S.F.'} </div>
-                                </div>
-                            </>
-                        )}
-                        
-                    </div>
-                    <div className = 'modaldesc'>
-                        {selectedIniciativa && (
-                                <>
-                                    <div className='modaltextodesc'>{selectedIniciativa.descripcion}</div>
-                                </>
-                        )}
-                    </div>
-                    <div className = 'modalsuscribir'>
-                        <div className='modalsusbotton' onClick={handleSuscribirse} disabled={suscribirDesactivado}>
-                            Suscribirse
+            {/* Spinner */}
+            {filteredIniciativas ? (
+                <div className='e-container'>
+                    <div className='e-seccion-container'>
+                        {/* Barra de búsqueda */}
+                        <div className='e-searchBar'>
+                            <FaSearch className="e-icons"/>
+                            <input
+                                type='search'
+                                placeholder='¿Qué iniciativa buscas?'
+                                value={filter}
+                                onChange={searchText}
+                                className='e-searchBarCaja'
+                            />
                         </div>
+
+                        {/* Iniciativas */}
+                        <div className='e-iniciativas-container'>
+                        {filteredIniciativas && filteredIniciativas.map((item, index) => (
+                            <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item)}>
+                                <div className='e-iniciativa-imagen'>
+                                    <img src={item.urlImagen} alt = {item.titulo} />
+                                </div>
+
+                                <div className='e-iniciativa-texto'>
+                                    <div className="e-titulo">{item.titulo}</div>
+                                    <div className="e-desc">{item.descripcion}</div>
+                                </div>
+                            </div>
+                        ))}
+                        </div>
+
+                        {/* Mostrar información adicional */}
+                        <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
+                            <div className="modalcontainer">
+                                <Modal.Header style={{ border: "none" }} closeButton> </Modal.Header>
+                                
+                                <div className='modaliniciativa'>
+                                    {selectedIniciativa && (
+                                        <>
+                                            <div className="modalhead">
+                                                <img src={selectedIniciativa.urlImagen} alt={selectedIniciativa.titulo} className="modalimg" />
+                                            </div>
+                                            
+                                            <div className='modalinfo'>
+                                                <div className='modaltitulo'>{selectedIniciativa.titulo}</div>
+                                                
+                                                {/* Etiquetas */}
+                                                <div className="m-etiquetas">
+                                                    {Object.values(selectedIniciativa.listaEtiquetas).map((etiqueta, idEtiqueta) => (
+                                                        <li key={idEtiqueta} className={'m-etiqueta-item'}>
+                                                        {etiqueta}
+                                                        </li>
+                                                    ))}
+                                                </div>
+
+                                                <div className='modalfecha'> <FaCalendar style={{marginRight: '5px'}} />{selectedIniciativa.fechaInicio} - {selectedIniciativa.fechaCierre ? selectedIniciativa.fechaCierre : 'S.F.'} </div>
+                                                <div className='modalregion'> <FaGlobe style={{marginRight: '5px'}} />{selectedIniciativa.region} </div>
+                                                <div className='modalpublica'>
+                                                    {selectedIniciativa.esPublica ? <><FaUnlockAlt style={{marginRight: '5px'}} />Pública</> : <><FaLock style={{marginRight: '5px'}} />Privada</>}
+                                                </div>
+
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className = 'modaldesc'>
+                                    {selectedIniciativa && (
+                                        <>
+                                            <div className='modaltextodesc'>{selectedIniciativa.descripcion}</div>
+                                        </>
+                                    )}
+                                </div>
+
+                                <div className = 'modalsuscribir'>
+                                    <div className='modalsusbotton' onClick={handleSuscribirse}>
+                                        Suscribirse
+                                    </div>
+                                </div>
+                            </div>
+                        </Modal>
+                    
                     </div>
                 </div>
-            </Modal>
-            </div>
-            </div>
+            ) : (
+                <div className="spinner">
+                    <Spinner animation="border" role="status"></Spinner>
+                </div>
+            )}
         </div>
     );
 };
-

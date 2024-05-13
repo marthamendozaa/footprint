@@ -612,17 +612,25 @@ export const Create = () => {
             <Modal.Header>
               <div className="c-modal-title">Subir Imagen</div>
             </Modal.Header>
-              <div className="c-input-body">
-                <input 
-                  className="c-input-imagen" 
-                  type="file" accept="image/*" 
-                  onChange={(e) => {
-                    setImagenSeleccionada(e.target.files[0])
-                    setErrorImagen('');
-                    }} 
-                />
-                {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
-              </div>
+              
+            <div className="c-input-body">
+              <label htmlFor="file-upload" className="c-custom-file-button">
+                Subir foto
+              </label>
+              <input 
+                id="file-upload"
+                className="c-input-imagen c-custom-file-input" 
+                type="file" 
+                accept="image/*" 
+                onChange={(e) => {
+                  setImagenSeleccionada(e.target.files[0])
+                  setErrorImagen('');
+                  }} 
+              />
+              <span className="c-custom-file-text">{imagenSeleccionada ? imagenSeleccionada.name : "Ninguna imagen seleccionada"}</span>
+            </div>
+            {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
+
             <Modal.Footer>
               <Button onClick={handleSubirImagen}>Guardar</Button>
               <Button onClick={handleCerrarImagen}>Cerrar</Button>

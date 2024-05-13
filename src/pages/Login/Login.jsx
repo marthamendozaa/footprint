@@ -127,7 +127,7 @@ export const Login = () => {
               />
               
               <span className="ojo-contrasena-2" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {password !== '' && (showPassword ? <FaEyeSlash /> : <FaEye />)}
               </span>
             </div>
 

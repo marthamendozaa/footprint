@@ -170,7 +170,7 @@ export const Register1 = ({ onNext, usuario }) => {
                 }} 
               />
               <span className="ojo-contrasena-2-register" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {password !== '' && (showPassword ? <FaEyeSlash /> : <FaEye />)}
               </span>
 
               {/* Advertencia de contraseña */}
@@ -201,7 +201,7 @@ export const Register1 = ({ onNext, usuario }) => {
                 }} 
               />
               <span className="ojo-contrasena-2-register" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                {confirmPassword !== '' && (showConfirmPassword ? <FaEyeSlash /> : <FaEye />)}
               </span>
 
               {/* Advertencia de contraseñas no coinciden */}
