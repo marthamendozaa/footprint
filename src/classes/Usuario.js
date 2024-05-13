@@ -1,17 +1,18 @@
 export default class Usuario {
-  constructor(idUsuario, nombreUsuario, nombre, correo, fechaNacimiento, edad, urlImagen, listaHabilidades, listaIntereses) {
-    this.idUsuario = idUsuario;
-    this.nombreUsuario = nombreUsuario;
-    this.nombre = nombre;
-    this.correo = correo;
-    this.fechaNacimiento = fechaNacimiento;
-    this.edad = edad;
-    this.urlImagen = urlImagen;
+  constructor() {
+    this.idUsuario = null;
+    this.nombreUsuario = null;
+    this.nombre = null;
+    this.correo = null;
+    this.contrasena = null;
+    this.fechaNacimiento = null;
+    this.edad = null;
+    this.urlImagen = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
     this.esAdmin = false;
     this.listaIniciativasMiembro = [];
     this.listaIniciativasAdmin = [];
     this.listaIniciativasFavoritas = [];
-    this.listaHabilidades = listaHabilidades || [];
-    this.listaIntereses = listaIntereses || [];
+    this.listaHabilidades = [];
+    this.listaIntereses = [];
   }
 }

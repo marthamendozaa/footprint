@@ -4,11 +4,11 @@ import { getIntereses } from '../../../api/api.js';
 import { Spinner } from 'react-bootstrap';
 import './Register3.css';
 
-export const Register3 = ({ onPrev, onNext }) => {
+export const Register3 = ({ onPrev, onNext, usuario }) => {
     const [error, setError] = useState('');
     const [showModal, setShowModal] = useState(false);
     const [intereses, setIntereses] = useState(null);
-    const [interesesUsuario, setInteresesUsuario] = useState({});
+    const [interesesUsuario, setInteresesUsuario] = useState(usuario.listaIntereses ? usuario.listaIntereses : {});
 
     useEffect(() => {
         document.body.classList.add('register2-body');
@@ -60,11 +60,17 @@ export const Register3 = ({ onPrev, onNext }) => {
         }
 
         try {
-            onNext();
+            usuario.listaIntereses = interesesUsuario;
+            onNext(usuario);
         } catch (error) {
             setError('Error al registrar intereses. Por favor, inténtalo de nuevo.');
             setShowModal(true);
         }
+    };
+
+    const handlePrev = () => {
+      usuario.listaIntereses = interesesUsuario;
+      onPrev(usuario);
     };
 
     return (
@@ -96,7 +102,7 @@ export const Register3 = ({ onPrev, onNext }) => {
                         <div className='flecha-register3-container'>
                             {/* Regreso */}
                             <div className='flecha-register3-container-start'>
-                                <button type="button" className="btn flecha-btn" onClick={onPrev}>
+                                <button type="button" className="btn flecha-btn" onClick={handlePrev}>
                                     <FaArrowLeft />
                                 </button>
                             </div>
