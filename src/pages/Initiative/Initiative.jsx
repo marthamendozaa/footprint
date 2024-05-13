@@ -5,12 +5,13 @@ import { BsPeopleFill } from "react-icons/bs";
 import { MdUpload } from "react-icons/md"
 import { Spinner } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa } from '../../api/api.js';
+import { getIniciativa, getMisTareas} from '../../api/api.js';
 import './Initiative.css';
 
 export const Initiative = () => {
   const { idIniciativa } = useParams();
   const [iniciativa, setIniciativa] = useState(null);
+  const [tareas, setTareas] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,6 +19,10 @@ export const Initiative = () => {
         const iniciativaData = await getIniciativa(idIniciativa);
         setIniciativa(iniciativaData);
         console.log(iniciativaData);
+
+        const iniciativaTarea = await getMisTareas(idIniciativa);
+        setTareas(iniciativaTarea);
+        console.log(iniciativaTarea);
       } catch (error) {
         console.error("Error obteniendo información de la iniciativa:", error.message);
       }
@@ -131,6 +136,37 @@ export const Initiative = () => {
 
               {/* Tarea asignada a mí */}
               <div className="i-titulo-tareas">Mis Tareas</div>
+              <div className="i-seccion-tareas1">
+              {tareas ? (
+                <div className='i-seccion-tareas'>
+                {tareas.length == 0 ? (
+                  <div className="m-error">
+                    No hay tareas asignadas.
+                  </div>
+                ): (
+                  <div className = "i-tareas-containaer">
+                    {tareas.map((tarea, idTarea) => (
+                      <div className="i-tarea" key={idTarea}>
+                      <div className="i-tarea-info">
+                        <div className="i-tarea-titulo">{tarea.titulo}</div>
+                        <div className="i-tarea-desc">{tarea.descripcion}</div>
+                        <div className="i-tarea-botones">
+                          <div className="i-tarea-boton"><FaCalendar /> {tarea.fecha}</div>
+
+                        </div>
+                      </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                </div>
+              ) : (
+                <div className="spinner">
+                  <Spinner animation="border" role="status"></Spinner>
+                </div>
+              )}
+
+              </div>
               <div className="i-tarea">
                 <div className="i-tarea-info">
                   <div className="i-tarea-titulo">Sprint 2</div>

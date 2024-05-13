@@ -280,3 +280,18 @@ export const crearTareas = async (data) => {
     return response.data.error;
   }
 };
+
+// Obtener tareas de iniciativa
+export const getMisTareas = async (idIniciativa) => {
+  const response = await axios.post(`${functionsURL}/getMisTareas`, {
+    idIniciativa: idIniciativa
+  });
+  if (response.data.success) {
+    console.log("Obtener tareas exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error obteniendo tareas");
+    throw new Error(response.data.error);
+  }
+};
+

@@ -338,3 +338,79 @@ li.i-etiqueta-item {
 .i-btn-ver-solicitudes:hover {
   background-color: #6b7780;
 }
+
+
+/*TAREAS MARTHA*/
+
+.i-seccion-tareas {
+  width: 80%;
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+}
+
+.i-tareas-container {
+  display: flex;
+  width: 80%;
+  flex-direction: column;
+}
+
+.i-tarea {
+  display: flex;
+  min-height: 120px;
+  width: 100%;
+  background-color: #E2EBF1;
+  border-radius: 25px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px 25px;
+  align-items: flex-start;
+  font-weight: 600;
+  flex-direction: row;
+}
+
+.i-tarea-titulo {
+  font-size: 25px;
+}
+
+input.i-tarea-titulo {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.i-tarea-texto {
+  font-size: 14px;
+  width: 100%;
+}
+
+.i-tarea-desc {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  word-break: break-all;
+  text-align: left;
+}
+
+.i-tarea-info {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  align-items: flex-start;
+}
+
+.i-tarea-botones {
+  display: flex;
+  height: 100%;
+  width: 20%;
+  justify-content: space-around;
+  flex-direction: column;
+}
+
+.i-tarea-boton {
+  background-color: #A0C1BF;
+  border-radius: 25px;
+  font-size: 14px;
+  padding: 5px 10px;
+  text-align: center;
+}
