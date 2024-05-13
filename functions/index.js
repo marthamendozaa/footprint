@@ -79,7 +79,6 @@ exports.autentificaUsuario = onRequest(async (req, res) => {
 });
 
 
-// DEPLOY
 // Registro de usuario
 exports.crearUsuario = onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -318,7 +317,6 @@ exports.actualizaIniciativa = onRequest(async (req, res) => {
 });
 
 
-// DEPLOY
 // Elimina iniciativa
 exports.eliminaIniciativa = onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -330,7 +328,8 @@ exports.eliminaIniciativa = onRequest(async (req, res) => {
       // Borrar iniciativa de Firestore
       const iniciativaRef = await getFirestore().doc(`Iniciativas/${iniciativa}`);
       const iniciativaData = await getFirestore().doc(`Iniciativas/${iniciativa}`).get();
-      const user = iniciativaData.data().idAdmin;
+      const admin = iniciativaData.data().idAdmin;
+      const miembros = iniciativaData.data().listaMiembros;
       await iniciativaRef.delete();
 
       // Elimina tareas de la iniciativa
@@ -345,10 +344,18 @@ exports.eliminaIniciativa = onRequest(async (req, res) => {
       }
   
       // Borrar iniciativa de lista de iniciativas del admin
-      const usuarioRef = await getFirestore().doc(`Usuarios/${user}`).get();
+      const usuarioRef = await getFirestore().doc(`Usuarios/${admin}`).get();
       const usuario = usuarioRef.data();
       const usuarioNuevo = { ...usuario, listaIniciativasAdmin: usuario.listaIniciativasAdmin.filter(id => id !== iniciativa) };
-      await getFirestore().doc(`Usuarios/${user}`).update(usuarioNuevo);
+      await getFirestore().doc(`Usuarios/${admin}`).update(usuarioNuevo);
+
+      // Borrar iniciativa de lista de iniciativas de los miembros
+      for (const miembro of miembros) {
+        const miembroRef = await getFirestore().doc(`Usuarios/${miembro}`).get();
+        const miembroData = miembroRef.data();
+        const miembroNuevo = { ...miembroData, listaIniciativasMiembro: miembroData.listaIniciativasMiembro.filter(id => id !== iniciativa) };
+        await getFirestore().doc(`Usuarios/${miembro}`).update(miembroNuevo);
+      }
       
       res.json({ success: true });
     } catch (error) {
@@ -410,7 +417,6 @@ exports.subirImagen = onRequest(async (req, res) => {
 });
 
 
-// DEPLOY
 // Suscribe el usuario a una iniciativa
 exports.suscribirseAIniciativa = onRequest(async (req, res) => {
   cors(req, res, async () => {
