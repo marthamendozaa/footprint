@@ -59,8 +59,8 @@ export const ResponsiveLetter = ({ isChecked, setIsChecked, onClose }) => {
   };
 
   const onlyLetters = (text) => {
-    return /^[a-zA-Z\s]+$/.test(text);
-  };
+    return /^[a-zA-ZñÑáéíóúüÁÉÍÓÚ\s]+$/.test(text);
+  };  
 
   useEffect(() => {
     setCheckboxError(false);

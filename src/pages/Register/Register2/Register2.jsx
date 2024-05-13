@@ -5,6 +5,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import es from 'date-fns/locale/es';
 import DateInfo from './DateInfo.jsx';
 import { ResponsiveLetter } from './ResponsiveLetter.jsx';
+import { existeNombreUsuario } from '../../../api/api.js';
 import './Register2.css';
 
 export const Register2 = ({ onPrev, onNext }) => {
@@ -29,16 +30,7 @@ export const Register2 = ({ onPrev, onNext }) => {
   }, []);
 
   const onlyLetters = (text) => {
-    return /^[a-zA-Z\s]+$/.test(text);
-  };
-
-  const validateUsername = (username) => {
-    const numbers = /[0-9]/;
-    if (!numbers.test(username)) {
-        return false;
-    }
-
-    return true;
+    return /^[a-zA-ZñÑáéíóúüÁÉÍÓÚ\s]+$/.test(text);
   };
 
   const calculateAge = (birthday) => {
@@ -66,11 +58,11 @@ export const Register2 = ({ onPrev, onNext }) => {
       setInvalidName(true);
       return;
     }
-      
 
-    if (!validateUsername(username)) {
-        setInvalidUsername(true);
-        return;
+    const response = await existeNombreUsuario(username);
+    if (response) {
+      setInvalidUsername(true);
+      return;
     }
 
     try {
@@ -114,7 +106,7 @@ export const Register2 = ({ onPrev, onNext }) => {
                   placeholder="Ingresa tu nombre completo"
                   value={name}
                   onChange={(e) => {
-                    if (e.target.value.length <= 35) {
+                    if (e.target.value.length <= 30) {
                       setName(e.target.value);
                     }
                     setInvalidName(false);

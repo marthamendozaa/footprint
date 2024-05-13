@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
+import { getIntereses } from '../../../api/api.js';
 import { Spinner } from 'react-bootstrap';
-import { getIntereses } from './Register3-fb';
 import './Register3.css';
 
 export const Register3 = ({ onPrev, onNext }) => {

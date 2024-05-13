@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaArrowLeft } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
+import { getHabilidades } from '../../../api/api.js';
 import { Spinner } from 'react-bootstrap';
-import { getHabilidades } from './Register4-fb';
 import './Register4.css';
 
 export const Register4 = ({ onPrev }) => {
