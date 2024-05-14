@@ -464,7 +464,20 @@ exports.crearTareas = onRequest(async (req, res) => {
   });
 });
 
-//Crea las solicitudes
+
+// Mostar datos de tarea
+exports.getMisTareas = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { idTarea } = req.body;
+
+    try {
+      const tareaRef = await getFirestore().doc(`Tareas/${idTarea}`).get();
+      const tarea = tareaRef.data();
+      res.json({ success: true, data: tarea });
+    } catch (error) {
+      logger.info("Error obteniendo tarea: ", error.message);
+      
+      
 exports.crearSolicitud = onRequest(async (req, res) => {
   cors(req, res, async () => {
     const { solicitud } = req.body;
@@ -496,6 +509,7 @@ exports.crearSolicitud = onRequest(async (req, res) => {
   });
 });
 
+      
 //Obtener solicitudes de usuario o iniciativa
 exports.getSolicitudes = onRequest(async (req, res) => {
   cors(req, res, async () => {

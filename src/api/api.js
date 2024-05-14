@@ -296,6 +296,20 @@ export const crearTareas = async (data) => {
   }
 };
 
+
+export const getMisTareas = async (idTarea) => {
+  const response = await axios.post(`${functionsURL}/getMisTareas`, {
+    idTarea: idTarea
+  });
+  if (response.data.success) {
+    console.log("Obtener tareas exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error obteniendo tareas");
+    throw new Error(response.data.error);
+  }
+};
+
 // Crear solicitudes
 export const crearSolicitud = async (solicitud) => {
   const response = await axios.post(`${functionsURL}/crearSolicitud`, {
@@ -324,3 +338,4 @@ export const getSolicitudes = async (collection, id) => {
     throw new Error(response.data.error);
   }
 };
+
