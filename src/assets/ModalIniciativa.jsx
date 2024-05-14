@@ -4,16 +4,16 @@ import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
 
-const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCrearSolicitud, esAdmin, esMiembro, suscribirDesactivado, pagina }) => {
+const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCrearSolicitud, esAdmin, esMiembro, suscribirDesactivado, setSuscribirDesactivado, pagina }) => {
     return (
-        <Modal show={showModal} onHide={() => setShowModal(false)} centered className='modal1'>
+        <Modal show={showModal} onHide={() => {setShowModal(false); setSuscribirDesactivado(false);}} centered className='modal1'>
             <div className=".modalcontainer">
                 <div className='modaliniciativa'>
                     {selectedIniciativa && (
                         <>
                             <div className="modalhead">
                                 <div className="modalbutton">
-                                    <button type="button" className="close" onClick={() => setShowModal(false)} aria-label="Close">
+                                    <button type="button" className="close" onClick={() => {setShowModal(false); setSuscribirDesactivado(false);}} aria-label="Close">
                                         <span aria-hidden="true">&times;</span>
                                     </button>
                                 </div>
@@ -51,9 +51,9 @@ const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCre
                                 <div className='modalsusbotton'> Ver iniciativa </div>   
                             </Link>
                         ) : (
-                            <div className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud}>
+                            <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud}>
                                 Solicitar unirme
-                            </div>
+                            </button>
                         )
                     ):null }
                 

@@ -488,7 +488,7 @@ exports.crearSolicitud = onRequest(async (req, res) => {
       const iniciativaNueva = { ...iniciativaData, listaSolicitudes: [...iniciativaData.listaSolicitudes, idSolicitud] };
       await getFirestore().doc(`Iniciativas/${idIniciativa}`).update(iniciativaNueva);
   
-      res.json({ success: true });
+      res.json({ success: true, data: idSolicitud });
     } catch (error) {
       logger.info("Error creando solicitud: ", error.message);
       res.json({ success: false, error: error.message });

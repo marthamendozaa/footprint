@@ -303,10 +303,10 @@ export const crearSolicitud = async (solicitud) => {
   });
   if (response.data.success) {
     console.log("Crear solicitud exitoso");
-    return response.data.success;
+    return response.data;
   } else {
     console.log("Error creando solicitud");
-    return response.data.error;
+    throw new Error(response.data.error);
   }
 };
 
@@ -321,6 +321,6 @@ export const getSolicitudes = async (collection, id) => {
     return response.data.data;
   } else {
     console.log("Error obteniendo solicitudes");
-    return response.data.error;
+    throw new Error(response.data.error);
   }
 };

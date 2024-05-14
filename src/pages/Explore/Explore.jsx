@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { useAuth } from '../../contexts/AuthContext';
 import Solicitud from '../../classes/Solicitud.js'
-import { getIniciativas, crearSolicitud } from '../../api/api.js';
+import { getIniciativas, crearSolicitud, getUsuario } from '../../api/api.js';
 import { Modal, Spinner } from 'react-bootstrap';
 import { FaHeart, FaRegHeart, FaSearch, FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
 import Fuse from 'fuse.js';
@@ -18,11 +18,17 @@ export const Explore = () => {
     const [selectedIniciativa, setSelectedIniciativa] = useState(null); // State to store the selected iniciativa
     const [selectedIniciativaIndex, setSelectedIniciativaIndex] = useState(null);
 
+    const { user } = useAuth();
+    const [usuario, setUsuario] = useState(null);
+
     useEffect(() => {
         const fetchData = async () => {
             const dataIniciativa = await getIniciativas();
             setIniciativas(dataIniciativa);
             setFilteredIniciativas(dataIniciativa); // Initialize filteredIniciativas with all iniciativas
+
+            const dataUsuario = await getUsuario(user);
+            setUsuario(dataUsuario);
         };
         fetchData();
     }, []);
@@ -64,12 +70,17 @@ export const Explore = () => {
         setFilteredIniciativas(filtered);
     };
     
-    const { user } = useAuth();
     const [esAdmin, setEsAdmin] = useState(false);
     const [esMiembro, setEsMiembro] = useState(false);
     const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
 
     const handleButtonClick = async (iniciativa, index) => {
+        for (const solicitud of usuario.listaSolicitudes) {
+          if (iniciativa.listaSolicitudes.includes(solicitud)) {
+            setSuscribirDesactivado(true);
+          }
+        }
+
         setSelectedIniciativa(iniciativa);
         setSelectedIniciativaIndex(index);
         if (iniciativa.listaMiembros.includes(user)) {
@@ -88,16 +99,19 @@ export const Explore = () => {
             const idIniciativa = selectedIniciativa.idIniciativa; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
             try {
                 setSuscribirDesactivado(true);
-                // const resultado = await suscribirseAIniciativa(user, idIniciativa);
                 const solicitud = new Solicitud(user, idIniciativa, "Pendiente", "UsuarioAIniciativa");
                 const response = await crearSolicitud(solicitud);
-                if (response) {
+                if (response.success) {
+                    const iniciativasNuevo = [...iniciativas];
+                    iniciativasNuevo[selectedIniciativaIndex].listaSolicitudes.push(response.data);
+                    setIniciativas(iniciativasNuevo);
+
+                    const usuarioNuevo = {...usuario};
+                    usuarioNuevo.listaSolicitudes.push(response.data);
+                    setUsuario(usuarioNuevo);
+
                     setShowModal(false);
                     alert("Has enviado solicitud a la iniciativa");
-                    
-                    // const iniciativasNuevo = [...iniciativas];
-                    // iniciativasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
-                    // setIniciativas(iniciativasNuevo);
                 }
             } catch (error) {
               alert("Error al enviar solicitud a la iniciativa");
@@ -150,6 +164,7 @@ export const Explore = () => {
                         esAdmin={esAdmin}
                         esMiembro={esMiembro}
                         suscribirDesactivado={suscribirDesactivado}
+                        setSuscribirDesactivado={setSuscribirDesactivado}
                         pagina = {"Explore"}
                         /> 
                     </div>
