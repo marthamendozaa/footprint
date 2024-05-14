@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
-import { AiOutlineSearch } from "react-icons/ai";
-import { getIniciativas, addFavoritas, isFavorito } from './Explore-fb.js';
+import { getIniciativas, addFavoritas, isFavorito, eliminarFavoritas } from './Explore-fb.js';
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
-import { ModalHeader } from 'react-bootstrap';
 import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { getIniciativasFavoritas } from '../MyInitiatives/MyInitiatives-fb.js';
 
 export const Explore = ({ userId, idIniciativa }) => {
     const [filter, setFilter] = useState('');
@@ -16,26 +12,36 @@ export const Explore = ({ userId, idIniciativa }) => {
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
     const [selectedIniciativa, setSelectedIniciativa] = useState(null); // State to store the selected iniciativa
     const [esFavorita, setEsFavorita] = useState(false);
+    const [favoritos, setFavoritos] = useState({});
 
     useEffect(() => {
         const fetchData = async () => {
             const dataIniciativa = await getIniciativas();
             setIniciativas(dataIniciativa);
             setFilteredIniciativas(dataIniciativa); // Initialize filteredIniciativas with all iniciativas
+            // Initialize favoritos state
+            const favoritosInicial = {};
+            dataIniciativa.forEach(iniciativa => {
+                verificarFavorito(iniciativa.idIniciativa);
+                favoritosInicial[iniciativa.idIniciativa] = false;
+            });
+            setFavoritos(favoritosInicial);
         };
         fetchData();
-
-        const verificarFavorito = async () => {
-            try {
-              const estaEnLista = await isFavorito(userId, idIniciativa);
-              setEsFavorita(estaEnLista);
-            } catch (error) {
-              console.error("Error al verificar si la iniciativa está en la lista de favoritos: ", error);
-            }
-        };
-        verificarFavorito();
-        
     }, [userId, idIniciativa]);
+
+
+    const verificarFavorito = async (idIniciativa) => {
+        try {
+            const estaEnLista = await isFavorito(idIniciativa);
+            setFavoritos(prevState => ({
+                ...prevState,
+                [idIniciativa]: estaEnLista
+            }));
+        } catch (error) {
+            console.error("Error al verificar si la iniciativa está en la lista de favoritos: ", error);
+        }
+    };
 
     const searchText = (event) => {
         const searchTerm = event.target.value;
@@ -54,8 +60,16 @@ export const Explore = ({ userId, idIniciativa }) => {
     }
 
     // Toggle de icono de favoritos
-    const handleToggleFavorita = () => {        
-        //setEsFavorita((esFavorita) => !esFavorita);
+    const handleToggleFavorita = async (idIniciativa) => {
+        if (favoritos[idIniciativa]) {
+            await eliminarFavoritas(idIniciativa);
+        } else {
+            await addFavoritas(idIniciativa);
+        }
+        setFavoritos(prevState => ({
+            ...prevState,
+            [idIniciativa]: !prevState[idIniciativa]
+        }));
     };
 
     return (
@@ -77,11 +91,11 @@ export const Explore = ({ userId, idIniciativa }) => {
             {filteredIniciativas && filteredIniciativas.map((item, index) => (
                 <div key={index} className='e-iniciativa'>
                     <div className='meGusta' >
-                    {esFavorita ? (
-                        <FaHeart onClick={() => {addFavoritas(item.idIniciativa); handleToggleFavorita()}} style={{ cursor: "pointer" }} />
-                    ) : (
-                        <FaRegHeart onClick={() => {addFavoritas(item.idIniciativa); handleToggleFavorita()}} style={{ cursor: "pointer" }} />
-                    )}
+                        {favoritos[item.idIniciativa] ? (
+                            <FaHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />
+                        ) : (
+                            <FaRegHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />
+                        )}
                     </div>
                     <div className='e-iniciativa-imagen' onClick={() => handleButtonClick(item)}>
                         <img src={item.urlImagen} alt = {item.titulo} />

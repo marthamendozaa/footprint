@@ -23,10 +23,10 @@ export const MyInitiatives = () => {
   },[]);
 
   const handleFavoritas = async (idIniciativa) => {
-    eliminarFavoritas(idIniciativa);
-    const newDatos = await getIniciativasFavoritas();
-    setIniciativasFavoritas(newDatos);
+    await eliminarFavoritas(idIniciativa);
+    setIniciativasFavoritas(prevIniciativas => prevIniciativas.filter(iniciativa => iniciativa.idIniciativa !== idIniciativa));
   };
+  
 
   return (
     <div>

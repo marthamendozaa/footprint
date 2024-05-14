@@ -48,14 +48,8 @@ export const addFavoritas = async (idIniciativa) => {
 
   const listaIniciativasFavoritas = usuarioData.listaIniciativasFavoritas;
 
-  // Eliminar iniciativa de lista de favoritos del usuario
-  if (listaIniciativasFavoritas.includes(idIniciativaFavoritaNueva)){
-    await updateDoc(usuarioDocRef, { listaIniciativasFavoritas: arrayRemove(idIniciativaFavoritaNueva) });
-    console.log("Iniciativa eliminada");
-  }
-
   // Agregar iniciativa a lista de favoritos del usuario
-  else try{
+  try{
     await updateDoc(usuarioDocRef, { listaIniciativasFavoritas: arrayUnion(idIniciativaFavoritaNueva) });
     console.log("Iniciativa agregada");
   } catch (error) {
@@ -64,9 +58,43 @@ export const addFavoritas = async (idIniciativa) => {
   }
 };
 
+// Eliminar iniciativa de lista de favoritos
+export const eliminarFavoritas = async (idIniciativa) => {
+  console.log("Sí se presionó el botón");
+  const user = JSON.parse(sessionStorage.getItem('user'));
+  if (!user) {
+    console.error("No hay usuario autenticado");
+    return null;
+  }
+
+  const idIniciativaFavoritaNueva = idIniciativa;
+  const usuarioDocRef = doc(firestore, "Usuarios", user.uid);
+
+  // Obtener el documento del usuario de Firestore
+  const usuarioDocSnap = await getDoc(usuarioDocRef);
+  if (!usuarioDocSnap.exists()) {
+    console.error("El documento del usuario no existe");
+    return null;
+  }
+
+  // Acceder a los datos del documento del usuario
+  const usuarioData = usuarioDocSnap.data();
+  if (!usuarioData.listaIniciativasFavoritas) {
+    console.error("La lista de iniciativas favoritas no está definida en el documento del usuario.");
+    return null;
+  }
+
+  const listaIniciativasFavoritas = usuarioData.listaIniciativasFavoritas;
+
+  // Eliminar iniciativa de lista de favoritos del usuario
+  if (listaIniciativasFavoritas.includes(idIniciativaFavoritaNueva)){
+    await updateDoc(usuarioDocRef, { listaIniciativasFavoritas: arrayRemove(idIniciativaFavoritaNueva) });
+    console.log("Iniciativa eliminada");
+  }
+};
+
 // Buscar si una iniciativa está en la lista de favoritos
 export const isFavorito = async (idIniciativa) => {
-  try {
   const user = JSON.parse(sessionStorage.getItem('user'));
   if (!user) {
     console.error("No hay usuario autenticado");
@@ -85,10 +113,6 @@ export const isFavorito = async (idIniciativa) => {
   // Obtener la lista de iniciativas favoritas del usuario
   const listaIniciativasFavoritas = usuarioDocSnap.data().listaIniciativasFavoritas
 
-  //Verificar si existe la iniciativa enla lista de favoritos
+  //Verificar si existe la iniciativa en la lista de favoritos
   return listaIniciativasFavoritas.includes(idIniciativa);
-  } catch (error) {
-    console.error("Error obteniendo lista de iniciativas favoritas: ", error.message);
-    return null;
-  }
 };

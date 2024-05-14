@@ -103,7 +103,7 @@ export const getIniciativasFavoritas = async () => {
   }
 };
 
-// Agregar iniciativa a lista de favoritos
+// Eliminar iniciativa de lista de favoritos
 export const eliminarFavoritas = async (idIniciativa) => {
   console.log("Sí se presionó el botón");
   const user = JSON.parse(sessionStorage.getItem('user'));
