@@ -6,6 +6,7 @@ import { getIniciativas, suscribirseAIniciativa } from '../../api/api.js';
 import { Spinner, Modal } from 'react-bootstrap';
 import { FaHeart, FaRegHeart, FaSearch, FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
 import Fuse from 'fuse.js';
+import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 
 
 export const Explore = () => {
@@ -62,12 +63,23 @@ export const Explore = () => {
     };
     
 
-    const handleButtonClick = (iniciativa) => {
+
+    const { user } = useAuth();
+    const [esAdmin, setEsAdmin] = useState(false);
+    const [esMiembro, setEsMiembro] = useState(false);
+    const handleButtonClick = async (iniciativa) => {
+        if (selectedIniciativa.listaMiembros.includes(user)) {
+            setEsMiembro(true);
+        }else if (selectedIniciativa.idAdmin === user){
+            setEsAdmin(true);
+        } else {
+            setEsAdmin(false);
+            setEsMiembro(false);
+        } 
         setSelectedIniciativa(iniciativa);
         setShowModal(true);
     }
 
-    const { user } = useAuth();
     const handleSuscribirse = async () => {
         if (selectedIniciativa) {
             const idIniciativa = selectedIniciativa.id; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
@@ -113,56 +125,14 @@ export const Explore = () => {
                         </div>
 
                         {/* Mostrar información adicional */}
-                        <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
-                            <div className="modalcontainer">
-                                <Modal.Header style={{ border: "none" }} closeButton> </Modal.Header>
-                                
-                                <div className='modaliniciativa'>
-                                    {selectedIniciativa && (
-                                        <>
-                                            <div className="modalhead">
-                                                <img src={selectedIniciativa.urlImagen} alt={selectedIniciativa.titulo} className="modalimg" />
-                                            </div>
-                                            
-                                            <div className='modalinfo'>
-                                                <div className='modaltitulo'>{selectedIniciativa.titulo}</div>
-                                                
-                                                {/* Etiquetas */}
-                                                <div className="m-etiquetas">
-                                                    {Object.values(selectedIniciativa.listaEtiquetas).map((etiqueta, idEtiqueta) => (
-                                                        <li key={idEtiqueta} className={'m-etiqueta-item'}>
-                                                        {etiqueta}
-                                                        </li>
-                                                    ))}
-                                                </div>
-
-                                                <div className='modalfecha'> <FaCalendar style={{marginRight: '5px'}} />{selectedIniciativa.fechaInicio} - {selectedIniciativa.fechaCierre ? selectedIniciativa.fechaCierre : 'S.F.'} </div>
-                                                <div className='modalregion'> <FaGlobe style={{marginRight: '5px'}} />{selectedIniciativa.region} </div>
-                                                <div className='modalpublica'>
-                                                    {selectedIniciativa.esPublica ? <><FaUnlockAlt style={{marginRight: '5px'}} />Pública</> : <><FaLock style={{marginRight: '5px'}} />Privada</>}
-                                                </div>
-
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-
-                                <div className = 'modaldesc'>
-                                    {selectedIniciativa && (
-                                        <>
-                                            <div className='modaltextodesc'>{selectedIniciativa.descripcion}</div>
-                                        </>
-                                    )}
-                                </div>
-
-                                <div className = 'modalsuscribir'>
-                                    <div className='modalsusbotton' onClick={handleSuscribirse}>
-                                        Suscribirse
-                                    </div>
-                                </div>
-                            </div>
-                        </Modal>
-                    
+                        <ModalIniciativa
+                        showModal={showModal}
+                        setShowModal={setShowModal}
+                        selectedIniciativa={selectedIniciativa}
+                        handleSuscribirse={handleSuscribirse}
+                        esAdmin={esAdmin}
+                        esMiembro={esMiembro}
+                    /> 
                     </div>
                 </div>
             ) : (
