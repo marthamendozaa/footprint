@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { useAuth } from '../../contexts/AuthContext';
-import { getIniciativas, suscribirseAIniciativa } from '../../api/api.js';
+import Solicitud from '../../classes/Solicitud.js'
+import { getIniciativas, crearSolicitud } from '../../api/api.js';
 import { Modal, Spinner } from 'react-bootstrap';
 import { FaHeart, FaRegHeart, FaSearch, FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
 import Fuse from 'fuse.js';
@@ -69,34 +70,37 @@ export const Explore = () => {
     const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
 
     const handleButtonClick = async (iniciativa, index) => {
-        if (selectedIniciativa.listaMiembros.includes(user)) {
+        setSelectedIniciativa(iniciativa);
+        setSelectedIniciativaIndex(index);
+        if (iniciativa.listaMiembros.includes(user)) {
             setEsMiembro(true);
-        }else if (selectedIniciativa.idAdmin === user){
+        }else if (iniciativa.idAdmin === user){
             setEsAdmin(true);
         } else {
             setEsAdmin(false);
             setEsMiembro(false);
         }
-        setSelectedIniciativa(iniciativa);
-        setSelectedIniciativaIndex(index);
         setShowModal(true);
     }
 
-    const handleSuscribirse = async () => {
+    const handleCrearSolicitud = async () => {
         if (selectedIniciativa) {
             const idIniciativa = selectedIniciativa.idIniciativa; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
             try {
-              const resultado = await suscribirseAIniciativa(user, idIniciativa);
-              if (resultado) {
-                  setShowModal(false);
-                  alert("Te has suscrito a la iniciativa");
-                  
-                  const iniciativasNuevo = [...iniciativas];
-                  iniciativasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
-                  setIniciativas(iniciativasNuevo);
-              }
+                setSuscribirDesactivado(true);
+                // const resultado = await suscribirseAIniciativa(user, idIniciativa);
+                const solicitud = new Solicitud(user, idIniciativa, "Pendiente", "UsuarioAIniciativa");
+                const response = await crearSolicitud(solicitud);
+                if (response) {
+                    setShowModal(false);
+                    alert("Has enviado solicitud a la iniciativa");
+                    
+                    // const iniciativasNuevo = [...iniciativas];
+                    // iniciativasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
+                    // setIniciativas(iniciativasNuevo);
+                }
             } catch (error) {
-              alert("Error al suscribirse a la iniciativa");
+              alert("Error al enviar solicitud a la iniciativa");
             } finally {
               setSuscribirDesactivado(false);
             }
@@ -142,10 +146,11 @@ export const Explore = () => {
                         showModal={showModal}
                         setShowModal={setShowModal}
                         selectedIniciativa={selectedIniciativa}
-                        handleSuscribirse={handleSuscribirse}
+                        handleCrearSolicitud={handleCrearSolicitud}
                         esAdmin={esAdmin}
                         esMiembro={esMiembro}
                         suscribirDesactivado={suscribirDesactivado}
+                        pagina = {"Explore"}
                         /> 
                     </div>
                 </div>

@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button';
 import { Link } from 'react-router-dom';
 
 
-const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleSuscribirse, esAdmin, esMiembro }) => {
+const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCrearSolicitud, esAdmin, esMiembro, suscribirDesactivado, pagina }) => {
     return (
         <Modal show={showModal} onHide={() => setShowModal(false)} centered className='modal1'>
             <div className=".modalcontainer">
@@ -45,15 +45,18 @@ const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleSus
                     )}
                 </div>
                 <div className='modalsuscribir'>
-                {esAdmin || esMiembro ? (
-                        <Link to={`/initiative/${selectedIniciativa.idIniciativa}`}>
-                            <div className='modalsusbotton'> Ver iniciativa </div>   
-                        </Link>
-                    ) : (
-                        <div className='modalsusbotton' onClick={handleSuscribirse}>
-                            Suscribirse
-                        </div>
-                    )}
+                    {pagina == "Explore" ?(
+                        esAdmin || esMiembro ? (
+                            <Link to={`/initiative/${selectedIniciativa.idIniciativa}`}>
+                                <div className='modalsusbotton'> Ver iniciativa </div>   
+                            </Link>
+                        ) : (
+                            <div className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud}>
+                                Solicitar unirme
+                            </div>
+                        )
+                    ):null }
+                
                 </div>
             </div>
         </Modal>
