@@ -2,36 +2,14 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-
-    match /Usuarios/{documents} {
-      allow update: if isLoggedIn() && request.auth.uid == documents; //solo editar los datos de tu mismo usuario
-      allow read, create: if isLoggedIn();
+    // Allow read access to all documents
+    match /{document=**} {
+      allow read;
     }
     
-    match /General/{documents} {
-      allow read, update: if isLoggedIn();
+    // Allow write access only from Firebase Admin SDK
+    match /{document=**} {
+      allow write: if request.auth != null && request.auth.token.firebase.sign_in_provider == "admin";
     }
-    
-    match /Iniciativas/{documents} {
-      allow read, update, delete, create: if isLoggedIn();
-    }
-    
-    match /Usuarios/{documents=**} {
-      allow read, update, create: if isLoggedIn();
-    }
-    
-    match /General/{documents=**} {
-      allow read, update: if isLoggedIn();
-    }
-    
-    match /Iniciativas/{documents=**} {
-      allow read, update, create: if isLoggedIn();
-    }
-    
-    // User ir authenticated
-    function isLoggedIn(){
-     return request.auth != null;
-    }
-    
   }
 }

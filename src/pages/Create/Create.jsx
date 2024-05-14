@@ -306,7 +306,7 @@ export const Create = () => {
   const [crearDesactivado, setCrearDesactivado] = useState(false);
 
   const handleCrearIniciativa = async () => {
-    if (!titulo || !desc || region === "" || Object.keys(etiquetasIniciativa).length === 0 || !fechaInicio) {
+    if (!titulo || !desc || region === "" || Object.keys(etiquetasIniciativa).length === 0 || !fechaInicio || tareas.find(tarea => !tarea.titulo || !tarea.descripcion || !tarea.fechaEntrega)) {
       handleMostrarError();
       return;
     }
