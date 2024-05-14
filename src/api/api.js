@@ -53,6 +53,21 @@ export const autentificaUsuario = async (email, password) => {
 };
 
 
+// Registro del usuario
+export const crearUsuario = async (data) => {
+  const response = await axios.post(`${functionsURL}/crearUsuario`, {
+    data: data
+  });
+  if (response.data.success) {
+    console.log("Registro exitoso");
+    return response.data.success;
+  } else {
+    console.log("Error en registro");
+    return response.data.success;
+  }
+};
+
+
 // Información del usuario
 export const getUsuario = async (user) => {
   const response = await axios.post(`${functionsURL}/getUsuario`, {

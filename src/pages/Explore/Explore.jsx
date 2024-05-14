@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { useAuth } from '../../contexts/AuthContext';
 import { getIniciativas, suscribirseAIniciativa } from '../../api/api.js';
-import { Spinner, Modal } from 'react-bootstrap';
+import { Modal, Spinner } from 'react-bootstrap';
 import { FaHeart, FaRegHeart, FaSearch, FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
 import Fuse from 'fuse.js';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
@@ -15,6 +15,7 @@ export const Explore = () => {
     const [filteredIniciativas, setFilteredIniciativas] = useState(null);
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
     const [selectedIniciativa, setSelectedIniciativa] = useState(null); // State to store the selected iniciativa
+    const [selectedIniciativaIndex, setSelectedIniciativaIndex] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -62,12 +63,12 @@ export const Explore = () => {
         setFilteredIniciativas(filtered);
     };
     
-
-
     const { user } = useAuth();
     const [esAdmin, setEsAdmin] = useState(false);
     const [esMiembro, setEsMiembro] = useState(false);
-    const handleButtonClick = async (iniciativa) => {
+    const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
+
+    const handleButtonClick = async (iniciativa, index) => {
         if (selectedIniciativa.listaMiembros.includes(user)) {
             setEsMiembro(true);
         }else if (selectedIniciativa.idAdmin === user){
@@ -75,17 +76,29 @@ export const Explore = () => {
         } else {
             setEsAdmin(false);
             setEsMiembro(false);
-        } 
+        }
         setSelectedIniciativa(iniciativa);
+        setSelectedIniciativaIndex(index);
         setShowModal(true);
     }
 
     const handleSuscribirse = async () => {
         if (selectedIniciativa) {
-            const idIniciativa = selectedIniciativa.id; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
-            const resultado = await suscribirseAIniciativa(user, idIniciativa);
-            if (resultado) {
-                setShowModal(false);
+            const idIniciativa = selectedIniciativa.idIniciativa; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
+            try {
+              const resultado = await suscribirseAIniciativa(user, idIniciativa);
+              if (resultado) {
+                  setShowModal(false);
+                  alert("Te has suscrito a la iniciativa");
+                  
+                  const iniciativasNuevo = [...iniciativas];
+                  iniciativasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
+                  setIniciativas(iniciativasNuevo);
+              }
+            } catch (error) {
+              alert("Error al suscribirse a la iniciativa");
+            } finally {
+              setSuscribirDesactivado(false);
             }
         }
     }
@@ -111,7 +124,7 @@ export const Explore = () => {
                         {/* Iniciativas */}
                         <div className='e-iniciativas-container'>
                         {filteredIniciativas && filteredIniciativas.map((item, index) => (
-                            <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item)}>
+                            <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item, index)}>
                                 <div className='e-iniciativa-imagen'>
                                     <img src={item.urlImagen} alt = {item.titulo} />
                                 </div>
@@ -132,7 +145,8 @@ export const Explore = () => {
                         handleSuscribirse={handleSuscribirse}
                         esAdmin={esAdmin}
                         esMiembro={esMiembro}
-                    /> 
+                        suscribirDesactivado={suscribirDesactivado}
+                        /> 
                     </div>
                 </div>
             ) : (

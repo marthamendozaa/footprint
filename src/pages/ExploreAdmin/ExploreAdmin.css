@@ -127,6 +127,16 @@
   color: #000;
 }
 
+.btn-eliminar-tarjeta-1:first-child:active {
+  background-color: #699AA0;
+  color: #000;
+}
+
+.btn-eliminar-tarjeta-1:disabled {
+  background-color: #699AA0;
+  color: #000;
+}
+
 /* Modal eliminar iniciativas */
 .fade.ea-modal.modal.show {
   display: flex !important;

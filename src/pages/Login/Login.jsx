@@ -36,6 +36,8 @@ export const Login = () => {
   const { setUser, setAdmin } = useAuth();
   const navigate = useNavigate();
 
+  const [loginBloqueado, setLoginBloqueado] = useState(false);
+
   const handleLogin = async (event) => {
     event.preventDefault();
 
@@ -50,6 +52,8 @@ export const Login = () => {
       return;
     }
 
+    setLoginBloqueado(true);
+    
     try {
       const user = await autentificaUsuario(email, password);
       setUser(user);
@@ -66,6 +70,8 @@ export const Login = () => {
       console.error("Error al hacer login:", error.message);
       setError('Inicio de sesión fallido. Verifica tu correo y contraseña.');
       setShowModal(true);
+    } finally {
+      setLoginBloqueado(false);
     }
   };
 
@@ -121,7 +127,7 @@ export const Login = () => {
               />
               
               <span className="ojo-contrasena-2" onClick={() => setShowPassword(!showPassword)}>
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                {password !== '' && (showPassword ? <FaEyeSlash /> : <FaEye />)}
               </span>
             </div>
 
@@ -138,7 +144,7 @@ export const Login = () => {
 
               {/* Botón de iniciar sesión */}
               <div className='iniciar-sesion-container'>
-                  <button type="submit" className="btn login-btn">
+                  <button type="submit" className="btn login-btn" disabled={loginBloqueado}>
                       Iniciar sesión
                   </button>
               </div>

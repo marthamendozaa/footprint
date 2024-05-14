@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ExploreAdmin.css';
 import { getIniciativas, eliminaIniciativa } from '../../api/api.js';
-import { Modal, Button } from 'react-bootstrap';
+import { Modal, Button, Spinner } from 'react-bootstrap';
 import { FaSearch } from "react-icons/fa";
 import Fuse from 'fuse.js';
 
@@ -36,14 +36,20 @@ export const ExploreAdmin = () => {
   const handleCerrarError = () => setModalError(false);
 
   // Eliminar iniciativa
+  const [eliminaBloqueado, setEliminaBloqueado] = useState(false);
+
   const handleEliminaIniciativa = async () => {
     console.log("Eliminando iniciativa con id: ", idIniciativaEliminar);
     handleCerrarEliminar();
+    setEliminaBloqueado(true);
+
     try {
       await eliminaIniciativa(idIniciativaEliminar);
       handleMostrarEliminada();
     } catch(error) {
       handleMostrarError();
+    } finally {
+      setEliminaBloqueado(false);
     }
   };
 
@@ -111,24 +117,30 @@ export const ExploreAdmin = () => {
           </div>
       </div>
 
-      <div className='ea-iniciativas-container'>
-      {filteredIniciativas && filteredIniciativas.map((item, index) => (
-        <div key={index} className='ea-iniciativa'>
-
-          <div className='ea-iniciativa-imagen'>
-            <img src={item.urlImagen} alt={item.titulo} />
-          </div>
-
-          <div className='ea-iniciativa-texto'>
-            <div className="ea-titulo">{item.titulo}</div>
-            <div className="ea-desc">{item.descripcion}</div>
-            <div className='ea-boton'>
-            <Button className="btn-eliminar-tarjeta-1" onClick={() => handleMostrarEliminar(item.titulo, item.idIniciativa)}>Eliminar</Button>
+      <div className='ea-iniciativas-container' style={!filteredIniciativas ? {justifyContent: "center"} : {}}>
+        {filteredIniciativas ? (
+          filteredIniciativas.map((item, index) => (
+            <div key={index} className='ea-iniciativa'>
+  
+              <div className='ea-iniciativa-imagen'>
+                <img src={item.urlImagen} alt={item.titulo} />
+              </div>
+  
+              <div className='ea-iniciativa-texto'>
+                <div className="ea-titulo">{item.titulo}</div>
+                <div className="ea-desc">{item.descripcion}</div>
+                <div className='ea-boton'>
+                <Button className="btn-eliminar-tarjeta-1" onClick={() => handleMostrarEliminar(item.titulo, item.idIniciativa)} disabled={eliminaBloqueado}>Eliminar</Button>
+                </div>
+              </div>
+  
             </div>
+          ))
+        ) : (
+          <div className="spinner">
+            <Spinner animation="border" role="status"></Spinner>
           </div>
-
-        </div>
-      ))}
+        )}
       </div>
 
       {/* Modal confirmar eliminar iniciativa*/}

@@ -8,11 +8,11 @@ import { ResponsiveLetter } from './ResponsiveLetter.jsx';
 import { existeNombreUsuario } from '../../../api/api.js';
 import './Register2.css';
 
-export const Register2 = ({ onPrev, onNext }) => {
-  const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
+export const Register2 = ({ onPrev, onNext, usuario }) => {
+  const [name, setName] = useState(usuario.nombre ? usuario.nombre : '');
+  const [username, setUsername] = useState(usuario.nombreUsuario ? usuario.nombreUsuario : '');
   const [invalidName, setInvalidName] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(usuario.fechaNacimiento ? new Date(usuario.fechaNacimiento) : null);
   const today = new Date();
   const maxDate = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
   const [invalidUsername, setInvalidUsername] = useState(false);
@@ -68,23 +68,36 @@ export const Register2 = ({ onPrev, onNext }) => {
     try {
         const userAge = calculateAge(selectedDate);
 
-        if (isChecked==true) {  
-          onNext();
+        if (isChecked==true) {
+          usuario.nombre = name;
+          usuario.nombreUsuario = username;
+          usuario.fechaNacimiento = selectedDate;
+          onNext(usuario);
         }
 
         if (userAge<18) {
-            setShowResponsiveLetter(true)
-            return;
+          setShowResponsiveLetter(true)
+          return;
         }
 
         else {
-            onNext();
+          usuario.nombre = name;
+          usuario.nombreUsuario = username;
+          usuario.fechaNacimiento = selectedDate;
+          onNext(usuario);
         }
         
       } catch {
         setError('Error al registrarse. Por favor, inténtalo de nuevo.');
         setShowModal(true);
       }
+  };
+
+  const handlePrev = () => {
+    usuario.nombre = name;
+    usuario.nombreUsuario = username;
+    usuario.fechaNacimiento = selectedDate;
+    onPrev(usuario);
   };
 
   return (
@@ -184,7 +197,7 @@ export const Register2 = ({ onPrev, onNext }) => {
 
             {/* Regreso */}
             <div className='flecha-register2-container-start'>
-              <button type="button" className="btn flecha-btn" onClick={onPrev}>
+              <button type="button" className="btn flecha-btn" onClick={handlePrev}>
                 <FaArrowLeft />
               </button>
             </div>

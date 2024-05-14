@@ -480,7 +480,7 @@ export const Profile = () => {
                   }} 
                 />
                 <span className="p-ojo-contrasena" onClick={() => setShowPassword(!showPassword)}>
-                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  {contrasenaActual !== '' && (showPassword ? <FaEyeSlash /> : <FaEye />)}
                 </span>
               </div>
 
@@ -503,7 +503,7 @@ export const Profile = () => {
                 <div className="p-row-dos-iconos">
                   <PasswordInfo2 className="p-p-i"/>
                   <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
-                      {showNewPassword ? <FaEyeSlash /> : <FaEye />}
+                      {nuevaContrasena !== '' && (showNewPassword ? <FaEyeSlash /> : <FaEye />)}
                   </span>
                 </div>
 
@@ -526,7 +526,7 @@ export const Profile = () => {
                   }}
                 />
                 <span className="p-ojo-contrasena" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    {confirmarContrasena !== '' && (showConfirmPassword ? <FaEyeSlash /> : <FaEye />)}
                 </span>
               </div>
               {errorConfirmarContraseña && <p className='p-error-cc' style={{marginTop: '-40px'}}><FaExclamationCircle className='p-fa-ec-2'/>{errorConfirmarContraseña}</p>}
