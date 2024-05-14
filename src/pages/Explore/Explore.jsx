@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { useAuth } from '../../contexts/AuthContext';
-import { getIniciativas, suscribirseAIniciativa } from '../../api/api.js';
+import Solicitud from '../../classes/Solicitud.js'
+import { getIniciativas, crearSolicitud, getUsuario } from '../../api/api.js';
 import { Modal, Spinner } from 'react-bootstrap';
 import { FaHeart, FaRegHeart, FaSearch, FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
 import Fuse from 'fuse.js';
+import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 
 
 export const Explore = () => {
@@ -16,11 +18,17 @@ export const Explore = () => {
     const [selectedIniciativa, setSelectedIniciativa] = useState(null); // State to store the selected iniciativa
     const [selectedIniciativaIndex, setSelectedIniciativaIndex] = useState(null);
 
+    const { user } = useAuth();
+    const [usuario, setUsuario] = useState(null);
+
     useEffect(() => {
         const fetchData = async () => {
             const dataIniciativa = await getIniciativas();
             setIniciativas(dataIniciativa);
             setFilteredIniciativas(dataIniciativa); // Initialize filteredIniciativas with all iniciativas
+
+            const dataUsuario = await getUsuario(user);
+            setUsuario(dataUsuario);
         };
         fetchData();
     }, []);
@@ -62,39 +70,51 @@ export const Explore = () => {
         setFilteredIniciativas(filtered);
     };
     
+    const [esAdmin, setEsAdmin] = useState(false);
+    const [esMiembro, setEsMiembro] = useState(false);
+    const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
 
-    const handleButtonClick = (iniciativa, index) => {
+    const handleButtonClick = async (iniciativa, index) => {
+        for (const solicitud of usuario.listaSolicitudes) {
+          if (iniciativa.listaSolicitudes.includes(solicitud)) {
+            setSuscribirDesactivado(true);
+          }
+        }
+
         setSelectedIniciativa(iniciativa);
         setSelectedIniciativaIndex(index);
+        if (iniciativa.listaMiembros.includes(user)) {
+            setEsMiembro(true);
+        }else if (iniciativa.idAdmin === user){
+            setEsAdmin(true);
+        } else {
+            setEsAdmin(false);
+            setEsMiembro(false);
+        }
         setShowModal(true);
     }
 
-    const { user } = useAuth();
-    const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
-
-    const handleSuscribirse = async () => {
+    const handleCrearSolicitud = async () => {
         if (selectedIniciativa) {
             const idIniciativa = selectedIniciativa.idIniciativa; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
-            if (selectedIniciativa.listaMiembros.includes(user)) {
-                alert("Ya estás suscrito a esta iniciativa");
-                return;
-            }
-            if (selectedIniciativa.idAdmin === user) {
-                alert("No puedes suscribirte a tu propia iniciativa");
-                return;
-            }
             try {
-              const resultado = await suscribirseAIniciativa(user, idIniciativa);
-              if (resultado) {
-                  setShowModal(false);
-                  alert("Te has suscrito a la iniciativa");
-                  
-                  const iniciativasNuevo = [...iniciativas];
-                  iniciativasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
-                  setIniciativas(iniciativasNuevo);
-              }
+                setSuscribirDesactivado(true);
+                const solicitud = new Solicitud(user, idIniciativa, "Pendiente", "UsuarioAIniciativa");
+                const response = await crearSolicitud(solicitud);
+                if (response.success) {
+                    const iniciativasNuevo = [...iniciativas];
+                    iniciativasNuevo[selectedIniciativaIndex].listaSolicitudes.push(response.data);
+                    setIniciativas(iniciativasNuevo);
+
+                    const usuarioNuevo = {...usuario};
+                    usuarioNuevo.listaSolicitudes.push(response.data);
+                    setUsuario(usuarioNuevo);
+
+                    setShowModal(false);
+                    alert("Has enviado solicitud a la iniciativa");
+                }
             } catch (error) {
-              alert("Error al suscribirse a la iniciativa");
+              alert("Error al enviar solicitud a la iniciativa");
             } finally {
               setSuscribirDesactivado(false);
             }
@@ -122,7 +142,7 @@ export const Explore = () => {
                         {/* Iniciativas */}
                         <div className='e-iniciativas-container'>
                         {filteredIniciativas && filteredIniciativas.map((item, index) => (
-                            <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item)}>
+                            <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item, index)}>
                                 <div className='e-iniciativa-imagen'>
                                     <img src={item.urlImagen} alt = {item.titulo} />
                                 </div>
@@ -136,56 +156,17 @@ export const Explore = () => {
                         </div>
 
                         {/* Mostrar información adicional */}
-                        <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
-                            <div className="modalcontainer">
-                                <Modal.Header style={{ border: "none" }} closeButton> </Modal.Header>
-                                
-                                <div className='modaliniciativa'>
-                                    {selectedIniciativa && (
-                                        <>
-                                            <div className="modalhead">
-                                                <img src={selectedIniciativa.urlImagen} alt={selectedIniciativa.titulo} className="modalimg" />
-                                            </div>
-                                            
-                                            <div className='modalinfo'>
-                                                <div className='modaltitulo'>{selectedIniciativa.titulo}</div>
-                                                
-                                                {/* Etiquetas */}
-                                                <div className="m-etiquetas">
-                                                    {Object.values(selectedIniciativa.listaEtiquetas).map((etiqueta, idEtiqueta) => (
-                                                        <li key={idEtiqueta} className={'m-etiqueta-item'}>
-                                                        {etiqueta}
-                                                        </li>
-                                                    ))}
-                                                </div>
-
-                                                <div className='modalfecha'> <FaCalendar style={{marginRight: '5px'}} />{selectedIniciativa.fechaInicio} - {selectedIniciativa.fechaCierre ? selectedIniciativa.fechaCierre : 'S.F.'} </div>
-                                                <div className='modalregion'> <FaGlobe style={{marginRight: '5px'}} />{selectedIniciativa.region} </div>
-                                                <div className='modalpublica'>
-                                                    {selectedIniciativa.esPublica ? <><FaUnlockAlt style={{marginRight: '5px'}} />Pública</> : <><FaLock style={{marginRight: '5px'}} />Privada</>}
-                                                </div>
-
-                                            </div>
-                                        </>
-                                    )}
-                                </div>
-
-                                <div className = 'modaldesc'>
-                                    {selectedIniciativa && (
-                                        <>
-                                            <div className='modaltextodesc'>{selectedIniciativa.descripcion}</div>
-                                        </>
-                                    )}
-                                </div>
-
-                                <div className = 'modalsuscribir'>
-                                    <div className='modalsusbotton' onClick={handleSuscribirse}>
-                                        Suscribirse
-                                    </div>
-                                </div>
-                            </div>
-                        </Modal>
-                    
+                        <ModalIniciativa
+                        showModal={showModal}
+                        setShowModal={setShowModal}
+                        selectedIniciativa={selectedIniciativa}
+                        handleCrearSolicitud={handleCrearSolicitud}
+                        esAdmin={esAdmin}
+                        esMiembro={esMiembro}
+                        suscribirDesactivado={suscribirDesactivado}
+                        setSuscribirDesactivado={setSuscribirDesactivado}
+                        pagina = {"Explore"}
+                        /> 
                     </div>
                 </div>
             ) : (

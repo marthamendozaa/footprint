@@ -476,9 +476,61 @@ exports.getMisTareas = onRequest(async (req, res) => {
       res.json({ success: true, data: tarea });
     } catch (error) {
       logger.info("Error obteniendo tarea: ", error.message);
+      
+      
+exports.crearSolicitud = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { solicitud } = req.body;
+
+    const idUsuario = solicitud.idUsuario;
+    const idIniciativa = solicitud.idIniciativa;
+
+    try {
+    
+      const solicitudData = await getFirestore().collection('Solicitudes').add(solicitud);
+      const idSolicitud = solicitudData.id;
+      await getFirestore().doc(`Solicitudes/${idSolicitud}`).update({ idSolicitud: idSolicitud });
+    
+      const usuarioRef = await getFirestore().doc(`Usuarios/${idUsuario}`).get();
+      const usuario = usuarioRef.data();
+      const usuarioNuevo = { ...usuario, listaSolicitudes: [...usuario.listaSolicitudes, idSolicitud] };
+      await getFirestore().doc(`Usuarios/${idUsuario}`).update(usuarioNuevo);
+
+      const iniciativaRef = await getFirestore().doc(`Iniciativas/${idIniciativa}`).get();
+      const iniciativaData = iniciativaRef.data();
+      const iniciativaNueva = { ...iniciativaData, listaSolicitudes: [...iniciativaData.listaSolicitudes, idSolicitud] };
+      await getFirestore().doc(`Iniciativas/${idIniciativa}`).update(iniciativaNueva);
+  
+      res.json({ success: true, data: idSolicitud });
+    } catch (error) {
+      logger.info("Error creando solicitud: ", error.message);
       res.json({ success: false, error: error.message });
     }
   });
 });
 
+      
+//Obtener solicitudes de usuario o iniciativa
+exports.getSolicitudes = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { collection, id } = req.body;
 
+    try {
+    
+      const objetoRef = await getFirestore().doc(`${collection}/${id}`).get();
+      const objeto = objetoRef.data();
+
+      // Lista de solicitudes
+      const solicitudes = [];
+      for (const idSolicitud of objeto.listaSolicitudes) {
+        const solicitudRef = await getFirestore().doc(`Solicitudes/${idSolicitud}`).get();
+        solicitudes.push(solicitudRef.data());
+      }
+  
+      res.json({ success: true, data: solicitudes });
+    } catch (error) {
+      logger.info("Error obteniendo solicitudes: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});

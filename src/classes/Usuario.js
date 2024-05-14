@@ -14,5 +14,6 @@ export default class Usuario {
     this.listaIniciativasFavoritas = [];
     this.listaHabilidades = [];
     this.listaIntereses = [];
+    this.listaSolicitudes = [];
   }
 }
