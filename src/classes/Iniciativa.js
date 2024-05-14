@@ -13,5 +13,6 @@ export default class Iniciativa {
     this.fechaInicio = fechaInicio;
     this.fechaCierre = fechaCierre;
     this.fechaCreacion = new Date();
+    this.listaSolicitudes = [];
   }
 }
