@@ -186,15 +186,6 @@ export const crearSolicitud = async (solicitud) => {
 };
 
 
-
-
-
-
-
-
-
-
-
 // LECTURAS CON FIREBASE CLIENT
 
 // Firebase Client SDK
