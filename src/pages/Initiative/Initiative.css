@@ -220,6 +220,7 @@ li.i-etiqueta-item {
   display: flex;
   align-items: center;
   flex-direction: column;
+  justify-content: space-evenly;
 }
 
 .i-btn-ver-miembros {
@@ -232,11 +233,7 @@ li.i-etiqueta-item {
 }
 
 /* Tareas */
-.i-tareas-container {
-  display: flex;
-  width: 90%;
-  flex-direction: column;
-}
+
 
 .i-titulo-tareas {
   font-size: 25px;
@@ -244,39 +241,11 @@ li.i-etiqueta-item {
   text-align: left;
 }
 
-.i-tarea {
-  display: flex;
-  height: 120px;
-  width: 100%;
-  background-color: #E2EBF1;
-  border-radius: 25px;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding: 10px 25px;
-  align-items: flex-start;
-  font-weight: 600;
-  flex-direction: row;
-}
-
-.i-tarea-titulo {
-  font-size: 25px;
-}
-
-.i-tarea-texto {
-  font-size: 14px;
-}
-
-.i-tarea-info {
-  display: flex;
-  flex-direction: column;
-  width: 85%;
-  align-items: flex-start;
-}
 
 .i-tarea-botones {
   display: flex;
   height: 100%;
-  width: 15%;
+  width: 25%;
   justify-content: space-around;
   flex-direction: column;
 }
@@ -287,7 +256,11 @@ li.i-etiqueta-item {
   font-size: 14px;
   padding: 5px 10px;
   text-align: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
+
+
 
 /* Miembros */
 .i-tipo-miembro {
@@ -323,18 +296,89 @@ li.i-etiqueta-item {
 }
 
 .i-btn-ver-solicitudes {
-  position: absolute;
   bottom: 0;
   background-color: #838F96; 
   border: none; 
-  border-radius: 15px;
   padding: 10px 20px; 
   font-size: 16px;
   color: #000000;
   font-weight: bold; 
   transition: background-color 0.3s ease;
+  border-radius: 20px;
+  margin-top: 20px;
+  margin-bottom: 5px;
+  width: 100%;
 }
 
 .i-btn-ver-solicitudes:hover {
   background-color: #6b7780;
+}
+
+/*TAREAS MARTHA*/
+
+.i-seccion-tareas {
+  width: 80%;
+  align-items: flex-start;
+}
+
+.i-tareas-seccion {
+  display: flex;
+  width: 80%;
+  flex-direction: column;
+}
+
+.i-tareas-container {
+  width: 100%;
+}
+
+.i-tarea {
+  display: flex;
+  min-height: 120px;
+  width: 100%;
+  background-color: #E2EBF1;
+  border-radius: 25px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 10px 25px;
+  align-items: flex-start;
+  font-weight: 600;
+  flex-direction: row;
+}
+
+
+.i-tarea-titulo {
+  font-size: 25px;
+}
+
+input.i-tarea-titulo {
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.i-tarea-texto {
+  font-size: 14px;
+  width: 100%;
+}
+
+.i-tarea-desc {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+  word-break: break-all;
+  text-align: left;
+}
+
+.i-tarea-info {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.i-tarea-texto {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-items: flex-start;
 }

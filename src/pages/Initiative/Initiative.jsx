@@ -5,12 +5,22 @@ import { BsPeopleFill } from "react-icons/bs";
 import { MdUpload } from "react-icons/md"
 import { Spinner } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa } from '../../api/api.js';
+import { getIniciativa, getMisTareas } from '../../api/api.js';
 import './Initiative.css';
 
 export const Initiative = () => {
   const { idIniciativa } = useParams();
   const [iniciativa, setIniciativa] = useState(null);
+  const [tareas, setTareas] = useState(null);
+
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1; 
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,6 +28,14 @@ export const Initiative = () => {
         const iniciativaData = await getIniciativa(idIniciativa);
         setIniciativa(iniciativaData);
         console.log(iniciativaData);
+
+        const tareaPromises = iniciativaData.listaTareas.map(async (idTarea) => {
+          const tareaData = await getMisTareas(idTarea);
+          return tareaData;
+        });
+        const tareas = await Promise.all(tareaPromises);
+        setTareas(tareas);
+
       } catch (error) {
         console.error("Error obteniendo información de la iniciativa:", error.message);
       }
@@ -115,33 +133,39 @@ export const Initiative = () => {
         {/* Tareas y Miembros*/}
         <div className="i-tareas-miembros">
           <div className="i-seccion-tareas">
-            <div className="i-tareas-container">
-              <div className="i-titulo-tareas">Evidencias</div>
-              {/* Tarea Pública */}
-              <div className="i-tarea">
-                <div className="i-tarea-info">
-                  <div className="i-tarea-titulo">Sprint 1</div>
-                  <div className="i-tarea-texto">Instrucciones...</div>
-                </div>
-                <div className="i-tarea-botones">
-                  <div className="i-tarea-boton"><BsPeopleFill /> Miembro</div>
-                  <div className="i-tarea-boton"><FaFolder /> Entrega</div>
-                </div>
-              </div>
-
+            <div className="i-tareas-seccion">
               {/* Tarea asignada a mí */}
               <div className="i-titulo-tareas">Mis Tareas</div>
-              <div className="i-tarea">
-                <div className="i-tarea-info">
-                  <div className="i-tarea-titulo">Sprint 2</div>
-                  <div className="i-tarea-texto">Instrucciones...</div>
-                </div>
-                <div className="i-tarea-botones">
-                  <div className="i-tarea-boton"><FaCalendar /> Fecha</div>
-                  <div className="i-tarea-boton"><FaClock /> Estado</div>
-                  <div className="i-tarea-boton"><MdUpload /> Subir</div>
-                </div>
-              </div>
+                {tareas ? (
+                  <div className='i-tareas-container'>
+                    {tareas.length === 0 ? (
+                      <div className="m-error">
+                      No hay tareas asignadas.
+                      </div>
+                    ) : (
+                    <div>
+                      {tareas.map((tarea, idTarea) => (
+                        <div className="i-tarea" key={idTarea}>
+                          <div className="i-tarea-info">
+                            <div className="i-tarea-texto">
+                              <div className="i-tarea-titulo">{tarea.titulo}</div>
+                              <div className="i-tarea-desc">{tarea.descripcion}</div>
+                            </div>
+                            <div className="i-tarea-botones">
+                              <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                              <div className="i-tarea-boton"><FaFolder /> Documento</div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    )}
+                  </div>
+                  ) : (
+                  <div className="m-error">
+                  No hay tareas asignadas.
+                  </div>
+                )}
             </div>
           </div>
 

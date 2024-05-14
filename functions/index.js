@@ -463,3 +463,22 @@ exports.crearTareas = onRequest(async (req, res) => {
     }
   });
 });
+
+
+// Mostar datos de tarea
+exports.getMisTareas = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { idTarea } = req.body;
+
+    try {
+      const tareaRef = await getFirestore().doc(`Tareas/${idTarea}`).get();
+      const tarea = tareaRef.data();
+      res.json({ success: true, data: tarea });
+    } catch (error) {
+      logger.info("Error obteniendo tarea: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+
