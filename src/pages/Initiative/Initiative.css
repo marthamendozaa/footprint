@@ -314,6 +314,7 @@ li.i-etiqueta-item {
   background-color: #6b7780;
 }
 
+
 /*TAREAS MARTHA*/
 
 .i-seccion-tareas {
@@ -382,3 +383,42 @@ input.i-tarea-titulo {
   width: 100%;
   align-items: flex-start;
 }
+
+
+.cuadro {
+  height: 150px;
+  width: 250px;
+  background-color: #D9D9D9;
+  border-radius: 25px;
+
+  margin: 5px;
+}
+
+.cuadro2 {
+  height: 27px;
+  width: 200px;
+  font-size: 15px;
+  float: left;
+  margin-top: 20px;
+  margin-left: 10px;
+  text-align: center;
+}
+
+.imagen {
+  background-color: #699AA0;
+  width: 150px;
+  height: 150px;
+  border-radius: 100px;
+  margin-top: 10px;
+  align-items: center;
+}
+
+.cuadro3 {
+  height: 70px;
+  width: 250px;
+  font-size: 14px;
+  float: left;
+  margin-top: 5px;
+  text-align: center;
+}
+

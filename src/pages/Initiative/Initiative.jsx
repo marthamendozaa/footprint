@@ -3,7 +3,7 @@ import { FaCalendar, FaFolder, FaTimesCircle  } from 'react-icons/fa';
 import { FaClock } from "react-icons/fa";
 import { BsPeopleFill } from "react-icons/bs";
 import { MdUpload } from "react-icons/md"
-import { Spinner } from 'react-bootstrap';
+import { Spinner, Modal } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { getIniciativa, getMisTareas } from '../../api/api.js';
 import './Initiative.css';
@@ -13,7 +13,6 @@ export const Initiative = () => {
   const [iniciativa, setIniciativa] = useState(null);
   const [tareas, setTareas] = useState(null);
 
-
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate();
@@ -21,6 +20,8 @@ export const Initiative = () => {
     const year = date.getFullYear();
     return `${day}/${month}/${year}`;
   };
+
+  const [showModal, setShowModal] = useState(false); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,6 +52,11 @@ export const Initiative = () => {
       </div>
     );
   };
+
+  const handleShowModal = () => {
+    setShowModal(true);
+  }
+
 
   return (
     <div>
@@ -178,10 +184,35 @@ export const Initiative = () => {
                   <FaTimesCircle className="i-icon-times-circle" />
                 </span>
               </button>
-              <button type="button" className="i-btn-ver-solicitudes">
+              <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowModal}>
                 VER SOLICITUDES
               </button>
             </div>
+
+            <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
+                            <div className="modalcontainer">
+                                <Modal.Header style={{ border: "none" }} closeButton> Solicitudes </Modal.Header>
+                                
+                                <div className='modaliniciativa'>
+                                <div className="cuadro">
+                                <div className="cuadro2">@angelaEverTech</div>
+                                
+                                <div className="cuadro3">
+                                    Angela Gtz,      21 años<br></br>
+                                    Teamwork, Back end, Proyect Manager <br></br>
+                                </div>
+                            </div>
+                            <div className="cuadro">
+                                <div className="cuadro2">@MarthaMendoza</div>
+                                
+                                <div className="cuadro3">
+                                    Martha Mendoza      21 años<br></br>
+                                    Teamwork, Front end, Proyect Manager <br></br>
+                                </div>
+                            </div>
+                                </div>
+                            </div>
+                        </Modal>
           </div>
         </div>
       ) : (
