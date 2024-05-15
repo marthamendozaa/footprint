@@ -64,7 +64,7 @@ export const Login = () => {
       if (admin.esAdmin) {
         navigate('/exploreAdmin');
       } else {
-        navigate('/home');
+        navigate('/explore');
       }
     } catch (error) {
       console.error("Error al hacer login:", error.message);

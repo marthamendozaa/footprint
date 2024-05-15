@@ -78,7 +78,7 @@ export const Register4 = ({ onPrev, usuario }) => {
             if (response.success) {
                 setUser(response.data);
                 setAdmin(false);
-                navigate('/home');
+                navigate('/explore');
             } else {
                 setError('Error al registrar usuario.');
                 setShowModal(true);

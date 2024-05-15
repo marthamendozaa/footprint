@@ -95,6 +95,10 @@
 }
 
 .ea-iniciativa-texto {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
   padding: 15px;
 }
 
@@ -111,9 +115,14 @@
 }
 
 .ea-boton {
+  display: flex;
   padding-top: 10px;
-
+  height: 100%;
+  width: 100%;
+  align-items: flex-end;
+  justify-content: center;
 }
+
 .btn-eliminar-tarjeta-1 {
   background-color: #A0C1BF;
   color: #000;
