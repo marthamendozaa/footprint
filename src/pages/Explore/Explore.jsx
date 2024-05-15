@@ -118,10 +118,10 @@ export const Explore = () => {
 
     // Toggle de icono de favoritos
     const handleToggleFavorita = async (idIniciativa) => {
-      const iniciativasFavoritasNuevo = {...iniciativasFavoritas};
+      let iniciativasFavoritasNuevo = [...iniciativasFavoritas];
 
       if (iniciativasFavoritas.includes(idIniciativa)) {
-          iniciativasFavoritasNuevo = iniciativasFavoritas.filter(iniciativa => iniciativa !== idIniciativa);
+          iniciativasFavoritasNuevo = iniciativasFavoritas.filter(favorita => favorita !== idIniciativa);
       } else {
           iniciativasFavoritasNuevo.push(idIniciativa);
       }
@@ -136,7 +136,7 @@ export const Explore = () => {
     return (
         <div>
             {/* Spinner */}
-            {filteredIniciativas ? (
+            {filteredIniciativas && iniciativasFavoritas ? (
                 <div className='e-container'>
                     <div className='e-seccion-container'>
                         {/* Barra de búsqueda */}
@@ -155,21 +155,21 @@ export const Explore = () => {
                         <div className='e-iniciativas-container'>
                         {filteredIniciativas && filteredIniciativas.map((item, index) => (
                             <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item, index)}>
-                                <div className='meGusta' >
-                                    {favoritas.includes(item.idIniciativa) ? (
-                                      <FaHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />
-                                    ) : (
-                                      <FaRegHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />
-                                    )}
-                                </div>
-
                                 <div className='e-iniciativa-imagen'>
                                     <img src={item.urlImagen} alt = {item.titulo} />
                                 </div>
-
-                                <div className='e-iniciativa-texto'>
-                                    <div className="e-titulo">{item.titulo}</div>
-                                    <div className="e-desc">{item.descripcion}</div>
+                                <div className='e-iniciativa-contenido'>
+                                  <div>
+                                      <div className="e-titulo">{item.titulo}</div>
+                                      <div className="e-desc">{item.descripcion}</div>
+                                  </div>
+                                  <div className='e-corazon' onClick={(e) => e.stopPropagation()}>
+                                      {iniciativasFavoritas.includes(item.idIniciativa) ? (
+                                        <FaHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />
+                                      ) : (
+                                        <FaRegHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />
+                                      )}
+                                  </div>
                                 </div>
                             </div>
                         ))}

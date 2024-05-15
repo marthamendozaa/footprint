@@ -41,9 +41,8 @@ export const crearUsuario = async (data) => {
 
 
 // Actualiza información del usuario
-export const actualizaUsuario = async (user, data) => {
+export const actualizaUsuario = async (data) => {
   const response = await axios.post(`${functionsURL}/actualizaUsuario`, {
-    user: user,
     data: data
   });
   if (response.data.success) {
@@ -88,9 +87,8 @@ export const crearIniciativa = async (data) => {
 
 
 // Actualizar una iniciativa
-export const actualizaIniciativa = async (iniciativa, data) => {
+export const actualizaIniciativa = async (data) => {
   const response = await axios.post(`${functionsURL}/actualizaIniciativa`, {
-    iniciativa: iniciativa,
     data: data
   });
   if (response.data.success) {

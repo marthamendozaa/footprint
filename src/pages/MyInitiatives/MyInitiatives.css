@@ -38,7 +38,7 @@
   color: #212529;
   border-radius: 6px;
   border:rgba(0, 0, 0, 0.176) 1.2px solid;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 16px 0px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
   max-width: 240px;
   position: relative;
 }
@@ -56,13 +56,36 @@
 
 .m-iniciativa-texto {
   width: 100%;
-  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+}
+
+.m-iniciativa-contenido {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  padding-bottom: 0px;
+}
+
+.m-corazon {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  font-size: 30px;
+  padding: 15px;
+  padding-top: 0px;
 }
 
 .m-titulo {
   font-size: 19.2px;
   font-weight: bold;
   word-break: break-all;
+  color: #212529;
 }
 
 .m-desc {
@@ -70,6 +93,7 @@
   font-weight: 600;
   word-break: break-all;
   text-align: justify;
+  color: #212529;
 }
 
 .m-error {
@@ -81,11 +105,4 @@
   color: #7d7d7d;
   margin-top: 20px;
   margin-bottom: 20px;
-}
-
-.meGusta2 {
-  position: absolute;
-  font-size: 25px;
-  top: 3px;
-  right:3px;
 }

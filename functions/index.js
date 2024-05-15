@@ -61,10 +61,10 @@ exports.crearUsuario = onRequest(async (req, res) => {
 // Actualiza información del usuario
 exports.actualizaUsuario = onRequest(async (req, res) => {
   cors(req, res, async () => {
-    const { user, data } = req.body;
+    const { data } = req.body;
 
     try {
-      await getFirestore().doc(`Usuarios/${user}`).update(data);
+      await getFirestore().doc(`Usuarios/${data.idUsuario}`).update(data);
       res.json({ success: true });
     } catch (error) {
       logger.info("Error actualizando usuario: ", error.message);
@@ -127,10 +127,10 @@ exports.crearIniciativa = onRequest(async (req, res) => {
 // Actualiza información de iniciativa
 exports.actualizaIniciativa = onRequest(async (req, res) => {
   cors(req, res, async () => {
-    const { iniciativa, data } = req.body;
+    const { data } = req.body;
 
     try {
-      await getFirestore().doc(`Iniciativas/${iniciativa}`).update(data);
+      await getFirestore().doc(`Iniciativas/${data.idIniciativa}`).update(data);
       res.json({ success: true });
     } catch (error) {
       logger.info("Error actualizando iniciativa: ", error.message);

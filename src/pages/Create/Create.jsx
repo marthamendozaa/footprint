@@ -343,7 +343,7 @@ export const Create = () => {
         urlImagen = url;
       }
       const iniciativaNueva = { ...iniciativa, urlImagen: urlImagen, idIniciativa: idIniciativa};
-      await actualizaIniciativa(idIniciativa, iniciativaNueva);
+      await actualizaIniciativa(iniciativaNueva);
 
       // Crear tareas
       const tareasIniciativa = [];
