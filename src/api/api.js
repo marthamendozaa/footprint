@@ -188,12 +188,9 @@ export const crearSolicitud = async (solicitud) => {
 // LECTURAS CON FIREBASE CLIENT
 
 // Firebase Client SDK
-import { initializeApp } from "firebase/app";
-import { query, where, doc, collection, getDoc, getDocs, getFirestore, connectFirestoreEmulator } from "firebase/firestore";
-import firebaseConfig from "../api/firebase-config";
+import { query, where, doc, collection, getDoc, getDocs, connectFirestoreEmulator } from "firebase/firestore";
+import firestore from "../api/firebase-config";
 
-const app = initializeApp(firebaseConfig);
-const firestore = getFirestore(app);
 if (isEmulator) {
   connectFirestoreEmulator(firestore, 'localhost', 8080);
 }
