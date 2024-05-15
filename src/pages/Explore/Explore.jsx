@@ -37,7 +37,7 @@ export const Explore = () => {
             setUsuario(usuarioData);
 
             const misIniciativasData = await getMisIniciativas(user);
-            setIniciativasFavoritas(misIniciativasData.iniciativasFavoritas);
+            setIniciativasFavoritas(misIniciativasData.iniciativasFavoritas.map(iniciativa => iniciativa.idIniciativa));
         };
         fetchData();
     }, []);
