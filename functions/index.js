@@ -38,7 +38,7 @@ exports.autentificaUsuario = onRequest(async (req, res) => {
   });
 });
 
-// DEPLOY
+
 // Registro de usuario
 exports.crearUsuario = onRequest(async (req, res) => {
   cors(req, res, async () => {
