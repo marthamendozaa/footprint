@@ -159,10 +159,8 @@ export const Explore = () => {
                                     <img src={item.urlImagen} alt = {item.titulo} />
                                 </div>
                                 <div className='e-iniciativa-contenido'>
-                                  <div>
-                                      <div className="e-titulo">{item.titulo}</div>
-                                      <div className="e-desc">{item.descripcion}</div>
-                                  </div>
+                                  <div className="e-titulo">{item.titulo}</div>
+                                  <div className="e-desc">{item.descripcion}</div>
                                   <div className='e-corazon' onClick={(e) => e.stopPropagation()}>
                                       {iniciativasFavoritas.includes(item.idIniciativa) ? (
                                         <FaHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />

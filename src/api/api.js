@@ -169,6 +169,7 @@ export const crearTareas = async (data) => {
   }
 };
 
+
 // Crear solicitudes
 export const crearSolicitud = async (solicitud) => {
   const response = await axios.post(`${functionsURL}/crearSolicitud`, {
@@ -369,6 +370,19 @@ export const getSolicitudes = async (collection, id) => {
     return solicitudes;
   } catch (error) {
     console.log("Error obteniendo solicitudes");
+    throw new Error(error);
+  }
+};
+
+
+// Obtener tareas de la iniciativa
+export const getMisTareas = async (idTarea) => {
+  try {
+    const tarea = await getDoc(doc(firestore, "Tareas", idTarea));
+    console.log("Obtener tarea exitoso");
+    return tarea.data();
+  } catch (error) {
+    console.log("Error obteniendo tarea");
     throw new Error(error);
   }
 };
