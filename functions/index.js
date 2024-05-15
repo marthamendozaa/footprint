@@ -14,46 +14,6 @@ initializeApp();
 const auth = getAuth();
 
 
-// Verifica correo duplicado
-exports.existeCorreo = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    const { correo } = req.body;
-
-    try {
-      const correosData = await getFirestore().collection('Usuarios').where('correo', '==', correo).get();
-      if (!correosData.empty) {
-        res.json({ success: true, data: true });
-      } else {
-        res.json({ success: true, data: false });
-      }
-    } catch (error) {
-      logger.info("Error verificando correo: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-
-// Verifica nombre de usuario duplicado
-exports.existeNombreUsuario = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    const { nombreUsuario } = req.body;
-
-    try {
-      const nombresData = await getFirestore().collection('Usuarios').where('nombreUsuario', '==', `@${nombreUsuario}`).get();
-      if (!nombresData.empty) {
-        res.json({ success: true, data: true });
-      } else {
-        res.json({ success: true, data: false });
-      }
-    } catch (error) {
-      logger.info("Error verificando nombre de usuario: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-
 // Autentificación del usuario
 exports.autentificaUsuario = onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -89,26 +49,9 @@ exports.crearUsuario = onRequest(async (req, res) => {
       data.idUsuario = user.uid;
       const { contrasena, ...usuario } = data;
       await getFirestore().doc(`Usuarios/${user.uid}`).set(usuario);
-      res.json({ success: true });
+      res.json({ success: true, data: user.uid});
     } catch (error) {
       logger.info("Error registrando usuario: ", error.message);
-      res.json({ success: false });
-    }
-  });
-});
-
-
-// Información del usuario
-exports.getUsuario = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    const { user } = req.body;
-
-    try {
-      const usuarioRef = await getFirestore().doc(`Usuarios/${user}`).get();
-      const usuario = usuarioRef.data();
-      res.json({ success: true, data: usuario });
-    } catch (error) {
-      logger.info("Error obteniendo usuario: ", error.message);
       res.json({ success: false, error: error.message });
     }
   });
@@ -118,10 +61,10 @@ exports.getUsuario = onRequest(async (req, res) => {
 // Actualiza información del usuario
 exports.actualizaUsuario = onRequest(async (req, res) => {
   cors(req, res, async () => {
-    const { user, data } = req.body;
+    const { data } = req.body;
 
     try {
-      await getFirestore().doc(`Usuarios/${user}`).update(data);
+      await getFirestore().doc(`Usuarios/${data.idUsuario}`).update(data);
       res.json({ success: true });
     } catch (error) {
       logger.info("Error actualizando usuario: ", error.message);
@@ -141,126 +84,6 @@ exports.actualizaContrasena = onRequest(async (req, res) => {
       res.json({ success: true });
     } catch (error) {
       logger.info("Error actualizando contraseña: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-
-// Obtener lista de habilidades
-exports.getHabilidades = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    try {
-      const habilidadesRef = await getFirestore().doc("General/Habilidades").get();
-      const habilidades = habilidadesRef.data();
-      res.json({ success: true, data: habilidades });
-    } catch (error) {
-      logger.info("Error obteniendo lista de habilidades: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-
-// Obtener lista de intereses
-exports.getIntereses = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    try {
-      const interesesRef = await getFirestore().doc("General/Intereses").get();
-      const intereses = interesesRef.data();
-      res.json({ success: true, data: intereses });
-    } catch (error) {
-      logger.info("Error obteniendo lista de intereses: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-
-// Obtener lista de regiones
-exports.getRegiones = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    try {
-      const regionesRef = await getFirestore().doc("General/Regiones").get();
-      const regiones = regionesRef.data();
-      res.json({ success: true, data: regiones });
-    } catch (error) {
-      logger.info("Error obteniendo lista de regiones: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-
-// Información de todas las iniciativas
-exports.getIniciativas = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    try {
-      const iniciativasRef = await getFirestore().collection(`Iniciativas`).get();
-      const iniciativasData = [];
-      iniciativasRef.forEach(doc => {
-        iniciativasData.push(doc.data());
-      });
-      res.json({ success: true, data: iniciativasData });
-    } catch (error) {
-      logger.info("Error obteniendo iniciativas: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-
-// Información de todas las iniciativas del usuario
-exports.getMisIniciativas = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    try {
-      const { user } = req.body;
-
-      const usuarioRef = await getFirestore().doc(`Usuarios/${user}`).get();
-      const usuario = usuarioRef.data();
-
-      // Iniciativas donde es miembro
-      const iniciativasMiembro = [];
-      for (const idIniciativa of usuario.listaIniciativasMiembro) {
-        const iniciativaRef = await getFirestore().doc(`Iniciativas/${idIniciativa}`).get();
-        iniciativasMiembro.push(iniciativaRef.data());
-      }
-
-      // Iniciativas creadas
-      const iniciativasAdmin = [];
-      for (const idIniciativa of usuario.listaIniciativasAdmin) {
-        const iniciativaRef = await getFirestore().doc(`Iniciativas/${idIniciativa}`).get();
-        iniciativasAdmin.push(iniciativaRef.data());
-      }
-
-      // Iniciativas favoritas
-      const iniciativasFavoritas = [];
-      for (const idIniciativa of usuario.listaIniciativasFavoritas) {
-        const iniciativaRef = await getFirestore().doc(`Iniciativas/${idIniciativa}`).get();
-        iniciativasFavoritas.push(iniciativaRef.data());
-      }
-
-      const iniciativasData = { iniciativasMiembro, iniciativasAdmin, iniciativasFavoritas };
-      res.json({ success: true, data: iniciativasData });
-    } catch (error) {
-      logger.info("Error obteniendo mis iniciativas: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-
-// Información de la iniciativa
-exports.getIniciativa = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    const { idIniciativa } = req.body;
-
-    try {
-      const iniciativaRef = await getFirestore().doc(`Iniciativas/${idIniciativa}`).get();
-      const iniciativa = iniciativaRef.data();
-      res.json({ success: true, data: iniciativa });
-    } catch (error) {
-      logger.info("Error obteniendo iniciativa: ", error.message);
       res.json({ success: false, error: error.message });
     }
   });
@@ -304,10 +127,10 @@ exports.crearIniciativa = onRequest(async (req, res) => {
 // Actualiza información de iniciativa
 exports.actualizaIniciativa = onRequest(async (req, res) => {
   cors(req, res, async () => {
-    const { iniciativa, data } = req.body;
+    const { data } = req.body;
 
     try {
-      await getFirestore().doc(`Iniciativas/${iniciativa}`).update(data);
+      await getFirestore().doc(`Iniciativas/${data.idIniciativa}`).update(data);
       res.json({ success: true });
     } catch (error) {
       logger.info("Error actualizando iniciativa: ", error.message);
@@ -465,19 +288,7 @@ exports.crearTareas = onRequest(async (req, res) => {
 });
 
 
-// Mostar datos de tarea
-exports.getMisTareas = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    const { idTarea } = req.body;
-
-    try {
-      const tareaRef = await getFirestore().doc(`Tareas/${idTarea}`).get();
-      const tarea = tareaRef.data();
-      res.json({ success: true, data: tarea });
-    } catch (error) {
-      logger.info("Error obteniendo tarea: ", error.message);
-      
-      
+//Crea las solicitudes
 exports.crearSolicitud = onRequest(async (req, res) => {
   cors(req, res, async () => {
     const { solicitud } = req.body;
@@ -504,32 +315,6 @@ exports.crearSolicitud = onRequest(async (req, res) => {
       res.json({ success: true, data: idSolicitud });
     } catch (error) {
       logger.info("Error creando solicitud: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-      
-//Obtener solicitudes de usuario o iniciativa
-exports.getSolicitudes = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    const { collection, id } = req.body;
-
-    try {
-    
-      const objetoRef = await getFirestore().doc(`${collection}/${id}`).get();
-      const objeto = objetoRef.data();
-
-      // Lista de solicitudes
-      const solicitudes = [];
-      for (const idSolicitud of objeto.listaSolicitudes) {
-        const solicitudRef = await getFirestore().doc(`Solicitudes/${idSolicitud}`).get();
-        solicitudes.push(solicitudRef.data());
-      }
-  
-      res.json({ success: true, data: solicitudes });
-    } catch (error) {
-      logger.info("Error obteniendo solicitudes: ", error.message);
       res.json({ success: false, error: error.message });
     }
   });

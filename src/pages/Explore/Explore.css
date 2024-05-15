@@ -53,14 +53,14 @@
   color: #212529;
   border-radius: 6px;
   border:rgba(0, 0, 0, 0.176) 1.2px solid;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 16px 0px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
   position: relative;
   max-width: 240px;
 }
 
 .e-iniciativa:hover {
   background-color: #eeeeee;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 16px 0px;
+  box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
 }
 
 .e-iniciativa-imagen img {
@@ -70,9 +70,22 @@
   object-fit: cover;
 }
 
-.e-iniciativa-texto {
+.e-iniciativa-contenido {
+  height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   padding: 15px;
+}
+
+.e-corazon {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  justify-content: flex-end;
+  align-items: flex-end;
+  font-size: 30px;
 }
 
 .e-titulo {

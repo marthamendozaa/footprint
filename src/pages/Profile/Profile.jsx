@@ -102,7 +102,7 @@ export const Profile = () => {
     const usuarioNuevo = { ...usuario, nombre: nuevoNombre };
     setUsuario(usuarioNuevo);
     setEditingNombre(false);
-    await actualizaUsuario(user, usuarioNuevo);
+    await actualizaUsuario(usuarioNuevo);
   };
 
   const handleNombreSubmit = async (event) => {
@@ -122,7 +122,7 @@ export const Profile = () => {
       const usuarioNuevo = { ...usuario, nombre: nuevoNombre };
       setUsuario(usuarioNuevo);
       setEditingNombre(false);
-      await actualizaUsuario(user, usuarioNuevo);
+      await actualizaUsuario(usuarioNuevo);
     }
   };  
 
@@ -142,7 +142,7 @@ export const Profile = () => {
     }
     
     setUsuario(usuarioNuevo);
-    await actualizaUsuario(user, usuarioNuevo);
+    await actualizaUsuario(usuarioNuevo);
   };
   
 
@@ -162,7 +162,7 @@ export const Profile = () => {
     }
   
     setUsuario(usuarioNuevo);
-    await actualizaUsuario(user, usuarioNuevo);
+    await actualizaUsuario(usuarioNuevo);
   };
 
 
@@ -291,7 +291,7 @@ export const Profile = () => {
       const imageUrl = await subirImagen(selectedImage, `Usuarios/${user}`);
       const usuarioNuevo = { ...usuario, urlImagen: imageUrl };
       setUsuario(usuarioNuevo);
-      await actualizaUsuario(user, usuarioNuevo);
+      await actualizaUsuario(usuarioNuevo);
       closeModal();
     } catch (error) {
       console.error("Error al subir la imagen de perfil:", error.message);

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
+import { useAuth } from '../../../contexts/AuthContext.jsx';
 import { getHabilidades, crearUsuario } from '../../../api/api.js';
 import { Spinner } from 'react-bootstrap';
 import './Register4.css';
@@ -53,6 +54,7 @@ export const Register4 = ({ onPrev, usuario }) => {
 
     // Manejar registro
     const [terminarDesactivado, setTerminarDesactivado] = useState(false);
+    const { setUser, setAdmin } = useAuth();
 
     const handleRegister = async (event) => {
         event.preventDefault();
@@ -73,8 +75,10 @@ export const Register4 = ({ onPrev, usuario }) => {
             usuario.edad = Math.abs(edadFecha.getUTCFullYear() - 1970);
 
             const response = await crearUsuario(usuario);
-            if (response) {
-                navigate('/login');
+            if (response.success) {
+                setUser(response.data);
+                setAdmin(false);
+                navigate('/home');
             } else {
                 setError('Error al registrar usuario.');
                 setShowModal(true);
