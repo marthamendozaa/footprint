@@ -32,10 +32,10 @@ export const crearUsuario = async (data) => {
   });
   if (response.data.success) {
     console.log("Registro exitoso");
-    return response.data.success;
+    return response.data;
   } else {
     console.log("Error en registro");
-    return response.data.success;
+    throw new Error(response.data.error);
   }
 };
 

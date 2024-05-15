@@ -38,7 +38,7 @@ exports.autentificaUsuario = onRequest(async (req, res) => {
   });
 });
 
-
+// DEPLOY
 // Registro de usuario
 exports.crearUsuario = onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -49,10 +49,10 @@ exports.crearUsuario = onRequest(async (req, res) => {
       data.idUsuario = user.uid;
       const { contrasena, ...usuario } = data;
       await getFirestore().doc(`Usuarios/${user.uid}`).set(usuario);
-      res.json({ success: true });
+      res.json({ success: true, data: user.uid});
     } catch (error) {
       logger.info("Error registrando usuario: ", error.message);
-      res.json({ success: false });
+      res.json({ success: false, error: error.message });
     }
   });
 });
