@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// LECTURAS CON FIREBASE FUNCTIONS
+// FIREBASE FUNCTIONS
 
 // URL para pruebas locales
 const isEmulator = JSON.parse(import.meta.env.VITE_EMULATOR);
