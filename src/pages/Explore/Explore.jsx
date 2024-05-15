@@ -3,50 +3,44 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { useAuth } from '../../contexts/AuthContext';
 import Solicitud from '../../classes/Solicitud.js'
-import { getIniciativas, crearSolicitud, getUsuario } from '../../api/api.js';
-import { Modal, Spinner } from 'react-bootstrap';
-import { FaHeart, FaRegHeart, FaSearch, FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
+import { getIniciativas, crearSolicitud, getUsuario, actualizaUsuario, getMisIniciativas } from '../../api/api.js';
+import { Spinner } from 'react-bootstrap';
+import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
 import Fuse from 'fuse.js';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 
-
 export const Explore = () => {
+    // Iniciativas
     const [filter, setFilter] = useState('');
     const [iniciativas, setIniciativas] = useState(null);
     const [filteredIniciativas, setFilteredIniciativas] = useState(null);
+
+    // Seleccionar una iniciativa
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
     const [selectedIniciativa, setSelectedIniciativa] = useState(null); // State to store the selected iniciativa
     const [selectedIniciativaIndex, setSelectedIniciativaIndex] = useState(null);
 
+    // Usuario
     const { user } = useAuth();
     const [usuario, setUsuario] = useState(null);
 
+    // Iniciativas favoritas
+    const [iniciativasFavoritas, setIniciativasFavoritas] = useState(null);
+
     useEffect(() => {
         const fetchData = async () => {
-            const dataIniciativa = await getIniciativas();
-            setIniciativas(dataIniciativa);
-            setFilteredIniciativas(dataIniciativa); // Initialize filteredIniciativas with all iniciativas
+            const iniciativasData = await getIniciativas();
+            setIniciativas(iniciativasData);
+            setFilteredIniciativas(iniciativasData); // Initialize filteredIniciativas with all iniciativas
 
-            const dataUsuario = await getUsuario(user);
-            setUsuario(dataUsuario);
+            const usuarioData = await getUsuario(user);
+            setUsuario(usuarioData);
+
+            const misIniciativasData = await getMisIniciativas(user);
+            setIniciativasFavoritas(misIniciativasData.iniciativasFavoritas);
         };
         fetchData();
     }, []);
-
-
-    /*
-    const searchText = (event) => {
-        const searchTerm = event.target.value;
-        console.log("Search Term:", searchTerm);
-        setFilter(searchTerm);
-
-        const filtered = iniciativas.filter(iniciativa =>
-            iniciativa.titulo.toLowerCase().includes(searchTerm)
-        );
-        setFilteredIniciativas(filtered);
-    }
-    */
-
     
     const searchText = (event) => {
         const searchTerm = event.target.value;
@@ -83,9 +77,10 @@ export const Explore = () => {
 
         setSelectedIniciativa(iniciativa);
         setSelectedIniciativaIndex(index);
+
         if (iniciativa.listaMiembros.includes(user)) {
             setEsMiembro(true);
-        }else if (iniciativa.idAdmin === user){
+        } else if (iniciativa.idAdmin === user){
             setEsAdmin(true);
         } else {
             setEsAdmin(false);
@@ -121,6 +116,23 @@ export const Explore = () => {
         }
     }
 
+    // Toggle de icono de favoritos
+    const handleToggleFavorita = async (idIniciativa) => {
+      const iniciativasFavoritasNuevo = {...iniciativasFavoritas};
+
+      if (iniciativasFavoritas.includes(idIniciativa)) {
+          iniciativasFavoritasNuevo = iniciativasFavoritas.filter(iniciativa => iniciativa !== idIniciativa);
+      } else {
+          iniciativasFavoritasNuevo.push(idIniciativa);
+      }
+      setIniciativasFavoritas(iniciativasFavoritasNuevo);
+
+      const usuarioNuevo = {...usuario};
+      usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
+      await actualizaUsuario(usuarioNuevo);
+      setUsuario(usuarioNuevo);
+    };
+
     return (
         <div>
             {/* Spinner */}
@@ -143,6 +155,14 @@ export const Explore = () => {
                         <div className='e-iniciativas-container'>
                         {filteredIniciativas && filteredIniciativas.map((item, index) => (
                             <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item, index)}>
+                                <div className='meGusta' >
+                                    {favoritas.includes(item.idIniciativa) ? (
+                                      <FaHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />
+                                    ) : (
+                                      <FaRegHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />
+                                    )}
+                                </div>
+
                                 <div className='e-iniciativa-imagen'>
                                     <img src={item.urlImagen} alt = {item.titulo} />
                                 </div>
@@ -157,16 +177,16 @@ export const Explore = () => {
 
                         {/* Mostrar información adicional */}
                         <ModalIniciativa
-                        showModal={showModal}
-                        setShowModal={setShowModal}
-                        selectedIniciativa={selectedIniciativa}
-                        handleCrearSolicitud={handleCrearSolicitud}
-                        esAdmin={esAdmin}
-                        esMiembro={esMiembro}
-                        suscribirDesactivado={suscribirDesactivado}
-                        setSuscribirDesactivado={setSuscribirDesactivado}
-                        pagina = {"Explore"}
-                        /> 
+                            showModal={showModal}
+                            setShowModal={setShowModal}
+                            selectedIniciativa={selectedIniciativa}
+                            handleCrearSolicitud={handleCrearSolicitud}
+                            esAdmin={esAdmin}
+                            esMiembro={esMiembro}
+                            suscribirDesactivado={suscribirDesactivado}
+                            setSuscribirDesactivado={setSuscribirDesactivado}
+                            pagina = {"Explore"}
+                        />
                     </div>
                 </div>
             ) : (

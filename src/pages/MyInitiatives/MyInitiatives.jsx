@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { getMisIniciativas } from '../../api/api.js';
+import { getMisIniciativas, getUsuario, actualizaUsuario } from '../../api/api.js';
+import { FaHeart} from "react-icons/fa";
 import './MyInitiatives.css';
 
 export const MyInitiatives = () => {
   const { user } = useAuth();
+  const [usuario, setUsuario] = useState(null);
   
   // Información de iniciativas del usuario
   const [iniciativasMiembro, setIniciativasMiembro] = useState(null);
@@ -19,10 +21,24 @@ export const MyInitiatives = () => {
       setIniciativasMiembro(iniciativasData.iniciativasMiembro);
       setIniciativasAdmin(iniciativasData.iniciativasAdmin);
       setIniciativasFavoritas(iniciativasData.iniciativasFavoritas);
+
+      const usuarioData = await getUsuario(user);
+      setUsuario(usuarioData);
     };
     fetchData();
   }, []);
 
+  // Eliminar iniciativa de lista de favoritos
+  const eliminaFavorita = async (idIniciativa) => {
+    const iniciativasFavoritasNuevo = iniciativasFavoritas.filter(iniciativa => iniciativa !== idIniciativa);
+    setIniciativasFavoritas(iniciativasFavoritasNuevo);
+
+    const usuarioNuevo = {...usuario};
+    usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
+    await actualizaUsuario(usuarioNuevo);
+    setUsuario(usuarioNuevo);
+  };
+  
 
   return (
     <div>
@@ -80,7 +96,7 @@ export const MyInitiatives = () => {
               </div>
             )}
           </div>
-          
+
           <div className="m-seccion-container">
             <div className="m-iniciativas-titulo">Iniciativas favoritas</div>
   
@@ -92,6 +108,9 @@ export const MyInitiatives = () => {
               <div className="m-iniciativas-container">
                 {iniciativasFavoritas.map((iniciativa, index) => (
                   <Link key={iniciativa.idIniciativa} to={`/initiative/${iniciativa.idIniciativa}`}>
+                    <div className="meGusta2">
+                      <FaHeart onClick={() => eliminaFavorita(iniciativa.idIniciativa)} style={{ cursor: "pointer" }} />
+                    </div>
                     <div className="m-iniciativa">
                         <div className="m-iniciativa-imagen">
                           <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
@@ -106,9 +125,7 @@ export const MyInitiatives = () => {
               </div>
             )}
           </div>
-  
-
-        </div>
+      </div>
       ) : (
         <div className="spinner">
           <Spinner animation="border" role="status"></Spinner>

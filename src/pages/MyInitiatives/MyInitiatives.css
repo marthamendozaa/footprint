@@ -40,6 +40,7 @@
   border:rgba(0, 0, 0, 0.176) 1.2px solid;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 8px 16px 0px;
   max-width: 240px;
+  position: relative;
 }
 
 .m-iniciativa:hover {
@@ -80,4 +81,11 @@
   color: #7d7d7d;
   margin-top: 20px;
   margin-bottom: 20px;
+}
+
+.meGusta2 {
+  position: absolute;
+  font-size: 25px;
+  top: 3px;
+  right:3px;
 }
