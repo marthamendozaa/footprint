@@ -17,7 +17,7 @@
     "bootstrap": "^5.3.3",
     "compressorjs": "^1.2.1",
     "date-fns": "^3.6.0",
-    "firebase": "^10.11.0",
+    "firebase": "^10.12.0",
     "fuse.js": "^7.0.0",
     "image-compressor": "^2.0.3",
     "react": "^18.2.0",
