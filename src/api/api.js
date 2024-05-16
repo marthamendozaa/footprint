@@ -12,7 +12,6 @@ console.log(functionsURL);
 export const autentificaUsuario = async (email, password) => {
   try {
     const apiKey = import.meta.env.VITE_FIREBASE_API_KEY;
-    console.log("apiKey", apiKey);
     const url = isEmulator ? 'http://127.0.0.1:9099' : 'https:/';
     const response = await axios.post(`${url}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
       email,

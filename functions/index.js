@@ -6,7 +6,6 @@ const { getAuth } = require("firebase-admin/auth");
 const { Storage } = require("@google-cloud/storage");
 const { v4: uuid } = require("uuid");
 const formidable = require("formidable-serverless");
-// npm remove axios
 const cors = require('cors')({ origin: true });
 
 initializeApp();
