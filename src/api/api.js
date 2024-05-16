@@ -10,17 +10,23 @@ console.log(functionsURL);
 
 // Autentificación del usuario
 export const autentificaUsuario = async (email, password) => {
-  const response = await axios.post(`${functionsURL}/autentificaUsuario`, {
-    email: email,
-    password: password,
-    isEmulator: isEmulator
-  });
-  if (response.data.success) {
+  try {
+    const apiKey = JSON.parse(import.meta.env.VITE_FIREBASE_API_KEY);
+    console.log("apiKey", apiKey);
+    const url = isEmulator ? 'http://127.0.0.1:9099' : 'https:/';
+    const response = await axios.post(`${url}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
+      email,
+      password,
+      returnSecureToken: true
+    });
+
+    const { data } = response;
+    const user = data.localId;
     console.log("Autentificación exitosa");
-    return response.data.data;
-  } else {
+    return user;
+  } catch (error) {
     console.log("Error en autentificación");
-    throw new Error(response.data.error);
+    throw new Error(error);
   }
 };
 

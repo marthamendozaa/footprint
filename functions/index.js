@@ -6,37 +6,11 @@ const { getAuth } = require("firebase-admin/auth");
 const { Storage } = require("@google-cloud/storage");
 const { v4: uuid } = require("uuid");
 const formidable = require("formidable-serverless");
-const axios = require('axios');
+// npm remove axios
 const cors = require('cors')({ origin: true });
-const config = require('./config');
 
 initializeApp();
 const auth = getAuth();
-
-
-// Autentificación del usuario
-exports.autentificaUsuario = onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    const { email, password, isEmulator } = req.body;
-
-    try {
-      const url = isEmulator ? 'http://127.0.0.1:9099' : 'https:/';
-      const response = await axios.post(`${url}/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${config.apiKey}`, {
-        email,
-        password,
-        returnSecureToken: true
-      });
-
-      const { data } = response;
-      const user = data.localId;
-      logger.info("Usuario autenticado:", user);
-      res.json({ success: true, data: user });
-    } catch (error) {
-      logger.info("Error en autentificación: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
 
 
 // Registro de usuario

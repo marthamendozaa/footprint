@@ -2,5 +2,3 @@ node_modules
 firebase-debug.log
 firestore-debug.log
 ui-debug.log
-src/api/firebase-config.js
-functions/config.js
