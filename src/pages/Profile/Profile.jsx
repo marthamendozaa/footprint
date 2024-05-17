@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { FaPen } from 'react-icons/fa';
+import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Button, Modal } from 'react-bootstrap';
 import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
@@ -266,6 +267,7 @@ export const Profile = () => {
 
   const closeModal = () => {
     setShowModal(false);
+    setSelectedImage(null);
   };
 
   const handleImageClick = (e) => {
@@ -297,6 +299,17 @@ export const Profile = () => {
       console.error("Error al subir la imagen de perfil:", error.message);
     }
   };
+
+  // React Dropzone
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: 'image/*',
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0) {
+        setSelectedImage(acceptedFiles[0]);
+        setErrorI('');
+      }
+    }
+  });
 
   return (
     <div className="profile-page">
@@ -422,23 +435,14 @@ export const Profile = () => {
             </Modal.Header>
             
             <div className="p-input-body">
-              <label htmlFor="file-upload" className="p-custom-file-button">
+                <div {...getRootProps({ className: 'p-custom-file-button' })}>
+                <input {...getInputProps()} />
                 Subir foto
-              </label>
-              <input 
-                id="file-upload"
-                className="p-input-imagen p-custom-file-input" 
-                type="file" 
-                accept="image/*" 
-                onChange={(e) => {
-                  setSelectedImage(e.target.files[0]);
-                  setErrorI('');
-                  }} 
-                />
-                <span className="p-custom-file-text">{selectedImage ? selectedImage.name : "Ninguna imagen seleccionada"}</span>
+              </div>
+              <span className="p-custom-file-text">{selectedImage ? selectedImage.name : "Ninguna imagen seleccionada"}</span>
             </div>
             {errorI && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
-            
+      
             <Modal.Footer>
               <Button onClick={handleUploadProfileImage}>Guardar</Button>
               <Button onClick={closeModal}>Cerrar</Button>
