@@ -435,7 +435,7 @@ export const Profile = () => {
             </Modal.Header>
             
             <div className="p-input-body">
-                <div {...getRootProps({ className: 'p-custom-file-button' })}>
+              <div {...getRootProps({ className: 'p-custom-file-button' })}>
                 <input {...getInputProps()} />
                 Subir foto
               </div>
