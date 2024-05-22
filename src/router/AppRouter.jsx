@@ -2,7 +2,6 @@ import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import Navbar from '../assets/Navbar';
 import NavbarAdmin from '../assets/NavbarAdmin';
-import { Home } from '../pages/Home/Home.jsx';
 import { Explore } from '../pages/Explore/Explore.jsx';
 import { Requests } from '../pages/Requests/Requests.jsx';
 import { MyInitiatives } from '../pages/MyInitiatives/MyInitiatives.jsx';
@@ -50,7 +49,6 @@ export const AppRouter = () => {
             )}
             {user && !admin &&(
                 <>
-                    <Route path="/home" element={<PageWithNavbar component={<Home />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
                     <Route path="/explore" element={<PageWithNavbar component={<Explore />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
                     <Route path="/requests" element={<PageWithNavbar component={<Requests />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
                     <Route path="/myInitiatives" element={<PageWithNavbar component={<MyInitiatives />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
@@ -64,7 +62,7 @@ export const AppRouter = () => {
                 <Route path="*" element={savedLocation ? (
                     <Navigate to={savedLocation} />) : (
                         admin ? (<Navigate to="/exploreAdmin" />) : (
-                            <Navigate to="/home" />
+                            <Navigate to="/explore" />
                         )
                     )}
                 />) : (

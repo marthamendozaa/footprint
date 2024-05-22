@@ -367,7 +367,7 @@ li.c-etiqueta-item:hover {
 .c-tareas-container {
   display: flex;
   width: 80%;
-  flex-direction: column;
+  flex-direction: column-reverse;
 }
 
 .c-tarea {

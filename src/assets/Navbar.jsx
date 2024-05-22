@@ -39,11 +39,6 @@ const Navbar = ({ isCreateOpen, toggleCreate }) => {
       </div>
 
       {/* Páginas */}
-      <li className={selectedTab === 'home' ? 'selected' : ''} onClick={() => handleTabClick('home')}>
-        <Link to="/home">
-          <FaHome /> {showText && 'Inicio'}
-        </Link>
-      </li>
 
       <li className={selectedTab === 'explore' ? 'selected' : ''} onClick={() => handleTabClick('explore')}>
         <Link to="/explore">
@@ -69,7 +64,7 @@ const Navbar = ({ isCreateOpen, toggleCreate }) => {
         </Link>
       </li>
     
-    <br /><br /><br /><br />
+    <br /><br />
       
       {/* Botón crear */}
       <Link to="/create" onClick={() => setSelectedTab('create')}>
