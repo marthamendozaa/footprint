@@ -5,12 +5,14 @@ import { BsPeopleFill } from "react-icons/bs";
 import { MdUpload } from "react-icons/md"
 import { Spinner, Modal } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa, getMisTareas } from '../../api/api.js';
+import { getIniciativa, getMiembros, getMisTareas, getUsuario } from '../../api/api.js';
 import './Initiative.css';
 
 export const Initiative = () => {
   const { idIniciativa } = useParams();
   const [iniciativa, setIniciativa] = useState(null);
+  const [infoAdmin, setInfoAdmin] = useState(null);
+  const [miembros, setMiembros] = useState(null);
   const [tareas, setTareas] = useState(null);
 
   const formatDate = (dateString) => {
@@ -29,6 +31,13 @@ export const Initiative = () => {
         const iniciativaData = await getIniciativa(idIniciativa);
         setIniciativa(iniciativaData);
         console.log(iniciativaData);
+
+        const infoIniciativaAdmin = await getUsuario(iniciativaData.idAdmin);
+        setInfoAdmin(infoIniciativaAdmin);
+        console.log(infoIniciativaAdmin);
+
+        const listaMiembros = await getMiembros(idIniciativa);
+        setMiembros(listaMiembros);
 
         const tareaPromises = iniciativaData.listaTareas.map(async (idTarea) => {
           const tareaData = await getMisTareas(idTarea);
@@ -177,13 +186,35 @@ export const Initiative = () => {
 
           <div className="i-seccion-miembros">
             <div className="i-tipo-miembro">Dueño</div>
-              <button type="button" className="i-btn-miembro">@isabellaEverTech</button>
+            {infoAdmin && 
+              <button type="button" className="i-btn-miembro">{infoAdmin.nombreUsuario}</button>
+            }
             <div className="i-tipo-miembro">Miembros</div>
-              <button type="button" className="i-btn-miembro">@valeEverTech
-                <span className="i-icono-elimina-miembro">
-                  <FaTimesCircle className="i-icon-times-circle" />
-                </span>
-              </button>
+            {miembros ? (
+                  <div>
+                    {miembros.length === 0 ? (
+                      <div>
+                      No hay miembros.
+                      </div>
+                    ) : (
+                    <div>
+                      {miembros.map((miembro, idMiembro) => (
+                        <div key={idMiembro}>
+                          <button type="button" className="i-btn-miembro">{miembro.nombreUsuario}
+                          <span className="i-icono-elimina-miembro">
+                            <FaTimesCircle className="i-icon-times-circle" />
+                          </span>
+                        </button>
+                        </div>
+                      ))}
+                    </div>
+                    )}
+                  </div>
+                  ) : (
+                  <div className="m-error">
+                  No hay tareas asignadas.
+                  </div>
+                )}
               <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowModal}>
                 VER SOLICITUDES
               </button>

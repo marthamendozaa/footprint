@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { useAuth } from '../../contexts/AuthContext';
 import Solicitud from '../../classes/Solicitud.js'
-import { getIniciativas, crearSolicitud, getUsuario, actualizaUsuario, getMisIniciativas } from '../../api/api.js';
+import { getIniciativas, crearSolicitud, getUsuario, actualizaUsuario, getMisIniciativas, suscribirseAIniciativa } from '../../api/api.js';
 import { Spinner } from 'react-bootstrap';
 import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
 import Fuse from 'fuse.js';
@@ -86,6 +86,7 @@ export const Explore = () => {
             setEsAdmin(false);
             setEsMiembro(false);
         }
+
         setShowModal(true);
     }
 
@@ -107,6 +108,34 @@ export const Explore = () => {
 
                     setShowModal(false);
                     alert("Has enviado solicitud a la iniciativa");
+                }
+            } catch (error) {
+              alert("Error al enviar solicitud a la iniciativa");
+            } finally {
+              setSuscribirDesactivado(false);
+            }
+        }
+    }
+
+    const handleSuscribirse = async () => {
+        if (selectedIniciativa) {
+            const idIniciativa = selectedIniciativa.idIniciativa; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
+            try {
+                setSuscribirDesactivado(true);
+                const response = await suscribirseAIniciativa(user, idIniciativa);
+                console.log(response)
+                if (response) {
+                    console.log("Entrada a response success")
+                    const iniciativasNuevo = [...iniciativas];
+                    iniciativasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
+                    setIniciativas(iniciativasNuevo);
+
+                    const usuarioNuevo = {...usuario};
+                    usuarioNuevo.listaIniciativasMiembro.push(idIniciativa);
+                    setUsuario(usuarioNuevo);
+
+                    setShowModal(false);
+                    alert("Te has suscrito a la iniciativa");
                 }
             } catch (error) {
               alert("Error al enviar solicitud a la iniciativa");
@@ -179,6 +208,7 @@ export const Explore = () => {
                             setShowModal={setShowModal}
                             selectedIniciativa={selectedIniciativa}
                             handleCrearSolicitud={handleCrearSolicitud}
+                            handleSuscribirse = {handleSuscribirse}
                             esAdmin={esAdmin}
                             esMiembro={esMiembro}
                             suscribirDesactivado={suscribirDesactivado}

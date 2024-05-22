@@ -6,7 +6,7 @@ import './ModalIniciativa.css';
 import { FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
 
 
-const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCrearSolicitud, esAdmin, esMiembro, suscribirDesactivado, setSuscribirDesactivado, pagina }) => {
+const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCrearSolicitud, handleSuscribirse, esAdmin, esMiembro, suscribirDesactivado, setSuscribirDesactivado, pagina }) => {
     return (
         <Modal show={showModal} onHide={() => {setShowModal(false); setSuscribirDesactivado(false);}} centered className='e-modal'>
             <div className="modalcontainer">
@@ -57,9 +57,15 @@ const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCre
                                 <div className='modalsusbotton'> Ver iniciativa </div>   
                             </Link>
                         ) : (
-                            <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud}>
+                            selectedIniciativa && selectedIniciativa.esPublica ? (
+                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleSuscribirse}>
+                                Suscribirme
+                                </button>
+                            ) : (
+                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud}>
                                 Solicitar unirme
-                            </button>
+                                </button>
+                            )  
                         )
                     ):null }
                 </div>

@@ -388,3 +388,20 @@ export const getMisTareas = async (idTarea) => {
     throw new Error(error);
   }
 };
+
+// Obtener miembros de la iniciativa
+export const getMiembros = async (idIniciativa) => {
+  try {
+    const iniciativa = await getDoc(doc(firestore, "Iniciativas", idIniciativa));
+    let miembros = [];
+    for (const docRef of iniciativa.data().listaMiembros) {
+      const miembro = await getDoc(doc(firestore, "Usuarios", docRef));
+      miembros.push(miembro.data());
+    }
+    console.log("Obtener miembros exitoso");
+    return miembros;
+  } catch (error) {
+    console.log("Error obteniendo miembros");
+    throw new Error(error);
+  }
+}
