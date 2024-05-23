@@ -302,7 +302,9 @@ export const Profile = () => {
 
   // React Dropzone
   const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
+    accept: {
+      'image/*': []
+    },
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
         setSelectedImage(acceptedFiles[0]);
