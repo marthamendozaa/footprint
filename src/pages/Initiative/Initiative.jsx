@@ -5,7 +5,7 @@ import { BsPeopleFill } from "react-icons/bs";
 import { MdUpload } from "react-icons/md"
 import { Spinner, Modal } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa, getMiembros, getMisTareas, getUsuario } from '../../api/api.js';
+import { getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes } from '../../api/api.js';
 import './Initiative.css';
 
 export const Initiative = () => {
@@ -24,6 +24,8 @@ export const Initiative = () => {
   };
 
   const [showModal, setShowModal] = useState(false); 
+  const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
+  const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,6 +40,26 @@ export const Initiative = () => {
 
         const listaMiembros = await getMiembros(idIniciativa);
         setMiembros(listaMiembros);
+
+        const solicitudes = await getSolicitudes("Iniciativas", idIniciativa);
+        console.log(solicitudes);
+
+        let solicitudesRecibidasData = []
+        for (const solicitud of solicitudes) {
+          if (solicitud.tipoInvitacion == "UsuarioAIniciativa") {
+            solicitudesRecibidasData.push(solicitud);
+          }
+        }
+        console.log(solicitudesRecibidasData);
+        setSolicitudesRecibidas(solicitudesRecibidasData);
+
+        let usuariosRecibidosData = []
+        for (const solicitud of solicitudesRecibidasData){
+          const usuarioRecibido = await getUsuario(solicitud.idUsuario);
+          usuariosRecibidosData.push(usuarioRecibido);
+        }
+        console.log(usuariosRecibidosData)
+        setUsuariosRecibidos(usuariosRecibidosData);
 
         const tareaPromises = iniciativaData.listaTareas.map(async (idTarea) => {
           const tareaData = await getMisTareas(idTarea);
@@ -215,31 +237,50 @@ export const Initiative = () => {
                   No hay tareas asignadas.
                   </div>
                 )}
-              <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowModal}>
-                VER SOLICITUDES
-              </button>
+                {!iniciativa.esPublica && (
+                  <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowModal}>
+                  VER SOLICITUDES
+                </button>
+                )}
+              
             </div>
 
               <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
                 <div className="modalcontainer">
                     <Modal.Header style={{ border: "none" }} closeButton> Solicitudes </Modal.Header>
                     
-                    <div className='modaliniciativa'>
-                      <div className="cuadro">
-                        <div className="cuadro2">@angelaEverTech</div>
-                        <div className="cuadro3">
-                          Angela Gtz,      21 años<br></br>
-                          Teamwork, Back end, Proyect Manager <br></br>
-                        </div>
-                      </div>
-                      
-                      <div className="cuadro">
-                          <div className="cuadro2">@MarthaMendoza</div>
-                          <div className="cuadro3">
-                            Martha Mendoza      21 años<br></br>
-                            Teamwork, Front end, Proyect Manager <br></br>
+                    <div>
+                      {!usuariosRecibidos ? (
+                          <div className="m-error">
+                            Esta iniciativa no ha recibido solicitudes.
                           </div>
-                      </div>
+                        ) : (
+                          <div className="m-iniciativas-container">
+                            {usuariosRecibidos.map((usuario, index) => (
+                              <div key={index} className='e-iniciativa'>
+                                <div className="e-desc">{usuario.nombreUsuario}</div>
+                              <div className='e-iniciativa-imagen'>
+                                  <img src={usuario.urlImagen} alt = {usuario.nombreUsuario} />
+                              </div>
+            
+                              <div className='e-iniciativa-texto'>
+                                  <div className="e-titulo">{usuario.nombre}</div>
+                                  <div className="i-etiquetas">
+                                  {Object.values(usuario.listaHabilidades).map((habilidad, idHabilidad) => (
+                                    <li key={idHabilidad} className={`i-etiqueta-item`}>
+                                      {habilidad}
+                                    </li>
+                                  ))}
+                                  <div>
+                                    <button>SI</button>
+                                    <button>No</button>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>    
+                            ))}
+                          </div>
+                        )}
                     </div>
                 </div>
             </Modal>
