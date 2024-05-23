@@ -220,30 +220,29 @@ export const Initiative = () => {
               </button>
             </div>
 
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
-                            <div className="modalcontainer">
-                                <Modal.Header style={{ border: "none" }} closeButton> Solicitudes </Modal.Header>
-                                
-                                <div className='modaliniciativa'>
-                                <div className="cuadro">
-                                <div className="cuadro2">@angelaEverTech</div>
-                                
-                                <div className="cuadro3">
-                                    Angela Gtz,      21 años<br></br>
-                                    Teamwork, Back end, Proyect Manager <br></br>
-                                </div>
-                            </div>
-                            <div className="cuadro">
-                                <div className="cuadro2">@MarthaMendoza</div>
-                                
-                                <div className="cuadro3">
-                                    Martha Mendoza      21 años<br></br>
-                                    Teamwork, Front end, Proyect Manager <br></br>
-                                </div>
-                            </div>
-                                </div>
-                            </div>
-                        </Modal>
+              <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
+                <div className="modalcontainer">
+                    <Modal.Header style={{ border: "none" }} closeButton> Solicitudes </Modal.Header>
+                    
+                    <div className='modaliniciativa'>
+                      <div className="cuadro">
+                        <div className="cuadro2">@angelaEverTech</div>
+                        <div className="cuadro3">
+                          Angela Gtz,      21 años<br></br>
+                          Teamwork, Back end, Proyect Manager <br></br>
+                        </div>
+                      </div>
+                      
+                      <div className="cuadro">
+                          <div className="cuadro2">@MarthaMendoza</div>
+                          <div className="cuadro3">
+                            Martha Mendoza      21 años<br></br>
+                            Teamwork, Front end, Proyect Manager <br></br>
+                          </div>
+                      </div>
+                    </div>
+                </div>
+            </Modal>
           </div>
         </div>
       ) : (
