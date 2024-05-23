@@ -275,7 +275,9 @@ export const Create = () => {
 
   // React Dropzone
   const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
+    accept: {
+      'image/*': []
+    },
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
         setImagenSeleccionada(acceptedFiles[0]);
