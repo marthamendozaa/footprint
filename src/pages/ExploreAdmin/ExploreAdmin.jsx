@@ -101,6 +101,11 @@ export const ExploreAdmin = () => {
     setFilteredIniciativas(filtered);
   };
 
+  function deletionEvent(item) {
+    handleMostrarEliminar(item.titulo, item.idIniciativa);
+    createMail(item.idIniciativa);
+  }
+
   return (
     <div className='ea-container'>
       <div className='ea-seccion-container'>
@@ -130,7 +135,7 @@ export const ExploreAdmin = () => {
                 <div className="ea-titulo">{item.titulo}</div>
                 <div className="ea-desc">{item.descripcion}</div>
                 <div className='ea-boton'>
-                <Button className="btn-eliminar-tarjeta-1" onClick={() => handleMostrarEliminar(item.titulo, item.idIniciativa)} disabled={eliminaBloqueado}>Eliminar</Button>
+                <Button className="btn-eliminar-tarjeta-1" onClick={() => deletionEvent(item)} disabled={eliminaBloqueado}>Eliminar</Button>
                 </div>
               </div>
   

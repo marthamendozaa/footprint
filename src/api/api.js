@@ -420,3 +420,38 @@ export const getMiembros = async (idIniciativa) => {
     throw new Error(error);
   }
 }
+
+export const sendMail = async (idIniciativa) => {
+  try {
+    const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
+    const iniciativaDoc = await getDoc(iniciativaRef);
+    const iniciativaData = iniciativaDoc.data();
+    const idAdmin = iniciativaData.idAdmin;
+    const titulo = iniciativaData.titulo;
+
+    const userRef = doc(firestore, "usuarios", idAdmin);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    const adminEmail = userData.correo;
+    const nombre = userData.nombre;
+
+    //const mailRef = collection(firestore, "mail");
+    const response = await axios.post(`${functionsURL}/sendMails`, {
+      titulo: titulo,
+      nombre: nombre,
+      adminEmail: adminEmail
+    });
+    
+    if (response.data.success) {
+      console.log("Envio de correo exitoso");
+      return;
+    } else {
+      console.log("Error enviando correo");
+      throw new Error(response.data.error);
+    }
+
+  } catch (error) {
+    console.log("Error sending email");
+    throw new Error(error);
+  }
+}
