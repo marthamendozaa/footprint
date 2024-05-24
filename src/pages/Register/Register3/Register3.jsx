@@ -5,8 +5,6 @@ import { Spinner } from 'react-bootstrap';
 import './Register3.css';
 
 export const Register3 = ({ onPrev, onNext, usuario }) => {
-    const [error, setError] = useState('');
-    const [showModal, setShowModal] = useState(false);
     const [intereses, setIntereses] = useState(null);
     const [interesesUsuario, setInteresesUsuario] = useState(usuario.listaIntereses ? usuario.listaIntereses : {});
 
@@ -36,11 +34,6 @@ export const Register3 = ({ onPrev, onNext, usuario }) => {
         const nuevosInteresesUsuario = { ...interesesUsuario };
         
         if (Object.keys(nuevosInteresesUsuario).includes(`${idInteres}`)) {
-            if (Object.keys(nuevosInteresesUsuario).length === 1) {
-                setError('Por favor, selecciona al menos un interés');
-                setShowModal(true);
-                return;
-            }
             delete nuevosInteresesUsuario[idInteres];
           } else {
             nuevosInteresesUsuario[idInteres] = interes;
@@ -52,20 +45,8 @@ export const Register3 = ({ onPrev, onNext, usuario }) => {
     // Manejar registro
     const handleRegister = async (event) => {
         event.preventDefault();
-
-        if (Object.keys(interesesUsuario).length === 0) {
-            setError('Por favor, selecciona al menos un interés');
-            setShowModal(true);
-            return;
-        }
-
-        try {
-            usuario.listaIntereses = interesesUsuario;
-            onNext(usuario);
-        } catch (error) {
-            setError('Error al registrar intereses. Por favor, inténtalo de nuevo.');
-            setShowModal(true);
-        }
+        usuario.listaIntereses = interesesUsuario;
+        onNext(usuario);
     };
 
     const handlePrev = () => {
@@ -109,7 +90,7 @@ export const Register3 = ({ onPrev, onNext, usuario }) => {
 
                             {/* Continuar con registro */}
                             <div className='flecha-register3-container-end'>
-                                <button type="submit" className="btn flecha-btn">
+                                <button type="submit" className="btn flecha-btn" disabled={Object.keys(interesesUsuario).length === 0}>
                                     <FaArrowRight />
                                 </button>
                             </div>
@@ -117,17 +98,6 @@ export const Register3 = ({ onPrev, onNext, usuario }) => {
                         </div>
 
                     </form>
-                )}
-
-                {/* Pop-up de error */}
-                {showModal && (
-                    <div className='pop-up-register3'>
-                        <div className='pop-up-3-register3'>
-                            <h2 style={{ textAlign: 'center' }}>Error</h2>
-                            <p style={{ textAlign: 'left', marginTop: '20px' }}>{error}</p>
-                            <button onClick={() => setShowModal(false)}>Cerrar</button>
-                        </div>
-                    </div>
                 )}
             </div>
         </div>

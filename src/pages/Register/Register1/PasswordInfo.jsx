@@ -15,9 +15,9 @@ const PasswordInfo = () => {
 
   const passwordRules = (
     <div className="password-info-styles">
-      <h2>Requisitos de contraseña</h2>
-      <p>Debe contener al menos:</p>
-      <li> 8 caracteres</li>
+      <h2>Recomendaciones</h2>
+      <p>Para mejorar seguridad:</p>
+      <li> 10 caracteres</li>
       <li> Un caracter especial</li>
       <li> Un número</li>
       <li> Una letra mayúscula </li>

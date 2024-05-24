@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+import { FaArrowLeft } from 'react-icons/fa';
 import { useAuth } from '../../../contexts/AuthContext.jsx';
 import { getHabilidades, crearUsuario } from '../../../api/api.js';
 import { Spinner } from 'react-bootstrap';
+import { ClipLoader } from 'react-spinners';
 import './Register4.css';
 
 export const Register4 = ({ onPrev, usuario }) => {
@@ -39,11 +40,6 @@ export const Register4 = ({ onPrev, usuario }) => {
         const nuevasHabilidadesUsuario = { ...habilidadesUsuario };
 
         if (Object.keys(nuevasHabilidadesUsuario).includes(`${idHabilidad}`)) {
-            if (Object.keys(nuevasHabilidadesUsuario).length === 1) {
-                setError('Por favor, selecciona al menos una habilidad');
-                setShowModal(true);
-                return;
-            }
             delete nuevasHabilidadesUsuario[idHabilidad];
           } else {
             nuevasHabilidadesUsuario[idHabilidad] = habilidad;
@@ -59,20 +55,10 @@ export const Register4 = ({ onPrev, usuario }) => {
     const handleRegister = async (event) => {
         event.preventDefault();
         
-        if (Object.keys(habilidadesUsuario).length === 0) {
-            setError('Por favor, selecciona al menos una habilidad');
-            setShowModal(true);
-            return;
-        }
-        
         setTerminarDesactivado(true);
         try {
             usuario.listaHabilidades = habilidadesUsuario;
-
-            // Calcular la edad
-            const edadMs = Date.now() - usuario.fechaNacimiento.getTime();
-            const edadFecha = new Date(edadMs);
-            usuario.edad = Math.abs(edadFecha.getUTCFullYear() - 1970);
+            usuario.nombreUsuario = `@${usuario.nombreUsuario}`;
 
             const response = await crearUsuario(usuario);
             if (response.success) {
@@ -84,7 +70,7 @@ export const Register4 = ({ onPrev, usuario }) => {
                 setShowModal(true);
             }
         } catch (error) {
-            setError('Error al registrar habilidades. Por favor, inténtalo de nuevo.');
+            setError('Error al registrar usuario.');
             setShowModal(true);
         } finally {
             setTerminarDesactivado(false);
@@ -132,9 +118,9 @@ export const Register4 = ({ onPrev, usuario }) => {
                             
                             {/* Terminar con registro */}
                             <div className='flecha-register4-container-end'>
-                                <button type="submit" className="btn flecha-btn" disabled={terminarDesactivado}>
+                                <button type="submit" className="btn flecha-btn" disabled={Object.keys(habilidadesUsuario).length === 0} style={{width: "100px"}}>
                                     {/*<FaArrowRight />*/}
-                                    Terminar
+                                    {terminarDesactivado ? <ClipLoader size={24} color="#6b6b6b" /> : 'Terminar'}
                                 </button>
                             </div>
                             

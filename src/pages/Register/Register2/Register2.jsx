@@ -11,15 +11,19 @@ import './Register2.css';
 export const Register2 = ({ onPrev, onNext, usuario }) => {
   const [name, setName] = useState(usuario.nombre ? usuario.nombre : '');
   const [username, setUsername] = useState(usuario.nombreUsuario ? usuario.nombreUsuario : '');
-  const [invalidName, setInvalidName] = useState(false);
   const [selectedDate, setSelectedDate] = useState(usuario.fechaNacimiento ? new Date(usuario.fechaNacimiento) : null);
   const today = new Date();
   const maxDate = new Date(today.getFullYear() - 15, today.getMonth(), today.getDate());
-  const [invalidUsername, setInvalidUsername] = useState(false);
-  const [error, setError] = useState('');
-  const [showModal, setShowModal] = useState(false);
   const [showResponsiveLetter, setShowResponsiveLetter] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
+
+  // Validaciones
+  const [fieldsEmpty, setFieldsEmpty] = useState(true);
+  const [changingName, setChangingName] = useState(true);
+  const [invalidName, setInvalidName] = useState(false);
+  const [changingUsername, setChangingUsername] = useState(true);
+  const [invalidUsername, setInvalidUsername] = useState(false);
+  const [duplicateUsername, setDuplicateUsername] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('register2-body');
@@ -29,9 +33,31 @@ export const Register2 = ({ onPrev, onNext, usuario }) => {
     };
   }, []);
 
-  const onlyLetters = (text) => {
-    return /^[a-zA-ZñÑáéíóúüÁÉÍÓÚ\s]+$/.test(text);
+  useEffect(() => {
+    if (!name || !username || !selectedDate) {
+      setFieldsEmpty(true);
+    } else {
+      setFieldsEmpty(false);
+    }
+  }, [name, username, selectedDate]);
+
+  const validateName = () => {
+    const nameValid = /^[a-zA-ZñÑáéíóúüÁÉÍÓÚ\s]+$/.test(name);
+    setInvalidName(!nameValid);
+    setChangingName(false);
   };
+
+  const validateUsername = async () => {
+    const usernameValid = /^[a-zA-Z0-9_]+$/.test(username);
+    setInvalidUsername(!usernameValid);
+
+    if (usernameValid) {
+      const response = await existeNombreUsuario(username);
+      setDuplicateUsername(response);
+    }
+    
+    setChangingUsername(false);
+  }
 
   const calculateAge = (birthday) => {
     const currentDate = new Date();
@@ -47,50 +73,26 @@ export const Register2 = ({ onPrev, onNext, usuario }) => {
 
   const handleRegister = async (event) => {
     event.preventDefault();
+    const userAge = calculateAge(selectedDate);
 
-    if (!name || !username || !selectedDate) {
-      setError('Por favor, llena todos los campos');
-      setShowModal(true);
-      return;
-    }
-
-    if (!onlyLetters(name)) {
-      setInvalidName(true);
-      return;
-    }
-
-    const response = await existeNombreUsuario(username);
-    if (response) {
-      setInvalidUsername(true);
-      return;
-    }
-
-    try {
-        const userAge = calculateAge(selectedDate);
-
-        if (isChecked==true) {
-          usuario.nombre = name;
-          usuario.nombreUsuario = username;
-          usuario.fechaNacimiento = selectedDate;
-          onNext(usuario);
-        }
-
-        if (userAge<18) {
-          setShowResponsiveLetter(true)
-          return;
-        }
-
-        else {
-          usuario.nombre = name;
-          usuario.nombreUsuario = username;
-          usuario.fechaNacimiento = selectedDate;
-          onNext(usuario);
-        }
-        
-      } catch {
-        setError('Error al registrarse. Por favor, inténtalo de nuevo.');
-        setShowModal(true);
+    if (userAge < 18) {
+      if (isChecked == true) {
+        usuario.nombre = name;
+        usuario.nombreUsuario = username;
+        usuario.fechaNacimiento = selectedDate;
+        usuario.edad = userAge;
+        onNext(usuario);
       }
+      setShowResponsiveLetter(true)
+      return;
+    }
+    else {
+      usuario.nombre = name;
+      usuario.nombreUsuario = username;
+      usuario.fechaNacimiento = selectedDate;
+      usuario.edad = userAge;
+      onNext(usuario);
+    }
   };
 
   const handlePrev = () => {
@@ -123,12 +125,19 @@ export const Register2 = ({ onPrev, onNext, usuario }) => {
                       setName(e.target.value);
                     }
                     setInvalidName(false);
-                  }} 
+                    setChangingName(true);
+                  }}
+                  onBlur={validateName}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      validateName();
+                    }
+                  }}
                 />
               </div>
 
               {/* Advertencia de usuario */}
-              {invalidName && (
+              {!changingName && invalidName && (
                 <div className="custom-alert-register2 bg-custom-color-register2" style={{ marginTop: '85px' }}>
                   <FaExclamationCircle className="custom-alert-icon-register2" />
                   <span>Formato de nombre inválido</span>
@@ -143,7 +152,7 @@ export const Register2 = ({ onPrev, onNext, usuario }) => {
               {/* Caja usuario */}
               <FaUser className="register2-icons" />
               <input 
-                className={`usuario-caja-register2 ${invalidUsername ? 'border-red-register2' : ''}`}
+                className={`usuario-caja-register2 ${invalidUsername || duplicateUsername ? 'border-red-register2' : ''}`}
                 type="usuario"
                 placeholder="Ingresa tu usuario" 
                 value={username}  
@@ -152,14 +161,25 @@ export const Register2 = ({ onPrev, onNext, usuario }) => {
                     setUsername(e.target.value);
                   }
                   setInvalidUsername(false);
-                }} 
+                  setDuplicateUsername(false);
+                  setChangingUsername(true);
+                }}
+                onBlur={validateUsername}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    validateUsername();
+                  }
+                }}
               />
 
               {/* Advertencia de usuario */}
-              {invalidUsername && (
+              {(!changingUsername && invalidUsername || duplicateUsername) && (
                 <div className="custom-alert-register2 bg-custom-color-register2" style={{ marginTop: '85px' }}>
                   <FaExclamationCircle className="custom-alert-icon-register2" />
-                  <span>El usuario ya existe</span>
+                  <span>
+                    {invalidUsername ? 'Formato de usuario inválido' : ''}
+                    {duplicateUsername ? 'El usuario ya está en uso' : ''}
+                  </span>
                 </div>
               )}
             </div>
@@ -204,7 +224,7 @@ export const Register2 = ({ onPrev, onNext, usuario }) => {
 
             {/* Continuar con registro */}
             <div className='flecha-register2-container-end'>
-              <button type="submit" className="btn flecha-btn">
+              <button type="submit" className="btn flecha-btn" disabled={fieldsEmpty || invalidName || invalidUsername}>
                 <FaArrowRight />
               </button>
             </div>
@@ -216,17 +236,6 @@ export const Register2 = ({ onPrev, onNext, usuario }) => {
 
       {/* Popup de Carta Resonsiva */}
       {showResponsiveLetter && <ResponsiveLetter isChecked={isChecked} setIsChecked={setIsChecked} onClose={() => setShowResponsiveLetter(false)} />}
-      
-      {/* Pop-up de error */}
-      {showModal && (
-        <div className='pop-up-register2'>
-          <div className='pop-up-3-register2'>
-            <h2 style={{textAlign: 'center'}}>Error</h2>
-            <p style={{textAlign: 'left', marginTop: '20px'}}>{error}</p>
-            <button onClick={() => setShowModal(false)}>Cerrar</button>
-          </div>
-        </div>
-      )}
     </div>
   );
 };

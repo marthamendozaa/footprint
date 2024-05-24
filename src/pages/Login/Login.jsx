@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { autentificaUsuario, getUsuario } from '../../api/api.js';
 import { FaUser, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
+import { ClipLoader } from 'react-spinners';
 import evertechImage from '../../assets/evertech.png';
 import './Login.css';
 
@@ -144,8 +145,8 @@ export const Login = () => {
 
               {/* Botón de iniciar sesión */}
               <div className='iniciar-sesion-container'>
-                  <button type="submit" className="btn login-btn" disabled={loginBloqueado}>
-                      Iniciar sesión
+                  <button type="submit" className="btn login-btn" disabled={loginBloqueado} style={{width:"180px"}}>
+                    {loginBloqueado ? <ClipLoader size={24} color="#fff" /> : 'Iniciar Sesión'}
                   </button>
               </div>
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FaEnvelope, FaArrowRight, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
+import PasswordStrengthBar from 'react-password-strength-bar';
 import { PrivacyPolicy } from './PrivacyPolicy.jsx';
 import PasswordInfo from './PasswordInfo.jsx';
 import { existeCorreo } from '../../../api/api.js';
@@ -12,13 +13,15 @@ export const Register1 = ({ onNext, usuario }) => {
   const [confirmPassword, setConfirmPassword] = useState(usuario.contrasena ? usuario.contrasena : '');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [showModal, setShowModal] = useState(false);
+  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
+  
+  // Validaciones
+  const [fieldsEmpty, setFieldsEmpty] = useState(true);
+  const [changingEmail, setChangingEmail] = useState(true);
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [duplicateEmail, setDuplicateEmail] = useState(false);
-  const [invalidPassword, setInvalidPasswordl] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordsMatch, setPasswordsMatch] = useState(true);
-  const [showPrivacyPolicy, setShowPrivacyPolicy] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('register-body');
@@ -28,80 +31,45 @@ export const Register1 = ({ onNext, usuario }) => {
     };
   }, []);
 
-  const validateEmail = (email) => {
-    if (email.length < 8) {
-      return false;
+  useEffect(() => {
+    if (!email || !password || !confirmPassword) {
+      setFieldsEmpty(true);
+    } else {
+      setFieldsEmpty(false);
     }
-    const re = /^[a-zA-Z0-9._-]+@[a-zA-Z-]{3,10}\.[a-zA-Z]{2,3}(?:\.[a-zA-Z]{2,3})?$/;
-    return re.test(String(email).toLowerCase());
+  }, [email, password, confirmPassword]);
+
+  const validateEmail = async () => {
+    const emailValid = /^[a-z0-9._-]+@[a-z-]{3,10}\.[a-z]{2,3}(?:\.[a-z]{2,3})?$/.test(email);
+    setInvalidEmail(!emailValid);
+
+    if (emailValid) {
+      const response = await existeCorreo(email);
+      setDuplicateEmail(response);
+    }
+    
+    setChangingEmail(false);
   };
 
-  const validatePassword = (password) => {
-    // Verificar que la contraseña tenga al menos 8 caracteres
-    if (password.length < 8) {
-        return false;
-    }
+  const handleStrengthChange = (score) => {
+    setPasswordStrength(score);
+  };
 
-    // Verificar si la contraseña contiene al menos un carácter especial
-    const specialCharacters = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
-    if (!specialCharacters.test(password)) {
-        return false;
+  const handlePasswordMatch = () => {
+    if (password && confirmPassword) {
+      if (password === confirmPassword) {
+        setPasswordsMatch(true);
+      } else {
+        setPasswordsMatch(false);
+      }
     }
-
-    // Verificar si la contraseña contiene al menos un número
-    const numbers = /[0-9]/;
-    if (!numbers.test(password)) {
-        return false;
-    }
-
-    // Verificar si la contraseña contiene al menos una letra mayúscula
-    const upperCaseLetters = /[A-Z]/;
-    if (!upperCaseLetters.test(password)) {
-        return false;
-    }
-
-    // Si la contraseña pasa todas las validaciones, retorna true
-    return true;
   };
 
   const handleRegister = async (event) => {
     event.preventDefault();
-
-    if (!email || !password || !confirmPassword) {
-      setError('Por favor, llena todos los campos');
-      setShowModal(true);
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setInvalidEmail(true);
-      return;
-    }
-
-    const response = await existeCorreo(email);
-    if (response) {
-      setDuplicateEmail(true);
-      return;
-    }
-
-    if (!validatePassword(password)) {
-      setInvalidPasswordl(true);
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setPasswordsMatch(false);
-      return;
-    }
-
-    try {
-      usuario.correo = email;
-      usuario.contrasena = password;
-      onNext(usuario);
-    } catch {
-      setError('Error al registrarse. Por favor, inténtalo de nuevo.');
-      setShowModal(true);
-    }
+    usuario.correo = email;
+    usuario.contrasena = password;
+    onNext(usuario);
   };
 
   return (
@@ -131,11 +99,18 @@ export const Register1 = ({ onNext, usuario }) => {
                     }
                     setInvalidEmail(false);
                     setDuplicateEmail(false);
+                    setChangingEmail(true);
+                  }}
+                  onBlur={validateEmail}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      validateEmail();
+                    }
                   }}
                 />
 
                 {/* Advertencia de correo */}
-                {(invalidEmail || duplicateEmail) && (
+                {(!changingEmail && invalidEmail || duplicateEmail) && (
                   <div className="custom-alert-register bg-custom-color-register" style={{ marginTop: '-5px' }}>
                     <FaExclamationCircle className="custom-alert-icon-register" />
                     <span>
@@ -157,29 +132,41 @@ export const Register1 = ({ onNext, usuario }) => {
 
               {/* Ojo */}
               <FaLock className="register-icons" />
-              <input 
-                className={`ojo-contrasena-register ${invalidPassword ? 'border-red-register' : ''}`}
-                type={showPassword ? 'text' : 'password'}
-                placeholder="Ingresa la contraseña" 
-                value={password}
-                onChange={(e) => {
-                  if (e.target.value.length <= 20) {
-                    setPassword(e.target.value);
-                  }
-                  setInvalidPasswordl(false);
-                }} 
-              />
-              <span className="ojo-contrasena-2-register" onClick={() => setShowPassword(!showPassword)}>
-                {password !== '' && (showPassword ? <FaEyeSlash /> : <FaEye />)}
-              </span>
+              <div>
+                <div style={{display: "flex", position: "relative"}}>
+                  <input 
+                    className={`ojo-contrasena-register`}
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder="Ingresa la contraseña" 
+                    value={password}
+                    onChange={(e) => {
+                      if (e.target.value.length <= 20) {
+                        setPassword(e.target.value);
+                      }
+                    }}
+                    onBlur={handlePasswordMatch}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        handlePasswordMatch();
+                      }
+                    }}
+                  />
 
-              {/* Advertencia de contraseña */}
-              {invalidPassword && (
-                <div className="custom-alert-register bg-custom-color-register" style={{ marginTop: '85px' }}>
-                  <FaExclamationCircle className="custom-alert-icon-register" />
-                  <span>Formato de contraseña inválido</span>
+                  <span className="ojo-contrasena-2-register" style={{height: "100%"}} onClick={() => setShowPassword(!showPassword)}>
+                    {password !== '' && (showPassword ? <FaEyeSlash /> : <FaEye />)}
+                  </span>                  
+
                 </div>
-              )}
+                  {password.length > 0 && 
+                    <PasswordStrengthBar style={{position: "absolute", width: "100%"}}
+                      className="password-strength-bar"
+                      password={password}
+                      onChangeScore={handleStrengthChange}
+                      shortScoreWord="Muy corta"
+                      scoreWords={["Muy débil", "Débil", "Aceptable", "Buena", "Fuerte"]}
+                    />
+                  }
+              </div>
             </div>
             
             {/* Confirmar Contraseña */}
@@ -197,8 +184,14 @@ export const Register1 = ({ onNext, usuario }) => {
                   if (e.target.value.length <= 20) {
                     setConfirmPassword(e.target.value);
                   }
-                  setPasswordsMatch(true);
-                }} 
+                  
+                }}
+                onBlur={handlePasswordMatch}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    handlePasswordMatch();
+                  }
+                }}
               />
               <span className="ojo-contrasena-2-register" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
                 {confirmPassword !== '' && (showConfirmPassword ? <FaEyeSlash /> : <FaEye />)}
@@ -229,7 +222,7 @@ export const Register1 = ({ onNext, usuario }) => {
 
             {/* Continuar con registro */}
             <div className='flecha-register-container-end'>
-              <button type="submit" className="btn flecha-btn">
+              <button type="submit" className="btn flecha-btn" disabled={fieldsEmpty || invalidEmail || duplicateEmail || passwordStrength < 4 || !passwordsMatch}>
                 <FaArrowRight />
               </button>
             </div>
@@ -247,17 +240,6 @@ export const Register1 = ({ onNext, usuario }) => {
       
       {/* Popup de Políticas de Privacidad */}
       {showPrivacyPolicy && <PrivacyPolicy onClose={() => setShowPrivacyPolicy(false)} />}
-      
-      {/* Pop-up de error */}
-      {showModal && (
-        <div className='pop-up-register'>
-          <div className='pop-up-3-register'>
-            <h2 style={{textAlign: 'center'}}>Error</h2>
-            <p style={{textAlign: 'left', marginTop: '20px'}}>{error}</p>
-            <button onClick={() => setShowModal(false)}>Cerrar</button>
-          </div>
-        </div>
-      )}
     </div>
   )
 }

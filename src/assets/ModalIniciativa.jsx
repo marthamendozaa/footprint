@@ -1,6 +1,7 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import Button from 'react-bootstrap/Button';
+import { ClipLoader } from 'react-spinners';
 import { Link } from 'react-router-dom';
 import './ModalIniciativa.css';
 import { FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
@@ -59,11 +60,11 @@ const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCre
                         ) : (
                             selectedIniciativa && selectedIniciativa.esPublica ? (
                                 <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleSuscribirse}>
-                                Suscribirme
+                                  {suscribirDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Suscribirme'}
                                 </button>
                             ) : (
                                 <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud}>
-                                Solicitar unirme
+                                  {suscribirDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Solicitar unirme'}
                                 </button>
                             )  
                         )

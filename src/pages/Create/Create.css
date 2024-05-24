@@ -460,6 +460,7 @@ input.c-tarea-titulo {
 .c-btn-crear {
   font-size: 25px;
   font-weight: 600;
+  width: 130px;
   padding: 10px 30px;
   background-color: #A0C1BF;
   border-radius: 30px;

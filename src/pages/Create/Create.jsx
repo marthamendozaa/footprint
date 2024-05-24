@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FaCalendar, FaFolder, FaPen, FaExclamationCircle } from 'react-icons/fa';
 import { Modal, Button, Spinner } from 'react-bootstrap';
+import { ClipLoader } from 'react-spinners';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
@@ -603,7 +604,9 @@ export const Create = () => {
           {/* Botón crear */}
           <div className="c-crear-container">
             <div className="c-btn-crear-container">
-              <button type="button" className="c-btn-crear" onClick={handleCrearIniciativa} disabled={crearDesactivado}> Crear </button>
+              <button type="button" className="c-btn-crear" onClick={handleCrearIniciativa} disabled={crearDesactivado}>
+                {crearDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Crear'}
+              </button>
             </div>
           </div>
 
