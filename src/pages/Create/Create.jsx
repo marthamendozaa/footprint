@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { format } from 'date-fns';
 import es from 'date-fns/locale/es';
 import { useAuth } from '../../contexts/AuthContext.jsx';
+import { useDropzone } from 'react-dropzone';
 import { getIntereses, getRegiones, crearIniciativa, actualizaIniciativa, subirImagen, crearTareas } from '../../api/api.js';
 import Iniciativa from '../../classes/Iniciativa.js';
 import Tarea from '../../classes/Tarea.js';
@@ -272,6 +273,19 @@ export const Create = () => {
     setImagenPreview(URL.createObjectURL(imagenSeleccionada));
     handleCerrarImagen();
   };
+
+  // React Dropzone
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: {
+      'image/*': []
+    },
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0) {
+        setImagenSeleccionada(acceptedFiles[0]);
+        setErrorImagen('');
+      }
+    }
+  });
 
 
   // Crear iniciativa
@@ -617,19 +631,10 @@ export const Create = () => {
             </Modal.Header>
               
             <div className="c-input-body">
-              <label htmlFor="file-upload" className="c-custom-file-button">
+              <div {...getRootProps({ className: 'c-custom-file-button' })}>
+                <input {...getInputProps()} />
                 Subir foto
-              </label>
-              <input 
-                id="file-upload"
-                className="c-input-imagen c-custom-file-input" 
-                type="file" 
-                accept="image/*" 
-                onChange={(e) => {
-                  setImagenSeleccionada(e.target.files[0])
-                  setErrorImagen('');
-                  }} 
-              />
+              </div>
               <span className="c-custom-file-text">{imagenSeleccionada ? imagenSeleccionada.name : "Ninguna imagen seleccionada"}</span>
             </div>
             {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
