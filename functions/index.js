@@ -368,3 +368,24 @@ exports.eliminaSolicitud = onRequest(async (req, res) => {
     }
   });
 });
+
+exports.sendMails = onRequest(async (req, res) =>{
+  cors(req, res, async () => {
+    const { titulo, nombre, adminEmail } = req.body;
+
+    try {
+      const email = {
+        to: adminEmail,
+        message: {
+          subject: "Tu iniciativa " + titulo + " ha sido borrada",
+          text: "Hola " + nombre + " lamentamos avisarte que tu iniciativa " + titulo + " ha sido borrada por los administradores debido a que no cumple con los estándares de la plataforma."
+        }
+      };
+      await getFirestore().collection('mail').add(email);
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error enviando correo: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});

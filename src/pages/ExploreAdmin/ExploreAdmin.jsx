@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ExploreAdmin.css';
-import { getIniciativas, eliminaIniciativa } from '../../api/api.js';
+import { getIniciativas, eliminaIniciativa, sendMail } from '../../api/api.js';
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { FaSearch } from "react-icons/fa";
 import Fuse from 'fuse.js';
@@ -42,6 +42,7 @@ export const ExploreAdmin = () => {
     console.log("Eliminando iniciativa con id: ", idIniciativaEliminar);
     handleCerrarEliminar();
     setEliminaBloqueado(true);
+    sendMail(idIniciativaEliminar);
 
     try {
       await eliminaIniciativa(idIniciativaEliminar);
@@ -101,6 +102,11 @@ export const ExploreAdmin = () => {
     setFilteredIniciativas(filtered);
   };
 
+  function deletionEvent(item) {
+    handleEliminaIniciativa();
+    sendMail(item.idIniciativa);
+  }
+
   return (
     <div className='ea-container'>
       <div className='ea-seccion-container'>
@@ -135,6 +141,7 @@ export const ExploreAdmin = () => {
               </div>
   
             </div>
+              
           ))
         ) : (
           <div className="spinner">
