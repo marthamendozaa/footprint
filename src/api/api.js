@@ -210,6 +210,7 @@ export const actualizaSolicitud = async (data) => {
 // Firebase Client SDK
 import { query, where, doc, collection, getDoc, getDocs, connectFirestoreEmulator } from "firebase/firestore";
 import firestore from "../api/firebase-config";
+import { add } from 'date-fns';
 
 if (isEmulator) {
   connectFirestoreEmulator(firestore, 'localhost', 8080);
@@ -426,12 +427,14 @@ export const sendMail = async (idIniciativa) => {
     const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
     const iniciativaDoc = await getDoc(iniciativaRef);
     const iniciativaData = iniciativaDoc.data();
+    console.log(iniciativaData);
     const idAdmin = iniciativaData.idAdmin;
     const titulo = iniciativaData.titulo;
 
-    const userRef = doc(firestore, "usuarios", idAdmin);
+    const userRef = doc(firestore, "Usuarios", idAdmin);
     const userDoc = await getDoc(userRef);
     const userData = userDoc.data();
+    console.log(userData);
     const adminEmail = userData.correo;
     const nombre = userData.nombre;
 
@@ -441,7 +444,7 @@ export const sendMail = async (idIniciativa) => {
       nombre: nombre,
       adminEmail: adminEmail
     });
-    
+
     if (response.data.success) {
       console.log("Envio de correo exitoso");
       return;

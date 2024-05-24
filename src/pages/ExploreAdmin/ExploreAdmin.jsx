@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './ExploreAdmin.css';
-import { getIniciativas, eliminaIniciativa } from '../../api/api.js';
+import { getIniciativas, eliminaIniciativa, sendMail } from '../../api/api.js';
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { FaSearch } from "react-icons/fa";
 import Fuse from 'fuse.js';
@@ -42,6 +42,7 @@ export const ExploreAdmin = () => {
     console.log("Eliminando iniciativa con id: ", idIniciativaEliminar);
     handleCerrarEliminar();
     setEliminaBloqueado(true);
+    sendMail(idIniciativaEliminar);
 
     try {
       await eliminaIniciativa(idIniciativaEliminar);
@@ -102,8 +103,8 @@ export const ExploreAdmin = () => {
   };
 
   function deletionEvent(item) {
-    handleMostrarEliminar(item.titulo, item.idIniciativa);
-    createMail(item.idIniciativa);
+    handleEliminaIniciativa();
+    sendMail(item.idIniciativa);
   }
 
   return (
@@ -135,11 +136,12 @@ export const ExploreAdmin = () => {
                 <div className="ea-titulo">{item.titulo}</div>
                 <div className="ea-desc">{item.descripcion}</div>
                 <div className='ea-boton'>
-                <Button className="btn-eliminar-tarjeta-1" onClick={() => deletionEvent(item)} disabled={eliminaBloqueado}>Eliminar</Button>
+                <Button className="btn-eliminar-tarjeta-1" onClick={() => handleMostrarEliminar(item.titulo, item.idIniciativa)} disabled={eliminaBloqueado}>Eliminar</Button>
                 </div>
               </div>
   
             </div>
+              
           ))
         ) : (
           <div className="spinner">
