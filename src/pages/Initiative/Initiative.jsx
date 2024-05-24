@@ -233,6 +233,8 @@ export const Initiative = () => {
             <div className="i-tipo-miembro">Dueño</div>
             {infoAdmin && 
               <button type="button" className="i-btn-miembro">{infoAdmin.nombreUsuario}</button>
+              
+              
             }
             <div className="i-tipo-miembro">Miembros</div>
             {miembros ? (

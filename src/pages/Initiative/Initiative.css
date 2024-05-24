@@ -197,7 +197,7 @@ li.i-etiqueta-item {
   font-weight: 600;
   font-size: 20px;
   color: #121212;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 /* Tareas y Miembros */
@@ -218,9 +218,10 @@ li.i-etiqueta-item {
   position: relative;
   width: 20%;
   display: flex;
-  align-items: center;
+  align-items: stretch;
   flex-direction: column;
   justify-content: space-evenly;
+
 }
 
 .i-btn-ver-miembros {
@@ -271,13 +272,25 @@ li.i-etiqueta-item {
 .i-btn-miembro {
   width: 100%;
   background-color: #E2EBF1;
-  border-radius: 20px;
+  border-radius: 25px;
   margin-top: 5px;
   margin-bottom: 5px;
-  border: none;
   padding-right: 30px;
   position: relative;
+  text-align: center;
 }
+
+.i-tarea-boton {
+  background-color: #A0C1BF;
+  border-radius: 25px;
+  font-size: 14px;
+  padding: 5px 10px;
+  text-align: center;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+
 
 .i-btn-miembro:hover {
   background-color: #E2EBF1;
@@ -288,6 +301,7 @@ li.i-etiqueta-item {
   right: 10px;
   top: 50%;
   transform: translateY(-60%);
+  padding-left: 10px;
 }
 
 .i-icon-times-circle {
@@ -366,7 +380,7 @@ input.i-tarea-titulo {
   display: flex;
   width: 100%;
   flex-wrap: wrap;
-  word-break: break-all;
+  word-break: break-word;
   text-align: left;
 }
 
