@@ -190,6 +190,21 @@ export const crearSolicitud = async (solicitud) => {
 };
 
 
+// Actualiza información de solicitud
+export const actualizaSolicitud = async (data) => {
+  const response = await axios.post(`${functionsURL}/actualizaSolicitud`, {
+    data: data
+  });
+  if (response.data.success) {
+    console.log("Actualizando solicitud exitoso");
+    return;
+  } else {
+    console.log("Error actualizando solicitud");
+    throw new Error(response.data.error);
+  }
+};
+
+
 // LECTURAS CON FIREBASE CLIENT
 
 // Firebase Client SDK
