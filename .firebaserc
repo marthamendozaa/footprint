@@ -1,5 +1,13 @@
 {
   "projects": {
     "default": "evertech-sprint2"
+  },
+  "targets": {},
+  "etags": {
+    "evertech-sprint2": {
+      "extensionInstances": {
+        "firestore-send-email": "14b2aa9e485f4407e1011944e996856d8337212a0f760607f46bbcd1b3816087"
+      }
+    }
   }
 }

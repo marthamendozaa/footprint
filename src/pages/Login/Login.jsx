@@ -13,6 +13,7 @@ export const Login = () => {
   const [error, setError] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
+  const [changingEmail, setChangingEmail] = useState(true);
 
   // Fondo de color
   useEffect(() => {
@@ -26,9 +27,10 @@ export const Login = () => {
   }, []);
 
   // Funciones
-  const validateEmail = (email) => {
-    const re = /^[a-zA-Z0-9._-]+@[a-zA-Z-]{3,10}\.[a-zA-Z]{2,3}(?:\.[a-zA-Z]{2,3})?$/;
-    return re.test(String(email).toLowerCase());
+  const validateEmail = () => {
+    const emailValid = /^[a-z0-9._-]+@[a-z-]{3,10}\.[a-z]{2,3}(?:\.[a-z]{2,3})?$/.test(email);
+    setInvalidEmail(!emailValid);
+    setChangingEmail(false);
   };
 
   // Autentificación
@@ -41,18 +43,6 @@ export const Login = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
-
-    if (!email || !password) {
-      setError('Correo y contraseña no pueden ser campos vacíos');
-      setShowModal(true);
-      return;
-    }
-
-    if (!validateEmail(email)) {
-      setInvalidEmail(true);
-      return;
-    }
-
     setLoginBloqueado(true);
     
     try {
@@ -100,11 +90,18 @@ export const Login = () => {
                   onChange={(e) => {
                     setEmail(e.target.value);
                     setInvalidEmail(false);
+                    setChangingEmail(true);
+                  }}
+                  onBlur={validateEmail}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      validateEmail();
+                    }
                   }}
                 />
 
                 {/* Advertencia de correo */}
-                {invalidEmail && (
+                {!changingEmail && invalidEmail && (
                 <div className="custom-alert bg-custom-color">
                   <FaExclamationCircle className='custom-alert-icon'/>
                   <span>Formato de correo inválido</span>
@@ -145,7 +142,7 @@ export const Login = () => {
 
               {/* Botón de iniciar sesión */}
               <div className='iniciar-sesion-container'>
-                  <button type="submit" className="btn login-btn" disabled={loginBloqueado} style={{width:"180px"}}>
+                  <button type="submit" className="btn login-btn" disabled={loginBloqueado || !email || !password || invalidEmail} style={{width:"180px"}}>
                     {loginBloqueado ? <ClipLoader size={24} color="#fff" /> : 'Iniciar Sesión'}
                   </button>
               </div>

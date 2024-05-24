@@ -224,7 +224,7 @@ export const Register2 = ({ onPrev, onNext, usuario }) => {
 
             {/* Continuar con registro */}
             <div className='flecha-register2-container-end'>
-              <button type="submit" className="btn flecha-btn" disabled={fieldsEmpty || invalidName || invalidUsername}>
+              <button type="submit" className="btn flecha-btn" disabled={fieldsEmpty || invalidName || invalidUsername || duplicateUsername}>
                 <FaArrowRight />
               </button>
             </div>

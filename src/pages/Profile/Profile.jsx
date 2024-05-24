@@ -3,11 +3,12 @@ import { FaPen } from 'react-icons/fa';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Button, Modal } from 'react-bootstrap';
+import { ClipLoader } from 'react-spinners';
 import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
+import PasswordStrengthBar from 'react-password-strength-bar';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { autentificaUsuario, getUsuario, actualizaUsuario, actualizaContrasena, getHabilidades, getIntereses, subirImagen } from '../../api/api.js';
 import Usuario from '../../classes/Usuario.js';
-import PasswordInfo2 from './PasswordInfo2.jsx';
 import './Profile.css';
 
 
@@ -172,12 +173,24 @@ export const Profile = () => {
   const [contrasenaActual, setContrasenaActual] = useState('');
   const [nuevaContrasena, setNuevaContrasena] = useState('');
   const [confirmarContrasena, setConfirmarContrasena] = useState('');
-  const [errorNuevaContraseña, setErrorNuevaContraseña] = useState('');
-  const [errorConfirmarContraseña, setErrorConfirmarContraseña] = useState('');
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Validaciones
+  const [fieldsEmpty, setFieldsEmpty] = useState(true);
+  const [contrasenaDesactivado, setContrasenaDesactivado] = useState(false);
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [passwordsMatch, setPasswordsMatch] = useState(true);
+
+  useEffect(() => {
+    if (!contrasenaActual || !nuevaContrasena || !confirmarContrasena) {
+      setFieldsEmpty(true);
+    } else {
+      setFieldsEmpty(false);
+    }
+  }, [contrasenaActual, nuevaContrasena, confirmarContrasena]);
 
   const openModalContrasena = () => {
     setShowModalContrasena(true);
@@ -191,51 +204,29 @@ export const Profile = () => {
     setShowPassword(false);
     setShowNewPassword(false);
     setShowConfirmPassword(false);
-    setErrorNuevaContraseña('');
-    setErrorConfirmarContraseña('');
     setError('');
+    setPasswordStrength(0);
+    setPasswordsMatch(true);
   };
 
-  const validatePassword = (password) => {
-    if (password.length < 8) {
-        return false;
-    }
+  const handleStrengthChange = (score) => {
+    setPasswordStrength(score);
+  };
 
-    const specialCharacters = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/;
-    if (!specialCharacters.test(password)) {
-        return false;
+  const handlePasswordMatch = () => {
+    if (nuevaContrasena && confirmarContrasena) {
+      if (nuevaContrasena === confirmarContrasena) {
+        setPasswordsMatch(true);
+      } else {
+        setPasswordsMatch(false);
+      }
+    } else {
+      setPasswordsMatch(true);
     }
-
-    const numbers = /[0-9]/;
-    if (!numbers.test(password)) {
-        return false;
-    }
-
-    const upperCaseLetters = /[A-Z]/;
-    if (!upperCaseLetters.test(password)) {
-        return false;
-    }
-
-    return true;
   };
 
   const handleSubmitPassword = async () => {
-    event.preventDefault();
-
-    if (contrasenaActual.trim() === '' || nuevaContrasena.trim() === '' || confirmarContrasena.trim() === '') {
-      setError('Por favor, llena todos los campos');
-      return;
-    }
-
-    if (!validatePassword(nuevaContrasena)) {
-      setErrorNuevaContraseña('Formato de contraseña inválido');
-      return;
-    }
-
-    if (nuevaContrasena !== confirmarContrasena) {
-      setErrorConfirmarContraseña('Las contraseñas no coinciden');
-      return;
-    }
+    setContrasenaDesactivado(true);
 
     try {
       // Si la contraseña se cambió con éxito, limpiar los campos y el estado de error
@@ -243,14 +234,13 @@ export const Profile = () => {
       await actualizaContrasena(user, nuevaContrasena);
       setContrasenaActual('');
       setNuevaContrasena('');
-      setConfirmarContrasena('');
-      setErrorNuevaContraseña('');
-      setErrorConfirmarContraseña('');
+      setConfirmarContrasena('');;
       setError('');
       setShowModalContrasena(false);
-
     } catch (error) {
       setError('Error: Contraseña no cambiada');
+    } finally {
+      setContrasenaDesactivado(false);
     }
   };
 
@@ -259,6 +249,7 @@ export const Profile = () => {
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [errorI, setErrorI] = useState('');
+  const [imagenDesactivado, setImagenDesactivado] = useState(false);
 
   const openModal = () => {
     setShowModal(true);
@@ -283,12 +274,14 @@ export const Profile = () => {
       return;
     }
 
-  if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
-    setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
-    setSelectedImage(null);
-    return;
-  }
-  
+    if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
+      setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
+      setSelectedImage(null);
+      return;
+    }
+
+    setImagenDesactivado(true);
+
     try {
       const imageUrl = await subirImagen(selectedImage, `Usuarios/${user}`);
       const usuarioNuevo = { ...usuario, urlImagen: imageUrl };
@@ -297,6 +290,8 @@ export const Profile = () => {
       closeModal();
     } catch (error) {
       console.error("Error al subir la imagen de perfil:", error.message);
+    } finally {
+      setImagenDesactivado(false);
     }
   };
 
@@ -446,7 +441,9 @@ export const Profile = () => {
             {errorI && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
       
             <Modal.Footer>
-              <Button onClick={handleUploadProfileImage}>Guardar</Button>
+              <Button onClick={handleUploadProfileImage} disabled={imagenDesactivado} style={{width: "118px"}}>
+                {imagenDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
+              </Button>
               <Button onClick={closeModal}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
@@ -493,7 +490,7 @@ export const Profile = () => {
               {/* Nueva contraseña */}
               <div className="caja-con-cojo">
                 <input
-                  className={`change-password-input ${((nuevaContrasena.trim() === '' && error) || errorNuevaContraseña) ? 'p-borde-rojo' : ''}`}
+                  className={`change-password-input ${((nuevaContrasena.trim() === '' && error)) ? 'p-borde-rojo' : ''}`}
                   type={showNewPassword ? 'text' : 'password'}
                   placeholder="Nueva contraseña"
                   value={nuevaContrasena}
@@ -501,25 +498,36 @@ export const Profile = () => {
                     if (e.target.value.length <= 20) {
                       setNuevaContrasena(e.target.value);
                     }
-                    setErrorNuevaContraseña('');
                     setError('');
-                  }} 
+                  }}
+                  onBlur={handlePasswordMatch}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handlePasswordMatch();
+                    }
+                  }}
                 />
                 
-                <div className="p-row-dos-iconos">
-                  <PasswordInfo2 className="p-p-i"/>
-                  <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
-                      {nuevaContrasena !== '' && (showNewPassword ? <FaEyeSlash /> : <FaEye />)}
-                  </span>
-                </div>
+                <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
+                    {nuevaContrasena && (showNewPassword ? <FaEyeSlash /> : <FaEye />)}
+                </span>
+
+                {nuevaContrasena.length > 0 && 
+                  <PasswordStrengthBar style={{position: "absolute", width: "100%", bottom: "-10px"}}
+                    className="password-strength-bar"
+                    password={nuevaContrasena}
+                    onChangeScore={handleStrengthChange}
+                    shortScoreWord="Muy corta"
+                    scoreWords={["Muy débil", "Débil", "Aceptable", "Buena", "Fuerte"]}
+                  />
+                }
 
               </div>
-              {errorNuevaContraseña && <p className='p-error-cc' style={{marginTop: '-40px'}}><FaExclamationCircle className='p-fa-ec-2'/>{errorNuevaContraseña}</p>}
 
               {/* Confirmar nueva contraseña */}
               <div className="caja-con-cojo">
                 <input
-                  className={`change-password-input ${((confirmarContrasena.trim() === '' && error) || errorConfirmarContraseña) ? 'p-borde-rojo' : ''}`}
+                  className={`change-password-input ${((confirmarContrasena.trim() === '' && error) || !passwordsMatch) ? 'p-borde-rojo' : ''}`}
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirmar nueva contraseña"
                   value={confirmarContrasena}
@@ -527,20 +535,35 @@ export const Profile = () => {
                     if (e.target.value.length <= 20) {
                       setConfirmarContrasena(e.target.value);
                     }
-                    setErrorConfirmarContraseña('');
                     setError('');
+                  }}
+                  onBlur={handlePasswordMatch}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handlePasswordMatch();
+                    }
                   }}
                 />
                 <span className="p-ojo-contrasena" onClick={() => setShowConfirmPassword(!showConfirmPassword)}>
-                    {confirmarContrasena !== '' && (showConfirmPassword ? <FaEyeSlash /> : <FaEye />)}
+                    {confirmarContrasena && (showConfirmPassword ? <FaEyeSlash /> : <FaEye />)}
                 </span>
               </div>
-              {errorConfirmarContraseña && <p className='p-error-cc' style={{marginTop: '-40px'}}><FaExclamationCircle className='p-fa-ec-2'/>{errorConfirmarContraseña}</p>}
+              
+              {/* Advertencia de contraseñas no coinciden */}
+              {!passwordsMatch && (
+                <p className='p-error-cc' style={{marginTop: '-40px'}}>
+                  <FaExclamationCircle className='p-fa-ec-2'/>
+                  Las contraseñas no coinciden
+                </p>
+              )}
+
             </div>
             {error && <p className='p-error-cc' style={{marginTop: '310px'}}><FaExclamationCircle className='p-fa-ec-2'/>{error}</p>}
             
             <Modal.Footer>
-              <Button onClick={handleSubmitPassword}>Guardar</Button>
+              <Button onClick={handleSubmitPassword} style={{width: "118px"}} disabled={fieldsEmpty || passwordStrength < 4 || !passwordsMatch || contrasenaDesactivado}>
+                {contrasenaDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
+              </Button>
               <Button onClick={closeModalContrasena}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
