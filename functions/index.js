@@ -238,6 +238,33 @@ exports.suscribirseAIniciativa = onRequest(async (req, res) => {
 });
 
 
+// Eliminar miembro de iniciativa
+exports.eliminarMiembro = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { user, iniciativa } = req.body;
+
+    try {
+      const usuarioRef = await getFirestore().doc(`Usuarios/${user}`).get();
+      const usuario = usuarioRef.data();
+      const listaUsuarioNueva = usuario.listaIniciativasMiembro.filter(id => id !== iniciativa);
+      const usuarioNuevo = { ...usuario, listaIniciativasMiembro: listaUsuarioNueva };
+      await getFirestore().doc(`Usuarios/${user}`).update(usuarioNuevo);
+
+      const iniciativaRef = await getFirestore().doc(`Iniciativas/${iniciativa}`).get();
+      const iniciativaData = iniciativaRef.data();
+      const listaIniciativaNueva = iniciativa.listaMiembros.filter(id => id !== user);
+      const iniciativaNueva = { ...iniciativaData, listaMiembros: listaIniciativaNueva };
+      await getFirestore().doc(`Iniciativas/${iniciativa}`).update(iniciativaNueva);
+
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error eliminando miembro de la iniciativa: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+
 // Crea las tareas de la iniciativa
 exports.crearTareas = onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -270,7 +297,6 @@ exports.crearSolicitud = onRequest(async (req, res) => {
     const idIniciativa = solicitud.idIniciativa;
 
     try {
-    
       const solicitudData = await getFirestore().collection('Solicitudes').add(solicitud);
       const idSolicitud = solicitudData.id;
       await getFirestore().doc(`Solicitudes/${idSolicitud}`).update({ idSolicitud: idSolicitud });
@@ -288,6 +314,56 @@ exports.crearSolicitud = onRequest(async (req, res) => {
       res.json({ success: true, data: idSolicitud });
     } catch (error) {
       logger.info("Error creando solicitud: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+
+// Actualiza información de la solicitud
+exports.actualizaSolicitud = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { data } = req.body;
+
+    try {
+      await getFirestore().doc(`Solicitudes/${data.idSolicitud}`).update(data);
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error actualizando solicitud: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+
+// Elimina solicitud
+exports.eliminaSolicitud = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { solicitud } = req.body;
+  
+    try {
+      // Borrar solicitud de Firestore
+      const solicitudRef = await getFirestore().doc(`Solicitudes/${solicitud}`);
+      const solicitudData = await getFirestore().doc(`Solicitudes/${solicitud}`).get();
+      const idIniciativa = solicitudData.data().idIniciativa;
+      const idUsuario = solicitudData.data().idUsuario;
+      await solicitudRef.delete();
+  
+      // Borrar solicitud de lista de solicitudes de la iniciativa
+      const iniciativaRef = await getFirestore().doc(`Iniciativas/${idIniciativa}`).get();
+      const iniciativa = iniciativaRef.data();
+      const iniciativaNueva = { ...iniciativa, listaSolicitudes: iniciativa.listaSolicitudes.filter(id => id !== solicitud) };
+      await getFirestore().doc(`Iniciativas/${idIniciativa}`).update(iniciativaNueva);
+
+      // Borrar solicitud de lista de solicitudes del usuario
+      const usuarioRef = await getFirestore().doc(`Usuarios/${idUsuario}`).get();
+      const usuario = usuarioRef.data();
+      const usuarioNuevo = { ...usuario, listaSolicitudes: usuario.listaSolicitudes.filter(id => id !== solicitud) };
+      await getFirestore().doc(`Usuarios/${idUsuario}`).update(usuarioNuevo);
+      
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error eliminando miembro de iniciativa: ", error.message);
       res.json({ success: false, error: error.message });
     }
   });
