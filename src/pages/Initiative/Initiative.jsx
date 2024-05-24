@@ -5,7 +5,7 @@ import { BsPeopleFill } from "react-icons/bs";
 import { MdUpload } from "react-icons/md"
 import { Spinner, Modal } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes } from '../../api/api.js';
+import { getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa } from '../../api/api.js';
 import './Initiative.css';
 
 export const Initiative = () => {
@@ -46,11 +46,10 @@ export const Initiative = () => {
 
         let solicitudesRecibidasData = []
         for (const solicitud of solicitudes) {
-          if (solicitud.tipoInvitacion == "UsuarioAIniciativa") {
+          if (solicitud.tipoInvitacion == "UsuarioAIniciativa" && solicitud.estado == "Pendiente") {
             solicitudesRecibidasData.push(solicitud);
           }
         }
-        console.log(solicitudesRecibidasData);
         setSolicitudesRecibidas(solicitudesRecibidasData);
 
         let usuariosRecibidosData = []
@@ -58,7 +57,6 @@ export const Initiative = () => {
           const usuarioRecibido = await getUsuario(solicitud.idUsuario);
           usuariosRecibidosData.push(usuarioRecibido);
         }
-        console.log(usuariosRecibidosData)
         setUsuariosRecibidos(usuariosRecibidosData);
 
         const tareaPromises = iniciativaData.listaTareas.map(async (idTarea) => {
@@ -86,6 +84,31 @@ export const Initiative = () => {
 
   const handleShowModal = () => {
     setShowModal(true);
+  }
+
+  const handleAceptarSolicitud = async(index) => {
+    //Actualizar Estatus de solicitud
+    let solicitudesRecibidasNuevo = solicitudesRecibidas;
+    solicitudesRecibidasNuevo[index].estado = "Aceptada";
+    const solicitud = solicitudesRecibidasNuevo[index];
+    setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+    await actualizaSolicitud(solicitud);
+
+    //Actualizar listaIniciativasMiembro del usuario que hizo la solicitud
+    const user = solicitudesRecibidasNuevo[index].idUsuario;
+    await suscribirseAIniciativa(user, idIniciativa);
+
+    
+    
+  }
+
+  const handleRechazarSolicitud = async(index) => {
+    let solicitudesRecibidasNuevo = solicitudesRecibidas;
+    solicitudesRecibidasNuevo[index].estado = "Rechazada";
+    const solicitud = solicitudesRecibidasNuevo[index];
+    setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+    await actualizaSolicitud(solicitud);
+
   }
 
 
@@ -272,8 +295,8 @@ export const Initiative = () => {
                                     </li>
                                   ))}
                                   <div>
-                                    <button>SI</button>
-                                    <button>No</button>
+                                    <button onClick={() => handleAceptarSolicitud(index)}>Aceptar</button>
+                                    <button onClick={() => handleRechazarSolicitud(index)}>Rechazar</button>
                                   </div>
                                 </div>
                               </div>
