@@ -108,7 +108,7 @@ export const MyInitiatives = () => {
                         </div>
                       <div className="m-iniciativa-texto">
                         <div className="m-titulo">{iniciativa.titulo}</div>
-                        <div className="m-desc">{iniciativa.descripcion}</div>
+
                       </div>
                     </div>
                   </Link>
@@ -134,7 +134,6 @@ export const MyInitiatives = () => {
                         </div>
                       <div className="m-iniciativa-texto">
                         <div className="m-titulo">{iniciativa.titulo}</div>
-                        <div className="m-desc">{iniciativa.descripcion}</div>
                       </div>
                     </div>
                   </Link>
@@ -162,7 +161,6 @@ export const MyInitiatives = () => {
                           </div>
                           <div className='m-iniciativa-contenido'>
                             <div className="m-titulo">{iniciativa.titulo}</div>
-                            <div className="m-desc">{iniciativa.descripcion}</div>
                           </div>
                         </Link>
                         <div className='m-corazon'>
@@ -176,7 +174,6 @@ export const MyInitiatives = () => {
                         </div>
                         <div className='m-iniciativa-contenido'>
                           <div className="m-titulo">{iniciativa.titulo}</div>
-                          <div className="m-desc">{iniciativa.descripcion}</div>
                         </div>
                         <div className='m-corazon'>
                           <FaHeart onClick={(e) => { e.stopPropagation(); eliminaFavorita(iniciativa.idIniciativa); }} style={{ cursor: "pointer" }} />
