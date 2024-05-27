@@ -7,7 +7,7 @@ import './ModalIniciativa.css';
 import { FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
 
 
-const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCrearSolicitud, handleSuscribirse, esAdmin, esMiembro, suscribirDesactivado, setSuscribirDesactivado, pagina }) => {
+const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCrearSolicitud, handleSuscribirse, esAdmin, esMiembro, suscribirDesactivado, setSuscribirDesactivado, suscribirCargando, pagina }) => {
     return (
         <Modal show={showModal} onHide={() => {setShowModal(false); setSuscribirDesactivado(false);}} centered className='e-modal'>
             <div className="modalcontainer">
@@ -59,12 +59,12 @@ const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCre
                             </Link>
                         ) : (
                             selectedIniciativa && selectedIniciativa.esPublica ? (
-                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleSuscribirse}>
-                                  {suscribirDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Suscribirme'}
+                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleSuscribirse} style={{width: "119px"}}>
+                                  {suscribirCargando ? <ClipLoader size={24} color="#fff" /> : 'Suscribirme'}
                                 </button>
                             ) : (
-                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud}>
-                                  {suscribirDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Solicitar unirme'}
+                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud} style={{width: "146px"}}>
+                                  {suscribirCargando ? <ClipLoader size={24} color="#fff" /> : 'Solicitar unirme'}
                                 </button>
                             )  
                         )
