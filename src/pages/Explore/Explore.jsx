@@ -125,9 +125,7 @@ export const Explore = () => {
                 setSuscribirDesactivado(true);
                 setSuscribirCargando(true);
                 const response = await suscribirseAIniciativa(user, idIniciativa);
-                console.log(response)
                 if (response) {
-                    console.log("Entrada a response success")
                     const iniciativasNuevo = [...iniciativas];
                     iniciativasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
                     setIniciativas(iniciativasNuevo);
