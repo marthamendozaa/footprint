@@ -124,8 +124,6 @@ export const Requests = () => {
               </div>
             )}
           </div>
-  
-          <br/>
 
           {/* Invitaciones recibidas */}
           <div className="rq-seccion-container">

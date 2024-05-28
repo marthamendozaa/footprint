@@ -31,7 +31,9 @@
 .rq-iniciativa {
   display: flex;
   flex-direction: column;
-  margin: 5px;
+  margin-top: 12px;
+  margin-right: 12px;
+  margin-bottom: 12px;
   border-radius: 6px;
   border:rgba(0, 0, 0, 0.176) 1.2px solid;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
