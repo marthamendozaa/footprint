@@ -67,6 +67,7 @@ export const Explore = () => {
     const [esAdmin, setEsAdmin] = useState(false);
     const [esMiembro, setEsMiembro] = useState(false);
     const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
+    const [suscribirCargando, setSuscribirCargando] = useState(false);
 
     const handleButtonClick = async (iniciativa, index) => {
         for (const solicitud of usuario.listaSolicitudes) {
@@ -95,6 +96,7 @@ export const Explore = () => {
             const idIniciativa = selectedIniciativa.idIniciativa; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
             try {
                 setSuscribirDesactivado(true);
+                setSuscribirCargando(true);
                 const solicitud = new Solicitud(user, idIniciativa, "Pendiente", "UsuarioAIniciativa");
                 const response = await crearSolicitud(solicitud);
                 if (response.success) {
@@ -107,12 +109,11 @@ export const Explore = () => {
                     setUsuario(usuarioNuevo);
 
                     setShowModal(false);
-                    alert("Has enviado solicitud a la iniciativa");
                 }
             } catch (error) {
-              alert("Error al enviar solicitud a la iniciativa");
+              console.log("Error al enviar solicitud a la iniciativa");
             } finally {
-              setSuscribirDesactivado(false);
+              setSuscribirCargando(false);
             }
         }
     }
@@ -122,10 +123,9 @@ export const Explore = () => {
             const idIniciativa = selectedIniciativa.idIniciativa; // Suponiendo que el id de la iniciativa está almacenado en selectedIniciativa.id
             try {
                 setSuscribirDesactivado(true);
+                setSuscribirCargando(true);
                 const response = await suscribirseAIniciativa(user, idIniciativa);
-                console.log(response)
                 if (response) {
-                    console.log("Entrada a response success")
                     const iniciativasNuevo = [...iniciativas];
                     iniciativasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
                     setIniciativas(iniciativasNuevo);
@@ -135,12 +135,12 @@ export const Explore = () => {
                     setUsuario(usuarioNuevo);
 
                     setShowModal(false);
-                    alert("Te has suscrito a la iniciativa");
                 }
             } catch (error) {
-              alert("Error al enviar solicitud a la iniciativa");
+              console.log("Error al enviar solicitud a la iniciativa");
             } finally {
               setSuscribirDesactivado(false);
+              setSuscribirCargando(false);
             }
         }
     }
@@ -213,7 +213,8 @@ export const Explore = () => {
                             esMiembro={esMiembro}
                             suscribirDesactivado={suscribirDesactivado}
                             setSuscribirDesactivado={setSuscribirDesactivado}
-                            pagina = {"Explore"}
+                            suscribirCargando={suscribirCargando}
+                            pagina={"Explore"}
                         />
                     </div>
                 </div>

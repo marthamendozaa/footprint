@@ -3,12 +3,59 @@ import { FaCalendar, FaFolder, FaTimesCircle  } from 'react-icons/fa';
 import { FaClock } from "react-icons/fa";
 import { BsPeopleFill } from "react-icons/bs";
 import { MdUpload } from "react-icons/md"
-import { Spinner, Modal } from 'react-bootstrap';
+import { Spinner, Modal, Button } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa } from '../../api/api.js';
+import { getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail } from '../../api/api.js';
 import './Initiative.css';
 
 export const Initiative = () => {
+ // Miembro seleccionado a eliminar
+ const [miembroEliminar, setMiembroEliminar] = useState(null);
+ const [idMiembroEliminar, setIdMiembroEliminar] = useState(null);
+
+ // Modal de confirmación de eliminación
+ const [modalEliminar, setModalEliminar] = useState(false);
+ const handleCerrarEliminar = () => setModalEliminar(false);
+ const handleMostrarEliminar = (miembro, idMiembro) => {
+   setMiembroEliminar(miembro.nombreUsuario);
+   setIdMiembroEliminar(idMiembro);
+   setModalEliminar(true);
+ }
+
+ // Modal de iniciativa eliminada
+ const [modalEliminada, setModalEliminada] = useState(false);
+ const handleMostrarEliminada = () => setModalEliminada(true);
+ const handleCerrarEliminada = async () => {
+   setModalEliminada(false);
+   //const dataMiembros = await getMiembros();
+   //setMiembros(dataMiembros);
+   await actualizarMiembros();
+ }
+
+ // Modal de error
+ const [modalError, setModalError] = useState(false);
+ const handleMostrarError = () => setModalError(true);
+ const handleCerrarError = () => setModalError(false);
+
+ // Eliminar iniciativa
+ const [eliminaBloqueado, setEliminaBloqueado] = useState(false);
+
+ const handleEliminaMiembro = async () => {
+   console.log("Eliminando miembro con id: ", idMiembroEliminar);
+   handleCerrarEliminar();
+   setEliminaBloqueado(true);
+   sendRemoveMail(idIniciativa, idMiembroEliminar);
+
+   try {
+     await eliminarMiembro(idIniciativa, idMiembroEliminar);
+     handleMostrarEliminada();
+   } catch(error) {
+     handleMostrarError();
+   } finally {
+     setEliminaBloqueado(false);
+   }
+ };
+
   const { idIniciativa } = useParams();
   const [iniciativa, setIniciativa] = useState(null);
   const [infoAdmin, setInfoAdmin] = useState(null);
@@ -37,9 +84,11 @@ export const Initiative = () => {
         const infoIniciativaAdmin = await getUsuario(iniciativaData.idAdmin);
         setInfoAdmin(infoIniciativaAdmin);
         console.log(infoIniciativaAdmin);
+        
+        await actualizarMiembros();
 
-        const listaMiembros = await getMiembros(idIniciativa);
-        setMiembros(listaMiembros);
+        //const listaMiembros = await getMiembros(idIniciativa);
+        //setMiembros(listaMiembros);
 
         const solicitudes = await getSolicitudes("Iniciativas", idIniciativa);
         console.log(solicitudes);
@@ -84,7 +133,7 @@ export const Initiative = () => {
 
   const handleShowModal = () => {
     setShowModal(true);
-  }
+  };
 
   const handleAceptarSolicitud = async(index) => {
     //Actualizar Estatus de solicitud
@@ -97,10 +146,7 @@ export const Initiative = () => {
     //Actualizar listaIniciativasMiembro del usuario que hizo la solicitud
     const user = solicitudesRecibidasNuevo[index].idUsuario;
     await suscribirseAIniciativa(user, idIniciativa);
-
-    
-    
-  }
+  };
 
   const handleRechazarSolicitud = async(index) => {
     let solicitudesRecibidasNuevo = solicitudesRecibidas;
@@ -108,9 +154,16 @@ export const Initiative = () => {
     const solicitud = solicitudesRecibidasNuevo[index];
     setSolicitudesRecibidas(solicitudesRecibidasNuevo);
     await actualizaSolicitud(solicitud);
+  };
 
-  }
-
+  const actualizarMiembros = async () => {
+    try {
+      const dataMiembros = await getMiembros(idIniciativa);
+      setMiembros(dataMiembros);
+    } catch (error) {
+      console.error("Error obteniendo miembros:", error.message);
+    }
+  };
 
   return (
     <div>
@@ -249,7 +302,7 @@ export const Initiative = () => {
                         <div key={idMiembro}>
                           <button type="button" className="i-btn-miembro">{miembro.nombreUsuario}
                           <span className="i-icono-elimina-miembro">
-                            <FaTimesCircle className="i-icon-times-circle" />
+                            <FaTimesCircle  onClick={() => handleMostrarEliminar(miembro, miembro.idUsuario)} disabled={eliminaBloqueado} className="i-icon-times-circle" />
                           </span>
                         </button>
                         </div>
@@ -316,6 +369,47 @@ export const Initiative = () => {
           <Spinner animation="border" role="status"></Spinner>
         </div>
       )}
+
+      {/* Modal confirmar eliminar iniciativa*/}
+      <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
+        <Modal.Header closeButton>
+          <div className="ea-modal-title">Confirmar eliminación</div>
+        </Modal.Header>
+          <div className="ea-modal-body">
+            ¿Estás seguro que quieres eliminar a <span style={{fontWeight:'bold'}}>{miembroEliminar}</span>?
+          </div>
+        <Modal.Footer>
+          <Button className="eliminar" onClick={handleEliminaMiembro}>Eliminar</Button>
+          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+      
+      {/* Modal iniciativa eliminada*/}
+      <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
+        <Modal.Header closeButton>
+          <div className="ea-modal-title">Éxito</div>
+        </Modal.Header>
+          <div className="ea-modal-body">
+            Miembro <span style={{fontWeight:'bold'}}>{miembroEliminar}</span> eliminado exitosamente
+          </div>
+        <Modal.Footer>
+          <Button onClick={handleCerrarEliminada}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+      
+      {/* Modal error eliminar*/}
+      <Modal className="ea-modal" show={modalError} onHide={handleCerrarError}>
+        <Modal.Header closeButton>
+        <div className="ea-modal-title">Error</div>
+        </Modal.Header>
+          <div className="ea-modal-body">
+            Error al eliminar miembro <span style={{fontWeight:'bold'}}>{miembroEliminar}</span>
+          </div>
+        <Modal.Footer>
+          <Button onClick={handleCerrarError}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+
     </div>
   );
 };

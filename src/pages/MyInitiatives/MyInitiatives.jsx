@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import Solicitud from '../../classes/Solicitud.js'
-import { getMisIniciativas, getUsuario, actualizaUsuario, crearSolicitud } from '../../api/api.js';
+import { getMisIniciativas, getUsuario, actualizaUsuario, crearSolicitud, suscribirseAIniciativa } from '../../api/api.js';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 import { FaHeart} from "react-icons/fa";
 import './MyInitiatives.css';
@@ -47,6 +47,7 @@ export const MyInitiatives = () => {
   const [selectedIniciativa, setSelectedIniciativa] = useState(null);
   const [selectedIniciativaIndex, setSelectedIniciativaIndex] = useState(null);
   const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
+  const [suscribirCargando, setSuscribirCargando] = useState(false);
 
   const seleccionaIniciativa = (iniciativa, index) => {
     for (const solicitud of usuario.listaSolicitudes) {
@@ -64,6 +65,7 @@ export const MyInitiatives = () => {
       const idIniciativa = selectedIniciativa.idIniciativa;
       try {
         setSuscribirDesactivado(true);
+        setSuscribirCargando(true);
         const solicitud = new Solicitud(user, idIniciativa, "Pendiente", "UsuarioAIniciativa");
         const response = await crearSolicitud(solicitud);
         if (response.success) {
@@ -76,12 +78,42 @@ export const MyInitiatives = () => {
           setUsuario(usuarioNuevo);
 
           setShowModal(false);
-          alert("Has enviado solicitud a la iniciativa");
         }
       } catch (error) {
-        alert("Error al enviar solicitud a la iniciativa");
+        console.log("Error al enviar solicitud a la iniciativa");
+      } finally {
+        setSuscribirCargando(false);
+      }
+    }
+  };
+
+  const handleSuscribirse = async () => {
+    if (selectedIniciativa) {
+      const idIniciativa = selectedIniciativa.idIniciativa;
+      try {
+        setSuscribirDesactivado(true);
+        setSuscribirCargando(true);
+        const response = await suscribirseAIniciativa(user, idIniciativa);
+        if (response) {
+          const iniciativasFavoritasNuevo = [...iniciativasFavoritas];
+          iniciativasFavoritasNuevo[selectedIniciativaIndex].listaMiembros.push(user);
+          setIniciativasFavoritas(iniciativasFavoritasNuevo);
+
+          const usuarioNuevo = {...usuario};
+          usuarioNuevo.listaIniciativasMiembro.push(idIniciativa);
+          setUsuario(usuarioNuevo);
+
+          const iniciativasMiembroNuevo = [...iniciativasMiembro];
+          iniciativasMiembroNuevo.push(selectedIniciativa);
+          setIniciativasMiembro(iniciativasMiembroNuevo);
+
+          setShowModal(false);
+        }
+      } catch (error) {
+        console.log("Error al suscribirse a la iniciativa");
       } finally {
         setSuscribirDesactivado(false);
+        setSuscribirCargando(false);
       }
     }
   };
@@ -108,7 +140,7 @@ export const MyInitiatives = () => {
                         </div>
                       <div className="m-iniciativa-texto">
                         <div className="m-titulo">{iniciativa.titulo}</div>
-                        <div className="m-desc">{iniciativa.descripcion}</div>
+
                       </div>
                     </div>
                   </Link>
@@ -134,7 +166,6 @@ export const MyInitiatives = () => {
                         </div>
                       <div className="m-iniciativa-texto">
                         <div className="m-titulo">{iniciativa.titulo}</div>
-                        <div className="m-desc">{iniciativa.descripcion}</div>
                       </div>
                     </div>
                   </Link>
@@ -162,7 +193,6 @@ export const MyInitiatives = () => {
                           </div>
                           <div className='m-iniciativa-contenido'>
                             <div className="m-titulo">{iniciativa.titulo}</div>
-                            <div className="m-desc">{iniciativa.descripcion}</div>
                           </div>
                         </Link>
                         <div className='m-corazon'>
@@ -176,7 +206,6 @@ export const MyInitiatives = () => {
                         </div>
                         <div className='m-iniciativa-contenido'>
                           <div className="m-titulo">{iniciativa.titulo}</div>
-                          <div className="m-desc">{iniciativa.descripcion}</div>
                         </div>
                         <div className='m-corazon'>
                           <FaHeart onClick={(e) => { e.stopPropagation(); eliminaFavorita(iniciativa.idIniciativa); }} style={{ cursor: "pointer" }} />
@@ -192,11 +221,13 @@ export const MyInitiatives = () => {
             setShowModal={setShowModal}
             selectedIniciativa={selectedIniciativa}
             handleCrearSolicitud={handleCrearSolicitud}
+            handleSuscribirse={handleSuscribirse}
             esAdmin={false}
             esMiembro={false}
             suscribirDesactivado={suscribirDesactivado}
             setSuscribirDesactivado={setSuscribirDesactivado}
-            pagina = {"Explore"}
+            suscribirCargando={suscribirCargando}
+            pagina={"Explore"}
           />
       </div>
       ) : (
