@@ -21,18 +21,22 @@
   display: flex;
   width: 100%;
   flex-direction: row;
+  overflow: overlay;
+}
+
+.rq-iniciativas-container::-webkit-scrollbar {
+  display: none;
 }
 
 .rq-iniciativa {
   display: flex;
   flex-direction: column;
-  height: 100%;
   margin: 5px;
   border-radius: 6px;
   border:rgba(0, 0, 0, 0.176) 1.2px solid;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
+  min-width: 200px;
   max-width: 200px;
-  overflow: hidden;
 }
 
 .rq-estado {

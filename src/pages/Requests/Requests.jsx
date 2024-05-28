@@ -93,32 +93,30 @@ export const Requests = () => {
               </div>
             ) : (
               <div className="rq-iniciativas-container">
-                {/* Lista de inicativas enviadas */}
+                {/* Lista de iniciativas enviadas */}
                 {iniciativasEnviadas.map((iniciativa, index) => (
-                  <div key={index}>
+                  <div key={index} className='rq-iniciativa' onClick={() => handleButtonClick(iniciativa, index)}>
                     {/* Imagen y título */}
-                    <div className='rq-iniciativa' onClick={() => handleButtonClick(iniciativa, index)}>
-                      <div className='rq-iniciativa-imagen'>
-                          <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
+                    <div className='rq-iniciativa-imagen'>
+                        <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
+                    </div>
+
+                    <div className='rq-iniciativa-texto'>
+                      <div className="rq-titulo">{iniciativa.titulo}</div>
+                      
+                      {/* Estado */}
+                      <div className='rq-estado'>
+                        <div>
+                          {solicitudesEnviadas[index].estado}
+                          {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
+                          {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
+                          {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
+                        </div>
                       </div>
 
-                      <div className='rq-iniciativa-texto'>
-                          <div className="rq-titulo">{iniciativa.titulo}</div>
-                          
-                          {/* Estado */}
-                          <div className='rq-estado'>
-                            <div>
-                              {solicitudesEnviadas[index].estado}
-                              {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
-                              {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
-                              {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
-                            </div>
-                          </div>
-
-                          <div className='fa-4'>
-                            <button className='fa-5-button'> <FaTrash/> </button>
-                          </div>
-
+                      {/* Basura */}
+                      <div className='fa-4'>
+                        <button className='fa-5-button'> <FaTrash/> </button>
                       </div>
                     </div>
                   </div>    
@@ -142,27 +140,28 @@ export const Requests = () => {
               <div className="rq-iniciativas-container">
                 {/* Lista de inicativas enviadas */}
                 {iniciativasRecibidas.map((iniciativa, index) => (
-                  <div key={index}>
-                  {/* Imagen y título */}
-                  <div className='rq-iniciativa' onClick={() => handleButtonClick(iniciativa, index)}>
+                  <div key={index} className='rq-iniciativa' onClick={() => handleButtonClick(iniciativa, index)}>
+                    {/* Imagen y título */}
                     <div className='rq-iniciativa-imagen'>
                         <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
                     </div>
 
+                    {/* Cuerpo */}
                     <div className='rq-iniciativa-texto'>
-                        {/* Titulo */}
-                        <div className="rq-titulo">{iniciativa.titulo}</div>
+                      {/* Titulo */}
+                      <div className="rq-titulo">{iniciativa.titulo}</div>
 
-                        {/* Botones */}
-                        <div className='rq-estado'>
-                          <div className='fa-5'>
-                            <button className='fa-5-button'> <FaCheckCircle/> </button>
-                            <button className='fa-5-button'> <FaTimesCircle/> </button>
-                          </div>
+                      {/* Botones */}
+                      <div className='rq-estado'>
+                        <div className='fa-5'>
+                          <button className='fa-5-button'> <FaCheckCircle/> </button>
+                          <button className='fa-5-button'> <FaTimesCircle/> </button>
                         </div>
+                      </div>
+
                     </div>
-                  </div>
-                </div>    
+
+                  </div>    
                 ))}
               </div>
             )}
