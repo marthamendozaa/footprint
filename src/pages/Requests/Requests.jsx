@@ -113,11 +113,12 @@ export const Requests = () => {
                               {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
                               {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
                             </div>
-
-                            <div className='fa-4'>
-                              <button className='fa-5-button'> <FaTrash/> </button>
-                            </div>
                           </div>
+
+                          <div className='fa-4'>
+                            <button className='fa-5-button'> <FaTrash/> </button>
+                          </div>
+
                       </div>
                     </div>
                   </div>    

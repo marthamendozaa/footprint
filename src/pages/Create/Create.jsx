@@ -403,7 +403,7 @@ export const Create = () => {
                       onBlur={handleGuardarTitulo}
                       onKeyDown={handleOnKeyDown}
                       autoFocus
-                      maxLength={35}
+                      maxLength={30}
                     />
                     <div className="c-titulo-conteo">
                       {titulo ? `${titulo.length}/30` : `0/30`}
