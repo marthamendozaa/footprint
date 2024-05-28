@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import './NavbarAdmin.css';
+import './Navbar.css';
 import { FaCompass, FaUser } from 'react-icons/fa';
 
 const NavbarAdmin = ({ isCreateOpen, toggleCreate }) => {
