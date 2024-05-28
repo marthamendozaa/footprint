@@ -38,6 +38,10 @@ body::-webkit-scrollbar {
   padding-left: 45px;
 }
 
+.e-searchBarCaja:focus-visible {
+  outline: none;
+}
+
 /* Iniciativas */
 .e-iniciativas-container {
   display: flex;
