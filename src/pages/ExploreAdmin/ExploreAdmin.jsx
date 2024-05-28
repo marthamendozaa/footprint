@@ -102,11 +102,6 @@ export const ExploreAdmin = () => {
     setFilteredIniciativas(filtered);
   };
 
-  function deletionEvent(item) {
-    handleEliminaIniciativa();
-    sendMail(item.idIniciativa);
-  }
-
   return (
     <div className='ea-container'>
       <div className='ea-seccion-container'>

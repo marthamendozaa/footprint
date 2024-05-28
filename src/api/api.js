@@ -107,15 +107,32 @@ export const actualizaIniciativa = async (data) => {
 
 
 // Eliminar una iniciativa
-export const eliminaIniciativa = async (iniciativa) => {
+export const eliminaIniciativa = async (iniciativa, user) => {
   const response = await axios.post(`${functionsURL}/eliminaIniciativa`, {
     iniciativa: iniciativa,
+    user: user
   });
   if (response.data.success) {
     console.log("Eliminar iniciativa exitoso");
     return response.data.data;
   } else {
     console.log("Error eliminando iniciativa");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Eliminar una iniciativa
+export const eliminarMiembro = async (iniciativa, user) => {
+  const response = await axios.post(`${functionsURL}/eliminarMiembro`, {
+    iniciativa: iniciativa,
+    user: user
+  });
+  if (response.data.success) {
+    console.log("Miembro eliminado exitosamente");
+    return response.data.data;
+  } else {
+    console.log("Error eliminando miembro");
     throw new Error(response.data.error);
   }
 };
@@ -443,6 +460,42 @@ export const sendMail = async (idIniciativa) => {
       titulo: titulo,
       nombre: nombre,
       adminEmail: adminEmail
+    });
+
+    if (response.data.success) {
+      console.log("Envio de correo exitoso");
+      return;
+    } else {
+      console.log("Error enviando correo");
+      throw new Error(response.data.error);
+    }
+
+  } catch (error) {
+    console.log("Error sending email");
+    throw new Error(error);
+  }
+}
+
+export const sendRemoveMail = async (idIniciativa, idUsuario) => {
+  try {
+    const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
+    const iniciativaDoc = await getDoc(iniciativaRef);
+    const iniciativaData = iniciativaDoc.data();
+    console.log(iniciativaData);
+    const idAdmin = iniciativaData.idAdmin;
+    const titulo = iniciativaData.titulo;
+
+    const userRef = doc(firestore, "Usuarios", idUsuario);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    console.log(userData);
+    const correo = userData.correo;
+    const nombre = userData.nombre;
+
+    const response = await axios.post(`${functionsURL}/sendRemoveMails`, {
+      titulo: titulo,
+      nombre: nombre,
+      correo: correo
     });
 
     if (response.data.success) {
