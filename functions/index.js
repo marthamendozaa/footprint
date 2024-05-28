@@ -252,7 +252,7 @@ exports.eliminarMiembro = onRequest(async (req, res) => {
 
       const iniciativaRef = await getFirestore().doc(`Iniciativas/${iniciativa}`).get();
       const iniciativaData = iniciativaRef.data();
-      const listaIniciativaNueva = iniciativa.listaMiembros.filter(id => id !== user);
+      const listaIniciativaNueva = iniciativaData.listaMiembros.filter(id => id !== user);
       const iniciativaNueva = { ...iniciativaData, listaMiembros: listaIniciativaNueva };
       await getFirestore().doc(`Iniciativas/${iniciativa}`).update(iniciativaNueva);
 
@@ -379,6 +379,27 @@ exports.sendMails = onRequest(async (req, res) =>{
         message: {
           subject: "Tu iniciativa " + titulo + " ha sido borrada",
           text: "Hola " + nombre + " lamentamos avisarte que tu iniciativa " + titulo + " ha sido borrada por los administradores debido a que no cumple con los estándares de la plataforma."
+        }
+      };
+      await getFirestore().collection('mail').add(email);
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error enviando correo: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+exports.sendRemoveMails = onRequest(async (req, res) =>{
+  cors(req, res, async () => {
+    const { titulo, nombre, correo } = req.body;
+
+    try {
+      const email = {
+        to: correo,
+        message: {
+          subject: "Has sido eliminado de una iniciativa",
+          text: "Hola " + nombre + " te avisamos que has sido eliminado de la iniciativa " + titulo + ". Si tienes dudas sobre la razón puedes contactar al líder de la iniciativa."
         }
       };
       await getFirestore().collection('mail').add(email);
