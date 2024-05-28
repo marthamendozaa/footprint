@@ -1,4 +1,8 @@
 /* Página general */
+body::-webkit-scrollbar {
+  display: none;
+}
+
 .e-container {
   display: flex;
   width: 1000px;
