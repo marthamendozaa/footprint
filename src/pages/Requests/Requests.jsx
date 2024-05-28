@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
-import { FaCheckCircle, FaTimesCircle, FaHourglass } from 'react-icons/fa';
+import { FaCheckCircle, FaTimesCircle, FaHourglass, FaTrash } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { getSolicitudes, getIniciativa } from '../../api/api.js';
 import './Requests.css';
@@ -84,7 +84,7 @@ export const Requests = () => {
           <div className="rq-seccion-container">
 
             {/* Solicitudes enviadas */}
-            <div className="rq-iniciativas-titulo">Solicitudes que he enviado</div>
+            <div className="rq-iniciativas-titulo">Tus solicitudes a iniciativas</div>
             
             {/* No hay ninguna solicitud */}
             {iniciativasEnviadas.length == 0 ? (
@@ -96,8 +96,7 @@ export const Requests = () => {
                 {/* Lista de inicativas enviadas */}
                 {iniciativasEnviadas.map((iniciativa, index) => (
                   <div key={index}>
-                    
-                    {/* Contenedor para imagen y título */}
+                    {/* Imagen y título */}
                     <div className='rq-iniciativa' onClick={() => handleButtonClick(iniciativa, index)}>
                       <div className='rq-iniciativa-imagen'>
                           <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
@@ -105,18 +104,22 @@ export const Requests = () => {
 
                       <div className='rq-iniciativa-texto'>
                           <div className="rq-titulo">{iniciativa.titulo}</div>
-                          {/*<div className="e-desc">{iniciativa.descripcion}</div>*/}
+                          
+                          {/* Estado */}
+                          <div className='rq-estado'>
+                            <div>
+                              {solicitudesEnviadas[index].estado}
+                              {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
+                              {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
+                              {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
+                            </div>
+
+                            <div className='fa-4'>
+                              <button className='fa-5-button'> <FaTrash/> </button>
+                            </div>
+                          </div>
                       </div>
                     </div>
-                    
-                    {/* Contenedor para el estado */}
-                    <div className='rq-estado'>
-                      <div>Estatus: {solicitudesEnviadas[index].estado}</div>
-                      {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
-                      {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
-                      {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
-                    </div>
-
                   </div>    
                 ))}
               </div>
@@ -125,9 +128,9 @@ export const Requests = () => {
   
           <br/>
 
-          {/* Solicitudes recibidas */}
+          {/* Invitaciones recibidas */}
           <div className="rq-seccion-container">
-            <div className="rq-iniciativas-titulo">Solicitudes recibidas</div>
+            <div className="rq-iniciativas-titulo">Invitaciones recibidas</div>
             
             {/* No hay ninguna solicitud */}
             {iniciativasRecibidas.length == 0 ? (
@@ -138,14 +141,25 @@ export const Requests = () => {
               <div className="rq-iniciativas-container">
                 {/* Lista de inicativas enviadas */}
                 {iniciativasRecibidas.map((iniciativa, index) => (
-                  <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(iniciativa)}>
-                  <div className='e-iniciativa-imagen'>
-                      <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
-                  </div>
+                  <div key={index}>
+                  {/* Imagen y título */}
+                  <div className='rq-iniciativa' onClick={() => handleButtonClick(iniciativa, index)}>
+                    <div className='rq-iniciativa-imagen'>
+                        <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
+                    </div>
 
-                  <div className='e-iniciativa-texto'>
-                      <div className="e-titulo">{iniciativa.titulo}</div>
-                      <div className="e-desc">{iniciativa.descripcion}</div>
+                    <div className='rq-iniciativa-texto'>
+                        {/* Titulo */}
+                        <div className="rq-titulo">{iniciativa.titulo}</div>
+
+                        {/* Botones */}
+                        <div className='rq-estado'>
+                          <div className='fa-5'>
+                            <button className='fa-5-button'> <FaCheckCircle/> </button>
+                            <button className='fa-5-button'> <FaTimesCircle/> </button>
+                          </div>
+                        </div>
+                    </div>
                   </div>
                 </div>    
                 ))}

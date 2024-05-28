@@ -31,11 +31,9 @@
 .rq-iniciativa {
   display: flex;
   flex-direction: column;
-  align-items: center;
   height: auto;
-  margin: 20px;
-  margin-left: 5px;
-  border-radius: 30px;
+  margin: 5px;
+  border-radius: 6px;
   border:rgba(0, 0, 0, 0.176) 1.2px solid;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
   max-width: 240px;
@@ -43,19 +41,9 @@
 }
 
 .rq-estado {
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  justify-content: center;
-  height: auto;
-  margin: 20px;
-  margin-left: 5px;
-  border-radius: 30px;
-  border:rgba(0, 0, 0, 0.176) 1.2px solid;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
-  max-width: 240px;
-  overflow: hidden;
-  padding: 5px;
+  font-size: 16px;
+  font-weight: 600;
 }
 
 .fa-1 {
@@ -73,6 +61,24 @@
   margin-left: 8px;
 }
 
+.fa-4 {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 30px;
+}
+
+.fa-5 {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+  font-size: 30px;
+}
+
+.fa-5-button {
+  background-color: transparent;
+  padding: 0px;
+}
+
 .rq-iniciativa:hover {
   background-color: #eeeeee;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
@@ -86,7 +92,7 @@
 
 .rq-iniciativa-texto {
   width: 100%;
-  padding: 16px;
+  padding: 15px;
 }
 
 .rq-titulo {
