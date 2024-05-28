@@ -150,11 +150,14 @@ export const Requests = () => {
                       <div className="rq-titulo">{iniciativa.titulo}</div>
 
                       {/* Botones */}
-                      <div className='rq-estado'>
+                      <div className='rq-botones-2'>
                         <div className='fa-5'>
                           <button className='fa-5-button'> <FaCheckCircle/> </button>
+                        </div>
+                        <div className='fa-5'>
                           <button className='fa-5-button'> <FaTimesCircle/> </button>
                         </div>
+
                       </div>
 
                     </div>
