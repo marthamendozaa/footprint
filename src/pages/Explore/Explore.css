@@ -78,7 +78,7 @@ body::-webkit-scrollbar {
 }
 
 .e-iniciativa:hover {
-  background-color: #eeeeee;
+  border: #000 4px solid;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
 }
 
