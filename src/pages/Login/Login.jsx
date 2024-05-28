@@ -142,7 +142,7 @@ export const Login = () => {
 
               {/* Botón de iniciar sesión */}
               <div className='iniciar-sesion-container'>
-                  <button type="submit" className="btn login-btn" disabled={loginBloqueado || !email || !password || invalidEmail} style={{width:"180px"}}>
+                  <button type="submit" className="btn login-btn" disabled={loginBloqueado || !email || !password || invalidEmail}>
                     {loginBloqueado ? <ClipLoader size={24} color="#fff" /> : 'Iniciar Sesión'}
                   </button>
               </div>
