@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import Solicitud from '../../classes/Solicitud.js'
-import { getMisIniciativas, getUsuario, actualizaUsuario, crearSolicitud, suscribirseAIniciativa } from '../../api/api.js';
+import { getMisIniciativas, getUsuario, actualizaUsuario, crearSolicitud, suscribirseAIniciativa, existeSolicitud } from '../../api/api.js';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 import { FaHeart} from "react-icons/fa";
 import './MyInitiatives.css';
@@ -49,11 +49,13 @@ export const MyInitiatives = () => {
   const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
   const [suscribirCargando, setSuscribirCargando] = useState(false);
 
-  const seleccionaIniciativa = (iniciativa, index) => {
-    for (const solicitud of usuario.listaSolicitudes) {
-      if (iniciativa.listaSolicitudes.includes(solicitud)) {
-        setSuscribirDesactivado(true);
-      }
+  const seleccionaIniciativa = async (iniciativa, index) => {
+    // Verificar si el usuario ya envió una solicitud a la iniciativa
+    const solicitudExiste = await existeSolicitud(user, iniciativa.idIniciativa);
+    if (solicitudExiste) {
+      setSuscribirDesactivado(true);
+    } else {
+      setSuscribirDesactivado(false);
     }
     setSelectedIniciativa(iniciativa);
     setSelectedIniciativaIndex(index);
