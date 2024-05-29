@@ -43,8 +43,8 @@ export const AppRouter = () => {
 
             {user && admin && (
                 <>
-                    <Route path="/exploreAdmin" element={<PageWithNavbarAdmin component={<ExploreAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                    <Route path="/profileAdmin" element={<PageWithNavbarAdmin component={<ProfileAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/explore" element={<PageWithNavbarAdmin component={<ExploreAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/profile" element={<PageWithNavbarAdmin component={<ProfileAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
                 </>
             )}
             {user && !admin &&(
