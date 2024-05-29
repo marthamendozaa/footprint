@@ -1,7 +1,8 @@
 .e-modal .modal-content {
   border-radius: 20px;
   padding: 10px;
-  width: 600 !important;
+  min-width: 600px;
+  width: auto;
 }
 
 .e-modal .modal-dialog {
@@ -138,6 +139,7 @@ li.m-etiqueta-item {
   line-height: 30px;
   user-select: none;
   justify-content: center;
+  color: #000;
 }
 
 .modalsusbotton.highlighted {
