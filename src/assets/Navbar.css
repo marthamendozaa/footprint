@@ -9,6 +9,7 @@
     padding-top: 110px; 
     transition: width 0.5s ease;
     flex-direction: column;
+    background-color: #ffffff;
     border-right: 7px solid #CEDDE2;
 }
   

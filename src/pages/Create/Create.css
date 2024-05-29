@@ -196,6 +196,22 @@ li.c-etiqueta-item:hover {
   border-radius: 3px;
 }
 
+.react-datepicker-2 {
+  width: 100px;
+  font-family: "Inter", sans-serif;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+  background: none;
+  border: none;
+  border-radius: 3px;
+}
+
+.react-datepicker-2:focus-visible {
+  border: none;
+  outline: none;
+}
+
 .c-calendario-separador {
   margin: 0 10px;
   font-size: 30px;
@@ -284,6 +300,7 @@ li.c-etiqueta-item:hover {
 .c-desc-texto {
   position: relative;
   width: 100%;
+  min-height: 136px;
   background-color: #A0C1BF;
   border-radius: 25px;
   padding: 15px;
@@ -386,6 +403,10 @@ li.c-etiqueta-item:hover {
 
 .c-tarea-titulo {
   font-size: 25px;
+}
+
+.c-tarea-titulo:focus-visible{
+  outline: none;
 }
 
 input.c-tarea-titulo {
