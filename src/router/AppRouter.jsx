@@ -10,8 +10,6 @@ import { Profile } from '../pages/Profile/Profile.jsx';
 import { Create } from '../pages/Create/Create.jsx';
 import { Login } from '../pages/Login/Login.jsx';
 import { Register } from '../pages/Register/Register.jsx';
-import { ExploreAdmin } from '../pages/ExploreAdmin/ExploreAdmin.jsx';
-import { ProfileAdmin } from '../pages/ProfileAdmin/ProfileAdmin.jsx';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
 export const AppRouter = () => {
@@ -43,8 +41,8 @@ export const AppRouter = () => {
 
             {user && admin && (
                 <>
-                    <Route path="/explore" element={<PageWithNavbarAdmin component={<ExploreAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
-                    <Route path="/profile" element={<PageWithNavbarAdmin component={<ProfileAdmin />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/explore" element={<PageWithNavbarAdmin component={<Explore />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
+                    <Route path="/profile" element={<PageWithNavbarAdmin component={<Profile />} isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />} />
                 </>
             )}
             {user && !admin &&(
@@ -59,14 +57,9 @@ export const AppRouter = () => {
             )}
 
             {user ? (
-                <Route path="*" element={savedLocation ? (
-                    <Navigate to={savedLocation} />) : (
-                        admin ? (<Navigate to="/exploreAdmin" />) : (
-                            <Navigate to="/explore" />
-                        )
-                    )}
-                />) : (
-                    <Route path="*" element={<Navigate to="/login" />} />
+                <Route path="*" element={savedLocation ? (<Navigate to={savedLocation} />) : (<Navigate to="/explore" />)}/>
+              ) : (
+                <Route path="*" element={<Navigate to="/login" />}/>
             )}
         </Routes>
     );
