@@ -487,6 +487,10 @@ input.c-tarea-titulo {
   border-radius: 30px;
 }
 
+.c-btn-crear:hover {
+  box-shadow: 0 0 0 3px #000;
+}
+
 /* Modal subir imagen */
 .c-input-body {
   display: flex;
