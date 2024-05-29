@@ -647,7 +647,7 @@ export const Create = () => {
           
           {/* Error campos vacíos */}
           <Modal className="c-modal" show={modalError} onHide={handleCerrarError}>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <div className="c-modal-title">Error</div>
             </Modal.Header>
               <div className="c-modal-body" style={{textAlign:'left'}}>
@@ -668,7 +668,7 @@ export const Create = () => {
 
           {/* Tarea campos vacíos */}
           <Modal className="c-modal" show={modalTarea} onHide={handleCerrarTarea}>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <div className="c-modal-title">Error</div>
             </Modal.Header>
               <div className="c-modal-body" style={{textAlign:'left'}}>
@@ -681,7 +681,7 @@ export const Create = () => {
           
           {/* Iniciativa creada */}
           <Modal className="c-modal" show={modalCreada} onHide={handleCerrarCreada}>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <div className="c-modal-title">Éxito</div>
             </Modal.Header>
               <div className="c-modal-body">

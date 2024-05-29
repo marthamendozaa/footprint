@@ -147,7 +147,7 @@ export const ExploreAdmin = () => {
 
       {/* Modal confirmar eliminar iniciativa*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <div className="ea-modal-title">Confirmar eliminación</div>
         </Modal.Header>
           <div className="ea-modal-body">
@@ -161,7 +161,7 @@ export const ExploreAdmin = () => {
       
       {/* Modal iniciativa eliminada*/}
       <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <div className="ea-modal-title">Éxito</div>
         </Modal.Header>
           <div className="ea-modal-body">
@@ -174,7 +174,7 @@ export const ExploreAdmin = () => {
       
       {/* Modal error eliminar*/}
       <Modal className="ea-modal" show={modalError} onHide={handleCerrarError}>
-        <Modal.Header closeButton>
+        <Modal.Header>
         <div className="ea-modal-title">Error</div>
         </Modal.Header>
           <div className="ea-modal-body">
