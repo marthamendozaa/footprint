@@ -134,7 +134,7 @@ export const MyInitiatives = () => {
               <div className="m-iniciativas-container">
                 {iniciativasMiembro.map((iniciativa, index) => (
                   <Link key={iniciativa.idIniciativa} to={`/initiative/${iniciativa.idIniciativa}`}>
-                    <div className="m-iniciativa">
+                    <div className="m-iniciativa" style={{height: '90%'}}>
                         <div className="m-iniciativa-imagen">
                           <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
                         </div>
@@ -160,7 +160,7 @@ export const MyInitiatives = () => {
               <div className="m-iniciativas-container">
                 {iniciativasAdmin.map((iniciativa, index) => (
                   <Link key={iniciativa.idIniciativa} to={`/initiative/${iniciativa.idIniciativa}`}>
-                    <div className="m-iniciativa">
+                    <div className="m-iniciativa" style={{height: '90%'}}>
                         <div className="m-iniciativa-imagen">
                           <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
                         </div>

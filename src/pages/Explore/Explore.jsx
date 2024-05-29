@@ -14,6 +14,7 @@ export const Explore = () => {
     const [filter, setFilter] = useState('');
     const [iniciativas, setIniciativas] = useState(null);
     const [filteredIniciativas, setFilteredIniciativas] = useState(null);
+    const [admins, setAdmins] = useState(null);
 
     // Seleccionar una iniciativa
     const [showModal, setShowModal] = useState(false); // State to manage modal visibility
@@ -31,7 +32,14 @@ export const Explore = () => {
         const fetchData = async () => {
             const iniciativasData = await getIniciativas();
             setIniciativas(iniciativasData);
-            setFilteredIniciativas(iniciativasData); // Initialize filteredIniciativas with all iniciativas
+            setFilteredIniciativas(iniciativasData.map((iniciativa, index) => ({ item: iniciativa, index })));
+
+            let adminsData = [];
+            for (const iniciativa of iniciativasData) {
+              const adminData = await getUsuario(iniciativa.idAdmin);
+              adminsData.push(adminData);
+            }
+            setAdmins(adminsData);
 
             const usuarioData = await getUsuario(user);
             setUsuario(usuarioData);
@@ -44,12 +52,11 @@ export const Explore = () => {
     
     const searchText = (event) => {
         const searchTerm = event.target.value;
-        console.log("Search Term:", searchTerm);
         setFilter(searchTerm);
     
         if (!searchTerm) {
             // If the search term is empty, show all iniciativas
-            setFilteredIniciativas(iniciativas);
+            setFilteredIniciativas(iniciativas.map((iniciativa, index) => ({ item: iniciativa, index })));
             return;
         }
     
@@ -60,7 +67,9 @@ export const Explore = () => {
         });
     
         const result = fuse.search(searchTerm);
-        const filtered = result.map((item) => item.item); // Extract the actual items from Fuse.js result
+        const filtered = result.map((item) => {
+          return { item: item.item, index: item.refIndex }; // Extract the item and its original index
+        });
         setFilteredIniciativas(filtered);
     };
     
@@ -165,7 +174,7 @@ export const Explore = () => {
     return (
         <div>
             {/* Spinner */}
-            {filteredIniciativas && iniciativasFavoritas ? (
+            {filteredIniciativas && iniciativasFavoritas && admins ? (
                 <div className='e-container'>
                     <div className='e-seccion-container'>
                         {/* Barra de búsqueda */}
@@ -182,19 +191,23 @@ export const Explore = () => {
 
                         {/* Iniciativas */}
                         <div className='e-iniciativas-container'>
-                        {filteredIniciativas && filteredIniciativas.map((item, index) => (
-                            <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(item, index)}>
+                        {filteredIniciativas && filteredIniciativas.map((item, id) => (
+                            <div key={id} className='e-iniciativa' onClick={() => handleButtonClick(item.item, item.index)}>
+                                <div className='e-iniciativa-admin'>
+                                    <img src={admins[item.index].urlImagen} alt = {admins[item.index].nombreUsuario} />
+                                    <div className='e-nombre-admin'>{admins[item.index].nombreUsuario}</div>
+                                </div>
                                 <div className='e-iniciativa-imagen'>
-                                    <img src={item.urlImagen} alt = {item.titulo} />
+                                    <img src={item.item.urlImagen} alt = {item.item.titulo} />
                                 </div>
                                 <div className='e-iniciativa-contenido'>
-                                  <div className="e-titulo">{item.titulo}</div>
-                                  <div className="e-desc">{item.descripcion}</div>
+                                  <div className="e-titulo">{item.item.titulo}</div>
+                                  <div className="e-desc">{item.item.descripcion}</div>
                                   <div className='e-corazon' onClick={(e) => e.stopPropagation()}>
-                                      {iniciativasFavoritas.includes(item.idIniciativa) ? (
-                                        <FaHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />
+                                      {iniciativasFavoritas.includes(item.item.idIniciativa) ? (
+                                        <FaHeart onClick={() => handleToggleFavorita(item.item.idIniciativa)} style={{ cursor: "pointer" }} />
                                       ) : (
-                                        <FaRegHeart onClick={() => handleToggleFavorita(item.idIniciativa)} style={{ cursor: "pointer" }} />
+                                        <FaRegHeart onClick={() => handleToggleFavorita(item.item.idIniciativa)} style={{ cursor: "pointer" }} />
                                       )}
                                   </div>
                                 </div>

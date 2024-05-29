@@ -403,7 +403,7 @@ export const Create = () => {
                       onBlur={handleGuardarTitulo}
                       onKeyDown={handleOnKeyDown}
                       autoFocus
-                      maxLength={35}
+                      maxLength={30}
                     />
                     <div className="c-titulo-conteo">
                       {titulo ? `${titulo.length}/30` : `0/30`}
@@ -593,7 +593,7 @@ export const Create = () => {
                     <div className="c-tarea-botones">
                       <div className="c-tarea-boton"><FaCalendar /> Fecha
                         <DatePicker
-                          className='react-datepicker__input-container-create'
+                          className='react-datepicker-2'
                           selected={tarea.fechaEntrega}
                           onChange={(date) => handleCambioFechaEntrega(date, idTarea)}
                           dateFormat="dd/MM/yyyy"

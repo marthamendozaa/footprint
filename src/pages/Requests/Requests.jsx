@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
+import { FaCheckCircle, FaTimesCircle, FaHourglass, FaTrash } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { getSolicitudes, getIniciativa } from '../../api/api.js';
 import './Requests.css';
@@ -80,54 +80,89 @@ export const Requests = () => {
   return (
     <div>
       {iniciativasEnviadas && iniciativasRecibidas ? (
-        <div className="m-container">
-          
-          <div className="m-seccion-container">
-            <div className="m-iniciativas-titulo">Solicitudes que he enviado</div>
-  
+        <div className="rq-container">
+          <div className="rq-seccion-container">
+
+            {/* Solicitudes enviadas */}
+            <div className="rq-iniciativas-titulo">Tus solicitudes a iniciativas</div>
+            
+            {/* No hay ninguna solicitud */}
             {iniciativasEnviadas.length == 0 ? (
-              <div className="m-error">
+              <div className="rq-error">
                 No has enviado solicitudes nuevas.
               </div>
             ) : (
-              <div className="m-iniciativas-container">
+              <div className="rq-iniciativas-container">
+                {/* Lista de iniciativas enviadas */}
                 {iniciativasEnviadas.map((iniciativa, index) => (
-                  <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(iniciativa)}>
-                  <div className='e-iniciativa-imagen'>
-                      <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
-                  </div>
+                  <div key={index} className='rq-iniciativa' onClick={() => handleButtonClick(iniciativa, index)}>
+                    {/* Imagen y título */}
+                    <div className='rq-iniciativa-imagen'>
+                        <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
+                    </div>
 
-                  <div className='e-iniciativa-texto'>
-                      <div className="e-titulo">{iniciativa.titulo}</div>
-                      <div className="e-desc">{iniciativa.descripcion}</div>
-                      <div className="e-desc">{solicitudesEnviadas[index].estado}</div>
-                  </div>
-                </div>    
+                    <div className='rq-iniciativa-texto'>
+                      <div className="rq-titulo">{iniciativa.titulo}</div>
+                      
+                      {/* Estado */}
+                      <div className='rq-estado'>
+                        <div>
+                          {solicitudesEnviadas[index].estado}
+                          {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
+                          {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
+                          {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
+                        </div>
+                      </div>
+
+                      {/* Basura */}
+                      <div className='fa-4'>
+                        <button className='fa-5-button'> <FaTrash/> </button>
+                      </div>
+                    </div>
+                  </div>    
                 ))}
               </div>
             )}
           </div>
-  
-          <div className="m-seccion-container">
-            <div className="m-iniciativas-titulo">Solicitudes recibidas</div>
-  
+
+          {/* Invitaciones recibidas */}
+          <div className="rq-seccion-container">
+            <div className="rq-iniciativas-titulo">Invitaciones recibidas</div>
+            
+            {/* No hay ninguna solicitud */}
             {iniciativasRecibidas.length == 0 ? (
-              <div className="m-error">
+              <div className="rq-error">
                 Aún no has recibido solicitudes.
               </div>
             ) : (
-              <div className="m-iniciativas-container">
+              <div className="rq-iniciativas-container">
+                {/* Lista de inicativas enviadas */}
                 {iniciativasRecibidas.map((iniciativa, index) => (
-                  <div key={index} className='e-iniciativa' onClick={() => handleButtonClick(iniciativa)}>
-                  <div className='e-iniciativa-imagen'>
-                      <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
-                  </div>
+                  <div key={index} className='rq-iniciativa' onClick={() => handleButtonClick(iniciativa, index)}>
+                    {/* Imagen y título */}
+                    <div className='rq-iniciativa-imagen'>
+                        <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
+                    </div>
 
-                  <div className='e-iniciativa-texto'>
-                      <div className="e-titulo">{iniciativa.titulo}</div>
-                      <div className="e-desc">{iniciativa.descripcion}</div>
-                  </div>
-                </div>    
+                    {/* Cuerpo */}
+                    <div className='rq-iniciativa-texto'>
+                      {/* Titulo */}
+                      <div className="rq-titulo">{iniciativa.titulo}</div>
+
+                      {/* Botones */}
+                      <div className='rq-botones-2'>
+                        <div className='fa-5'>
+                          <button className='fa-5-button'> <FaCheckCircle/> </button>
+                        </div>
+                        <div className='fa-5'>
+                          <button className='fa-5-button'> <FaTimesCircle/> </button>
+                        </div>
+
+                      </div>
+
+                    </div>
+
+                  </div>    
                 ))}
               </div>
             )}
@@ -135,15 +170,15 @@ export const Requests = () => {
 
           {/* Mostrar información adicional */}
           <ModalIniciativa
-                        showModal={showModal}
-                        setShowModal={setShowModal}
-                        selectedIniciativa={selectedIniciativa}
-                        handleCrearSolicitud={handleCrearSolicitud}
-                        esAdmin={esAdmin}
-                        esMiembro={esMiembro}
-                        suscribirDesactivado={suscribirDesactivado}
-                        pagina = {"Requests"}
-                        /> 
+            showModal={showModal}
+            setShowModal={setShowModal}
+            selectedIniciativa={selectedIniciativa}
+            handleCrearSolicitud={handleCrearSolicitud}
+            esAdmin={esAdmin}
+            esMiembro={esMiembro}
+            suscribirDesactivado={suscribirDesactivado}
+            pagina = {"Requests"}
+            /> 
         </div>
       ) : (
         <div className="spinner">

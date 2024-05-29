@@ -87,6 +87,7 @@ const PageWithNavbarAdmin = ({ component, isCreateOpen, toggleCreate }) => {
     return (
         <div>
             <NavbarAdmin isCreateOpen={isCreateOpen} toggleCreate={toggleCreate} />
+            {/* El style es lo que hace que el contenido se mueva */}
             <div className="content-container" style={{ marginLeft: isCreateOpen ? '190px' : '100px', transition: 'margin-left 0.3s ease' }}>
                 {component}
             </div>
