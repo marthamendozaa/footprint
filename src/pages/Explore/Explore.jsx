@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Explore.css';
 import { useAuth } from '../../contexts/AuthContext';
 import Solicitud from '../../classes/Solicitud.js'
-import { getIniciativas, crearSolicitud, getUsuario, actualizaUsuario, getMisIniciativas, suscribirseAIniciativa, eliminaIniciativa, sendMail } from '../../api/api.js';
+import { getIniciativas, crearSolicitud, getUsuario, actualizaUsuario, getMisIniciativas, suscribirseAIniciativa, existeSolicitud, eliminaIniciativa, sendMail } from '../../api/api.js';
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { FaHeart, FaRegHeart, FaSearch } from "react-icons/fa";
 import Fuse from 'fuse.js';
@@ -80,10 +80,12 @@ export const Explore = () => {
   const [suscribirCargando, setSuscribirCargando] = useState(false);
 
   const handleButtonClick = async (iniciativa, index) => {
-    for (const solicitud of usuario.listaSolicitudes) {
-      if (iniciativa.listaSolicitudes.includes(solicitud)) {
-        setSuscribirDesactivado(true);
-      }
+    // Verificar si el usuario ya envió una solicitud a la iniciativa
+    const solicitudExiste = await existeSolicitud(user, iniciativa.idIniciativa);
+    if (solicitudExiste) {
+      setSuscribirDesactivado(true);
+    } else {
+      setSuscribirDesactivado(false);
     }
 
     setSelectedIniciativa(iniciativa);

@@ -150,6 +150,10 @@ li.m-etiqueta-item {
   box-shadow: 0 0 0 2px #000;
 }
 
+.modalsusbotton:disabled {
+  opacity: 0.5;
+}
+
 .modalsusbotton:disabled:hover {
   box-shadow: none;
 }
