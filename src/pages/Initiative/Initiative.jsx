@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaCalendar, FaFolder, FaTimesCircle  } from 'react-icons/fa';
 import { FaClock } from "react-icons/fa";
 import { BsPeopleFill } from "react-icons/bs";
+import { useAuth } from '../../contexts/AuthContext';
 import { MdUpload } from "react-icons/md"
 import { Spinner, Modal, Button } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
@@ -62,6 +63,11 @@ export const Initiative = () => {
   const [miembros, setMiembros] = useState(null);
   const [tareas, setTareas] = useState(null);
 
+  //LO QUE AÑADI DE CHECAR SI ES ADMIN
+  const { user } = useAuth();
+  const [usuario, setUsuario] = useState(null);
+  const [esAdmin, setEsAdmin] = useState(false);
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     const day = date.getDate();
@@ -84,6 +90,12 @@ export const Initiative = () => {
         const infoIniciativaAdmin = await getUsuario(iniciativaData.idAdmin);
         setInfoAdmin(infoIniciativaAdmin);
         console.log(infoIniciativaAdmin);
+
+
+        const usuarioData = await getUsuario(user); // Assuming this gets the current logged-in user
+        setUsuario(usuarioData);
+        setEsAdmin(usuarioData.idUsuario === iniciativaData.idAdmin);
+
         
         await actualizarMiembros();
 
@@ -301,9 +313,11 @@ export const Initiative = () => {
                       {miembros.map((miembro, idMiembro) => (
                         <div key={idMiembro}>
                           <button type="button" className="i-btn-miembro">{miembro.nombreUsuario}
+                          { esAdmin && (
                           <span className="i-icono-elimina-miembro">
                             <FaTimesCircle  onClick={() => handleMostrarEliminar(miembro, miembro.idUsuario)} disabled={eliminaBloqueado} className="i-icon-times-circle" />
                           </span>
+                          )}
                         </button>
                         </div>
                       ))}
@@ -312,7 +326,7 @@ export const Initiative = () => {
                   </div>
                   ) : (
                   <div className="m-error">
-                  No hay tareas asignadas.
+                  No hay miembros.
                   </div>
                 )}
                 {!iniciativa.esPublica && (
