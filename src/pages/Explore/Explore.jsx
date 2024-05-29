@@ -256,7 +256,7 @@ export const Explore = () => {
         </div>
 
         {/* Iniciativas */}
-        <div className='e-iniciativas-container' style={!iniciativasFiltradas ? {justifyContent: "center"} : {}}>
+        <div className='e-iniciativas-container' style={iniciativasFiltradas && iniciativasFavoritas ? {} : {justifyContent: "center"}}>
           
           {/* Si no hay iniciativas, mostrar spinner */}
           {iniciativasFiltradas && iniciativasFavoritas ? (
