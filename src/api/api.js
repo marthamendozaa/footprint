@@ -173,13 +173,13 @@ export const getUsuario = async (user) => {
 // Información de todos los usuarios
 export const getUsuarios = async () => {
   try {
-    const usuariosRef = await getDocs(collection(firestore, "usuariosRef"));
-    let usuarios = [];
-    usuariosRef.forEach((doc) => {
-      console.log('Doc data:', doc.data()); // Log para ver la estructura del documento
-      usuarios.push(doc.data());
-    });
-    console.log("Obtener usuarios exitoso", usuarios); // Log para verificar los datos obtenidos
+    const usuariosRef = await getDocs(collection(firestore, "Usuarios"));
+    let usuarios = {};
+    for (const docRef of usuariosRef.docs) {
+      const usuario = docRef.data();
+      usuarios[usuario.idUsuario] = usuario;
+    }
+    console.log("Obtener usuarios exitoso");
     return usuarios;
   } catch (error) {
     console.log("Error obteniendo usuarios", error);

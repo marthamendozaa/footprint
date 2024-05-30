@@ -16,7 +16,7 @@ export const Profile = () => {
   // Cerrar sesión
   const [sesionCerrada, setSesionCerrada] = useState(false);
   const [showModalSesionCerrada, setShowModalSesionCerrada] = useState(false);
-  const { user, setUser, setAdmin } = useAuth();
+  const { user, admin, setUser, setAdmin } = useAuth();
   const navigate = useNavigate();
   
   const openModalSesionCerrada = () => {
@@ -58,7 +58,7 @@ export const Profile = () => {
   }, [sesionCerrada]);
 
 
-  // Modal de erroes
+  // Modal de errores
   const [showModalError, setShowModalError] = useState(false);
   const [errorMensaje, setErrorMensaje] = useState('');
   
@@ -365,9 +365,11 @@ export const Profile = () => {
               
               <div className="p-info">
                 {/* Edad */}
-                <div className="profile-icons-text">
-                  <p> <span> Edad: </span> {usuario.edad} años</p>
-                </div>
+                {!admin && 
+                  <div className="profile-icons-text">
+                    <p> <span> Edad: </span> {usuario.edad} años</p>
+                  </div>
+                }
 
                 {/* Usuario */}
                 <div className="profile-icons-text">
@@ -395,28 +397,32 @@ export const Profile = () => {
           </div>
 
           {/* Intereses */}
-          <div className="intereses-container">
-            <h3>Temas de interés</h3> 
-            <div className='p-etiquetas'>
-              {Object.values(intereses).map((interes, idInteres) => (
-                <li key={idInteres} className={`p-etiquetas-item  ${Object.values(usuario.listaIntereses).includes(interes) ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
-                  {interes}
-                </li>
-              ))}
+          {!admin && (
+            <div className="intereses-container">
+              <h3>Temas de interés</h3> 
+              <div className='p-etiquetas'>
+                {Object.values(intereses).map((interes, idInteres) => (
+                  <li key={idInteres} className={`p-etiquetas-item  ${Object.values(usuario.listaIntereses).includes(interes) ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
+                    {interes}
+                  </li>
+                ))}
+              </div>
             </div>
-          </div>
-
+          )}
+          
           {/* Habilidades */}
-          <div className="habilidades-container">
-            <h3>Habilidades</h3>
-            <div className='p-etiquetas'>
-              {Object.values(habilidades).map((habilidad, idHabilidad) => (
-                <li key={idHabilidad} className={`p-etiquetas-item ${Object.values(usuario.listaHabilidades).includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
-                  {habilidad}
-                </li>
-              ))}
+          {!admin && (
+            <div className="habilidades-container">
+              <h3>Habilidades</h3>
+              <div className='p-etiquetas'>
+                {Object.values(habilidades).map((habilidad, idHabilidad) => (
+                  <li key={idHabilidad} className={`p-etiquetas-item ${Object.values(usuario.listaHabilidades).includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
+                    {habilidad}
+                  </li>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Botón para cerrar sesión */}
           <div className="perfil-logout" style={{borderRadius: "18px"}}>
@@ -585,7 +591,7 @@ export const Profile = () => {
         </header>
       
       ) : (
-        <div className="spinner">
+        <div className="spinner" style={{justifyContent: "center", width: "100%"}}>
           <Spinner animation="border" role="status"></Spinner>
         </div>
       )}

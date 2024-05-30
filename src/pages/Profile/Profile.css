@@ -4,11 +4,13 @@
   background-color: white;
   color: black;
   text-align: left;
+  min-width: 1000px;
 }
 
 .profile-header {
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .Profile-header h1 {

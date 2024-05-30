@@ -31,14 +31,18 @@
 .rq-iniciativa {
   display: flex;
   flex-direction: column;
+  align-items: center;
   margin-top: 12px;
   margin-right: 12px;
   margin-bottom: 12px;
-  border-radius: 6px;
-  border:rgba(0, 0, 0, 0.176) 1.2px solid;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
+  border-radius: 20px;
+  border: #A0C1BF 4px solid;
   min-width: 200px;
   max-width: 200px;
+}
+
+.rq-iniciativa:hover {
+  border: #000 4px solid;
 }
 
 .rq-estado {
@@ -89,12 +93,9 @@
   padding: 0px;
 }
 
-.rq-iniciativa:hover {
-  background-color: #eeeeee;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
-}
-
 .rq-iniciativa-imagen img {
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
   width: 200px;
   max-width: 100%;
   height: 130px;
