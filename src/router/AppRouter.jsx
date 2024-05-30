@@ -15,7 +15,7 @@ import { ProfileAdmin } from '../pages/ProfileAdmin/ProfileAdmin.jsx';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
 export const AppRouter = () => {
-    const [isCreateOpen, setIsCreateOpen] = useState(true);
+    const [isCreateOpen, setIsCreateOpen] = useState(false);
 
     const toggleCreate = () => {
         setIsCreateOpen(!isCreateOpen);

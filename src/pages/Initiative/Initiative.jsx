@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FaCalendar, FaFolder, FaTimesCircle  } from 'react-icons/fa';
-import { FaClock } from "react-icons/fa";
-import { BsPeopleFill } from "react-icons/bs";
 import { useAuth } from '../../contexts/AuthContext';
-import { MdUpload } from "react-icons/md"
 import { Spinner, Modal, Button } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail } from '../../api/api.js';
+import { useDropzone } from 'react-dropzone';
+import { getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail,  subirImagen } from '../../api/api.js';
 import './Initiative.css';
 
 export const Initiative = () => {
@@ -65,7 +63,6 @@ export const Initiative = () => {
 
   //LO QUE AÑADI DE CHECAR SI ES ADMIN
   const { user } = useAuth();
-  const [usuario, setUsuario] = useState(null);
   const [esAdmin, setEsAdmin] = useState(false);
 
   const formatDate = (dateString) => {
@@ -80,6 +77,7 @@ export const Initiative = () => {
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
   const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -93,7 +91,7 @@ export const Initiative = () => {
 
 
         const usuarioData = await getUsuario(user); // Assuming this gets the current logged-in user
-        setUsuario(usuarioData);
+        
         setEsAdmin(usuarioData.idUsuario === iniciativaData.idAdmin);
 
         
@@ -278,7 +276,7 @@ export const Initiative = () => {
                             </div>
                             <div className="i-tarea-botones">
                               <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                              <div className="i-tarea-boton"><FaFolder /> Documento</div>
+                              <div className="i-tarea-boton" ><FaFolder /> Documento </div>
                             </div>
                           </div>
                         </div>
@@ -329,7 +327,7 @@ export const Initiative = () => {
                   No hay miembros.
                   </div>
                 )}
-                {!iniciativa.esPublica && (
+                {!iniciativa.esPublica && esAdmin && (
                   <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowModal}>
                   VER SOLICITUDES
                 </button>
@@ -383,6 +381,7 @@ export const Initiative = () => {
           <Spinner animation="border" role="status"></Spinner>
         </div>
       )}
+
 
       {/* Modal confirmar eliminar iniciativa*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>

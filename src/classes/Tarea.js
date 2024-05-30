@@ -7,5 +7,7 @@ export default class Tarea {
     this.descripcion = descripcion;
     this.fechaEntrega = fechaEntrega;
     this.fechaCreacion = new Date();
+    this.completada = false;
+    this.urlEntrega = null;
   }
 }
