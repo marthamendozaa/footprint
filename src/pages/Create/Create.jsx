@@ -203,9 +203,6 @@ export const Create = () => {
   const handleSeleccionaPrivacidad = (privacidad) => {
     setEsPublica(privacidad);
     setDropdownPrivacidad(false);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
   };
 
 
@@ -215,7 +212,6 @@ export const Create = () => {
   const [buscaRegion, setBuscaRegion] = useState("");
   const [resultadosRegion, setResultadosRegion] = useState([]);
   const [dropdownRegion, setDropdownRegion] = useState(false);
-  const inputRef = useRef(null);
   
 
   // Búsqueda regiones
@@ -238,10 +234,28 @@ export const Create = () => {
   const handleSeleccionaRegion = (region) => {
     setRegion(region);
     setDropdownRegion(false);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
   };
+
+
+  // Cerrar dropdowns al hacer click fuera de ellos
+  const dropdownPrivacidadRef = useRef(null);
+  const dropdownRegionRef = useRef(null);
+
+  useEffect(() => {
+    const handleCerrarDropdown = (event) => {
+      if (dropdownPrivacidadRef.current && !dropdownPrivacidadRef.current.contains(event.target)) {
+        setDropdownPrivacidad(false);
+      }
+      if (dropdownRegionRef.current && !dropdownRegionRef.current.contains(event.target)) {
+        setDropdownRegion(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleCerrarDropdown);
+    return () => {
+      document.removeEventListener('mousedown', handleCerrarDropdown);
+    };
+  }, []);
   
 
   // Subir imagen
@@ -471,7 +485,7 @@ export const Create = () => {
                 </div>
 
                 {/* Seleccionar privacidad */}
-                <div className="c-dropdown-container">
+                <div className="c-dropdown-container" ref={dropdownPrivacidadRef}>
                   <button className="c-selecciona-dropdown" onClick={() => setDropdownPrivacidad(!dropdownPrivacidad)}>
                     <span>{esPublica ? "Pública" : "Privada"}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
@@ -488,7 +502,7 @@ export const Create = () => {
                 </div>
                 
                 {/* Agregar región */}
-                <div className="c-dropdown-container">
+                <div className="c-dropdown-container" ref={dropdownRegionRef}>
                   <button className="c-selecciona-dropdown" onClick={() => setDropdownRegion(!dropdownRegion)}>
                     <span className="mr-2">{region ? region : "Ubicación"}</span>
                       <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">

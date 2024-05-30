@@ -42,6 +42,49 @@ body::-webkit-scrollbar {
   outline: none;
 }
 
+/* Filtros */
+.e-filtros-container {
+  display: flex;
+  width: 75%;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.e-filtros-titulo {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.e-filtros-borrar {
+  color: #A0C1BF;
+}
+
+.e-filtros-borrar:hover {
+  color: #000000;
+  cursor: pointer;
+}
+
+/* Dropdown */
+.e-dropdown-item {
+  display: flex;
+  padding: 8px 16px;
+  color: #4a5568;
+  background-color: #ffffff;
+  cursor: pointer;
+  border-radius: 25px;
+  align-items: center;
+  user-select: none;
+}
+
+.e-dropdown-item input {
+  margin-right: 10px;
+}
+
+.e-dropdown-item:hover {
+  background-color: #f7fafc;
+}
+
 /* Iniciativas */
 .e-iniciativas-container {
   display: flex;

@@ -4,7 +4,6 @@ export default class Usuario {
     this.nombreUsuario = null;
     this.nombre = null;
     this.correo = null;
-    this.contrasena = null;
     this.fechaNacimiento = null;
     this.edad = null;
     this.urlImagen = 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png';
