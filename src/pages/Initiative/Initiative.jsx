@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Spinner, Modal, Button } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
 import { useDropzone } from 'react-dropzone';
+import { ClipLoader } from 'react-spinners';
 import { getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail,  subirImagen } from '../../api/api.js';
 import './Initiative.css';
 
@@ -76,6 +77,63 @@ export const Initiative = () => {
   const [showModal, setShowModal] = useState(false); 
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
   const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
+
+
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileError, setFileError] = useState('');
+  const [uploadDisabled, setUploadDisabled] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+
+  const openUploadModal = (taskId) => {
+    setShowUploadModal(true);
+    setFileError('');
+    setSelectedTaskId(taskId);
+  };
+
+  const closeUploadModal = () => {
+    setShowUploadModal(false);
+    setSelectedFile(null);
+    setSelectedTaskId(null);
+  };
+
+  const handleUploadFile = async () => {
+    if (!selectedFile) {
+      setFileError('Selecciona un archivo');
+      return;
+    }
+
+    if (selectedFile.size > 10 * 1024 * 1024) { // 10 MB en bytes
+      setFileError('El archivo seleccionado supera el límite de tamaño de 10 MB');
+      setSelectedFile(null);
+      return;
+    }
+
+    setUploadDisabled(true);
+
+    try {
+      const fileUrl = await subirImagen(selectedFile, `Tareas/${selectedTaskId}`);
+      // Handle fileUrl appropriately in your application context
+      closeUploadModal();
+    } catch (error) {
+      console.error("Error al subir el archivo:", error.message);
+    } finally {
+      setUploadDisabled(false);
+    }
+  };
+
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: {
+      'image/*': [],
+      'application/pdf': []
+    },
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0) {
+        setSelectedFile(acceptedFiles[0]);
+        setFileError('');
+      }
+    }
+  });
 
 
   useEffect(() => {
@@ -276,7 +334,7 @@ export const Initiative = () => {
                             </div>
                             <div className="i-tarea-botones">
                               <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                              <div className="i-tarea-boton" ><FaFolder /> Documento </div>
+                              <div className="i-tarea-boton" onClick={() => openUploadModal(tarea.idTarea)}><FaFolder /> Documento </div>
                             </div>
                           </div>
                         </div>
@@ -420,6 +478,30 @@ export const Initiative = () => {
           </div>
         <Modal.Footer>
           <Button onClick={handleCerrarError}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+
+
+
+      <Modal className="p-modal" show={showUploadModal} onHide={closeUploadModal}>
+        <Modal.Header>
+          <div className='p-modal-title'>Archivos</div>
+        </Modal.Header>
+        
+        <div className="p-input-body">
+          <div {...getRootProps({ className: 'p-custom-file-button' })}>
+            <input {...getInputProps()} />
+            Subir archivo
+          </div>
+          <span className="p-custom-file-text">{selectedFile ? selectedFile.name : "Ningun archivo seleccionado"}</span>
+        </div>
+        {fileError && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{fileError}</span>}
+  
+        <Modal.Footer>
+          <Button onClick={handleUploadFile} disabled={uploadDisabled} style={{width: "118px"}}>
+            {uploadDisabled ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
+          </Button>
+          <Button onClick={closeUploadModal}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
 
