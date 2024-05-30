@@ -1,12 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { FaCalendar, FaFolder, FaTimesCircle  } from 'react-icons/fa';
-import { FaClock } from "react-icons/fa";
-import { BsPeopleFill } from "react-icons/bs";
+import { FaCalendar, FaFolder, FaTimesCircle, FaSearch } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
-import { MdUpload } from "react-icons/md"
-import { Spinner, Modal, Button } from 'react-bootstrap';
+import { Spinner, Modal, Button, FormControl } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail } from '../../api/api.js';
+import { getIniciativa, getMiembros, getMisTareas, getUsuario, getUsuarios, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail } from '../../api/api.js';
+import Fuse from 'fuse.js';
 import './Initiative.css';
 
 export const Initiative = () => {
@@ -65,7 +63,6 @@ export const Initiative = () => {
 
   //LO QUE AÑADI DE CHECAR SI ES ADMIN
   const { user } = useAuth();
-  const [usuario, setUsuario] = useState(null);
   const [esAdmin, setEsAdmin] = useState(false);
 
   const formatDate = (dateString) => {
@@ -76,9 +73,15 @@ export const Initiative = () => {
     return `${day}/${month}/${year}`;
   };
 
-  const [showModal, setShowModal] = useState(false); 
+  const [showSolicitudesModal, setShowSolicitudesModal] = useState(false); 
+  const [showInvitarModal, setShowInvitarModal] = useState(false); 
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
   const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
+
+  //Búsqueda de usuarios para agregar miembros
+  const [usuarios, setUsuarios] = useState([]);
+  const [filter, setFilter] = useState('');
+  const [filteredUsuarios, setFilteredUsuarios] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -91,16 +94,19 @@ export const Initiative = () => {
         setInfoAdmin(infoIniciativaAdmin);
         console.log(infoIniciativaAdmin);
 
-
-        const usuarioData = await getUsuario(user); // Assuming this gets the current logged-in user
-        setUsuario(usuarioData);
+        const usuarioData = await getUsuario(user); 
         setEsAdmin(usuarioData.idUsuario === iniciativaData.idAdmin);
 
-        
         await actualizarMiembros();
 
-        //const listaMiembros = await getMiembros(idIniciativa);
-        //setMiembros(listaMiembros);
+        try {
+          const dataUsuarios = await getUsuarios();
+          console.log('Usuarios obtenidos:', dataUsuarios); // Verificar datos obtenidos
+          setUsuarios(dataUsuarios);
+          setFilteredUsuarios(dataUsuarios.map((usuario, index) => ({ item: usuario, index })));
+        } catch (error) {
+          console.error('Error al obtener usuarios:', error);
+        }
 
         const solicitudes = await getSolicitudes("Iniciativas", idIniciativa);
         console.log(solicitudes);
@@ -143,8 +149,34 @@ export const Initiative = () => {
     );
   };
 
-  const handleShowModal = () => {
-    setShowModal(true);
+  const handleShowSolicitudesModal = () => {
+    setShowSolicitudesModal(true);
+  };
+
+  const handleShowInvitarModal = () => {
+    setShowInvitarModal(true);
+  };
+
+  const searchText = (event) => {
+    const searchTerm = event.target.value;
+    setFilter(searchTerm);
+
+    if (!searchTerm) {
+      setFilteredUsuarios(usuarios.map((usuario, index) => ({ item: usuario, index })));
+      return;
+    }
+
+    const fuse = new Fuse(usuarios, {
+      keys: ['nombreUsuario', 'nombre'],
+      includeScore: true,
+      threshold: 0.4,
+    });
+
+    const result = fuse.search(searchTerm);
+    const filtered = result.map((item) => {
+      return { item: item.item, index: item.refIndex };
+    });
+    setFilteredUsuarios(filtered);
   };
 
   const handleAceptarSolicitud = async(index) => {
@@ -297,11 +329,14 @@ export const Initiative = () => {
           <div className="i-seccion-miembros">
             <div className="i-tipo-miembro">Dueño</div>
             {infoAdmin && 
-              <button type="button" className="i-btn-miembro">{infoAdmin.nombreUsuario}</button>
-              
-              
+              <button type="button" className="i-btn-miembro">{infoAdmin.nombreUsuario}</button> 
             }
             <div className="i-tipo-miembro">Miembros</div>
+            <div>
+              <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowInvitarModal}>
+                Agregar miembro
+              </button>
+            </div>
             {miembros ? (
                   <div>
                     {miembros.length === 0 ? (
@@ -330,14 +365,13 @@ export const Initiative = () => {
                   </div>
                 )}
                 {!iniciativa.esPublica && (
-                  <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowModal}>
+                  <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowSolicitudesModal}>
                   VER SOLICITUDES
                 </button>
-                )}
-              
+                )}              
             </div>
 
-              <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
+              <Modal show={showSolicitudesModal} onHide={() => setShowSolicitudesModal(false)} centered className='e-modal'>
                 <div className="modalcontainer">
                     <Modal.Header style={{ border: "none" }} closeButton> Solicitudes </Modal.Header>
                     
@@ -376,13 +410,51 @@ export const Initiative = () => {
                     </div>
                 </div>
             </Modal>
+
+            {/*Modal para agregar/inivtar usuarios*/}
+            <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
+                <div className="modalcontainer">
+                  <Modal.Header closeButton>
+                    <Modal.Title>Invitar Usuarios</Modal.Title>
+                  </Modal.Header>
+                    <Modal.Body>
+                      <div className='e-searchBar'>
+                        <FaSearch className="e-icons"/>
+                        <input
+                          type='search'
+                          placeholder='Buscar usuarios...'
+                          value={filter}
+                          onChange={searchText}
+                          className='e-searchBarCaja'
+                        />
+                      </div>
+                      {filteredUsuarios && filteredUsuarios.length > 0 ? (
+                        <ul>
+                          {filteredUsuarios.map((usuario, id) => (
+                            <li key={id} className='user-item'>
+                              <div className='user-info'>
+                                <span>{usuario.item.nombreUsuario}</span> ({usuario.item.email})
+                              </div>
+                              <Button variant="primary" onClick={() => handleAceptarSolicitud(index)}>Invitar</Button>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="spinner">
+                          <Spinner animation="border" role="status"></Spinner>
+                        </div>
+                      )}
+                    </Modal.Body>
+                    
+                </div>
+            </Modal>
           </div>
         </div>
-      ) : (
+      ):(
         <div className="spinner">
           <Spinner animation="border" role="status"></Spinner>
         </div>
-      )}
+      ) }
 
       {/* Modal confirmar eliminar iniciativa*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
