@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { FaCalendar, FaFolder, FaTimesCircle  } from 'react-icons/fa';
-import { FaClock } from "react-icons/fa";
-import { BsPeopleFill } from "react-icons/bs";
+import React, { useState, useEffect, useRef } from 'react';
+import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock } from 'react-icons/fa';
+import { useDropzone } from 'react-dropzone';
 import { useAuth } from '../../contexts/AuthContext';
-import { MdUpload } from "react-icons/md"
 import { Spinner, Modal, Button } from 'react-bootstrap';
+import { ClipLoader } from 'react-spinners';
 import { useParams } from 'react-router-dom';
-import { getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail } from '../../api/api.js';
+import DatePicker from "react-datepicker";
+import es from 'date-fns/locale/es';
+import { getIntereses, getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, subirImagen, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail } from '../../api/api.js';
 import './Initiative.css';
 
 export const Initiative = () => {
@@ -23,7 +24,7 @@ export const Initiative = () => {
    setModalEliminar(true);
  }
 
- // Modal de miembro eliminado
+ // Modal de iniciativa eliminada
  const [modalEliminada, setModalEliminada] = useState(false);
  const handleMostrarEliminada = () => setModalEliminada(true);
  const handleCerrarEliminada = async () => {
@@ -38,11 +39,10 @@ export const Initiative = () => {
  const handleMostrarError = () => setModalError(true);
  const handleCerrarError = () => setModalError(false);
 
- // Eliminar miembro
+ // Eliminar iniciativa
  const [eliminaBloqueado, setEliminaBloqueado] = useState(false);
 
  const handleEliminaMiembro = async () => {
-   console.log("Eliminando miembro con id: ", idMiembroEliminar);
    handleCerrarEliminar();
    setEliminaBloqueado(true);
    sendRemoveMail(idIniciativa, idMiembroEliminar);
@@ -63,9 +63,11 @@ export const Initiative = () => {
   const [miembros, setMiembros] = useState(null);
   const [tareas, setTareas] = useState(null);
 
+  const [imagenPreview, setImagenPreview] = useState(null);
+  const [nuevaFechaFinal, setNuevaFechaFinal] = useState(null);
+
   //LO QUE AÑADI DE CHECAR SI ES ADMIN
   const { user } = useAuth();
-  const [usuario, setUsuario] = useState(null);
   const [esAdmin, setEsAdmin] = useState(false);
 
   const formatDate = (dateString) => {
@@ -80,30 +82,88 @@ export const Initiative = () => {
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
   const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
 
+
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileError, setFileError] = useState('');
+  const [uploadDisabled, setUploadDisabled] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+
+  const openUploadModal = (taskId) => {
+    setShowUploadModal(true);
+    setFileError('');
+    setSelectedTaskId(taskId);
+  };
+
+  const closeUploadModal = () => {
+    setShowUploadModal(false);
+    setSelectedFile(null);
+    setSelectedTaskId(null);
+  };
+
+  const handleUploadFile = async () => {
+    if (!selectedFile) {
+      setFileError('Selecciona un archivo');
+      return;
+    }
+
+    if (selectedFile.size > 10 * 1024 * 1024) { // 10 MB en bytes
+      setFileError('El archivo seleccionado supera el límite de tamaño de 10 MB');
+      setSelectedFile(null);
+      return;
+    }
+
+    setUploadDisabled(true);
+
+    try {
+      const fileUrl = await subirImagen(selectedFile, `Tareas/${selectedTaskId}`);
+      // Handle fileUrl appropriately in your application context
+      closeUploadModal();
+    } catch (error) {
+      console.error("Error al subir el archivo:", error.message);
+    } finally {
+      setUploadDisabled(false);
+    }
+  };
+
+  const { getRootProps: getRootPropsTarea, getInputProps: getInputPropsTarea } = useDropzone({
+    accept: {
+      'image/*': [],
+      'application/pdf': []
+    },
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0) {
+        setSelectedFile(acceptedFiles[0]);
+        setFileError('');
+      }
+    }
+  });
+
+
+  const parseDate = (dateString) => {
+    const [day, month, year] = dateString.split('/');
+    return new Date(year, month - 1, day);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const iniciativaData = await getIniciativa(idIniciativa);
         setIniciativa(iniciativaData);
-        console.log(iniciativaData);
+        setImagenPreview(iniciativaData.urlImagen)
+
+        const fechaCierre = iniciativaData.fechaCierre ? parseDate(iniciativaData.fechaCierre) : null;
+        setNuevaFechaFinal(fechaCierre);
 
         const infoIniciativaAdmin = await getUsuario(iniciativaData.idAdmin);
         setInfoAdmin(infoIniciativaAdmin);
-        console.log(infoIniciativaAdmin);
 
-
-        const usuarioData = await getUsuario(user); // Assuming this gets the current logged-in user
-        setUsuario(usuarioData);
+        const usuarioData = await getUsuario(user);
         setEsAdmin(usuarioData.idUsuario === iniciativaData.idAdmin);
-
         
         await actualizarMiembros();
 
-        //const listaMiembros = await getMiembros(idIniciativa);
-        //setMiembros(listaMiembros);
-
         const solicitudes = await getSolicitudes("Iniciativas", idIniciativa);
-        console.log(solicitudes);
 
         let solicitudesRecibidasData = []
         for (const solicitud of solicitudes) {
@@ -177,39 +237,249 @@ export const Initiative = () => {
     }
   };
 
+  // Editar la información
+  const [editingCampos, setEditingCampos] = useState(false);
+  const [today, setToday] = useState(new Date());
+
+  useEffect(() => {
+    setToday(new Date());
+  }, []);
+
+
+  const handleCamposEdit = () => {
+    setEditingCampos(true);
+    setNuevoTitulo(iniciativa.titulo);
+    setNuevaDescripcion(iniciativa.descripcion)
+
+    const nuevaEtiquetasIniciativa = {...etiquetasIniciativa};
+    Object.values(iniciativa.listaEtiquetas).forEach((etiquetaExistente) => {
+      const idEtiquetaExistente = Object.keys(etiquetas).find(key => etiquetas[key] === etiquetaExistente);
+      if (idEtiquetaExistente && !nuevaEtiquetasIniciativa[idEtiquetaExistente]) {
+        nuevaEtiquetasIniciativa[idEtiquetaExistente] = etiquetaExistente;
+      }
+    });
+    setEtiquetasIniciativa(nuevaEtiquetasIniciativa);
+  };
+
+  // Editar imagen
+  const [imagenBloqueado, setImagenBloqueado] = useState(true);
+  const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
+  const [imagenIniciativa, setImagenIniciativa] = useState(null);
+  
+  const [modalImagen, setModalImagen] = useState(false);
+  const [errorImagen, setErrorImagen] = useState("");
+  const handleMostrarImagen = () => setModalImagen(true);
+  
+  const handleCerrarImagen = () => {
+    setModalImagen(false);
+    setImagenSeleccionada(null);
+    setErrorImagen("");
+  };
+
+  useEffect(() => {
+    if (!imagenSeleccionada) {
+      setImagenBloqueado(true);
+      return;
+    }
+
+    if (imagenSeleccionada.size > 2 * 1024 * 1024) {
+      setErrorImagen('La imagen seleccionada supera el límite de tamaño de 2 MB');
+      setImagenBloqueado(true);
+    } else {
+      setErrorImagen('');
+      setImagenBloqueado(false);
+    }
+  }, [imagenSeleccionada]);
+
+  const handleSubirImagen = () => {
+    setImagenIniciativa(imagenSeleccionada);
+    setImagenPreview(URL.createObjectURL(imagenSeleccionada));
+    handleCerrarImagen();
+  };
+
+  const { getRootProps: getRootPropsImagen, getInputProps: getInputPropsImagen } = useDropzone({
+    accept: {
+      'image/*': []
+    },
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0) {
+        setSelectedImageFile(acceptedFiles[0]);
+        setFileError('');
+      }
+    }
+  });
+
+  // Editar titulo
+  const [nuevoTitulo, setNuevoTitulo] = useState("");
+
+  const handleTituloCambios = (event) => {
+    setNuevoTitulo(event.target.value);
+  };
+
+  // Editar etiquetas
+  useEffect(() => {
+    const fetchData = async () => {
+      const etiquetasData = await getIntereses();
+      setEtiquetas(etiquetasData);
+    };
+    fetchData();
+  }, []);
+
+  const [etiquetas, setEtiquetas] = useState(null);
+  const [etiquetasIniciativa, setEtiquetasIniciativa] = useState({});
+
+  const seleccionaEtiqueta = (etiqueta, idEtiqueta) => {
+    const nuevaEtiquetasIniciativa = {...etiquetasIniciativa};
+
+    if (nuevaEtiquetasIniciativa.hasOwnProperty(idEtiqueta)) {
+      delete nuevaEtiquetasIniciativa[idEtiqueta];
+    } else {
+      nuevaEtiquetasIniciativa[idEtiqueta] = etiqueta;
+    }
+
+    setEtiquetasIniciativa(nuevaEtiquetasIniciativa);
+  };
+
+  // Editar fecha final
+  const datePickerCierre = useRef(null);
+
+  const handleCambioFechaCierre = () => {
+    if (datePickerCierre.current) {
+      datePickerCierre.current.setOpen(true);
+    }
+  };
+
+  // Editar descripción
+  const [nuevaDescripcion, setNuevaDescripcion] = useState("");
+
+  const handleDescripcionCambios = (event) => {
+    setNuevaDescripcion(event.target.value);
+  };
+
+  // Guardar la información editada
+  const [guardarCamposBloqueado, setGuardarCamposBloqueado] = useState(false);
+
+  useEffect(() => {
+    const verificarCampos = () => {
+      if (!imagenPreview || nuevoTitulo.trim() === '' || nuevaDescripcion.trim() === '' || Object.keys(etiquetasIniciativa).length === 0) {
+        setGuardarCamposBloqueado(true);
+      } else {
+        setGuardarCamposBloqueado(false);
+      }
+    };
+
+    verificarCampos();
+  }, [imagenPreview, nuevoTitulo, nuevaDescripcion, Object.keys(etiquetasIniciativa)]);
+
+  const handleGuardarCampos = async () => {
+    if (guardarCamposBloqueado) {
+      return
+    }
+
+    setEditingCampos(false);
+
+    try {
+
+    } catch (error) {
+
+    }
+  };
+
+  const handleCancelarCampos = async () => {
+    setEditingCampos(false);
+  };
+
   return (
     <div>
       {iniciativa ? (
         <div className="i-container">
           <div className="i-iniciativa-container">
+            {/* Boton para editar todo */}
+            { editingCampos || esAdmin && (
+              <button className="i-fa-pen" onClick={handleCamposEdit}>
+                <FaPen />
+              </button>
+            )}
+
+            { !editingCampos || esAdmin && (
+              <>
+                <button className="i-fa-pen" onClick={handleGuardarCampos} disabled={guardarCamposBloqueado}>
+                  Guardar
+                </button>
+
+                <button className="i-fa-pen-2" onClick={handleCancelarCampos}>
+                  Cerrar
+                </button>
+              </>
+            )}
+
             {/* Foto de iniciativa */}
-            <img src={iniciativa.urlImagen} className="i-foto-iniciativa"/> 
+            {editingCampos ? (
+              <div className="c-foto-iniciativa" onClick={handleMostrarImagen}>
+                <img src={imagenPreview} className ="c-preview-imagen"/>
+                <FaPen className="c-editar-foto"/>
+              </div>
+            ) : (
+              <img src={iniciativa.urlImagen} className="i-foto-iniciativa"/> 
+            )}
             
             <div className="i-info-container"> 
               {/* Título */}
               <div className="i-titulo">
-                <div className="i-titulo-texto">{iniciativa.titulo}</div>
+                {editingCampos ? (
+                  <div className='i-titulo-texto'>
+                    <input
+                      type="text"
+                      className="i-edit-titulo-box"
+                      value={nuevoTitulo}
+                      onChange={handleTituloCambios}
+                      autoFocus
+                      maxLength={30}
+                    />
+                    <div className="i-titulo-conteo">
+                      {nuevoTitulo ? `${nuevoTitulo.length}/30` : `0/30`}
+                    </div>
+                  </div>
+                ) : (
+                  iniciativa.titulo
+                )}
               </div>
   
             {/* Etiquetas */}
-            <div className="i-etiquetas">
-              {Object.values(iniciativa.listaEtiquetas).map((etiqueta, idEtiqueta) => (
-                <li key={idEtiqueta} className={`i-etiqueta-item`}>
-                  {etiqueta}
-                </li>
-              ))}
-            </div>
+            {editingCampos ? (
+              <div className="c-etiquetas">
+                {Object.values(etiquetas).map((etiqueta, idEtiqueta) => (
+                  <li 
+                    key={idEtiqueta} 
+                    className={`c-etiqueta-item ${Object.values(etiquetasIniciativa).includes(etiqueta) ? "highlighted" : ""}`} 
+                    onClick={() => seleccionaEtiqueta(etiqueta, idEtiqueta)}
+                  >
+                    {etiqueta}
+                  </li>
+                ))}
+              </div>
+            ) : (
+              <div className="i-etiquetas">
+                {Object.values(iniciativa.listaEtiquetas).map((etiqueta, idEtiqueta) => (
+                  <li 
+                    key={idEtiqueta} 
+                    className={`i-etiqueta-item`}
+                  >
+                    {etiqueta}
+                  </li>
+                ))}
+              </div>
+            )}
   
-            <div className="i-datos">
+            <div className="i-datos" style={{marginLeft: '5px'}}>
+              
               {/* Fecha inicio y fecha cierre */}
               <div className="i-calendarios-container">
                 <div className="i-calendarios">
                   {/* Fecha inicio */}
                   <div className="i-calendario-container">
                     <div className="i-calendario">
-                      <div className="i-icono-calendario">
-                        <FaCalendar/>
-                      </div>
+                      <FaCalendar/>
                     </div>
                     <div className='i-fecha'>{iniciativa.fechaInicio}</div>
                   </div>
@@ -219,19 +489,44 @@ export const Initiative = () => {
 
                   {/* Fecha cierre */}
                   <div className="i-calendario-container">
-                    <div className="i-calendario">
-                      <div className="i-icono-calendario">
-                        <FaCalendar/>
-                      </div>
-                    </div>
-                    <div className='i-fecha'>{iniciativa.fechaCierre}</div>
+                    {editingCampos ? (
+                      <>
+                        <div className="i-calendario" onClick={handleCambioFechaCierre}>
+                          <FaCalendar/>
+                        </div>
+                        <DatePicker
+                          className='react-datepicker__input-container-create'
+                          selected={nuevaFechaFinal}
+                          onChange={(date) => setNuevaFechaFinal(date)}
+                          dateFormat="dd/MM/yyyy"
+                          ref={datePickerCierre}
+                          locale={es}
+                          showYearDropdown
+                          scrollableYearDropdown 
+                          yearDropdownItemNumber={66}
+                          showMonthDropdown
+                          minDate={today}
+                        />
+                      </>
+                    ) : (
+                      <>
+                        <div className="i-calendario">
+                          <div className="i-icono-calendario">
+                            <FaCalendar/>
+                          </div>
+                        </div>
+                        <div className='i-fecha'>{iniciativa.fechaCierre}</div>
+                      </>
+                    )}
                   </div>
+
                 </div>
               </div>
 
               {/* Privacidad */}
               <div className="i-dato-container">
                 <div className="i-dato">
+                  {iniciativa.esPublica ? <FaUnlockAlt style={{marginRight: "5px"}}/> : <FaLock style={{marginRight: "5px"}}/>}
                   {iniciativa.esPublica ? "Pública" : "Privada"}
                 </div>
               </div>
@@ -239,6 +534,7 @@ export const Initiative = () => {
               {/* Ubicación */}
               <div className="i-dato-container">
                 <div className="i-dato">
+                  <FaGlobe style={{marginRight: "5px"}}/>
                   {iniciativa.region}
                 </div>
               </div>
@@ -250,8 +546,23 @@ export const Initiative = () => {
         <div className="i-desc">
           <div className="i-progreso-texto">Progreso</div>
           <ProgressBar progress={50} />
-          <div className="i-desc-texto">
-            {iniciativa.descripcion}
+        </div>
+
+        <div className="c-desc">
+          <div className="c-desc-texto">
+            {editingCampos ? (
+              <div className="c-desc-input">
+                <textarea className="c-desc-input-texto"
+                  value={nuevaDescripcion}
+                  onChange={handleDescripcionCambios}
+                  autoFocus
+                  maxLength={200} />
+                <div className="c-desc-conteo">
+                  {nuevaDescripcion ? `${nuevaDescripcion.length}/200` : `0/200`}
+                </div>
+            </div>) : (
+                iniciativa.descripcion
+            )}
           </div>
         </div>
           
@@ -278,7 +589,7 @@ export const Initiative = () => {
                             </div>
                             <div className="i-tarea-botones">
                               <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                              <div className="i-tarea-boton"><FaFolder /> Documento</div>
+                              <div className="i-tarea-boton" onClick={() => openUploadModal(tarea.idTarea)}><FaFolder /> Documento </div>
                             </div>
                           </div>
                         </div>
@@ -297,9 +608,11 @@ export const Initiative = () => {
           <div className="i-seccion-miembros">
             <div className="i-tipo-miembro">Dueño</div>
             {infoAdmin && 
-              <button type="button" className="i-btn-miembro">{infoAdmin.nombreUsuario}</button>
-              
-              
+              <div className="i-btn-miembro">
+                  <div className='i-btn-miembro-contenido'>
+                    {infoAdmin.nombreUsuario}
+                  </div>
+              </div>
             }
             <div className="i-tipo-miembro">Miembros</div>
             {miembros ? (
@@ -312,13 +625,17 @@ export const Initiative = () => {
                     <div>
                       {miembros.map((miembro, idMiembro) => (
                         <div key={idMiembro}>
-                          <button type="button" className="i-btn-miembro">{miembro.nombreUsuario}
-                          { esAdmin && (
-                          <span className="i-icono-elimina-miembro">
-                            <FaTimesCircle  onClick={() => handleMostrarEliminar(miembro, miembro.idUsuario)} disabled={eliminaBloqueado} className="i-icon-times-circle" />
-                          </span>
-                          )}
-                        </button>
+                          <div className="i-btn-miembro">
+                            <div className='i-btn-miembro-contenido' style={{width: '85%'}}>
+                              {miembro.nombreUsuario}
+                            </div>
+
+                            <div className='i-icon-estilos'>
+                              { esAdmin && (
+                                <FaTimesCircle  onClick={() => handleMostrarEliminar(miembro, miembro.idUsuario)} disabled={eliminaBloqueado} className="i-icon-times-circle" />
+                              )}
+                            </div>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -329,7 +646,7 @@ export const Initiative = () => {
                   No hay miembros.
                   </div>
                 )}
-                {!iniciativa.esPublica && (
+                {!iniciativa.esPublica && esAdmin && (
                   <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowModal}>
                   VER SOLICITUDES
                 </button>
@@ -339,7 +656,7 @@ export const Initiative = () => {
 
               <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
                 <div className="modalcontainer">
-                    <Modal.Header style={{ border: "none" }} closeButton> Solicitudes </Modal.Header>
+                    <Modal.Header style={{ border: "none" }}> Solicitudes </Modal.Header>
                     
                     <div>
                       {!usuariosRecibidos ? (
@@ -384,9 +701,34 @@ export const Initiative = () => {
         </div>
       )}
 
-      {/* Modal confirmar eliminar miembro*/}
+      {/* ----- Modales ----- */}
+
+      {/* Subir imagen */}
+      <Modal className="c-modal" show={modalImagen} onHide={handleCerrarImagen}>
+        <Modal.Header>
+          <div className="c-modal-title">Subir Imagen</div>
+        </Modal.Header>
+          
+        <div className="c-input-body">
+          <div {...getRootPropsImagen({ className: 'c-custom-file-button' })}>
+            <input {...getInputPropsImagen()} />
+            Subir foto
+          </div>
+          <span className="c-custom-file-text">
+            {imagenSeleccionada ? (imagenSeleccionada.name) : "Ninguna imagen seleccionada"}
+          </span>
+        </div>
+        {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
+
+        <Modal.Footer>
+          <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
+          <Button onClick={handleCerrarImagen}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal confirmar eliminar iniciativa*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <div className="ea-modal-title">Confirmar eliminación</div>
         </Modal.Header>
           <div className="ea-modal-body">
@@ -398,9 +740,9 @@ export const Initiative = () => {
         </Modal.Footer>
       </Modal>
       
-      {/* Modal miembro eliminado*/}
+      {/* Modal iniciativa eliminada*/}
       <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
-        <Modal.Header closeButton>
+        <Modal.Header>
           <div className="ea-modal-title">Éxito</div>
         </Modal.Header>
           <div className="ea-modal-body">
@@ -413,7 +755,7 @@ export const Initiative = () => {
       
       {/* Modal error eliminar*/}
       <Modal className="ea-modal" show={modalError} onHide={handleCerrarError}>
-        <Modal.Header closeButton>
+        <Modal.Header>
         <div className="ea-modal-title">Error</div>
         </Modal.Header>
           <div className="ea-modal-body">
@@ -421,6 +763,30 @@ export const Initiative = () => {
           </div>
         <Modal.Footer>
           <Button onClick={handleCerrarError}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+
+
+
+      <Modal className="p-modal" show={showUploadModal} onHide={closeUploadModal}>
+        <Modal.Header>
+          <div className='p-modal-title'>Archivos</div>
+        </Modal.Header>
+        
+        <div className="p-input-body">
+          <div {...getRootPropsTarea({ className: 'p-custom-file-button' })}>
+            <input {...getInputPropsTarea()} />
+            Subir archivo
+          </div>
+          <span className="p-custom-file-text">{selectedFile ? selectedFile.name : "Ningun archivo seleccionado"}</span>
+        </div>
+        {fileError && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{fileError}</span>}
+  
+        <Modal.Footer>
+          <Button onClick={handleUploadFile} disabled={uploadDisabled} style={{width: "118px"}}>
+            {uploadDisabled ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
+          </Button>
+          <Button onClick={closeUploadModal}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
 

@@ -64,7 +64,6 @@ export const Requests = () => {
   useEffect(() => {
     const fetchData = async () => {
       const solicitudes = await getSolicitudes("Usuarios", user);
-      console.log(solicitudes);
 
       let solicitudesEnviadasData = []
       let solicitudesRecibidasData = []
@@ -221,6 +220,7 @@ export const Requests = () => {
             esAdmin={esAdmin}
             esMiembro={esMiembro}
             suscribirDesactivado={suscribirDesactivado}
+            setSuscribirDesactivado={setSuscribirDesactivado}
             pagina = {"Requests"}
             /> 
         </div>

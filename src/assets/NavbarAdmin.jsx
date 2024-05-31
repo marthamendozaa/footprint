@@ -40,13 +40,13 @@ const NavbarAdmin = ({ isCreateOpen, toggleCreate }) => {
 
       {/* Páginas */}
       <li className={selectedTab === 'explore' ? 'selected' : ''} onClick={() => handleTabClick('explore')}>
-        <Link to="/exploreAdmin">
+        <Link to="/explore">
           <FaCompass /> {showText && 'Explora'}
         </Link>
       </li>
 
       <li className={selectedTab === 'profile' ? 'selected' : ''} onClick={() => handleTabClick('profile')}>
-        <Link to="/profileAdmin">
+        <Link to="/profile">
           <FaUser /> {showText && 'Perfil'}
         </Link>
       </li>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaFolder, FaPen, FaExclamationCircle } from 'react-icons/fa';
+import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock } from 'react-icons/fa';
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
 import DatePicker from "react-datepicker";
@@ -203,9 +203,6 @@ export const Create = () => {
   const handleSeleccionaPrivacidad = (privacidad) => {
     setEsPublica(privacidad);
     setDropdownPrivacidad(false);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
   };
 
 
@@ -215,7 +212,6 @@ export const Create = () => {
   const [buscaRegion, setBuscaRegion] = useState("");
   const [resultadosRegion, setResultadosRegion] = useState([]);
   const [dropdownRegion, setDropdownRegion] = useState(false);
-  const inputRef = useRef(null);
   
 
   // Búsqueda regiones
@@ -238,10 +234,28 @@ export const Create = () => {
   const handleSeleccionaRegion = (region) => {
     setRegion(region);
     setDropdownRegion(false);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
   };
+
+
+  // Cerrar dropdowns al hacer click fuera de ellos
+  const dropdownPrivacidadRef = useRef(null);
+  const dropdownRegionRef = useRef(null);
+
+  useEffect(() => {
+    const handleCerrarDropdown = (event) => {
+      if (dropdownPrivacidadRef.current && !dropdownPrivacidadRef.current.contains(event.target)) {
+        setDropdownPrivacidad(false);
+      }
+      if (dropdownRegionRef.current && !dropdownRegionRef.current.contains(event.target)) {
+        setDropdownRegion(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleCerrarDropdown);
+    return () => {
+      document.removeEventListener('mousedown', handleCerrarDropdown);
+    };
+  }, []);
   
 
   // Subir imagen
@@ -434,9 +448,7 @@ export const Create = () => {
                     {/* Fecha inicio */}
                     <div className="c-calendario-input">
                       <div className="c-calendario" onClick={handleCambioFechaInicio}>
-                        <div className="c-icono-calendario">
-                          <FaCalendar/>
-                        </div>
+                        <FaCalendar/>
                       </div>
                       <DatePicker
                         className='react-datepicker__input-container-create'
@@ -454,9 +466,7 @@ export const Create = () => {
                     {/* Fecha cierre */}
                     <div className="c-calendario-input">
                       <div className="c-calendario" onClick={handleCambioFechaCierre}>
-                        <div className="c-icono-calendario">
-                          <FaCalendar/>
-                        </div>
+                        <FaCalendar/>
                       </div>
                       <DatePicker
                         className='react-datepicker__input-container-create'
@@ -467,12 +477,14 @@ export const Create = () => {
                         locale={es}
                       />
                     </div>
+                    
                   </div>
                 </div>
 
                 {/* Seleccionar privacidad */}
-                <div className="c-dropdown-container">
+                <div className="c-dropdown-container" ref={dropdownPrivacidadRef}>
                   <button className="c-selecciona-dropdown" onClick={() => setDropdownPrivacidad(!dropdownPrivacidad)}>
+                    {esPublica ? <FaUnlockAlt style={{marginRight: "5px"}}/> : <FaLock style={{marginRight: "5px"}}/>}
                     <span>{esPublica ? "Pública" : "Privada"}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
                       <path fillRule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -488,8 +500,9 @@ export const Create = () => {
                 </div>
                 
                 {/* Agregar región */}
-                <div className="c-dropdown-container">
+                <div className="c-dropdown-container" ref={dropdownRegionRef}>
                   <button className="c-selecciona-dropdown" onClick={() => setDropdownRegion(!dropdownRegion)}>
+                    <FaGlobe style={{marginRight: "5px"}}/>
                     <span className="mr-2">{region ? region : "Ubicación"}</span>
                       <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
                         <path fillRule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -647,7 +660,7 @@ export const Create = () => {
           
           {/* Error campos vacíos */}
           <Modal className="c-modal" show={modalError} onHide={handleCerrarError}>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <div className="c-modal-title">Error</div>
             </Modal.Header>
               <div className="c-modal-body" style={{textAlign:'left'}}>
@@ -668,7 +681,7 @@ export const Create = () => {
 
           {/* Tarea campos vacíos */}
           <Modal className="c-modal" show={modalTarea} onHide={handleCerrarTarea}>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <div className="c-modal-title">Error</div>
             </Modal.Header>
               <div className="c-modal-body" style={{textAlign:'left'}}>
@@ -681,7 +694,7 @@ export const Create = () => {
           
           {/* Iniciativa creada */}
           <Modal className="c-modal" show={modalCreada} onHide={handleCerrarCreada}>
-            <Modal.Header closeButton>
+            <Modal.Header>
               <div className="c-modal-title">Éxito</div>
             </Modal.Header>
               <div className="c-modal-body">
