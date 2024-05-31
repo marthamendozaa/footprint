@@ -315,7 +315,7 @@ li.c-etiqueta-item:hover {
   font-weight: 600;
   font-size: 20px;
   color: #121212;
-  word-break: break-all;
+  word-break: break-word;
 }
 
 .c-desc-input {
@@ -379,10 +379,12 @@ li.c-etiqueta-item:hover {
 .c-btn-agregar-tarea,
 .c-btn-invitar-miembro {
   display: flex;
+  align-items: center;
   background-color: #A0C1BF;
   border-radius: 25px;
-  font-size: 17px;
-  padding: 10px 25px;
+  font-size: 16px;
+  padding: 0px 20px;
+  height: 44px;
   font-weight: 600;
 }
 
@@ -419,10 +421,11 @@ input.c-tarea-titulo {
   background: none;
   border: none;
   padding: 0;
+  font-weight: 600;
 }
 
 .c-tarea-texto {
-  font-size: 14px;
+  font-size: 16px;
   width: 100%;
 }
 
@@ -430,7 +433,7 @@ input.c-tarea-titulo {
   display: flex;
   width: 100%;
   flex-wrap: wrap;
-  word-break: break-all;
+  word-break: break-word;
   text-align: left;
 }
 

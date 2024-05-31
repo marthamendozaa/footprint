@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock } from 'react-icons/fa';
+import { IoMdAddCircleOutline } from "react-icons/io";
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
 import DatePicker from "react-datepicker";
@@ -551,6 +552,7 @@ export const Create = () => {
           <div className="c-tareas-miembros">
             <div className="c-seccion-tareas">
               <button type="button" className="c-btn-agregar-tarea" onClick={handleCrearTarea}>
+                <IoMdAddCircleOutline style={{marginRight: "5px"}}/>
                 Añadir tarea
               </button>
               <div className="c-tareas-container">
@@ -623,7 +625,10 @@ export const Create = () => {
 
 
             <div className="c-seccion-miembros">
-              <div className="c-btn-invitar-miembro">Invitar miembro</div>
+              <div className="c-btn-invitar-miembro">
+                <IoMdAddCircleOutline style={{marginRight: "5px"}}/>
+                Invitar miembro
+              </div>
             </div>
           </div>
           
