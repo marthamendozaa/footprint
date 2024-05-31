@@ -1,6 +1,5 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import { ClipLoader } from 'react-spinners';
 import { Link } from 'react-router-dom';
 import './ModalIniciativa.css';
@@ -59,12 +58,12 @@ const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCre
                             </Link>
                         ) : (
                             selectedIniciativa && selectedIniciativa.esPublica ? (
-                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleSuscribirse} style={{width: "119px"}}>
-                                  {suscribirCargando ? <ClipLoader size={24} color="#fff" /> : 'Suscribirme'}
+                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleSuscribirse} style={{width: "120px"}}>
+                                  {suscribirCargando ? <ClipLoader size={24} color="#000" /> : 'Suscribirme'}
                                 </button>
                             ) : (
-                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud} style={{width: "146px"}}>
-                                  {suscribirCargando ? <ClipLoader size={24} color="#fff" /> : 'Solicitar unirme'}
+                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud} style={{width: "155px"}}>
+                                  {suscribirCargando ? <ClipLoader size={24} color="#000" /> : 'Solicitar unirme'}
                                 </button>
                             )  
                         )

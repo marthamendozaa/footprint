@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
 .c-container {
   display: flex;
   width: 1000px;
@@ -167,27 +169,22 @@ li.c-etiqueta-item:hover {
 
 .c-calendario {
   display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
   width: 100px;
   font-size: 25px;
   background-color: #A0C1BF;
   border-radius: 25px;
   cursor: pointer;
-  flex-direction: column;
-  align-items: center;
 }
 
 .c-calendario:hover {
   box-shadow: 0 0 0 3px #699AA0;
 }
 
-.c-icono-calendario {
-  width: 50px;
-  height: 50px;
-}
-
 .react-datepicker__input-container-create {
   width: 100px;
-  font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: 12px;
   text-align: center;
@@ -198,7 +195,6 @@ li.c-etiqueta-item:hover {
 
 .react-datepicker-2 {
   width: 100px;
-  font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: 12px;
   text-align: center;
@@ -227,11 +223,12 @@ li.c-etiqueta-item:hover {
 }
 
 .c-selecciona-dropdown {
+  display: flex;
+  align-items: center;
   position: relative;
-  display: inline-flex;
+  height: 44px;
   width: 180px;
-  padding: 8px 16px;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   background-color: #A0C1BF;
   border: none;
@@ -267,17 +264,20 @@ li.c-etiqueta-item:hover {
 }
 
 .c-dropdown-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 16px;
   color: #4a5568;
   background-color: #ffffff;
   cursor: pointer;
   border-radius: 25px;
   user-select: none;
+  font-size: 14px;
 }
 
 .c-dropdown-item:hover {
-  background-color: #f7fafc;
+  background-color: #e8e8e8;
 }
 
 /* Búsqueda dropdown */
@@ -286,14 +286,14 @@ li.c-etiqueta-item:hover {
   padding: 8px 16px;
   font-size: 14px;
   color: #4a5568;
-  border: 1px solid #cbd5e0;
+  border: 1px solid #e8e8e8;
   border-radius: 25px;
   outline: none;
 }
 
 .c-dropdown-input:focus,
 .c-dropdown-input:hover {
-  border-color: #2563eb;
+  border-color: #b6b6b6;
 }
 
 /* Descripción */
@@ -452,7 +452,7 @@ input.c-tarea-titulo {
 .c-tarea-boton {
   background-color: #A0C1BF;
   border-radius: 25px;
-  font-size: 14px;
+  font-size: 12px;
   padding: 5px 10px;
   text-align: center;
 }
@@ -485,9 +485,13 @@ input.c-tarea-titulo {
 }
 
 .c-btn-crear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 25px;
   font-weight: 600;
-  width: 130px;
+  width: 135px;
+  height: 50px;
   padding: 10px 30px;
   background-color: #A0C1BF;
   border-radius: 30px;
@@ -502,7 +506,6 @@ input.c-tarea-titulo {
   display: flex;
   padding: 20px;
   width: 500px;
-  font-family: "Inter", sans-serif;
   justify-content: center;
   align-items: center;
   flex-direction: row;
@@ -565,7 +568,6 @@ input.c-tarea-titulo {
 
 .c-modal-body {
   padding: 16px;
-  font-family: "Inter", sans-serif;
 }
 
 .c-modal .modal-header,
@@ -587,7 +589,6 @@ input.c-tarea-titulo {
 .c-modal-title {
   font-weight: 600;
   font-size: 30px;
-  font-family: "Inter", sans-serif;
 }
 
 .c-modal .btn.btn-primary {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle  } from 'react-icons/fa';
+import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock } from 'react-icons/fa';
 import { useDropzone } from 'react-dropzone';
 import { useAuth } from '../../contexts/AuthContext';
 import { Spinner, Modal, Button } from 'react-bootstrap';
@@ -425,9 +425,7 @@ export const Initiative = () => {
                   {/* Fecha inicio */}
                   <div className="i-calendario-container">
                     <div className="i-calendario">
-                      <div className="i-icono-calendario">
-                        <FaCalendar/>
-                      </div>
+                      <FaCalendar/>
                     </div>
                     <div className='i-fecha'>{iniciativa.fechaInicio}</div>
                   </div>
@@ -440,9 +438,7 @@ export const Initiative = () => {
                     {editingCampos ? (
                       <>
                         <div className="i-calendario" onClick={handleCambioFechaCierre}>
-                          <div className="i-icono-calendario">
-                            <FaCalendar/>
-                          </div>
+                          <FaCalendar/>
                         </div>
                         <DatePicker
                           className='react-datepicker__input-container-create'
@@ -476,6 +472,7 @@ export const Initiative = () => {
               {/* Privacidad */}
               <div className="i-dato-container">
                 <div className="i-dato">
+                  {iniciativa.esPublica ? <FaUnlockAlt style={{marginRight: "5px"}}/> : <FaLock style={{marginRight: "5px"}}/>}
                   {iniciativa.esPublica ? "Pública" : "Privada"}
                 </div>
               </div>
@@ -483,6 +480,7 @@ export const Initiative = () => {
               {/* Ubicación */}
               <div className="i-dato-container">
                 <div className="i-dato">
+                  <FaGlobe style={{marginRight: "5px"}}/>
                   {iniciativa.region}
                 </div>
               </div>
