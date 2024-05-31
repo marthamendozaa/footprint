@@ -138,6 +138,21 @@ export const eliminarMiembro = async (iniciativa, user) => {
 };
 
 
+// Eliminar una iniciativa
+export const eliminarSolicitud = async (idSolicitud) => {
+  const response = await axios.post(`${functionsURL}/eliminaSolicitud`, {
+    solicitud: idSolicitud,
+  });
+  if (response.data.success) {
+    console.log("Solicitud eliminada exitosamente");
+    return response.data.data;
+  } else {
+    console.log("Error eliminando solicitud");
+    throw new Error(response.data.error);
+  }
+};
+
+
 // Subir imágenes a Storage
 export const subirImagen = async (imagen, path) => {
   const formData = new FormData();
@@ -422,6 +437,7 @@ export const getMisTareas = async (idTarea) => {
   }
 };
 
+
 // Obtener miembros de la iniciativa
 export const getMiembros = async (idIniciativa) => {
   try {
@@ -438,6 +454,7 @@ export const getMiembros = async (idIniciativa) => {
     throw new Error(error);
   }
 }
+
 
 export const sendMail = async (idIniciativa) => {
   try {
@@ -476,13 +493,13 @@ export const sendMail = async (idIniciativa) => {
   }
 }
 
+
 export const sendRemoveMail = async (idIniciativa, idUsuario) => {
   try {
     const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
     const iniciativaDoc = await getDoc(iniciativaRef);
     const iniciativaData = iniciativaDoc.data();
     console.log(iniciativaData);
-    const idAdmin = iniciativaData.idAdmin;
     const titulo = iniciativaData.titulo;
 
     const userRef = doc(firestore, "Usuarios", idUsuario);
@@ -496,6 +513,49 @@ export const sendRemoveMail = async (idIniciativa, idUsuario) => {
       titulo: titulo,
       nombre: nombre,
       correo: correo
+    });
+
+    if (response.data.success) {
+      console.log("Envio de correo exitoso");
+      return;
+    } else {
+      console.log("Error enviando correo");
+      throw new Error(response.data.error);
+    }
+
+  } catch (error) {
+    console.log("Error sending email");
+    throw new Error(error);
+  }
+}
+
+
+export const sendTareaMail = async (idIniciativa, idUsuario, idTarea) => {
+  try {
+    const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
+    const iniciativaDoc = await getDoc(iniciativaRef);
+    const iniciativaData = iniciativaDoc.data();
+    console.log(iniciativaData);
+    const titulo = iniciativaData.titulo;
+
+    const userRef = doc(firestore, "Usuarios", idUsuario);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    console.log(userData);
+    const correo = userData.correo;
+    const nombre = userData.nombre;
+
+    const tareaRef = doc(firestore, "Tareas", idTarea);
+    const tareaDoc = await getDoc(tareaRef);
+    const tareaData = tareaDoc.data();
+    console.log(tareaData);
+    const tituloTarea = tareaData.titulo;
+
+    const response = await axios.post(`${functionsURL}/sendTareaMails`, {
+      titulo: titulo,
+      nombre: nombre,
+      correo: correo,
+      tituloTarea: tituloTarea
     });
 
     if (response.data.success) {
