@@ -52,11 +52,7 @@ export const Login = () => {
       const admin = await getUsuario(user);
       setAdmin(admin.esAdmin);
 
-      if (admin.esAdmin) {
-        navigate('/exploreAdmin');
-      } else {
-        navigate('/explore');
-      }
+      navigate('/explore');
     } catch (error) {
       console.error("Error al hacer login:", error.message);
       setError('Inicio de sesión fallido. Verifica tu correo y contraseña.');

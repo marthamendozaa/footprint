@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { FaPen } from 'react-icons/fa';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Button, Modal } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
-import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
+import { FaPen, FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { autentificaUsuario, getUsuario, actualizaUsuario, actualizaContrasena, getHabilidades, getIntereses, subirImagen } from '../../api/api.js';
@@ -16,7 +15,7 @@ export const Profile = () => {
   // Cerrar sesión
   const [sesionCerrada, setSesionCerrada] = useState(false);
   const [showModalSesionCerrada, setShowModalSesionCerrada] = useState(false);
-  const { user, setUser, setAdmin } = useAuth();
+  const { user, admin, setUser, setAdmin } = useAuth();
   const navigate = useNavigate();
   
   const openModalSesionCerrada = () => {
@@ -58,7 +57,7 @@ export const Profile = () => {
   }, [sesionCerrada]);
 
 
-  // Modal de erroes
+  // Modal de errores
   const [showModalError, setShowModalError] = useState(false);
   const [errorMensaje, setErrorMensaje] = useState('');
   
@@ -365,9 +364,11 @@ export const Profile = () => {
               
               <div className="p-info">
                 {/* Edad */}
-                <div className="profile-icons-text">
-                  <p> <span> Edad: </span> {usuario.edad} años</p>
-                </div>
+                {!admin && 
+                  <div className="profile-icons-text">
+                    <p> <span> Edad: </span> {usuario.edad} años</p>
+                  </div>
+                }
 
                 {/* Usuario */}
                 <div className="profile-icons-text">
@@ -395,28 +396,32 @@ export const Profile = () => {
           </div>
 
           {/* Intereses */}
-          <div className="intereses-container">
-            <h3>Temas de interés</h3> 
-            <div className='p-etiquetas'>
-              {Object.values(intereses).map((interes, idInteres) => (
-                <li key={idInteres} className={`p-etiquetas-item  ${Object.values(usuario.listaIntereses).includes(interes) ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
-                  {interes}
-                </li>
-              ))}
+          {!admin && (
+            <div className="intereses-container">
+              <h3>Temas de interés</h3> 
+              <div className='p-etiquetas'>
+                {Object.values(intereses).map((interes, idInteres) => (
+                  <li key={idInteres} className={`p-etiquetas-item  ${Object.values(usuario.listaIntereses).includes(interes) ? "highlighted" : ""}`} onClick={() => toggleInteres(interes, idInteres)}>
+                    {interes}
+                  </li>
+                ))}
+              </div>
             </div>
-          </div>
-
+          )}
+          
           {/* Habilidades */}
-          <div className="habilidades-container">
-            <h3>Habilidades</h3>
-            <div className='p-etiquetas'>
-              {Object.values(habilidades).map((habilidad, idHabilidad) => (
-                <li key={idHabilidad} className={`p-etiquetas-item ${Object.values(usuario.listaHabilidades).includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
-                  {habilidad}
-                </li>
-              ))}
+          {!admin && (
+            <div className="habilidades-container">
+              <h3>Habilidades</h3>
+              <div className='p-etiquetas'>
+                {Object.values(habilidades).map((habilidad, idHabilidad) => (
+                  <li key={idHabilidad} className={`p-etiquetas-item ${Object.values(usuario.listaHabilidades).includes(habilidad) ? "highlighted" : ""}`} onClick={() => toggleHabilidad(habilidad, idHabilidad)}>
+                    {habilidad}
+                  </li>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Botón para cerrar sesión */}
           <div className="perfil-logout" style={{borderRadius: "18px"}}>
@@ -441,7 +446,7 @@ export const Profile = () => {
             {errorI && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
       
             <Modal.Footer>
-              <Button onClick={handleUploadProfileImage} disabled={imagenDesactivado} style={{width: "118px"}}>
+              <Button onClick={handleUploadProfileImage} disabled={imagenDesactivado} style={{width: "130px"}}>
                 {imagenDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
               </Button>
               <Button onClick={closeModal}>Cerrar</Button>
@@ -561,7 +566,7 @@ export const Profile = () => {
             {error && <p className='p-error-cc' style={{marginTop: '310px'}}><FaExclamationCircle className='p-fa-ec-2'/>{error}</p>}
             
             <Modal.Footer>
-              <Button onClick={handleSubmitPassword} style={{width: "118px"}} disabled={fieldsEmpty || passwordStrength < 4 || !passwordsMatch || contrasenaDesactivado}>
+              <Button onClick={handleSubmitPassword} style={{width: "130px"}} disabled={fieldsEmpty || passwordStrength < 4 || !passwordsMatch || contrasenaDesactivado}>
                 {contrasenaDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
               </Button>
               <Button onClick={closeModalContrasena}>Cerrar</Button>
@@ -585,7 +590,7 @@ export const Profile = () => {
         </header>
       
       ) : (
-        <div className="spinner">
+        <div className="spinner" style={{justifyContent: "center", width: "100%"}}>
           <Spinner animation="border" role="status"></Spinner>
         </div>
       )}

@@ -52,7 +52,6 @@
     margin-left: 35px;
     margin-right: 35px;
     height: 312px;
-    /*overflow-y: auto;*/
 }
 
 .habilidades-register4::-webkit-scrollbar {
@@ -82,12 +81,11 @@ li.r4-etiquetas-item {
     max-width: calc(47% - 8px);
     min-width: calc(47% - 8px);
     cursor: pointer;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
 }
   
 li.r4-etiquetas-item.highlighted {
-    background-color: #bcd9e7;
     border: 3px solid #000;
 }
   

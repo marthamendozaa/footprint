@@ -118,7 +118,7 @@ export const Register4 = ({ onPrev, usuario }) => {
                             
                             {/* Terminar con registro */}
                             <div className='flecha-register4-container-end'>
-                                <button type="submit" className="btn flecha-btn" disabled={Object.keys(habilidadesUsuario).length === 0} style={{width: "100px"}}>
+                                <button type="submit" className="btn flecha-btn" disabled={Object.keys(habilidadesUsuario).length === 0} style={{width: "125px"}}>
                                     {/*<FaArrowRight />*/}
                                     {terminarDesactivado ? <ClipLoader size={24} color="#6b6b6b" /> : 'Terminar'}
                                 </button>

@@ -16,6 +16,10 @@ body::-webkit-scrollbar {
   align-items: flex-start;
 }
 
+.e-contenido {
+  width: 100%;
+}
+
 /* Barra de búsqueda */
 .e-searchBar {
   display: flex;
@@ -23,7 +27,7 @@ body::-webkit-scrollbar {
   width: 100%;
 }
 
-.e-icons{
+.e-icons {
   display: flex;
   position: absolute;
   margin-left: 20px;
@@ -34,20 +38,89 @@ body::-webkit-scrollbar {
   padding: 15px;
   width: 100%;
   border-radius: 30px;
-  border: #000000 4px solid;
   padding-left: 45px;
+  border: 2px #e8e8e8 solid;
+  box-shadow: #e8e8e8 2px 4px 0px 0px;
 }
 
 .e-searchBarCaja:focus-visible {
   outline: none;
+  border: 2px #b6b6b6 solid;
+  box-shadow: #b6b6b6 2px 4px 0px 0px;
+}
+
+/* Filtros */
+.e-filtros-container {
+  display: flex;
+  width: 75%;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 20px;
+}
+
+.e-filtros-titulo {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.e-filtros-borrar {
+  color: #000;
+  user-select: none;
+}
+
+.e-filtros-borrar:hover {
+  color: #b6b6b6;
+  cursor: pointer;
+}
+
+/* Dropdown */
+.e-selecciona-dropdown {
+  position: relative;
+  display: inline-flex;
+  width: 180px;
+  padding: 8px 16px;
+  font-size: 20px;
+  font-weight: 600;
+  background-color: #fff;
+  border-radius: 25px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  border: 2px #e8e8e8 solid;
+  box-shadow: #e8e8e8 2px 4px 0px 0px;
+  font-family: "Poppins", sans-serif;
+}
+
+.e-selecciona-dropdown:hover {
+  border: 2px #b6b6b6 solid;
+  box-shadow: #b6b6b6 2px 4px 0px 0px;
+}
+
+.e-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  color: #4a5568;
+  background-color: #ffffff;
+  cursor: pointer;
+  border-radius: 25px;
+  user-select: none;
+  font-size: 14px;
+}
+
+.e-dropdown-item input {
+  margin-right: 10px;
+}
+
+.e-dropdown-item:hover {
+  background-color: #e8e8e8;
 }
 
 /* Iniciativas */
 .e-iniciativas-container {
   display: flex;
   width: 100%;
-  flex-wrap:wrap;
+  flex-wrap: wrap;
   overflow: overlay;
+  padding-bottom: 10px;
 }
 
 .e-iniciativa {
@@ -59,9 +132,15 @@ body::-webkit-scrollbar {
   margin-right: 5px;
   color: #212529;
   border-radius: 20px;
-  border: #A0C1BF 4px solid;
   position: relative;
   max-width: 240px;
+  border: 2px #e8e8e8 solid;
+  box-shadow: #e8e8e8 2px 4px 0px 0px;
+}
+
+.e-iniciativa:hover {
+  border: 2px #b6b6b6 solid;
+  box-shadow: #b6b6b6 2px 4px 0px 0px;
 }
 
 .e-iniciativa-admin {
@@ -81,11 +160,6 @@ body::-webkit-scrollbar {
   margin-right: 10px;
 }
 
-.e-iniciativa:hover {
-  border: #000 4px solid;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 4px 4px 0px;
-}
-
 .e-iniciativa-imagen img {
   width: 236.9px;
   max-width: 100%;
@@ -102,7 +176,7 @@ body::-webkit-scrollbar {
   padding: 15px;
 }
 
-.e-corazon {
+.e-boton {
   display: flex;
   width: 100%;
   height: 100%;
@@ -122,4 +196,66 @@ body::-webkit-scrollbar {
   font-weight: 600;
   word-wrap: break-word;
   text-align: justify;
+}
+
+/* Modal eliminar iniciativas */
+.fade.ea-modal.modal.show {
+  display: flex !important;
+  align-items: center;
+}
+
+.ea-modal .modal-content {
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  padding: 10px;
+  font-size: 20px;
+  text-align: center;
+}
+
+.ea-modal-body {
+  padding: 16px;
+}
+
+.ea-modal .modal-header,
+.ea-modal .modal-footer {
+  border: none;
+  padding: 0;
+}
+
+.ea-modal .modal-footer {
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+.ea-modal .modal-header .btn-close {
+  position: absolute;
+  right: 5%;
+}
+
+.ea-modal-title {
+  font-weight: 600;
+  font-size: 30px;
+}
+
+.ea-modal .btn.btn-primary {
+  color: #000;
+  background-color: #A0C1BF;
+  padding: 10px 30px;
+  font-weight: 600;
+  border: none;
+  border-radius: 30px;
+}
+
+.ea-modal .btn.btn-primary:hover {
+  background-color: #699AA0;
+}
+
+.ea-modal .eliminar.btn.btn-primary {
+  background-color: #f09e9e;
+  
+}
+
+.ea-modal .eliminar.btn.btn-primary:hover {
+  background-color: rgb(224, 99, 99);
 }
