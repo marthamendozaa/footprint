@@ -313,7 +313,7 @@ export const Initiative = () => {
     },
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
-        setSelectedImageFile(acceptedFiles[0]);
+        setImagenSeleccionada(acceptedFiles[0]);
         setFileError('');
       }
     }
