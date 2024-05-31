@@ -409,7 +409,7 @@ export const Create = () => {
               {/* Cambiar título */}
               <div className="c-titulo">
                 {editandoTitulo ? (
-                  <div className="c-titulo-input">
+                  <div className="c-titulo-input" style={{height: "105px"}}>
                     <input
                       type="text"
                       className="c-titulo-input-texto"
