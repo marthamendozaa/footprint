@@ -193,7 +193,7 @@ li.c-etiqueta-item:hover {
   text-align: center;
   background: none;
   border: 2px solid #699AA0;
-  border-radius: 3px;
+  border-radius: 15px;
 }
 
 .react-datepicker-2 {
@@ -488,7 +488,7 @@ input.c-tarea-titulo {
 }
 
 .c-btn-crear:hover {
-  box-shadow: 0 0 0 3px #000;
+  background-color: #7d9795;
 }
 
 /* Modal subir imagen */
