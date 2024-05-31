@@ -5,7 +5,7 @@ const isEmulator = JSON.parse(import.meta.env.VITE_EMULATOR);
 // LECTURAS CON FIREBASE CLIENT
 
 // Firebase Client SDK
-import { query, where, doc, collection, getDoc, getDocs, connectFirestoreEmulator } from "firebase/firestore";
+import { query, where, orderBy, doc, collection, getDoc, getDocs, connectFirestoreEmulator } from "firebase/firestore";
 import firestore from "../api/firebase-config";
 
 if (isEmulator) {
@@ -107,7 +107,8 @@ export const getIniciativa = async (idIniciativa) => {
 // Información de todas las iniciativas
 export const getIniciativas = async () => {
   try {
-    const iniciativasRef = await getDocs(collection(firestore, "Iniciativas"));
+    const q = query(collection(firestore, "Iniciativas"), orderBy("fechaCreacion", "asc"));
+    const iniciativasRef = await getDocs(q);
     let iniciativas = [];
     for (const docRef of iniciativasRef.docs) {
       iniciativas.push(docRef.data());
@@ -376,7 +377,7 @@ export const eliminaIniciativa = async (iniciativa, user) => {
   });
   if (response.data.success) {
     console.log("Eliminar iniciativa exitoso");
-    return response.data.data;
+    return response.data.success;
   } else {
     console.log("Error eliminando iniciativa");
     throw new Error(response.data.error);
