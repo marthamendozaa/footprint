@@ -24,7 +24,7 @@ export const Initiative = () => {
    setModalEliminar(true);
  }
 
- // Modal de iniciativa eliminada
+ // Modal de miembro eliminado
  const [modalEliminada, setModalEliminada] = useState(false);
  const handleMostrarEliminada = () => setModalEliminada(true);
  const handleCerrarEliminada = async () => {
@@ -39,7 +39,7 @@ export const Initiative = () => {
  const handleMostrarError = () => setModalError(true);
  const handleCerrarError = () => setModalError(false);
 
- // Eliminar iniciativa
+ // Eliminar miembro
  const [eliminaBloqueado, setEliminaBloqueado] = useState(false);
 
  const handleEliminaMiembro = async () => {
@@ -773,7 +773,7 @@ export const Initiative = () => {
         </Modal.Footer>
       </Modal>
       
-      {/* Modal iniciativa eliminada*/}
+      {/* Modal miembro eliminado*/}
       <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
         <Modal.Header>
           <div className="ea-modal-title">Éxito</div>

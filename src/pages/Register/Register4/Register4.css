@@ -139,6 +139,10 @@ li.r4-etiquetas-item:hover {
     color: #000000;
 }
 
+.flecha-register4-container-end button.btn:active {
+  border: none;
+}
+
 .pop-up-register4 {
     position: fixed;
     top: 0;

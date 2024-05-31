@@ -378,12 +378,7 @@ export const Explore = () => {
   // Modal de iniciativa eliminada
   const [modalEliminada, setModalEliminada] = useState(false);
   const handleMostrarEliminada = () => setModalEliminada(true);
-  const handleCerrarEliminada = async () => {
-    setModalEliminada(false);
-    const iniciativasData = iniciativas.filter(iniciativa => iniciativa.idIniciativa !== seleccionada.idIniciativa);
-    setIniciativas(iniciativasData);
-    setIniciativasFiltradas(iniciativasData);
-  }
+  const handleCerrarEliminada = () => setModalEliminada(false);
 
   // Modal de error
   const [modalError, setModalError] = useState(false);
@@ -395,16 +390,22 @@ export const Explore = () => {
 
   const handleEliminaIniciativa = async () => {
     setEliminaBloqueado(true);
-    sendMail(seleccionada.idIniciativa);
 
     try {
+      await sendMail(seleccionada.idIniciativa);
       await eliminaIniciativa(seleccionada.idIniciativa);
+
+      const iniciativasData = iniciativas.filter(iniciativa => iniciativa.idIniciativa !== seleccionada.idIniciativa);
+      setIniciativas(iniciativasData);
+      setIniciativasFiltradas(iniciativasData);
+
+      handleCerrarEliminar();
+      handleMostrarEliminada();
     } catch (error) {
+      handleCerrarEliminar();
       handleMostrarError();
     } finally {
       setEliminaBloqueado(false);
-      handleCerrarEliminar();
-      handleMostrarEliminada();
     }
   };
 

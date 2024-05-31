@@ -1,15 +1,60 @@
 import { useEffect, useState } from 'react';
-import { Spinner } from 'react-bootstrap';
+import { Spinner, Modal, Button } from 'react-bootstrap';
 import { FaCheckCircle, FaTimesCircle, FaHourglass, FaTrash } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { getSolicitudes, getIniciativa } from '../../api/api.js';
+import { getSolicitudes, getIniciativa, eliminarSolicitud } from '../../api/api.js';
+import { useParams } from 'react-router-dom';
 import './Requests.css';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 
 export const Requests = () => {
+  // Solicitud seleccionada a eliminar
+  const [idSolicitudEliminar, setIdSolicitudEliminar] = useState(null);
+
+  // Modal de confirmación de eliminación
+  const [modalEliminar, setModalEliminar] = useState(false);
+  const handleCerrarEliminar = () => setModalEliminar(false);
+  const handleMostrarEliminar = (idSolicitud) => {
+    setIdSolicitudEliminar(idSolicitud);
+    setModalEliminar(true);
+  }
+
+  // Modal de solicitud eliminada
+  const [modalEliminada, setModalEliminada] = useState(false);
+  const handleMostrarEliminada = () => setModalEliminada(true);
+  const handleCerrarEliminada = async () => {
+    setModalEliminada(false);
+  }
+
+  // Modal de error
+  const [modalError, setModalError] = useState(false);
+  const handleMostrarError = () => setModalError(true);
+  const handleCerrarError = () => setModalError(false);
+
+  // Eliminar miembro
+  const [eliminaBloqueado, setEliminaBloqueado] = useState(false);
+
+  const handleEliminaSolicitud = async () => {
+    console.log("Eliminando solicitud con id: ", idSolicitudEliminar);
+    handleCerrarEliminar();
+    setEliminaBloqueado(true);
+
+    try {
+      await eliminarSolicitud(idSolicitudEliminar);
+      handleMostrarEliminada();
+      setSolicitudesEnviadas(solicitudesEnviadas.filter(solicitud => solicitud.idSolicitud !== idSolicitudEliminar));
+      setIniciativasEnviadas(iniciativasEnviadas.filter(iniciativa => iniciativa.idSolicitud !== idSolicitudEliminar));
+    } catch(error) {
+      handleMostrarError();
+    } finally {
+      setEliminaBloqueado(false);
+    }
+  };
+
   const { user } = useAuth();
   
   // Información de solicitudes del usuario
+  const { idSolicitud } = useParams();
   const [solicitudesEnviadas, setSolicitudesEnviadas] = useState(null);
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
 
@@ -25,8 +70,7 @@ export const Requests = () => {
       for (const solicitud of solicitudes) {
         if (solicitud.tipoInvitacion == "UsuarioAIniciativa") {
           solicitudesEnviadasData.push(solicitud);
-        }
-        else if (solicitud.tipoInvitacion == "IniciativaAUsuario") {
+        } else if (solicitud.tipoInvitacion == "IniciativaAUsuario") {
           solicitudesRecibidasData.push(solicitud);
         }
       }
@@ -36,7 +80,7 @@ export const Requests = () => {
       let iniciativasEnviadasData = []
       for (const solicitud of solicitudesEnviadasData){
         const iniciativa = await getIniciativa(solicitud.idIniciativa);
-        iniciativasEnviadasData.push(iniciativa);
+        iniciativasEnviadasData.push({ ...iniciativa, idSolicitud: solicitud.idSolicitud });
       }
 
       let iniciativasRecibidasData = []
@@ -46,11 +90,11 @@ export const Requests = () => {
       }
 
       setIniciativasEnviadas(iniciativasEnviadasData);
-      setIniciativasRecibidas(iniciativasRecibidasData)
+      setIniciativasRecibidas(iniciativasRecibidasData);
 
     };
     fetchData();
-  }, []);
+  }, [user]);
 
   const [showModal, setShowModal] = useState(false);
   const [selectedIniciativa, setSelectedIniciativa] = useState(null);
@@ -70,11 +114,11 @@ export const Requests = () => {
     }
     setSuscribirDesactivado(true);
     setShowModal(true);
-}
+  };
   
   const handleCrearSolicitud = async() =>{
     setSuscribirDesactivado(true);
-  }
+  };
 
   return (
     <div>
@@ -114,8 +158,8 @@ export const Requests = () => {
                       </div>
 
                       {/* Basura */}
-                      <div className='fa-4'>
-                        <button className='fa-5-button'> <FaTrash/> </button>
+                      <div className='fa-4' onClick={(e) => e.stopPropagation()}>
+                        <button className='fa-5-button'> <FaTrash onClick={() => handleMostrarEliminar(solicitudesEnviadas[index].idSolicitud)} disabled={eliminaBloqueado}/> </button>
                       </div>
                     </div>
                   </div>    
@@ -185,6 +229,47 @@ export const Requests = () => {
           <Spinner animation="border" role="status"></Spinner>
         </div>
       )}
+
+    {/* Modal confirmar eliminar solicitud*/}
+    <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
+        <Modal.Header closeButton>
+          <div className="ea-modal-title">Confirmar eliminación</div>
+        </Modal.Header>
+          <div className="ea-modal-body">
+            ¿Estás seguro que quieres eliminar esta solicitud?
+          </div>
+        <Modal.Footer>
+          <Button className="eliminar" onClick={handleEliminaSolicitud}>Eliminar</Button>
+          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+      
+      {/* Modal solicitud eliminado*/}
+      <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
+        <Modal.Header closeButton>
+          <div className="ea-modal-title">Éxito</div>
+        </Modal.Header>
+          <div className="ea-modal-body">
+            Solicitud eliminada exitosamente
+          </div>
+        <Modal.Footer>
+          <Button onClick={handleCerrarEliminada}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+      
+      {/* Modal error eliminar*/}
+      <Modal className="ea-modal" show={modalError} onHide={handleCerrarError}>
+        <Modal.Header closeButton>
+        <div className="ea-modal-title">Error</div>
+        </Modal.Header>
+          <div className="ea-modal-body">
+            Error al eliminar solicitud
+          </div>
+        <Modal.Footer>
+          <Button onClick={handleCerrarError}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+
     </div>
   );  
 }

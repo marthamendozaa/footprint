@@ -318,7 +318,7 @@ li.i-etiqueta-item {
 .i-tarea-boton {
   background-color: #A0C1BF;
   border-radius: 25px;
-  font-size: 14px;
+  font-size: 13px;
   padding: 5px 10px;
   text-align: center;
   margin-top: 5px;
@@ -357,16 +357,6 @@ li.i-etiqueta-item {
 .i-icon-estilos {
   display: flex;
   justify-content: flex-end;
-}
-
-.i-tarea-boton {
-  background-color: #A0C1BF;
-  border-radius: 25px;
-  font-size: 14px;
-  padding: 5px 10px;
-  text-align: center;
-  margin-top: 5px;
-  margin-bottom: 5px;
 }
 
 .i-icon-times-circle {

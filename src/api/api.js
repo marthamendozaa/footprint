@@ -5,7 +5,7 @@ const isEmulator = JSON.parse(import.meta.env.VITE_EMULATOR);
 // LECTURAS CON FIREBASE CLIENT
 
 // Firebase Client SDK
-import { query, where, doc, collection, getDoc, getDocs, connectFirestoreEmulator } from "firebase/firestore";
+import { query, where, orderBy, doc, collection, getDoc, getDocs, connectFirestoreEmulator } from "firebase/firestore";
 import firestore from "../api/firebase-config";
 
 if (isEmulator) {
@@ -107,7 +107,8 @@ export const getIniciativa = async (idIniciativa) => {
 // Información de todas las iniciativas
 export const getIniciativas = async () => {
   try {
-    const iniciativasRef = await getDocs(collection(firestore, "Iniciativas"));
+    const q = query(collection(firestore, "Iniciativas"), orderBy("fechaCreacion", "asc"));
+    const iniciativasRef = await getDocs(q);
     let iniciativas = [];
     for (const docRef of iniciativasRef.docs) {
       iniciativas.push(docRef.data());
@@ -376,7 +377,7 @@ export const eliminaIniciativa = async (iniciativa, user) => {
   });
   if (response.data.success) {
     console.log("Eliminar iniciativa exitoso");
-    return response.data.data;
+    return response.data.success;
   } else {
     console.log("Error eliminando iniciativa");
     throw new Error(response.data.error);
@@ -395,6 +396,21 @@ export const eliminarMiembro = async (iniciativa, user) => {
     return response.data.data;
   } else {
     console.log("Error eliminando miembro");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Eliminar una iniciativa
+export const eliminarSolicitud = async (idSolicitud) => {
+  const response = await axios.post(`${functionsURL}/eliminaSolicitud`, {
+    solicitud: idSolicitud,
+  });
+  if (response.data.success) {
+    console.log("Solicitud eliminada exitosamente");
+    return response.data.data;
+  } else {
+    console.log("Error eliminando solicitud");
     throw new Error(response.data.error);
   }
 };
@@ -539,5 +555,48 @@ export const sendRemoveMail = async (idIniciativa, idUsuario) => {
   } else {
     console.log("Error enviando correo");
     throw new Error(response.data.error);
+  }
+}
+
+
+export const sendTareaMail = async (idIniciativa, idUsuario, idTarea) => {
+  try {
+    const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
+    const iniciativaDoc = await getDoc(iniciativaRef);
+    const iniciativaData = iniciativaDoc.data();
+    console.log(iniciativaData);
+    const titulo = iniciativaData.titulo;
+
+    const userRef = doc(firestore, "Usuarios", idUsuario);
+    const userDoc = await getDoc(userRef);
+    const userData = userDoc.data();
+    console.log(userData);
+    const correo = userData.correo;
+    const nombre = userData.nombre;
+
+    const tareaRef = doc(firestore, "Tareas", idTarea);
+    const tareaDoc = await getDoc(tareaRef);
+    const tareaData = tareaDoc.data();
+    console.log(tareaData);
+    const tituloTarea = tareaData.titulo;
+
+    const response = await axios.post(`${functionsURL}/sendTareaMails`, {
+      titulo: titulo,
+      nombre: nombre,
+      correo: correo,
+      tituloTarea: tituloTarea
+    });
+
+    if (response.data.success) {
+      console.log("Envio de correo exitoso");
+      return;
+    } else {
+      console.log("Error enviando correo");
+      throw new Error(response.data.error);
+    }
+
+  } catch (error) {
+    console.log("Error sending email");
+    throw new Error(error);
   }
 }

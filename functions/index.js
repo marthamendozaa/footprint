@@ -113,6 +113,7 @@ exports.actualizaIniciativa = onRequest(async (req, res) => {
 });
 
 
+// DEPLOY
 // Elimina iniciativa
 exports.eliminaIniciativa = onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -121,37 +122,72 @@ exports.eliminaIniciativa = onRequest(async (req, res) => {
     const { iniciativa } = req.body;
   
     try {
-      // Borrar iniciativa de Firestore
       const iniciativaRef = await getFirestore().doc(`Iniciativas/${iniciativa}`);
       const iniciativaData = await getFirestore().doc(`Iniciativas/${iniciativa}`).get();
-      const admin = iniciativaData.data().idAdmin;
-      const miembros = iniciativaData.data().listaMiembros;
-      await iniciativaRef.delete();
 
+      // Elimina solicitudes de la iniciativa
+      logger.info("Borrando solicitudes de la iniciativa...");
+      for (const solicitud of iniciativaData.data().listaSolicitudes) {
+        // Borrar solicitud de Firestore
+        const solicitudRef = await getFirestore().doc(`Solicitudes/${solicitud}`);
+        const solicitudData = await getFirestore().doc(`Solicitudes/${solicitud}`).get();
+        await solicitudRef.delete();
+
+        // Borrar solicitud de la lista de solicitudes del usuario que la creó
+        const idUsuario = solicitudData.data().idUsuario;
+        const usuarioRef = await getFirestore().doc(`Usuarios/${idUsuario}`).get();
+        const usuario = usuarioRef.data();
+        const usuarioNuevo = { ...usuario, listaSolicitudes: usuario.listaSolicitudes.filter(id => id !== solicitud) };
+        await getFirestore().doc(`Usuarios/${idUsuario}`).update(usuarioNuevo);
+      }
+      
       // Elimina tareas de la iniciativa
+      logger.info("Borrando tareas de la iniciativa...");
       for (const tarea of iniciativaData.data().listaTareas) {
         await getFirestore().doc(`Tareas/${tarea}`).delete();
       }
-  
+      
       // Elimina archivos en el folder
+      logger.info("Borrando imagen de la iniciativa...");
       const [files] = await bucket.getFiles({ prefix: `Iniciativas/${iniciativa}` });
       if (files.length > 0) {
         await Promise.all(files.map(file => file.delete()));
       }
-  
-      // Borrar iniciativa de lista de iniciativas del admin
+      
+      // Elimina iniciativa de lista de iniciativas del admin
+      logger.info("Borrando iniciativa de admin...");
+      const admin = iniciativaData.data().idAdmin;
       const usuarioRef = await getFirestore().doc(`Usuarios/${admin}`).get();
       const usuario = usuarioRef.data();
       const usuarioNuevo = { ...usuario, listaIniciativasAdmin: usuario.listaIniciativasAdmin.filter(id => id !== iniciativa) };
       await getFirestore().doc(`Usuarios/${admin}`).update(usuarioNuevo);
-
-      // Borrar iniciativa de lista de iniciativas de los miembros
+      
+      // Elimina iniciativa de lista de iniciativas de los miembros
+      logger.info("Borrando iniciativa de miembros...");
+      const miembros = iniciativaData.data().listaMiembros;
       for (const miembro of miembros) {
         const miembroRef = await getFirestore().doc(`Usuarios/${miembro}`).get();
         const miembroData = miembroRef.data();
         const miembroNuevo = { ...miembroData, listaIniciativasMiembro: miembroData.listaIniciativasMiembro.filter(id => id !== iniciativa) };
         await getFirestore().doc(`Usuarios/${miembro}`).update(miembroNuevo);
       }
+
+      // Query para obtener usuarios donde la iniciativa esté en lista de favoritas
+      logger.info("Borrando iniciativa de favoritos...");
+      const usuariosQuery = await getFirestore().collection('Usuarios')
+        .where('listaIniciativasFavoritas', 'array-contains', iniciativa)
+        .get();
+      
+      // Elimina iniciativa de lista de favoritas de los usuarios
+      for (const usuario of usuariosQuery.docs) {
+        const usuarioData = usuario.data();
+        const usuarioNuevo = { ...usuarioData, listaIniciativasFavoritas: usuarioData.listaIniciativasFavoritas.filter(id => id !== iniciativa) };
+        await getFirestore().doc(`Usuarios/${usuario.id}`).update(usuarioNuevo);
+      }
+      
+      // Borrar iniciativa de Firestore
+      logger.info("Borrando iniciativa de Firestore...");
+      await iniciativaRef.delete();
       
       res.json({ success: true });
     } catch (error) {
@@ -400,6 +436,29 @@ exports.sendRemoveMails = onRequest(async (req, res) =>{
         message: {
           subject: "Has sido eliminado de una iniciativa",
           text: "Hola " + nombre + " te avisamos que has sido eliminado de la iniciativa " + titulo + ". Si tienes dudas sobre la razón puedes contactar al líder de la iniciativa."
+        }
+      };
+      await getFirestore().collection('mail').add(email);
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error enviando correo: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+
+// DEPLOY
+exports.sendTareaMails = onRequest(async (req, res) =>{
+  cors(req, res, async () => {
+    const { titulo, nombre, correo, tituloTarea } = req.body;
+
+    try {
+      const email = {
+        to: correo,
+        message: {
+          subject: "Has sido asignado una tarea",
+          text: "Hola " + nombre + " se te ha asignado la tarea " + tituloTarea + "en la iniciativa " + titulo + ". Si tienes dudas puedes contactar al lider de la iniciativa."
         }
       };
       await getFirestore().collection('mail').add(email);
