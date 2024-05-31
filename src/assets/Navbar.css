@@ -6,7 +6,7 @@
     top: 0;
     height: 100%;
     width: 100px;
-    padding-top: 110px; 
+    padding-top: 200px; 
     transition: width 0.5s ease;
     flex-direction: column;
     background-color: #ffffff;
@@ -14,22 +14,23 @@
 }
   
 .side-navbar.open {
-    width: 200px;
+    width: 260px;
 }
   
 .side-navbar li {
-    margin-bottom: 80px;
+    margin-bottom: 40px;
     list-style-type: none;
 }
 
 .side-navbar.open li {
     text-align: left;
+    padding-left: 10px;
 }
   
 .side-navbar li a {
     color: #A0C1BF;
     padding: 15px;
-    font-size: 18px;
+    font-size: 25px;
 }
 
 .side-navbar li.selected a {
