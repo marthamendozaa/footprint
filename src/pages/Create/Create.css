@@ -301,14 +301,27 @@ li.c-etiqueta-item:hover {
   margin-top: 30px;
 }
 
+.c-container-conteo {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.c-desc-conteo {
+  position: absolute;
+  font-weight: 600;
+  font-size: 18px;
+  color: #121212;
+}
+
 .c-desc-texto {
   position: relative;
   width: 100%;
-  min-height: 136px;
+
   background-color: #A0C1BF;
+  
   border-radius: 25px;
-  padding: 15px;
-  padding-bottom: 50px;
+
   text-align: left;
   font-weight: 600;
   font-size: 20px;
@@ -316,32 +329,25 @@ li.c-etiqueta-item:hover {
   word-break: break-word;
 }
 
-.c-desc-input {
-  width: 100%;
-}
-
 .c-desc-input-texto {
+  position: relative;
   width: 100%;
+
   background-color: transparent;
-  font-weight: 600;
-  color: #121212;
-  border: none;
+  border-radius: 0px;
   outline: none;
-  line-height: 1.5;
+
+  text-align: left;
+  font-weight: 600;
+  font-size: 20px;
+  color: #121212;
+  word-break: break-all;
+
   resize: none;
 }
 
 .c-desc-input-texto::-webkit-scrollbar {
   display: none;
-}
-
-.c-desc-conteo {
-  font-size: 20px;
-  font-weight: 600;
-  color: #121212;
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
 }
 
 .c-btn-editar-desc {
@@ -395,7 +401,6 @@ li.c-etiqueta-item:hover {
 
 .c-tarea {
   display: flex;
-  min-height: 120px;
   width: 100%;
   background-color: #E2EBF1;
   border-radius: 25px;

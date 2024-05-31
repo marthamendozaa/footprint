@@ -491,3 +491,11 @@ input.i-tarea-titulo {
   margin-top: 5px;
   text-align: center;
 }
+
+/* Modal */
+.i-modal-guardar {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}

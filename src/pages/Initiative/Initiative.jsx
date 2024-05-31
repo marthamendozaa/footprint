@@ -86,7 +86,8 @@ export const Initiative = () => {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileError, setFileError] = useState('');
-  const [uploadDisabled, setUploadDisabled] = useState(false);
+  const [uploadDisabled, setUploadDisabled] = useState(true);
+  const [cargandoTarea, setCargandoTarea] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
 
   const openUploadModal = (taskId) => {
@@ -96,24 +97,35 @@ export const Initiative = () => {
   };
 
   const closeUploadModal = () => {
+    setCargandoTarea(false);
     setShowUploadModal(false);
     setSelectedFile(null);
     setSelectedTaskId(null);
   };
 
-  const handleUploadFile = async () => {
-    if (!selectedFile) {
-      setFileError('Selecciona un archivo');
-      return;
+  useEffect(() => {
+    if (cargandoTarea) {
+      setUploadDisabled(true);
     }
 
-    if (selectedFile.size > 10 * 1024 * 1024) { // 10 MB en bytes
+    if (!selectedFile) {
+      setUploadDisabled(true);
+      return;
+    }
+    
+    if (selectedFile.size > 2 * 1024 * 1024) {
       setFileError('El archivo seleccionado supera el límite de tamaño de 10 MB');
       setSelectedFile(null);
-      return;
+      setUploadDisabled(true);
+    } else {
+      setFileError('');
+      setUploadDisabled(false);
     }
+  }, [selectedFile, cargandoTarea]);
 
+  const handleUploadFile = async () => {
     setUploadDisabled(true);
+    setCargandoTarea(true);
 
     try {
       const fileUrl = await subirImagen(selectedFile, `Tareas/${selectedTaskId}`);
@@ -121,9 +133,7 @@ export const Initiative = () => {
       closeUploadModal();
     } catch (error) {
       console.error("Error al subir el archivo:", error.message);
-    } finally {
-      setUploadDisabled(false);
-    }
+    } 
   };
 
   const { getRootProps: getRootPropsTarea, getInputProps: getInputPropsTarea } = useDropzone({
@@ -303,7 +313,7 @@ export const Initiative = () => {
     },
     onDrop: (acceptedFiles) => {
       if (acceptedFiles.length > 0) {
-        setSelectedImageFile(acceptedFiles[0]);
+        setImagenSeleccionada(acceptedFiles[0]);
         setFileError('');
       }
     }
@@ -589,7 +599,7 @@ export const Initiative = () => {
                             </div>
                             <div className="i-tarea-botones">
                               <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                              <div className="i-tarea-boton" onClick={() => openUploadModal(tarea.idTarea)}><FaFolder /> Documento </div>
+                              <div className="i-tarea-boton" style={{cursor: 'pointer'}} onClick={() => openUploadModal(tarea.idTarea)}><FaFolder /> Documento </div>
                             </div>
                           </div>
                         </div>
@@ -726,6 +736,29 @@ export const Initiative = () => {
         </Modal.Footer>
       </Modal>
 
+      {/* Subir tareas */}
+      <Modal className="p-modal" show={showUploadModal} onHide={closeUploadModal}>
+        <Modal.Header>
+          <div className='p-modal-title'>Archivos</div>
+        </Modal.Header>
+        
+        <div className="p-input-body">
+          <div {...getRootPropsTarea({ className: 'p-custom-file-button' })}>
+            <input {...getInputPropsTarea()} />
+            Subir archivo
+          </div>
+          <span className="p-custom-file-text">{selectedFile ? selectedFile.name : "Ningun archivo seleccionado"}</span>
+        </div>
+        {fileError && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{fileError}</span>}
+  
+        <Modal.Footer>
+          <Button className='i-modal-guardar' onClick={handleUploadFile} disabled={uploadDisabled} style={{width: '115px'}}>
+            {cargandoTarea ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
+          </Button>
+          <Button onClick={closeUploadModal} style={{width: '115px'}}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+
       {/* Modal confirmar eliminar iniciativa*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
         <Modal.Header>
@@ -763,30 +796,6 @@ export const Initiative = () => {
           </div>
         <Modal.Footer>
           <Button onClick={handleCerrarError}>Cerrar</Button>
-        </Modal.Footer>
-      </Modal>
-
-
-
-      <Modal className="p-modal" show={showUploadModal} onHide={closeUploadModal}>
-        <Modal.Header>
-          <div className='p-modal-title'>Archivos</div>
-        </Modal.Header>
-        
-        <div className="p-input-body">
-          <div {...getRootPropsTarea({ className: 'p-custom-file-button' })}>
-            <input {...getInputPropsTarea()} />
-            Subir archivo
-          </div>
-          <span className="p-custom-file-text">{selectedFile ? selectedFile.name : "Ningun archivo seleccionado"}</span>
-        </div>
-        {fileError && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{fileError}</span>}
-  
-        <Modal.Footer>
-          <Button onClick={handleUploadFile} disabled={uploadDisabled} style={{width: "118px"}}>
-            {uploadDisabled ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
-          </Button>
-          <Button onClick={closeUploadModal}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
 

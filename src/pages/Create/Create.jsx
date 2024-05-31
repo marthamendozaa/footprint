@@ -149,8 +149,11 @@ export const Create = () => {
   const [desc, setDesc] = useState("");
   const [editandoDesc, setEditandoDesc] = useState(false);
 
+  const textareaRef = useRef(null);
+
   const handleCambioDesc = (event) => {
     setDesc(event.target.value);
+    autoResizeTextarea();
   };
 
   const handleEditarDesc = () => {
@@ -161,6 +164,24 @@ export const Create = () => {
     setEditandoDesc(false);
   };
 
+  const autoResizeTextarea = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    if (editandoDesc) {
+      autoResizeTextarea();
+
+      if (editandoDesc && textareaRef.current) {
+        const length = textareaRef.current.value.length;
+        textareaRef.current.setSelectionRange(length, length);
+        textareaRef.current.focus();
+      }
+    }
+  }, [editandoDesc]);
 
   // Seleccionar etiquetas
   const [etiquetas, setEtiquetas] = useState(null);
@@ -393,6 +414,8 @@ export const Create = () => {
     }
   };
 
+  // Descripcion
+
 
   return (
     <div>
@@ -526,26 +549,47 @@ export const Create = () => {
 
           {/* Descripción */}
           <div className="c-desc">
-            <div className="c-desc-texto">
-              {editandoDesc ? (
-                <div className="c-desc-input">
-                  <textarea className="c-desc-input-texto"
-                    value={desc}
-                    onChange={handleCambioDesc}
-                    onBlur={handleGuardarDesc}
-                    onKeyDown={handleOnKeyDown}
-                    autoFocus
-                    maxLength={200} />
-                  <div className="c-desc-conteo">
-                    {desc ? `${desc.length}/200` : `0/200`}
-                  </div>
-              </div>) : (
-                <div style={desc ? {} : { color: '#677D7C' }}>
+            {editandoDesc ?(
+              <div className='c-container-conteo'>
+                <div className="c-desc-conteo" style={{marginTop: '-30px', marginLeft: '910px'}}>
+                  {desc ? `${desc.length}/200` : `0/200`}
+                </div>
+                
+                <div className="c-desc-texto" style={{paddingTop: '10px', padding: '15px'}}>
+                  <style jsx>{`
+                    textarea {
+                      border-radius: 25px;
+                      position: relative;
+                      width: 100%;
+                      height: 25px;
+                      font-size: 20px;
+                      resize: none;
+                      outline: none;
+                    }
+                  `}
+                  </style>
+                  <textarea 
+                      ref={textareaRef}
+                      className="c-desc-input-texto"
+                      value={desc}
+                      onChange={handleCambioDesc}
+                      onBlur={handleGuardarDesc}
+                      onKeyDown={handleOnKeyDown}
+                      autoFocus
+                      maxLength={200} 
+                      style={{ borderColor: editandoDesc ? 'transparent' : 'transparent' }}
+                    />
+                </div>
+              </div>
+              ) : (
+              <div className="c-desc-texto" style={{paddingBottom: '10.5px', paddingLeft: '2px'}}>
+                <div style={desc ? {marginTop: '2px', padding: '15px'} : {marginTop: '2px', color: '#677D7C', padding: '15px'}}>
                   {desc ? desc : "Agrega tu descripción aquí..."}
                 </div>
-              )}
-              {!editandoDesc && (<button className="c-btn-editar-desc" onClick={handleEditarDesc}><FaPen /></button>)}
-            </div>
+
+                {!editandoDesc && (<button className="c-btn-editar-desc" onClick={handleEditarDesc}><FaPen /></button>)}
+              </div>
+            )}
           </div>
 
           {/* Tareas y Miembros*/}
