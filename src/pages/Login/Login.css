@@ -184,7 +184,7 @@
     font-weight: 600;
     border: none;
     border-radius: 30px;
-    width: 180px;
+    width: 200px;
     height: 50px;
 }
 
@@ -196,14 +196,15 @@
 .registrarse-container {
     display: flex;
     justify-content: center;
-    align-items: baseline;
+    align-items: flex-end;
     width: 100%;
     height: 30%;
 }
 
-.register-texto-login{
-    margin-top: 20px;
+.register-texto-login {
     font-size: 15px;
+    margin: 0px;
+    padding: 0px;
 }
 
 .registrarse-container button.btn {
@@ -212,8 +213,10 @@
     font-weight: 600;
     background-color: transparent;
     border: none;
-    margin-bottom: 5px;
     text-decoration: underline;
+    margin: 0px;
+    margin-left: 5px;
+    padding: 0px;
 }
 
 .registrarse-container button.btn:hover {

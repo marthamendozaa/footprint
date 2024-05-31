@@ -17,7 +17,6 @@
   font-size: 45px;
   font-weight: 600;
   margin-bottom: 10px;
-  font-family: "Inter", sans-serif;
 }
 
 .profile-info {
@@ -78,7 +77,6 @@
   display: flex;
   padding: 20px;
   width: 500px;
-  font-family: "Inter", sans-serif;
   justify-content: center;
   align-items: center;
   flex-direction: row;
@@ -140,7 +138,6 @@
 
 .p-modal-body {
   padding: 16px;
-  font-family: "Inter", sans-serif;
 }
 
 .p-modal .modal-header,
@@ -162,7 +159,6 @@
 .p-modal-title {
   font-weight: 600;
   font-size: 30px;
-  font-family: "Inter", sans-serif;
 }
 
 .p-modal .btn.btn-primary {
@@ -200,7 +196,6 @@
   font-size: 30px;
   font-weight: 600;
   margin-bottom: 10px;
-  font-family: "Inter", sans-serif;
 }
 
 .edit-name-box {
@@ -259,7 +254,6 @@
   font-size: 16px;
   margin-right: 3px;
   font-weight: 600;
-  font-family: "Inter", sans-serif;
 }
 
 .p-correo {
@@ -268,8 +262,8 @@
 }
 
 /* Cambiar contraseña */
-.p-info button{
-  font-size: 13px;
+.p-info button {
+  font-size: 12px;
   background-color: #f2f2f2;
   padding: 0px 0px;
   width: 147px;

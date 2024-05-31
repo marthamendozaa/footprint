@@ -37,19 +37,21 @@
   margin-bottom: 12px;
   color: #212529;
   border-radius: 20px;
-  border: #A0C1BF 4px solid;
   min-width: 200px;
   max-width: 200px;
   position: relative;
+  border: 2px #e8e8e8 solid;
+  box-shadow: #e8e8e8 2px 4px 0px 0px;
 }
 
 .m-iniciativa:hover {
-  border: #000 4px solid;
+  border: 2px #b6b6b6 solid;
+  box-shadow: #b6b6b6 2px 4px 0px 0px;
 }
 
 .m-iniciativa-imagen img {
-  border-top-left-radius: 15px;
-  border-top-right-radius: 15px;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
   width: 200px;
   max-width: 100%;
   height: 130px;
