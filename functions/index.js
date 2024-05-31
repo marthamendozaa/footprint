@@ -446,3 +446,26 @@ exports.sendRemoveMails = onRequest(async (req, res) =>{
     }
   });
 });
+
+
+// DEPLOY
+exports.sendTareaMails = onRequest(async (req, res) =>{
+  cors(req, res, async () => {
+    const { titulo, nombre, correo, tituloTarea } = req.body;
+
+    try {
+      const email = {
+        to: correo,
+        message: {
+          subject: "Has sido asignado una tarea",
+          text: "Hola " + nombre + " se te ha asignado la tarea " + tituloTarea + "en la iniciativa " + titulo + ". Si tienes dudas puedes contactar al lider de la iniciativa."
+        }
+      };
+      await getFirestore().collection('mail').add(email);
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error enviando correo: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
