@@ -206,7 +206,7 @@ export const Register2 = ({ onPrev, onNext, usuario }) => {
                 yearDropdownItemNumber={66}
                 showMonthDropdown
                 locale={es}
-                maxDate={maxDate}
+                minDate={maxDate}
               />
             </div>
 

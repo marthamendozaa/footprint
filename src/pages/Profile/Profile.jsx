@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
-import { FaPen } from 'react-icons/fa';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Button, Modal } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
-import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
+import { FaPen, FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { autentificaUsuario, getUsuario, actualizaUsuario, actualizaContrasena, getHabilidades, getIntereses, subirImagen } from '../../api/api.js';

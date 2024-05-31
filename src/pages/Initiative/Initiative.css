@@ -11,6 +11,45 @@
   width: 100%;
 }
 
+/* Botón para editar */
+.i-fa-pen {
+  position: absolute;
+  display: flex;
+  padding: 0px; 
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #A0C1BF;
+  font-size: 20px;
+  margin-top: -20px;
+}
+
+.i-fa-pen:hover{
+  color: #000;
+}
+
+button.i-fa-pen:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.i-fa-pen-2 {
+  position: absolute;
+  display: flex;
+  padding: 0px; 
+  margin-left: 100px;
+  margin-top: -20px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #A0C1BF;
+  font-size: 20px;
+}
+
+.i-fa-pen-2:hover{
+  color: #000;
+}
+
 /* Imagen de la iniciativa */
 .i-foto-iniciativa {
   height: 255px;
@@ -34,11 +73,11 @@
 /* Título */
 .i-titulo {
   display: flex;
+  justify-content: space-between;
   font-size: 70px;
   font-weight: 600;
   text-align: left;
   white-space: nowrap;
-  align-items: center;
 }
 
 .i-titulo-texto {
@@ -48,6 +87,34 @@
 
 .i-titulo-texto::-webkit-scrollbar {
   display: none;
+}
+
+.i-edit-titulo-box {
+  outline: none;
+  border: none;
+  font-weight: 600;
+}
+
+.i-titulo-conteo {
+  position: absolute;
+  font-size: 20px;
+  font-weight: 600;
+  color: #A0C1BF;
+  margin-right: auto;
+  margin-top: 0px;
+  margin-left: 170px;
+  padding-left: 500px;
+}
+
+.i-descripcion-conteo {
+  display: flex;
+  justify-content: flex-end;
+  position: relative;
+  font-size: 20px;
+  font-weight: 600;
+  word-break: break-all;
+  color: #000;
+  margin-right: 0px;
 }
 
 /* Etiquetas */
@@ -261,8 +328,6 @@ li.i-etiqueta-item {
   margin-bottom: 5px;
 }
 
-
-
 /* Miembros */
 .i-tipo-miembro {
   font-size: 20px;
@@ -270,14 +335,31 @@ li.i-etiqueta-item {
 }
 
 .i-btn-miembro {
-  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   background-color: #E2EBF1;
+  width: 200px;
+  height: 50px;
   border-radius: 25px;
   margin-top: 5px;
   margin-bottom: 5px;
-  padding-right: 30px;
-  position: relative;
-  text-align: center;
+  border: 1px solid transparent;
+  padding: 20px;
+  text-align: left
+}
+
+.i-btn-miembro-contenido {
+  font-size: 1em;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.i-icon-estilos {
+  display: flex;
+  justify-content: flex-end;
 }
 
 .i-tarea-boton {
@@ -290,28 +372,15 @@ li.i-etiqueta-item {
   margin-bottom: 5px;
 }
 
-
-
-.i-btn-miembro:hover {
-  background-color: #E2EBF1;
-}
-
-.i-icono-elimina-miembro {
-  position: absolute;
-  right: 10px;
-  top: 50%;
-  transform: translateY(-60%);
-  padding-left: 10px;
-}
-
 .i-icon-times-circle {
-  color: rgba(0, 0, 0, 0.5); 
+  color: #000; 
   font-size: 20px;
+  cursor: pointer;
 }
 
 .i-btn-ver-solicitudes {
   bottom: 0;
-  background-color: #838F96; 
+  background-color: #909da4; 
   border: none; 
   padding: 10px 20px; 
   font-size: 16px;
