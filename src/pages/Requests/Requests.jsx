@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import { FaCheckCircle, FaTimesCircle, FaHourglass, FaTrash } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { getSolicitudes, getIniciativa } from '../../api/api.js';
+import { getSolicitudes, getIniciativa, suscribirseAIniciativa } from '../../api/api.js';
 import './Requests.css';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 
@@ -75,6 +75,20 @@ export const Requests = () => {
   const handleCrearSolicitud = async() =>{
     setSuscribirDesactivado(true);
   }
+
+  const handleAceptarSolicitud = async(index) => {
+    //Actualizar Estatus de solicitud
+    let solicitudesRecibidasNuevo = solicitudesRecibidas;
+    solicitudesRecibidasNuevo[index].estado = "Aceptada";
+    const solicitud = solicitudesRecibidasNuevo[index];
+    setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+    await actualizaSolicitud(solicitud);
+
+    //Actualizar listaIniciativasMiembro del usuario que hizo la solicitud
+    const user = solicitudesRecibidasNuevo[index].idUsuario;
+    const iniciativa = solicitudesRecibidasNuevo[index].idIniciativa;
+    await suscribirseAIniciativa(user, iniciativa);
+  };
 
   return (
     <div>
@@ -154,7 +168,7 @@ export const Requests = () => {
                           <button className='fa-5-button'> <FaCheckCircle/> </button>
                         </div>
                         <div className='fa-5'>
-                          <button className='fa-5-button'> <FaTimesCircle/> </button>
+                          <button className='fa-5-button' onClick={() => handleAceptarSolicitud() }> <FaTimesCircle/> </button>
                         </div>
 
                       </div>

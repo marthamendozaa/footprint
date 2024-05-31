@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { FaCalendar, FaFolder, FaTimesCircle, FaSearch } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
-import { Spinner, Modal, Button, FormControl } from 'react-bootstrap';
+import { Spinner, Modal, Button } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa, getMiembros, getMisTareas, getUsuario, getUsuarios, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail } from '../../api/api.js';
+import { getIniciativa, getMiembros, getMisTareas, getUsuario, getUsuarios, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail, crearSolicitud } from '../../api/api.js';
+import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import './Initiative.css';
 
@@ -74,14 +75,16 @@ export const Initiative = () => {
   };
 
   const [showSolicitudesModal, setShowSolicitudesModal] = useState(false); 
-  const [showInvitarModal, setShowInvitarModal] = useState(false); 
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
   const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
 
   //Búsqueda de usuarios para agregar miembros
+  const [showInvitarModal, setShowInvitarModal] = useState(false); 
   const [usuarios, setUsuarios] = useState([]);
-  const [filter, setFilter] = useState('');
-  const [filteredUsuarios, setFilteredUsuarios] = useState([]);
+  const [filtro, setFiltro] = useState('');
+  const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
+  const [invitarCargando, setInvitarCargando] = useState(false);
+  const [invitarDesactivado, setInvitarDesactivado] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -99,14 +102,10 @@ export const Initiative = () => {
 
         await actualizarMiembros();
 
-        try {
-          const dataUsuarios = await getUsuarios();
-          console.log('Usuarios obtenidos:', dataUsuarios); // Verificar datos obtenidos
-          setUsuarios(dataUsuarios);
-          setFilteredUsuarios(dataUsuarios.map((usuario, index) => ({ item: usuario, index })));
-        } catch (error) {
-          console.error('Error al obtener usuarios:', error);
-        }
+        const usuariosData = await getUsuarios();
+        setUsuarios(Object.values(usuariosData));
+        setUsuariosFiltrados(Object.values(usuariosData));
+        console.log("usuarios:",  usuariosData)
 
         const solicitudes = await getSolicitudes("Iniciativas", idIniciativa);
         console.log(solicitudes);
@@ -157,27 +156,54 @@ export const Initiative = () => {
     setShowInvitarModal(true);
   };
 
-  const searchText = (event) => {
-    const searchTerm = event.target.value;
-    setFilter(searchTerm);
+  const buscarUsuario = (event) => {
+    const busqueda = event.target.value;
+    setFiltro(busqueda);
 
-    if (!searchTerm) {
-      setFilteredUsuarios(usuarios.map((usuario, index) => ({ item: usuario, index })));
+    if (!busqueda) {
+      // Si el término de búsqueda está vacío, mostrar todos los usuarios
+      setUsuariosFiltrados(usuarios);
       return;
     }
 
     const fuse = new Fuse(usuarios, {
-      keys: ['nombreUsuario', 'nombre'],
+      keys: ['nombreUsuario', 'nombre'], // Especificar las claves para buscar
       includeScore: true,
-      threshold: 0.4,
+      threshold: 0.4, // Ajustar el umbral según sea necesario
     });
 
-    const result = fuse.search(searchTerm);
-    const filtered = result.map((item) => {
-      return { item: item.item, index: item.refIndex };
-    });
-    setFilteredUsuarios(filtered);
+    const resultado = fuse.search(busqueda);
+    const filtradas = resultado.map((item) => item.item);
+    setUsuariosFiltrados(filtradas);
+    console.log(usuariosFiltrados);
+    
   };
+
+  const handleInvitarUsuario = async(index) => {
+    let usuariosNuevo = usuarios;
+    const userInvitado = usuariosNuevo[index].idUsuario
+    try {
+      // Crear solicitud
+      setInvitarDesactivado(true);
+      setInvitarCargando(true);
+      const solicitud = new Solicitud(userInvitado, idIniciativa, "Pendiente", "IniciativaAUsuario");
+      const response = await crearSolicitud(solicitud);
+
+      // Actualizar la lista de solicitudes de la iniciativa y del miembro
+      if (response.success) {
+        iniciativa.listaSolicitudes.push(response.data);
+
+        usuariosNuevo[index].listaSolicitudes.push(response.data);
+
+        // Cierra el modal
+        setShowInvitarModal(false);
+      }
+    } catch (error) {
+      console.log("Error al enviar solicitud a la iniciativa");
+    } finally {
+      setInvitarCargando(false);
+    }
+  }
 
   const handleAceptarSolicitud = async(index) => {
     //Actualizar Estatus de solicitud
@@ -370,84 +396,6 @@ export const Initiative = () => {
                 </button>
                 )}              
             </div>
-
-              <Modal show={showSolicitudesModal} onHide={() => setShowSolicitudesModal(false)} centered className='e-modal'>
-                <div className="modalcontainer">
-                    <Modal.Header style={{ border: "none" }} closeButton> Solicitudes </Modal.Header>
-                    
-                    <div>
-                      {!usuariosRecibidos ? (
-                          <div className="m-error">
-                            Esta iniciativa no ha recibido solicitudes.
-                          </div>
-                        ) : (
-                          <div className="m-iniciativas-container">
-                            {usuariosRecibidos.map((usuario, index) => (
-                              <div key={index} className='e-iniciativa'>
-                                <div className="e-desc">{usuario.nombreUsuario}</div>
-                              <div className='e-iniciativa-imagen'>
-                                  <img src={usuario.urlImagen} alt = {usuario.nombreUsuario} />
-                              </div>
-            
-                              <div className='e-iniciativa-texto'>
-                                  <div className="e-titulo">{usuario.nombre}</div>
-                                  <div className="i-etiquetas">
-                                  {Object.values(usuario.listaHabilidades).map((habilidad, idHabilidad) => (
-                                    <li key={idHabilidad} className={`i-etiqueta-item`}>
-                                      {habilidad}
-                                    </li>
-                                  ))}
-                                  <div>
-                                    <button onClick={() => handleAceptarSolicitud(index)}>Aceptar</button>
-                                    <button onClick={() => handleRechazarSolicitud(index)}>Rechazar</button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>    
-                            ))}
-                          </div>
-                        )}
-                    </div>
-                </div>
-            </Modal>
-
-            {/*Modal para agregar/inivtar usuarios*/}
-            <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
-                <div className="modalcontainer">
-                  <Modal.Header closeButton>
-                    <Modal.Title>Invitar Usuarios</Modal.Title>
-                  </Modal.Header>
-                    <Modal.Body>
-                      <div className='e-searchBar'>
-                        <FaSearch className="e-icons"/>
-                        <input
-                          type='search'
-                          placeholder='Buscar usuarios...'
-                          value={filter}
-                          onChange={searchText}
-                          className='e-searchBarCaja'
-                        />
-                      </div>
-                      {filteredUsuarios && filteredUsuarios.length > 0 ? (
-                        <ul>
-                          {filteredUsuarios.map((usuario, id) => (
-                            <li key={id} className='user-item'>
-                              <div className='user-info'>
-                                <span>{usuario.item.nombreUsuario}</span> ({usuario.item.email})
-                              </div>
-                              <Button variant="primary" onClick={() => handleAceptarSolicitud(index)}>Invitar</Button>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <div className="spinner">
-                          <Spinner animation="border" role="status"></Spinner>
-                        </div>
-                      )}
-                    </Modal.Body>
-                    
-                </div>
-            </Modal>
           </div>
         </div>
       ):(
@@ -495,6 +443,84 @@ export const Initiative = () => {
           <Button onClick={handleCerrarError}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Modal revisar solicitudes*/}
+      <Modal show={showSolicitudesModal} onHide={() => setShowSolicitudesModal(false)} centered className='e-modal'>
+        <div className="modalcontainer">
+            <Modal.Header style={{ border: "none" }} closeButton> Solicitudes </Modal.Header>
+            
+            <div>
+              {!usuariosRecibidos ? (
+                  <div className="m-error">
+                    Esta iniciativa no ha recibido solicitudes.
+                  </div>
+                ) : (
+                  <div className="m-iniciativas-container">
+                    {usuariosRecibidos.map((usuario, index) => (
+                      <div key={index} className='e-iniciativa'>
+                        <div className="e-desc">{usuario.nombreUsuario}</div>
+                      <div className='e-iniciativa-imagen'>
+                          <img src={usuario.urlImagen} alt = {usuario.nombreUsuario} />
+                      </div>
+    
+                      <div className='e-iniciativa-texto'>
+                          <div className="e-titulo">{usuario.nombre}</div>
+                          <div className="i-etiquetas">
+                          {Object.values(usuario.listaHabilidades).map((habilidad, idHabilidad) => (
+                            <li key={idHabilidad} className={`i-etiqueta-item`}>
+                              {habilidad}
+                            </li>
+                          ))}
+                          <div>
+                            <button onClick={() => handleAceptarSolicitud(index)}>Aceptar</button>
+                            <button onClick={() => handleRechazarSolicitud(index)}>Rechazar</button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>    
+                    ))}
+                  </div>
+                )}
+            </div>
+        </div>
+    </Modal>
+
+    {/*Modal para inivtar usuarios*/}
+    <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
+      <div className="modalcontainer">
+        <Modal.Header closeButton>
+          <Modal.Title>Invitar Usuarios</Modal.Title>
+        </Modal.Header>
+          <Modal.Body>
+            <div className='e-searchBar'>
+              <FaSearch className="e-icons"/>
+              <input
+                type='search'
+                placeholder='Buscar usuarios...'
+                value={filtro}
+                onChange={buscarUsuario}
+                className='e-searchBarCaja'
+              />
+            </div>
+            {usuariosFiltrados && usuariosFiltrados.length > 0 ? (
+              <ul>
+                {usuariosFiltrados.map((usuario, id) => (
+                  <li key={id} className='user-item'>
+                    <div className='user-info'>
+                      <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
+                    </div>
+                    <Button variant="primary" onClick={() => handleInvitarUsuario(id)}>Invitar</Button>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <div className="spinner">
+                <Spinner animation="border" role="status"></Spinner>
+              </div>
+            )}
+          </Modal.Body>  
+      </div>
+    </Modal>
 
     </div>
   );
