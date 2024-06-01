@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FaEnvelope, FaArrowRight, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { PrivacyPolicy } from './PrivacyPolicy.jsx';
+import PasswordInfo from './PasswordInfo.jsx';
 import { existeCorreo } from '../../../api/api.js';
 import './Register1.css';
 
@@ -127,6 +128,8 @@ export const Register1 = ({ onNext, usuario }) => {
             <div className='container-contrasena-register'>
               <div className='container-contrasena-register-2'>
                 <p className='contrasena-texto-register'>Contraseña</p>
+                {/* Info de contraseña */}
+                <PasswordInfo/>
               </div>
 
               {/* Ojo */}

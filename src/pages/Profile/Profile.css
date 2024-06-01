@@ -303,6 +303,14 @@
   margin: 16px;
 }
 
+.p-row-dos-iconos {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  cursor: pointer;
+  right: 0;
+}
+
 .p-p-icono {
   display: flex;
   position: absolute;

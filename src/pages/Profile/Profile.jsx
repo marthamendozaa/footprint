@@ -5,6 +5,7 @@ import { Spinner, Button, Modal } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
 import { FaPen, FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
+import PasswordInfo2 from './PasswordInfo2.jsx';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { autentificaUsuario, getUsuario, actualizaUsuario, actualizaContrasena, getHabilidades, getIntereses, subirImagen } from '../../api/api.js';
 import Usuario from '../../classes/Usuario.js';
@@ -488,7 +489,7 @@ export const Profile = () => {
                   }} 
                 />
                 <span className="p-ojo-contrasena" onClick={() => setShowPassword(!showPassword)}>
-                  {contrasenaActual !== '' && (showPassword ? <FaEyeSlash /> : <FaEye />)}
+                  {contrasenaActual && (showPassword ? <FaEyeSlash /> : <FaEye />)}
                 </span>
               </div>
 
@@ -513,9 +514,12 @@ export const Profile = () => {
                   }}
                 />
                 
-                <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
+                <div className="p-row-dos-iconos">
+                  {nuevaContrasena && <PasswordInfo2/>}
+                  <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
                     {nuevaContrasena && (showNewPassword ? <FaEyeSlash /> : <FaEye />)}
-                </span>
+                  </span>
+                </div>
 
                 {nuevaContrasena.length > 0 && 
                   <PasswordStrengthBar style={{position: "absolute", width: "100%", bottom: "-10px"}}
