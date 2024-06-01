@@ -75,6 +75,7 @@
     padding: 15px 15px;
     border-radius: 35px;
     margin: 5px;
+    user-select: none;
 }
   
 li.r3-etiquetas-item {
