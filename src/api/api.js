@@ -501,23 +501,18 @@ export const actualizaSolicitud = async (data) => {
 
 
 // Enviar correo de notificación al eliminar iniciativa
-export const sendMail = async (idIniciativa) => {
-  const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
-  const iniciativaDoc = await getDoc(iniciativaRef);
-  const iniciativaData = iniciativaDoc.data();
-  const idAdmin = iniciativaData.idAdmin;
-  const titulo = iniciativaData.titulo;
+export const enviarCorreoIniciativa = async (iniciativa) => {
+  const adminRef = await getDoc(doc(firestore, "Usuarios", iniciativa.idAdmin));
+  const admin = adminRef.data();
 
-  const userRef = doc(firestore, "Usuarios", idAdmin);
-  const userDoc = await getDoc(userRef);
-  const userData = userDoc.data();
-  const adminEmail = userData.correo;
-  const nombre = userData.nombre;
+  const message = {
+    subject: `Notificación sobre la eliminación de tu iniciativa ${iniciativa.titulo}`,
+    text: `Estimado/a ${admin.nombre},\n\nLamentamos informarte que tu iniciativa ${iniciativa.titulo} ha sido borrada por los administradores debido a que no cumple con los estándares de la plataforma. Si tienes alguna duda sobre el motivo de esta decisión, te invitamos a ponerte en contacto con la administración para obtener más información.\n\nAgradecemos tu comprensión.\n\nSaludos cordiales,\nAdministración de Evertech`
+  }  
 
-  const response = await axios.post(`${functionsURL}/sendMails`, {
-    titulo: titulo,
-    nombre: nombre,
-    adminEmail: adminEmail
+  const response = await axios.post(`${functionsURL}/enviarCorreo`, {
+    email: admin.correo,
+    message: message
   });
 
   if (response.data.success) {
@@ -531,22 +526,15 @@ export const sendMail = async (idIniciativa) => {
 
 
 // Enviar correo de notificación al eliminar miembro de iniciativa
-export const sendRemoveMail = async (idIniciativa, idUsuario) => {
-  const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
-  const iniciativaDoc = await getDoc(iniciativaRef);
-  const iniciativaData = iniciativaDoc.data();
-  const titulo = iniciativaData.titulo;
+export const enviarCorreoMiembro = async (iniciativa, miembro) => {
+  const message = {
+    subject: `Notificación sobre tu participación en la iniciativa ${iniciativa.titulo}`,
+    text: `Estimado/a ${miembro.nombre},\n\nLamentamos informarte que has sido removido/a de la iniciativa ${iniciativa.titulo}. Si tienes alguna duda sobre el motivo de esta decisión, te invitamos a ponerte en contacto con la persona a cargo de la iniciativa para obtener más información.\n\nAgradecemos tu comprensión.\n\nSaludos cordiales,\nAdministración de Evertech`
+  }
 
-  const userRef = doc(firestore, "Usuarios", idUsuario);
-  const userDoc = await getDoc(userRef);
-  const userData = userDoc.data();
-  const correo = userData.correo;
-  const nombre = userData.nombre;
-
-  const response = await axios.post(`${functionsURL}/sendRemoveMails`, {
-    titulo: titulo,
-    nombre: nombre,
-    correo: correo
+  const response = await axios.post(`${functionsURL}/enviarCorreo`, {
+    email: miembro.correo,
+    message: message
   });
 
   if (response.data.success) {
@@ -559,32 +547,17 @@ export const sendRemoveMail = async (idIniciativa, idUsuario) => {
 }
 
 
-export const sendTareaMail = async (idIniciativa, idUsuario, idTarea) => {
+// Enviar correo de notificación al asignar miembro a una tarea
+export const enviarCorreoTarea = async (iniciativa, miembro, tarea) => {
   try {
-    const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
-    const iniciativaDoc = await getDoc(iniciativaRef);
-    const iniciativaData = iniciativaDoc.data();
-    console.log(iniciativaData);
-    const titulo = iniciativaData.titulo;
+    const message = {
+      subject: `Notificación sobre tu asignación a la tarea ${tarea.titulo}`,
+      text: `Estimado/a ${miembro.nombre},\n\nNos complace informarte que has sido asignado/a a la tarea ${tarea.titulo} en la iniciativa ${iniciativa.titulo}. Si tienes alguna duda, te invitamos a ponerte en contacto con la persona a cargo de la iniciativa.\n\nSaludos cordiales,\nAdministración de Evertech`
+    }
 
-    const userRef = doc(firestore, "Usuarios", idUsuario);
-    const userDoc = await getDoc(userRef);
-    const userData = userDoc.data();
-    console.log(userData);
-    const correo = userData.correo;
-    const nombre = userData.nombre;
-
-    const tareaRef = doc(firestore, "Tareas", idTarea);
-    const tareaDoc = await getDoc(tareaRef);
-    const tareaData = tareaDoc.data();
-    console.log(tareaData);
-    const tituloTarea = tareaData.titulo;
-
-    const response = await axios.post(`${functionsURL}/sendTareaMails`, {
-      titulo: titulo,
-      nombre: nombre,
-      correo: correo,
-      tituloTarea: tituloTarea
+    const response = await axios.post(`${functionsURL}/enviarCorreo`, {
+      email: miembro.correo,
+      message: message
     });
 
     if (response.data.success) {
@@ -594,7 +567,6 @@ export const sendTareaMail = async (idIniciativa, idUsuario, idTarea) => {
       console.log("Error enviando correo");
       throw new Error(response.data.error);
     }
-
   } catch (error) {
     console.log("Error sending email");
     throw new Error(error);

@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Spinner, Modal, Button } from 'react-bootstrap';
 import { FaCheckCircle, FaTimesCircle, FaHourglass, FaTrash } from 'react-icons/fa';
+import { ClipLoader } from 'react-spinners';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { getSolicitudes, getIniciativa, eliminarSolicitud } from '../../api/api.js';
-import { useParams } from 'react-router-dom';
 import './Requests.css';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 
@@ -35,16 +35,18 @@ export const Requests = () => {
   const [eliminaBloqueado, setEliminaBloqueado] = useState(false);
 
   const handleEliminaSolicitud = async () => {
-    console.log("Eliminando solicitud con id: ", idSolicitudEliminar);
-    handleCerrarEliminar();
     setEliminaBloqueado(true);
 
     try {
       await eliminarSolicitud(idSolicitudEliminar);
-      handleMostrarEliminada();
+
       setSolicitudesEnviadas(solicitudesEnviadas.filter(solicitud => solicitud.idSolicitud !== idSolicitudEliminar));
       setIniciativasEnviadas(iniciativasEnviadas.filter(iniciativa => iniciativa.idSolicitud !== idSolicitudEliminar));
+
+      handleCerrarEliminar();
+      handleMostrarEliminada();
     } catch(error) {
+      handleCerrarEliminar();
       handleMostrarError();
     } finally {
       setEliminaBloqueado(false);
@@ -54,7 +56,6 @@ export const Requests = () => {
   const { user } = useAuth();
   
   // Información de solicitudes del usuario
-  const { idSolicitud } = useParams();
   const [solicitudesEnviadas, setSolicitudesEnviadas] = useState(null);
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
 
@@ -91,7 +92,6 @@ export const Requests = () => {
 
       setIniciativasEnviadas(iniciativasEnviadasData);
       setIniciativasRecibidas(iniciativasRecibidasData);
-
     };
     fetchData();
   }, [user]);
@@ -239,7 +239,9 @@ export const Requests = () => {
             ¿Estás seguro que quieres eliminar esta solicitud?
           </div>
         <Modal.Footer>
-          <Button className="eliminar" onClick={handleEliminaSolicitud}>Eliminar</Button>
+          <Button className="eliminar" onClick={handleEliminaSolicitud} disabled={eliminaBloqueado} style={{width: "127px"}}>
+            {eliminaBloqueado ? <ClipLoader size={20} color="#fff" /> : 'Eliminar'}
+          </Button>
           <Button onClick={handleCerrarEliminar}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
