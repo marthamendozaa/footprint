@@ -493,9 +493,31 @@ input.i-tarea-titulo {
 }
 
 /* Modal */
+.e-modal .modal-content {
+  padding: 0px 10px 10px 10px !important;
+  border: none;
+}
+
 .i-modal-guardar {
   display: flex;
   align-items: center;
   text-align: center;
   justify-content: center;
+}
+
+.modal-nav {
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-nav button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.modal-nav .active {
+  font-weight: bold;
 }

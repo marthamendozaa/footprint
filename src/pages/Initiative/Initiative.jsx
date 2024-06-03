@@ -399,6 +399,9 @@ export const Initiative = () => {
     setEditingCampos(false);
   };
 
+  // Paginas modal mis solicitudes
+  const [paginaActual, setPaginaActual] = useState('solicitudes');
+
   return (
     <div>
       {iniciativa ? (
@@ -663,46 +666,6 @@ export const Initiative = () => {
                 )}
               
             </div>
-
-              <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
-                <div className="modalcontainer">
-                    <Modal.Header style={{ border: "none" }}> Solicitudes </Modal.Header>
-                    
-                    <div>
-                      {!usuariosRecibidos ? (
-                          <div className="m-error">
-                            Esta iniciativa no ha recibido solicitudes.
-                          </div>
-                        ) : (
-                          <div className="m-iniciativas-container">
-                            {usuariosRecibidos.map((usuario, index) => (
-                              <div key={index} className='e-iniciativa'>
-                                <div className="e-desc">{usuario.nombreUsuario}</div>
-                              <div className='e-iniciativa-imagen'>
-                                  <img src={usuario.urlImagen} alt = {usuario.nombreUsuario} />
-                              </div>
-            
-                              <div className='e-iniciativa-texto'>
-                                  <div className="e-titulo">{usuario.nombre}</div>
-                                  <div className="i-etiquetas">
-                                  {Object.values(usuario.listaHabilidades).map((habilidad, idHabilidad) => (
-                                    <li key={idHabilidad} className={`i-etiqueta-item`}>
-                                      {habilidad}
-                                    </li>
-                                  ))}
-                                  <div>
-                                    <button onClick={() => handleAceptarSolicitud(index)}>Aceptar</button>
-                                    <button onClick={() => handleRechazarSolicitud(index)}>Rechazar</button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>    
-                            ))}
-                          </div>
-                        )}
-                    </div>
-                </div>
-            </Modal>
           </div>
         </div>
       ) : (
@@ -712,6 +675,84 @@ export const Initiative = () => {
       )}
 
       {/* ----- Modales ----- */}
+
+      {/* ----- Ver solicitudes ----- */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered className='e-modal'>
+        <div className="modalcontainer">
+          <Modal.Header closeButton style={{ border: "none" }}> </Modal.Header>
+
+          {/* Determinar en que página esta */}
+          <div className="modal-nav">
+            <button 
+              className={paginaActual === 'solicitudes' ? 'active' : ''} 
+              onClick={() => setPaginaActual('solicitudes')}
+            >
+              Solicitudes
+            </button>
+            <button 
+              className={paginaActual === 'miembros' ? 'active' : ''} 
+              onClick={() => setPaginaActual('miembros')}
+            >
+              Miembros
+            </button>
+          </div>
+
+          {/* Contenido */}
+          <div className="modal-content">
+            {/* Solicitudes */}
+            {paginaActual === 'solicitudes' ? (
+              !usuariosRecibidos || usuariosRecibidos.length === 0 ? (
+                <div className="m-error">
+                  {/* Ninguna solicitud */}
+                  Esta iniciativa no ha recibido solicitudes.
+                </div>
+              ) : (
+                <div className="m-iniciativas-container">
+                  {/* Lista de solicitudes */}
+                  {usuariosRecibidos.map((usuario, index) => (
+                    <div key={index} className='e-iniciativa'>
+                      {/* Usuario */}
+                      <div className="e-desc">{usuario.nombreUsuario}</div>
+
+                      {/* Imagen */}
+                      <div className='e-iniciativa-imagen'>
+                        <img src={usuario.urlImagen} alt={usuario.nombreUsuario} />
+                      </div>
+
+                      {/* Info extra */}
+                      <div className='e-iniciativa-texto'>
+                        {/* Nombre */}
+                        <div className="e-titulo">{usuario.nombre}</div>
+                        
+                        {/* Etiquetas */}
+                        <div className="i-etiquetas">
+                          {Object.values(usuario.listaHabilidades).map((habilidad, idHabilidad) => (
+                            <li key={idHabilidad} className={`i-etiqueta-item`}>
+                              {habilidad}
+                            </li>
+                          ))}
+                        </div>
+
+                        {/* Aceptar / rechazar */}
+                        <div>
+                          <button onClick={() => handleAceptarSolicitud(index)}>Aceptar</button>
+                          <button onClick={() => handleRechazarSolicitud(index)}>Rechazar</button>
+                        </div>
+                      </div>
+
+                    </div>
+                  ))}
+                </div>
+              )
+            ) : (
+              <div className="m-iniciativas-container">
+                {/* Contenido de miembros */}
+                Lista de los miembros
+              </div>
+            )}
+          </div>
+        </div>
+      </Modal>
 
       {/* Subir imagen */}
       <Modal className="c-modal" show={modalImagen} onHide={handleCerrarImagen}>
