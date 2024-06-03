@@ -513,8 +513,28 @@ input.c-tarea-titulo {
   padding: 20px;
   width: 500px;
   justify-content: center;
+}
+
+.c-drag-drop {
+  display: flex;
+  width: 400px;
+  border: 2px dashed #ccc;
+  border-radius: 20px;
+  justify-content: center;
   align-items: center;
-  flex-direction: row;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.c-drag-drop-image {
+  font-size: 50px;
+  color: #A0C1BF;
+  margin: 10px;
+  margin-bottom: 0px;
+}
+
+.c-drag-drop-text {
+  margin: 10px;
 }
 
 .c-custom-file-button {

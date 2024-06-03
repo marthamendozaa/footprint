@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock } from 'react-icons/fa';
+import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
@@ -281,6 +281,7 @@ export const Create = () => {
   
 
   // Subir imagen
+  const [imagenBloqueado, setImagenBloqueado] = useState(true);
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
   const [imagenIniciativa, setImagenIniciativa] = useState(null);
   const [imagenPreview, setImagenPreview] = useState('https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg');
@@ -294,17 +295,22 @@ export const Create = () => {
     setErrorImagen("");
   };
 
-  const handleSubirImagen = () => {
+  useEffect(() => {
     if (!imagenSeleccionada) {
-      setErrorImagen("Por favor selecciona una imagen")
+      setImagenBloqueado(true);
       return;
     }
 
     if (imagenSeleccionada.size > 2 * 1024 * 1024) {
-      setErrorImagen("La imagen seleccionada supera el límite de tamaño de 2 MB")
-      return;
+      setErrorImagen('La imagen seleccionada supera el límite de tamaño de 2 MB');
+      setImagenBloqueado(true);
+    } else {
+      setErrorImagen('');
+      setImagenBloqueado(false);
     }
+  }, [imagenSeleccionada]);
 
+  const handleSubirImagen = () => {
     setImagenIniciativa(imagenSeleccionada);
     setImagenPreview(URL.createObjectURL(imagenSeleccionada));
     handleCerrarImagen();
@@ -693,16 +699,24 @@ export const Create = () => {
             </Modal.Header>
               
             <div className="c-input-body">
-              <div {...getRootProps({ className: 'c-custom-file-button' })}>
+              <div {...getRootProps({ className: "c-drag-drop" })}>
                 <input {...getInputProps()} />
-                Subir foto
+                <FaImages className="c-drag-drop-image"/>
+                {imagenSeleccionada ? (
+                  <div className="c-drag-drop-text">
+                    {imagenSeleccionada.name}
+                  </div>
+                ) : (
+                  <div className="c-drag-drop-text" style={{width: "150px"}}>
+                    <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra una imagen
+                  </div>
+                )}
               </div>
-              <span className="c-custom-file-text">{imagenSeleccionada ? imagenSeleccionada.name : "Ninguna imagen seleccionada"}</span>
             </div>
             {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
 
             <Modal.Footer>
-              <Button onClick={handleSubirImagen}>Guardar</Button>
+              <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
               <Button onClick={handleCerrarImagen}>Cerrar</Button>
             </Modal.Footer>
           </Modal>

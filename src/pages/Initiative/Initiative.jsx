@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock } from 'react-icons/fa';
+import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages } from 'react-icons/fa';
+import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
 import { useAuth } from '../../contexts/AuthContext';
 import { Spinner, Modal, Button } from 'react-bootstrap';
@@ -710,13 +711,19 @@ export const Initiative = () => {
         </Modal.Header>
           
         <div className="c-input-body">
-          <div {...getRootPropsImagen({ className: 'c-custom-file-button' })}>
+          <div {...getRootPropsImagen({ className: "c-drag-drop" })}>
             <input {...getInputPropsImagen()} />
-            Subir foto
+            <FaImages className="c-drag-drop-image"/>
+            {imagenSeleccionada ? (
+              <div className="c-drag-drop-text">
+                {imagenSeleccionada.name}
+              </div>
+            ) : (
+              <div className="c-drag-drop-text" style={{width: "150px"}}>
+                <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra una imagen
+              </div>
+            )}
           </div>
-          <span className="c-custom-file-text">
-            {imagenSeleccionada ? (imagenSeleccionada.name) : "Ninguna imagen seleccionada"}
-          </span>
         </div>
         {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
 
@@ -727,17 +734,25 @@ export const Initiative = () => {
       </Modal>
 
       {/* Subir tareas */}
-      <Modal className="p-modal" show={showUploadModal} onHide={closeUploadModal}>
+      <Modal className="c-modal" show={showUploadModal} onHide={closeUploadModal}>
         <Modal.Header>
-          <div className='p-modal-title'>Archivos</div>
+          <div className="c-modal-title">Subir Archivo</div>
         </Modal.Header>
         
-        <div className="p-input-body">
-          <div {...getRootPropsTarea({ className: 'p-custom-file-button' })}>
+        <div className="c-input-body">
+          <div {...getRootPropsTarea({ className: "c-drag-drop" })}>
             <input {...getInputPropsTarea()} />
-            Subir archivo
+            <LuUpload className="c-drag-drop-image"/>
+            {selectedFile ? (
+              <div className="c-drag-drop-text">
+                {selectedFile.name}
+              </div>
+            ) : (
+              <div className="c-drag-drop-text" style={{width: "150px"}}>
+                <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra un archivo
+              </div>
+            )}
           </div>
-          <span className="p-custom-file-text">{selectedFile ? selectedFile.name : "Ningun archivo seleccionado"}</span>
         </div>
         {fileError && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{fileError}</span>}
   
