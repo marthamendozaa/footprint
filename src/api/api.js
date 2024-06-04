@@ -260,10 +260,6 @@ export const existeSolicitud = async (idUsuario, idIniciativa) => {
 
 
 
-
-
-
-
 // FIREBASE FUNCTIONS
 
 // URL para pruebas locales
@@ -469,6 +465,20 @@ export const crearTareas = async (data) => {
   }
 };
 
+
+// Actualizar tarea
+export const actualizaTarea = async (data) => {
+  const response = await axios.post(`${functionsURL}/actualizaTarea`, {
+    data: data
+  });
+  if (response.data.success) {
+    console.log("Actualizar tarea exitoso");
+    return response.data.data;
+  } else {
+    console.log("Error actualizando tarea");
+    throw new Error(response.data.error);
+  }
+};
 
 // Crear solicitudes
 export const crearSolicitud = async (solicitud) => {
