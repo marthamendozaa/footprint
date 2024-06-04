@@ -651,7 +651,7 @@ export const Create = () => {
                             maxLength={30}
                           />
                         ) : (
-                          <div className="c-titulo-texto" style={{maxWidth: '400px'}}>
+                          <div className="c-titulo-texto" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>
                             {tarea.titulo ? tarea.titulo : "Título"}
                           </div>
                         )}
