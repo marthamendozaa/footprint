@@ -94,8 +94,9 @@
   font-size: 20px;
   font-weight: 600;
   color: #A0C1BF;
-  margin-left: 10px;
-  margin-top: 20px;
+  margin-left: 0px;
+  margin-top: -45px;
+  margin-left: 15px;
 }
 
 .c-btn-editar-titulo {
@@ -406,13 +407,16 @@ li.c-etiqueta-item:hover {
   align-items: flex-start;
   font-weight: 600;
   flex-direction: row;
+  overflow-x: auto;
 }
 
 .c-tarea-titulo {
+  display: flex;
+  flex-direction: row;
   font-size: 25px;
 }
 
-.c-tarea-titulo:focus-visible{
+.c-tarea-titulo:focus-visible {
   outline: none;
 }
 
@@ -421,11 +425,13 @@ input.c-tarea-titulo {
   border: none;
   padding: 0;
   font-weight: 600;
+  min-width: 400px;
 }
 
 .c-tarea-texto {
   font-size: 16px;
   width: 100%;
+  white-space: nowrap;
 }
 
 .c-tarea-desc {
@@ -466,6 +472,7 @@ input.c-tarea-titulo {
   font-size: 15px;
   padding: 0;
   padding-left: 10px;
+  max-width: 400px;
 }
 
 /* Crear */

@@ -454,16 +454,22 @@ export const Create = () => {
                       autoFocus
                       maxLength={30}
                     />
+                    
+                  </div>
+                  ) : (
+                    <div className="c-titulo-texto">
+                      {titulo ? titulo : "Título"}
+                    </div>
+                  )}
+
+                  {editandoTitulo ? (
                     <div className="c-titulo-conteo">
                       {titulo ? `${titulo.length}/30` : `0/30`}
                     </div>
-                  </div>) : (
-                    <div className="c-titulo-texto">
-                      {titulo ? titulo : "Título"}
+                    ) : (
                       <button className="c-btn-editar-titulo" onClick={handleEditarTitulo}>
                         <FaPen />
                       </button>
-                    </div>
                   )}
               </div>
 
@@ -633,7 +639,7 @@ export const Create = () => {
 
                       {/* Titulo */}
                       <div className="c-tarea-titulo">
-                        {tarea.editandoTitulo ? (
+                        {tarea.editandoTitulo? (
                           <input
                             type="text"
                             className="c-tarea-titulo"
@@ -645,15 +651,22 @@ export const Create = () => {
                             maxLength={30}
                           />
                         ) : (
-                          <div className="c-titulo-texto">
+                          <div className="c-titulo-texto" style={{maxWidth: '400px'}}>
                             {tarea.titulo ? tarea.titulo : "Título"}
-                            <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
-                              <FaPen />
-                            </button>
                           </div>
                         )}
-                      </div>
 
+                        {tarea.editandoTitulo? (
+                          <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
+                            {tarea.titulo ? `${tarea.titulo.length}/30` : `0/30`}
+                          </button>
+                        ) : (
+                          <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
+                            <FaPen />
+                          </button>
+                        )}
+                      </div>
+                      
                       {/* Descripcion */}
                       <div className="c-tarea-desc">
                         {tarea.editandoDesc ? (
@@ -696,7 +709,7 @@ export const Create = () => {
                       </div>
 
                       {/* Documento */}
-                      <div className="c-tarea-boton"><FaFolder /> Documento</div>
+                      <div className="c-tarea-boton" style={{marginTop: '5px'}}><FaFolder /> Documento</div>
                     </div>
                   </div>
                 ))}
