@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Spinner } from 'react-bootstrap';
 import { FaCheckCircle, FaTimesCircle, FaHourglass, FaTrash } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { getSolicitudes, getIniciativa, suscribirseAIniciativa } from '../../api/api.js';
+import { getSolicitudes, getIniciativa, suscribirseAIniciativa, actualizaSolicitud } from '../../api/api.js';
 import './Requests.css';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 
@@ -26,7 +26,7 @@ export const Requests = () => {
         if (solicitud.tipoInvitacion == "UsuarioAIniciativa") {
           solicitudesEnviadasData.push(solicitud);
         }
-        else if (solicitud.tipoInvitacion == "IniciativaAUsuario") {
+        else if (solicitud.tipoInvitacion == "IniciativaAUsuario" && solicitud.estado == "Pendiente") {
           solicitudesRecibidasData.push(solicitud);
         }
       }
@@ -78,7 +78,7 @@ export const Requests = () => {
 
   const handleAceptarSolicitud = async(index) => {
     //Actualizar Estatus de solicitud
-    let solicitudesRecibidasNuevo = solicitudesRecibidas;
+    let solicitudesRecibidasNuevo = [...solicitudesRecibidas];
     solicitudesRecibidasNuevo[index].estado = "Aceptada";
     const solicitud = solicitudesRecibidasNuevo[index];
     setSolicitudesRecibidas(solicitudesRecibidasNuevo);
@@ -88,6 +88,14 @@ export const Requests = () => {
     const user = solicitudesRecibidasNuevo[index].idUsuario;
     const iniciativa = solicitudesRecibidasNuevo[index].idIniciativa;
     await suscribirseAIniciativa(user, iniciativa);
+  };
+
+  const handleRechazarSolicitud = async(index) => {
+    let solicitudesRecibidasNuevo = solicitudesRecibidas;
+    solicitudesRecibidasNuevo[index].estado = "Rechazada";
+    const solicitud = solicitudesRecibidasNuevo[index];
+    setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+    await actualizaSolicitud(solicitud);
   };
 
   return (
@@ -163,12 +171,12 @@ export const Requests = () => {
                       <div className="rq-titulo">{iniciativa.titulo}</div>
 
                       {/* Botones */}
-                      <div className='rq-botones-2'>
+                      <div className='rq-botones-2' onClick={(e) => e.stopPropagation()}>
                         <div className='fa-5'>
-                          <button className='fa-5-button'> <FaCheckCircle/> </button>
+                          <button className='fa-5-button' onClick={() => handleAceptarSolicitud(index) } > <FaCheckCircle/> </button>
                         </div>
                         <div className='fa-5'>
-                          <button className='fa-5-button' onClick={() => handleAceptarSolicitud() }> <FaTimesCircle/> </button>
+                          <button className='fa-5-button'onClick={() => handleRechazarSolicitud(index) } > <FaTimesCircle/> </button>
                         </div>
 
                       </div>

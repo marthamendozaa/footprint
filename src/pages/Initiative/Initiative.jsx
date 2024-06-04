@@ -3,7 +3,7 @@ import { FaCalendar, FaFolder, FaTimesCircle, FaSearch } from 'react-icons/fa';
 import { useAuth } from '../../contexts/AuthContext';
 import { Spinner, Modal, Button } from 'react-bootstrap';
 import { useParams } from 'react-router-dom';
-import { getIniciativa, getMiembros, getMisTareas, getUsuario, getUsuarios, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail, crearSolicitud } from '../../api/api.js';
+import { getIniciativa, getMiembros, getMisTareas, getUsuario, getUsuarios, getSolicitudes, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail, crearSolicitud, existeSolicitud } from '../../api/api.js';
 import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import './Initiative.css';
@@ -83,8 +83,9 @@ export const Initiative = () => {
   const [usuarios, setUsuarios] = useState([]);
   const [filtro, setFiltro] = useState('');
   const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
-  const [invitarCargando, setInvitarCargando] = useState(false);
-  const [invitarDesactivado, setInvitarDesactivado] = useState(false);
+  const [invitarCargando, setInvitarCargando] = useState(false); //Implementar?
+  const [usuariosDesactivados, setUsuariosDesactivados] = useState({});
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -103,9 +104,15 @@ export const Initiative = () => {
         await actualizarMiembros();
 
         const usuariosData = await getUsuarios();
-        setUsuarios(Object.values(usuariosData));
-        setUsuariosFiltrados(Object.values(usuariosData));
-        console.log("usuarios:",  usuariosData)
+
+        const usuariosSinMiembros = Object.values(usuariosData).filter(usuario => 
+          usuario.idUsuario !== iniciativaData.idAdmin &&
+          !iniciativaData.listaMiembros.includes(usuario.idUsuario) && !usuario.esAdmin
+        );
+
+        setUsuarios(usuariosSinMiembros);
+        setUsuariosFiltrados(usuariosSinMiembros);
+        console.log("usuarios:", usuariosSinMiembros);
 
         const solicitudes = await getSolicitudes("Iniciativas", idIniciativa);
         console.log(solicitudes);
@@ -138,6 +145,21 @@ export const Initiative = () => {
     };
     fetchData();
   }, [idIniciativa]);
+
+  useEffect(() => {
+    const verificarSolicitudes = async () => {
+      let desactivados = {};
+      for (const usuario of usuariosFiltrados) {
+        const existe = await existeSolicitud(usuario.idUsuario, idIniciativa);
+        desactivados[usuario.idUsuario] = existe;
+      }
+      setUsuariosDesactivados(desactivados);
+    };
+  
+    if (usuariosFiltrados && usuariosFiltrados.length > 0) {
+      verificarSolicitudes();
+    }
+  }, [usuariosFiltrados]);
 
   const ProgressBar = ({ progress }) => {
     return (
@@ -179,22 +201,22 @@ export const Initiative = () => {
     
   };
 
-  const handleInvitarUsuario = async(index) => {
-    let usuariosNuevo = usuarios;
-    const userInvitado = usuariosNuevo[index].idUsuario
+  const handleInvitarUsuario = async (index, idUsuario) => {
+    let usuariosNuevo = [...usuarios];
     try {
       // Crear solicitud
-      setInvitarDesactivado(true);
       setInvitarCargando(true);
-      const solicitud = new Solicitud(userInvitado, idIniciativa, "Pendiente", "IniciativaAUsuario");
+      const solicitud = new Solicitud(idUsuario, idIniciativa, "Pendiente", "IniciativaAUsuario");
       const response = await crearSolicitud(solicitud);
-
+  
       // Actualizar la lista de solicitudes de la iniciativa y del miembro
       if (response.success) {
         iniciativa.listaSolicitudes.push(response.data);
-
         usuariosNuevo[index].listaSolicitudes.push(response.data);
-
+  
+        // Actualizar el estado de desactivación
+        setUsuariosDesactivados((prev) => ({ ...prev, [idUsuario]: true }));
+  
         // Cierra el modal
         setShowInvitarModal(false);
       }
@@ -203,7 +225,8 @@ export const Initiative = () => {
     } finally {
       setInvitarCargando(false);
     }
-  }
+  };
+  
 
   const handleAceptarSolicitud = async(index) => {
     //Actualizar Estatus de solicitud
@@ -509,7 +532,12 @@ export const Initiative = () => {
                     <div className='user-info'>
                       <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
                     </div>
-                    <Button variant="primary" onClick={() => handleInvitarUsuario(id)}>Invitar</Button>
+                    <Button
+                      variant="primary"
+                      disabled={usuariosDesactivados[usuario.idUsuario]}
+                      onClick={() => handleInvitarUsuario(id, usuario.idUsuario)}
+                    >
+                      Invitar</Button>
                   </li>
                 ))}
               </ul>
