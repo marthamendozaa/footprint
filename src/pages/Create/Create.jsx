@@ -616,14 +616,22 @@ export const Create = () => {
           {/* Tareas y Miembros*/}
           <div className="c-tareas-miembros">
             <div className="c-seccion-tareas">
+
+              {/* Agregar tarea */}
               <button type="button" className="c-btn-agregar-tarea" onClick={handleCrearTarea}>
                 <IoMdAddCircleOutline style={{marginRight: "5px"}}/>
                 Añadir tarea
               </button>
+
+              {/* Tarea */}
               <div className="c-tareas-container">
                 {tareas.map((tarea, idTarea) => (
                   <div className="c-tarea" key={idTarea}>
+                    
+                    {/* Titulo + descripción */}
                     <div className="c-tarea-info">
+
+                      {/* Titulo */}
                       <div className="c-tarea-titulo">
                         {tarea.editandoTitulo ? (
                           <input
@@ -645,6 +653,8 @@ export const Create = () => {
                           </div>
                         )}
                       </div>
+
+                      {/* Descripcion */}
                       <div className="c-tarea-desc">
                         {tarea.editandoDesc ? (
                           <div className="c-tarea-texto">
@@ -668,9 +678,12 @@ export const Create = () => {
                             <FaPen />
                           </button>
                         )}
-                      </div>
+                      </div> 
                     </div>
+
+                    {/* Botones izquierda */}
                     <div className="c-tarea-botones">
+                      {/* Fecha */}
                       <div className="c-tarea-boton"><FaCalendar /> Fecha
                         <DatePicker
                           className='react-datepicker-2'
@@ -681,6 +694,8 @@ export const Create = () => {
                           locale={es}
                         />
                       </div>
+
+                      {/* Documento */}
                       <div className="c-tarea-boton"><FaFolder /> Documento</div>
                     </div>
                   </div>
@@ -688,7 +703,7 @@ export const Create = () => {
               </div>
             </div>
 
-
+            {/* Invitar mimebros */}
             <div className="c-seccion-miembros">
               <div className="c-btn-invitar-miembro">
                 <IoMdAddCircleOutline style={{marginRight: "5px"}}/>
@@ -696,7 +711,6 @@ export const Create = () => {
               </div>
             </div>
           </div>
-          
           
           {/* Botón crear */}
           <div className="c-crear-container">
@@ -706,6 +720,8 @@ export const Create = () => {
               </button>
             </div>
           </div>
+
+          {/* ----------------- Modales ----------------- */}
 
           {/* Subir imagen */}
           <Modal className="c-modal" show={modalImagen} onHide={handleCerrarImagen}>
