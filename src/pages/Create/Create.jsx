@@ -557,7 +557,7 @@ export const Create = () => {
           <div className="c-desc">
             {editandoDesc ?(
               <div className='c-container-conteo'>
-                <div className="c-desc-conteo" style={{marginTop: '-30px', marginLeft: '910px'}}>
+                <div className="c-desc-conteo">
                   {desc ? `${desc.length}/200` : `0/200`}
                 </div>
                 
