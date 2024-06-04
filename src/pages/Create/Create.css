@@ -302,6 +302,7 @@ li.c-etiqueta-item:hover {
 }
 
 .c-container-conteo {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -312,16 +313,15 @@ li.c-etiqueta-item:hover {
   font-weight: 600;
   font-size: 18px;
   color: #121212;
+  margin-top: "-30px";
+  right: 0;
 }
 
 .c-desc-texto {
   position: relative;
   width: 100%;
-
   background-color: #A0C1BF;
-  
   border-radius: 25px;
-
   text-align: left;
   font-weight: 600;
   font-size: 20px;
@@ -332,17 +332,14 @@ li.c-etiqueta-item:hover {
 .c-desc-input-texto {
   position: relative;
   width: 100%;
-
   background-color: transparent;
   border-radius: 0px;
   outline: none;
-
   text-align: left;
   font-weight: 600;
   font-size: 20px;
   color: #121212;
   word-break: break-all;
-
   resize: none;
 }
 
@@ -513,8 +510,28 @@ input.c-tarea-titulo {
   padding: 20px;
   width: 500px;
   justify-content: center;
+}
+
+.c-drag-drop {
+  display: flex;
+  width: 400px;
+  border: 2px dashed #ccc;
+  border-radius: 20px;
+  justify-content: center;
   align-items: center;
-  flex-direction: row;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.c-drag-drop-image {
+  font-size: 50px;
+  color: #A0C1BF;
+  margin: 10px;
+  margin-bottom: 0px;
+}
+
+.c-drag-drop-text {
+  margin: 10px;
 }
 
 .c-custom-file-button {

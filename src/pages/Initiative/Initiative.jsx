@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock } from 'react-icons/fa';
+import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages } from 'react-icons/fa';
+import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
 import { useAuth } from '../../contexts/AuthContext';
 import { Spinner, Modal, Button } from 'react-bootstrap';
@@ -7,32 +8,25 @@ import { ClipLoader } from 'react-spinners';
 import { useParams } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import es from 'date-fns/locale/es';
-import { getIntereses, getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, subirImagen, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, sendRemoveMail } from '../../api/api.js';
+import { getIntereses, getIniciativa, getMiembros, getMisTareas, getUsuario, getSolicitudes, subirImagen, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro } from '../../api/api.js';
 import './Initiative.css';
 
 export const Initiative = () => {
  // Miembro seleccionado a eliminar
  const [miembroEliminar, setMiembroEliminar] = useState(null);
- const [idMiembroEliminar, setIdMiembroEliminar] = useState(null);
 
  // Modal de confirmación de eliminación
  const [modalEliminar, setModalEliminar] = useState(false);
  const handleCerrarEliminar = () => setModalEliminar(false);
- const handleMostrarEliminar = (miembro, idMiembro) => {
-   setMiembroEliminar(miembro.nombreUsuario);
-   setIdMiembroEliminar(idMiembro);
+ const handleMostrarEliminar = (miembro) => {
+   setMiembroEliminar(miembro);
    setModalEliminar(true);
  }
 
  // Modal de miembro eliminado
  const [modalEliminada, setModalEliminada] = useState(false);
  const handleMostrarEliminada = () => setModalEliminada(true);
- const handleCerrarEliminada = async () => {
-   setModalEliminada(false);
-   //const dataMiembros = await getMiembros();
-   //setMiembros(dataMiembros);
-   await actualizarMiembros();
- }
+ const handleCerrarEliminada = () => setModalEliminada(false);
 
  // Modal de error
  const [modalError, setModalError] = useState(false);
@@ -43,17 +37,22 @@ export const Initiative = () => {
  const [eliminaBloqueado, setEliminaBloqueado] = useState(false);
 
  const handleEliminaMiembro = async () => {
-   handleCerrarEliminar();
    setEliminaBloqueado(true);
-   sendRemoveMail(idIniciativa, idMiembroEliminar);
 
    try {
-     await eliminarMiembro(idIniciativa, idMiembroEliminar);
-     handleMostrarEliminada();
+      await eliminarMiembro(idIniciativa, miembroEliminar.idUsuario);
+      await enviarCorreoMiembro(iniciativa, miembroEliminar);
+
+      const miembrosNuevo = miembros.filter((miembro) => miembro.idUsuario !== miembroEliminar.idUsuario);
+      setMiembros(miembrosNuevo);
+      
+      handleCerrarEliminar();
+      handleMostrarEliminada();
    } catch(error) {
-     handleMostrarError();
+      handleCerrarEliminar();
+      handleMostrarError();
    } finally {
-     setEliminaBloqueado(false);
+      setEliminaBloqueado(false);
    }
  };
 
@@ -171,7 +170,8 @@ export const Initiative = () => {
         const usuarioData = await getUsuario(user);
         setEsAdmin(usuarioData.idUsuario === iniciativaData.idAdmin);
         
-        await actualizarMiembros();
+        const miembrosData = await getMiembros(idIniciativa);
+        setMiembros(miembrosData);
 
         const solicitudes = await getSolicitudes("Iniciativas", idIniciativa);
 
@@ -236,15 +236,6 @@ export const Initiative = () => {
     const solicitud = solicitudesRecibidasNuevo[index];
     setSolicitudesRecibidas(solicitudesRecibidasNuevo);
     await actualizaSolicitud(solicitud);
-  };
-
-  const actualizarMiembros = async () => {
-    try {
-      const dataMiembros = await getMiembros(idIniciativa);
-      setMiembros(dataMiembros);
-    } catch (error) {
-      console.error("Error obteniendo miembros:", error.message);
-    }
   };
 
   // Editar la información
@@ -404,7 +395,7 @@ export const Initiative = () => {
 
   return (
     <div>
-      {iniciativa ? (
+      {iniciativa && tareas && miembros ? (
         <div className="i-container">
           <div className="i-iniciativa-container">
             {/* Boton para editar todo */}
@@ -646,8 +637,8 @@ export const Initiative = () => {
                             </div>
 
                             <div className='i-icon-estilos'>
-                              { esAdmin && (
-                                <FaTimesCircle  onClick={() => handleMostrarEliminar(miembro, miembro.idUsuario)} disabled={eliminaBloqueado} className="i-icon-times-circle" />
+                              {esAdmin && (
+                                <FaTimesCircle  onClick={() => handleMostrarEliminar(miembro)} className="i-icon-times-circle" />
                               )}
                             </div>
                           </div>
@@ -763,13 +754,19 @@ export const Initiative = () => {
         </Modal.Header>
           
         <div className="c-input-body">
-          <div {...getRootPropsImagen({ className: 'c-custom-file-button' })}>
+          <div {...getRootPropsImagen({ className: "c-drag-drop" })}>
             <input {...getInputPropsImagen()} />
-            Subir foto
+            <FaImages className="c-drag-drop-image"/>
+            {imagenSeleccionada ? (
+              <div className="c-drag-drop-text">
+                {imagenSeleccionada.name}
+              </div>
+            ) : (
+              <div className="c-drag-drop-text" style={{width: "150px"}}>
+                <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra una imagen
+              </div>
+            )}
           </div>
-          <span className="c-custom-file-text">
-            {imagenSeleccionada ? (imagenSeleccionada.name) : "Ninguna imagen seleccionada"}
-          </span>
         </div>
         {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
 
@@ -780,17 +777,25 @@ export const Initiative = () => {
       </Modal>
 
       {/* Subir tareas */}
-      <Modal className="p-modal" show={showUploadModal} onHide={closeUploadModal}>
+      <Modal className="c-modal" show={showUploadModal} onHide={closeUploadModal}>
         <Modal.Header>
-          <div className='p-modal-title'>Archivos</div>
+          <div className="c-modal-title">Subir Archivo</div>
         </Modal.Header>
         
-        <div className="p-input-body">
-          <div {...getRootPropsTarea({ className: 'p-custom-file-button' })}>
+        <div className="c-input-body">
+          <div {...getRootPropsTarea({ className: "c-drag-drop" })}>
             <input {...getInputPropsTarea()} />
-            Subir archivo
+            <LuUpload className="c-drag-drop-image"/>
+            {selectedFile ? (
+              <div className="c-drag-drop-text">
+                {selectedFile.name}
+              </div>
+            ) : (
+              <div className="c-drag-drop-text" style={{width: "150px"}}>
+                <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra un archivo
+              </div>
+            )}
           </div>
-          <span className="p-custom-file-text">{selectedFile ? selectedFile.name : "Ningun archivo seleccionado"}</span>
         </div>
         {fileError && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{fileError}</span>}
   
@@ -802,16 +807,20 @@ export const Initiative = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal confirmar eliminar iniciativa*/}
+      {/* Modal confirmar eliminar miembro*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
         <Modal.Header>
           <div className="ea-modal-title">Confirmar eliminación</div>
         </Modal.Header>
-          <div className="ea-modal-body">
-            ¿Estás seguro que quieres eliminar a <span style={{fontWeight:'bold'}}>{miembroEliminar}</span>?
-          </div>
+          {miembroEliminar && (
+            <div className="ea-modal-body">
+              ¿Estás seguro que quieres eliminar a <span style={{fontWeight:'bold'}}>{miembroEliminar.nombreUsuario}</span>?
+            </div>
+          )}
         <Modal.Footer>
-          <Button className="eliminar" onClick={handleEliminaMiembro}>Eliminar</Button>
+          <Button className="eliminar" onClick={handleEliminaMiembro} disabled={eliminaBloqueado} style={{width: "127px"}}>
+            {eliminaBloqueado ? <ClipLoader size={20} color="#fff" /> : 'Eliminar'}
+          </Button>
           <Button onClick={handleCerrarEliminar}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
@@ -821,9 +830,11 @@ export const Initiative = () => {
         <Modal.Header>
           <div className="ea-modal-title">Éxito</div>
         </Modal.Header>
-          <div className="ea-modal-body">
-            Miembro <span style={{fontWeight:'bold'}}>{miembroEliminar}</span> eliminado exitosamente
-          </div>
+          {miembroEliminar && (
+            <div className="ea-modal-body">
+              Miembro <span style={{fontWeight:'bold'}}>{miembroEliminar.nombreUsuario}</span> eliminado exitosamente
+            </div>
+          )}
         <Modal.Footer>
           <Button onClick={handleCerrarEliminada}>Cerrar</Button>
         </Modal.Footer>
@@ -834,9 +845,11 @@ export const Initiative = () => {
         <Modal.Header>
         <div className="ea-modal-title">Error</div>
         </Modal.Header>
-          <div className="ea-modal-body">
-            Error al eliminar miembro <span style={{fontWeight:'bold'}}>{miembroEliminar}</span>
-          </div>
+          {miembroEliminar && (
+            <div className="ea-modal-body">
+              Error al eliminar miembro <span style={{fontWeight:'bold'}}>{miembroEliminar.nombreUsuario}</span>
+            </div>
+          )}
         <Modal.Footer>
           <Button onClick={handleCerrarError}>Cerrar</Button>
         </Modal.Footer>

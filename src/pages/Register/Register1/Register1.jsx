@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FaEnvelope, FaArrowRight, FaLock, FaEye, FaEyeSlash, FaExclamationCircle} from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
 import { PrivacyPolicy } from './PrivacyPolicy.jsx';
+import PasswordInfo from './PasswordInfo.jsx';
 import { existeCorreo } from '../../../api/api.js';
 import './Register1.css';
 
@@ -50,6 +51,27 @@ export const Register1 = ({ onNext, usuario }) => {
     setChangingEmail(false);
   };
 
+  // Valida correo al cargar la página si ya está autocompletado
+  const emailInputRef = useRef(null);
+
+  const handleAutofilledEmail = async (email) => {
+    const response = await existeCorreo(email);
+    setDuplicateEmail(response);
+  }
+
+  useEffect(() => {
+    // Timer para esperar a que se complete el autocompletado del correo
+    const delay = 1000;
+    const timer = setTimeout(() => {
+      const autofilled = emailInputRef.current.value;
+      if (autofilled) {
+        handleAutofilledEmail(autofilled);
+      }
+    }, delay);
+  
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleStrengthChange = (score) => {
     setPasswordStrength(score);
   };
@@ -91,6 +113,7 @@ export const Register1 = ({ onNext, usuario }) => {
               <div className="relative">
                 <input
                   className={`correo-caja-register ${invalidEmail || duplicateEmail ? 'border-red-register' : ''}`}
+                  ref={emailInputRef}
                   type="correo"
                   placeholder="Ingresa el correo"
                   value={email}
@@ -127,6 +150,8 @@ export const Register1 = ({ onNext, usuario }) => {
             <div className='container-contrasena-register'>
               <div className='container-contrasena-register-2'>
                 <p className='contrasena-texto-register'>Contraseña</p>
+                {/* Info de contraseña */}
+                <PasswordInfo/>
               </div>
 
               {/* Ojo */}

@@ -41,11 +41,13 @@ const Navbar = ({ isCreateOpen, toggleCreate }) => {
       </div>
 
       {/* Logo */}
-      {isCreateOpen ? (
-        <img src={logo} style={{marginBottom: '70px'}}/>
-      ) : (
-        <img src={logo2} style={{marginBottom: '70px'}}/>
-      )}
+      <div style={{display: "flex", minHeight: "100px", marginBottom: "70px"}}>
+        {isCreateOpen ? (
+          <img src={logo} style={{width: "80%", paddingLeft: "10px", objectFit: "contain"}}/>
+        ) : (
+          <img src={logo2} style={{width: "100%", objectFit: "contain"}}/>
+        )}
+      </div>
 
       {/* Páginas */}
       <li className={selectedTab === 'explore' ? 'selected' : ''} onClick={() => handleTabClick('explore')}>
