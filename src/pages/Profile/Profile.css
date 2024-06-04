@@ -17,7 +17,6 @@
   font-size: 45px;
   font-weight: 600;
   margin-bottom: 10px;
-  font-family: "Inter", sans-serif;
 }
 
 .profile-info {
@@ -73,57 +72,7 @@
   opacity: 1;
 }
 
-/* Modal subir imgen */
-.p-input-body {
-  display: flex;
-  padding: 20px;
-  width: 500px;
-  font-family: "Inter", sans-serif;
-  justify-content: center;
-  align-items: center;
-  flex-direction: row;
-}
-
-.p-custom-file-button {
-  border: 2px solid #ccc;
-  background-color: #f2f2f2;
-  border-radius: 30px;
-  padding: 6px 12px;
-  cursor: pointer;
-}
-
-.p-custom-file-button:hover {
-  background-color: #d4d4d4;
-}
-
-.p-input-imagen {
-  display: flex;
-  width: 60%;
-}
-
-.p-custom-file-input {
-  width: 0;
-  height: 0;
-  visibility: hidden;
-}
-
-.p-custom-file-text {
-  margin-left: 10px;
-}
-
-.p-error-imagen {
-  color: red;
-  font-size: 18px;
-  font-weight: 500;
-  margin-bottom: 15px;
-  margin-left: 25px;
-  margin-right: 25px;
-}
-
-.p-fa-ec{
-  margin-right: 5px;
-}
-
+/* Modales */
 .fade.p-modal.modal.show {
   display: flex !important;
   align-items: center;
@@ -140,7 +89,6 @@
 
 .p-modal-body {
   padding: 16px;
-  font-family: "Inter", sans-serif;
 }
 
 .p-modal .modal-header,
@@ -162,7 +110,6 @@
 .p-modal-title {
   font-weight: 600;
   font-size: 30px;
-  font-family: "Inter", sans-serif;
 }
 
 .p-modal .btn.btn-primary {
@@ -200,7 +147,6 @@
   font-size: 30px;
   font-weight: 600;
   margin-bottom: 10px;
-  font-family: "Inter", sans-serif;
 }
 
 .edit-name-box {
@@ -259,7 +205,6 @@
   font-size: 16px;
   margin-right: 3px;
   font-weight: 600;
-  font-family: "Inter", sans-serif;
 }
 
 .p-correo {
@@ -268,8 +213,8 @@
 }
 
 /* Cambiar contraseña */
-.p-info button{
-  font-size: 13px;
+.p-info button {
+  font-size: 12px;
   background-color: #f2f2f2;
   padding: 0px 0px;
   width: 147px;
@@ -307,6 +252,14 @@
   cursor: pointer;
   right: 0;
   margin: 16px;
+}
+
+.p-row-dos-iconos {
+  display: flex;
+  flex-direction: row;
+  position: absolute;
+  cursor: pointer;
+  right: 0;
 }
 
 .p-p-icono {
@@ -367,6 +320,13 @@
 .change-password-cancel:hover {
   background-color: #cb3c3c;
   color: white;
+}
+
+.modal-footer .btn {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 44px;
 }
 
 /* Información */

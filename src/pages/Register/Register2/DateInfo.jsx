@@ -23,13 +23,11 @@ const DateInfo = () => {
   );
 
   return (
-    <span
-      className="d-d-inline-block"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <FaInfoCircle className='d-fa-info-icon'/>
-      {showPopover && <div className="date-info-popover">{dateRules}</div>}
+    <span className="d-d-inline-block">
+      <FaInfoCircle className='d-fa-info-icon'
+        onMouseEnter={handleMouseEnter}
+      />
+      {showPopover && <div className="date-info-popover" onMouseLeave={handleMouseLeave}>{dateRules}</div>}
     </span>
   );
 };

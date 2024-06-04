@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { FaHeart, FaRegHeart, FaSearch, FaTrash } from "react-icons/fa";
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
-import { getIniciativas, getUsuarios, getMisIniciativas, actualizaUsuario, crearSolicitud, suscribirseAIniciativa, existeSolicitud, eliminaIniciativa, sendMail, getIntereses, getRegiones } from '../../api/api.js';
+import { getIniciativas, getUsuarios, getMisIniciativas, actualizaUsuario, crearSolicitud, suscribirseAIniciativa, existeSolicitud, eliminaIniciativa, enviarCorreoIniciativa, getIntereses, getRegiones } from '../../api/api.js';
 import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
@@ -174,9 +174,9 @@ export const Explore = () => {
     const busqueda = event.target.value;
     setFiltro(busqueda);
 
-    // Mostrar todas las iniciativas si no hay término de búsqueda
+    // Si no hay término de búsqueda, mostrar todas las iniciativas
     if (!busqueda) {
-      setIniciativasFiltradas(iniciativas);
+      setIniciativasFiltradas(filtrarIniciativas(iniciativas));
       return;
     }
 
@@ -190,45 +190,59 @@ export const Explore = () => {
     // Filtrar las iniciativas que coincidan con el término de búsqueda
     const resultado = fuse.search(busqueda);
     const filtradas = resultado.map((item) => item.item);
-    setIniciativasFiltradas(filtradas);
+    
+    setIniciativasFiltradas(filtrarIniciativas(filtradas));
   };
-
+  
 
   // Manejar filtros de búsqueda
-  useEffect(() => {
-    if (iniciativasFiltradas) {
-      setIniciativasFiltradas(iniciativas.filter(iniciativa => {
-        // Si se borran los filtros, mostrar todas las iniciativas
-        let filtroEtiqueta = etiquetasSeleccionadas.length === 0 ? true : false;
-        let filtroPrivacidad = privacidadesSeleccionadas.length === 0 ? true : false;
-        let filtroRegion = regionesSeleccionadas.length === 0 ? true : false;
-
-        // Filtrar por etiquetas
-        const etiquetasIniciativa = Object.values(iniciativa.listaEtiquetas);
-        for (let etiqueta of etiquetasIniciativa) {
-          if (etiquetasSeleccionadas.includes(etiqueta)) {
-            filtroEtiqueta = true;
-            break;
-          }
-        };
-        
-        // Filtrar por privacidad
-        const privacidadIniciativa = iniciativa.esPublica ? "Pública" : "Privada";
-        if (privacidadesSeleccionadas.includes(privacidadIniciativa)) {
-          filtroPrivacidad = true;
-        }
-
-        // Filtrar por región
-        const regionIniciativa = iniciativa.region;
-        if (regionesSeleccionadas.includes(regionIniciativa)) {
-          filtroRegion = true;
-        }
-
-        return filtroEtiqueta && filtroPrivacidad && filtroRegion;
-      }));
+  const filtrarIniciativas = (iniciativas) => {
+    if (!iniciativas) {
+      return [];
     }
+    return iniciativas.filter(iniciativa => {
+      // Si se borran los filtros, mostrar todas las iniciativas
+      let filtroEtiqueta = etiquetasSeleccionadas.length === 0 ? true : false;
+      let filtroPrivacidad = privacidadesSeleccionadas.length === 0 ? true : false;
+      let filtroRegion = regionesSeleccionadas.length === 0 ? true : false;
+
+      // Filtrar por etiquetas
+      const etiquetasIniciativa = Object.values(iniciativa.listaEtiquetas);
+      for (let etiqueta of etiquetasIniciativa) {
+        if (etiquetasSeleccionadas.includes(etiqueta)) {
+          filtroEtiqueta = true;
+          break;
+        }
+      };
+      
+      // Filtrar por privacidad
+      const privacidadIniciativa = iniciativa.esPublica ? "Pública" : "Privada";
+      if (privacidadesSeleccionadas.includes(privacidadIniciativa)) {
+        filtroPrivacidad = true;
+      }
+
+      // Filtrar por región
+      const regionIniciativa = iniciativa.region;
+      if (regionesSeleccionadas.includes(regionIniciativa)) {
+        filtroRegion = true;
+      }
+
+      return filtroEtiqueta && filtroPrivacidad && filtroRegion;
+    });
+  };
+
+  useEffect(() => {
+    buscarIniciativa({ target: { value: filtro } });
   }, [etiquetasSeleccionadas, privacidadesSeleccionadas, regionesSeleccionadas]);
-  
+
+
+  // Borrar filtros de búsqueda
+  const handleBorrarFiltros = () => {
+    setEtiquetasSeleccionadas([]);
+    setPrivacidadesSeleccionadas([]);
+    setRegionesSeleccionadas([]);
+  };
+
 
   // Seleccionar una iniciativa
   const [showModalIniciativa, setShowModalIniciativa] = useState(false);
@@ -364,12 +378,7 @@ export const Explore = () => {
   // Modal de iniciativa eliminada
   const [modalEliminada, setModalEliminada] = useState(false);
   const handleMostrarEliminada = () => setModalEliminada(true);
-  const handleCerrarEliminada = async () => {
-    setModalEliminada(false);
-    const iniciativasData = iniciativas.filter(iniciativa => iniciativa.idIniciativa !== seleccionada.idIniciativa);
-    setIniciativas(iniciativasData);
-    setIniciativasFiltradas(iniciativasData);
-  }
+  const handleCerrarEliminada = () => setModalEliminada(false);
 
   // Modal de error
   const [modalError, setModalError] = useState(false);
@@ -381,16 +390,22 @@ export const Explore = () => {
 
   const handleEliminaIniciativa = async () => {
     setEliminaBloqueado(true);
-    sendMail(seleccionada.idIniciativa);
 
     try {
+      await enviarCorreoIniciativa(seleccionada);
       await eliminaIniciativa(seleccionada.idIniciativa);
+
+      const iniciativasData = iniciativas.filter(iniciativa => iniciativa.idIniciativa !== seleccionada.idIniciativa);
+      setIniciativas(iniciativasData);
+      setIniciativasFiltradas(iniciativasData);
+
+      handleCerrarEliminar();
+      handleMostrarEliminada();
     } catch (error) {
+      handleCerrarEliminar();
       handleMostrarError();
     } finally {
       setEliminaBloqueado(false);
-      handleCerrarEliminar();
-      handleMostrarEliminada();
     }
   };
 
@@ -406,17 +421,25 @@ export const Explore = () => {
             value={filtro}
             onChange={buscarIniciativa}
             className='e-searchBarCaja'
+            style={filtro ? {
+              border: "2px #b6b6b6 solid",
+              boxShadow: "#b6b6b6 2px 4px 0px 0px"} : {}}
           />
         </div>
 
-        {/* Filtros dropdowns */}
-        {etiquetas && regiones && (
+        {(etiquetas && regiones && iniciativasFiltradas && iniciativasFavoritas) ? ( <div className="e-contenido">
+          {/* Filtros dropdowns */}
           <div className="e-filtros-container">
             <div className="e-filtros-titulo">Filtrar por:</div>
 
             {/* Dropdown etiquetas */}
             <div className="c-dropdown-container" ref={dropdownEtiquetaRef}>
-              <button className="c-selecciona-dropdown" onClick={() => setDropdownEtiqueta(!dropdownEtiqueta)}>
+              {/* Resalta botón si hay etiquetas seleccionadas */}
+              <button className="e-selecciona-dropdown"
+                onClick={() => setDropdownEtiqueta(!dropdownEtiqueta)}
+                style={etiquetasSeleccionadas.length > 0 ? {
+                  border: "2px #b6b6b6 solid",
+                  boxShadow: "#b6b6b6 2px 4px 0px 0px"} : {}}>
                 <span className="mr-2">Etiquetas</span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
                   <path fillRule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -427,6 +450,7 @@ export const Explore = () => {
                 <div className="c-dropdown">
                   {/* Input búsqueda etiqueta */}
                   <input className="c-dropdown-input" type="text" placeholder="Buscar..." autoComplete="off" value={buscaEtiqueta} onChange={handleBuscaEtiqueta} />
+                  
                   {/* Resultados búsqueda etiqueta */}
                   {resultadosEtiqueta.map((etiqueta, idEtiqueta) => (
                     <label key={idEtiqueta} className="e-dropdown-item">
@@ -445,7 +469,12 @@ export const Explore = () => {
             
             {/* Dropdown privacidad */}
             <div className="c-dropdown-container" ref={dropdownPrivacidadRef}>
-              <button className="c-selecciona-dropdown" onClick={() => setDropdownPrivacidad(!dropdownPrivacidad)}>
+              {/* Resalta botón si hay privacidades seleccionadas */}
+              <button className="e-selecciona-dropdown"
+                onClick={() => setDropdownPrivacidad(!dropdownPrivacidad)}
+                style={privacidadesSeleccionadas.length > 0 ? {
+                  border: "2px #b6b6b6 solid",
+                  boxShadow: "#b6b6b6 2px 4px 0px 0px"} : {}}>
                 <span className="mr-2">Privacidad</span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
                   <path fillRule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -468,7 +497,12 @@ export const Explore = () => {
             
             {/* Dropdown región */}
             <div className="c-dropdown-container" ref={dropdownRegionRef}>
-              <button className="c-selecciona-dropdown" onClick={() => setDropdownRegion(!dropdownRegion)}>
+              {/* Resalta botón si hay regiones seleccionadas */}
+              <button className="e-selecciona-dropdown"
+                onClick={() => setDropdownRegion(!dropdownRegion)}
+                style={regionesSeleccionadas.length > 0 ? {
+                  border: "2px #b6b6b6 solid",
+                  boxShadow: "#b6b6b6 2px 4px 0px 0px"} : {}}>
                 <span className="mr-2">Ubicación</span>
                 <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
                   <path fillRule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -479,6 +513,7 @@ export const Explore = () => {
                 <div className="c-dropdown">
                   {/* Input búsqueda región */}
                   <input className="c-dropdown-input" type="text" placeholder="Buscar..." autoComplete="off" value={buscaRegion} onChange={handleBuscaRegion} />
+                  
                   {/* Resultados búsqueda región */}
                   {resultadosRegion.map((region, idRegion) => (
                     <label key={idRegion} className="e-dropdown-item">
@@ -495,55 +530,54 @@ export const Explore = () => {
 
             </div>
 
-            <div className="e-filtros-borrar">Borrar</div>
+            <div className="e-filtros-borrar" onClick={handleBorrarFiltros}>Borrar</div>
           </div>
-        )}
 
-        {/* Iniciativas */}
-        <div className='e-iniciativas-container' style={iniciativasFiltradas && iniciativasFavoritas ? {} : {justifyContent: "center"}}>
-          
-          {/* Si no hay iniciativas, mostrar spinner */}
-          {iniciativasFiltradas && iniciativasFavoritas ? (
-            iniciativasFiltradas.map((iniciativa, indice) => (
-            <div key={indice} className='e-iniciativa' onClick={() => seleccionaIniciativa(iniciativa, indice)}>
+          {/* Iniciativas */}
+          <div className='e-iniciativas-container'>
+            {iniciativasFiltradas.map((iniciativa, indice) => (
+              <div key={indice} className='e-iniciativa' onClick={() => seleccionaIniciativa(iniciativa, indice)}>
 
-              {/* Nombre y foto del usuario administrador*/}
-              <div className='e-iniciativa-admin'>
-                <img src={iniciativa.urlImagenAdmin} alt = {iniciativa.nombreAdmin} />
-                <div className='e-nombre-admin'>{iniciativa.nombreAdmin}</div>
-              </div>
-              
-              {/* Imagen de la iniciativa */}
-              <div className='e-iniciativa-imagen'>
-                <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
-              </div>
-              
-              {/* Titulo, descripción, y botón */}
-              <div className='e-iniciativa-contenido'>
-                <div className="e-titulo">{iniciativa.titulo}</div>
-                <div className="e-desc">{iniciativa.descripcion}</div>
-
-                {/* Botón */}
-                <div className='e-boton' onClick={(e) => e.stopPropagation()}>
-                  {admin ? (
-                    <FaTrash onClick={() => handleMostrarEliminar(iniciativa)} style={{ cursor: "pointer" }} />
-                  ) : (
-                    iniciativasFavoritas.includes(iniciativa.idIniciativa) ? (
-                      <FaHeart onClick={() => handleToggleFavorita(iniciativa.idIniciativa)} style={{ cursor: "pointer" }} />
-                    ) : (
-                      <FaRegHeart onClick={() => handleToggleFavorita(iniciativa.idIniciativa)} style={{ cursor: "pointer" }} />
-                    )
-                  )}
+                {/* Nombre y foto del usuario administrador*/}
+                <div className='e-iniciativa-admin'>
+                  <img src={iniciativa.urlImagenAdmin} alt = {iniciativa.nombreAdmin} />
+                  <div className='e-nombre-admin'>{iniciativa.nombreAdmin}</div>
                 </div>
+                
+                {/* Imagen de la iniciativa */}
+                <div className='e-iniciativa-imagen'>
+                  <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
+                </div>
+                
+                {/* Titulo, descripción, y botón */}
+                <div className='e-iniciativa-contenido'>
+                  <div className="e-titulo">{iniciativa.titulo}</div>
+                  <div className="e-desc">{iniciativa.descripcion}</div>
+
+                  {/* Botón */}
+                  <div className='e-boton' onClick={(e) => e.stopPropagation()}>
+                    {admin ? (
+                      <FaTrash onClick={() => handleMostrarEliminar(iniciativa)} style={{ cursor: "pointer" }} />
+                    ) : (
+                      iniciativasFavoritas.includes(iniciativa.idIniciativa) ? (
+                        <FaHeart onClick={() => handleToggleFavorita(iniciativa.idIniciativa)} style={{ cursor: "pointer" }} />
+                      ) : (
+                        <FaRegHeart onClick={() => handleToggleFavorita(iniciativa.idIniciativa)} style={{ cursor: "pointer" }} />
+                      )
+                    )}
+                  </div>
+                </div>
+
               </div>
-            </div>
-          ))
+            ))
+          }
+          </div>
+        </div>
         ) : (
-          <div className="spinner">
+          <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
             <Spinner animation="border" role="status"></Spinner>
           </div>
-        )}
-        </div>
+        )}        
 
         {/* Mostrar información adicional */}
         <ModalIniciativa
@@ -571,8 +605,8 @@ export const Explore = () => {
             ¿Estás seguro que quieres eliminar la iniciativa <span style={{fontWeight:'bold'}}>{seleccionada.titulo}</span>?
           </div>
         <Modal.Footer>
-          <Button className="eliminar" onClick={handleEliminaIniciativa} disabled={eliminaBloqueado} style={{width: "119px"}}>
-            {eliminaBloqueado ? <ClipLoader color="white" size={15} /> : "Eliminar"}
+          <Button className="eliminar" onClick={handleEliminaIniciativa} disabled={eliminaBloqueado} style={{width: "128px"}}>
+            {eliminaBloqueado ? <ClipLoader color="white" size={20} /> : "Eliminar"}
           </Button>
           <Button onClick={handleCerrarEliminar}>Cerrar</Button>
           </Modal.Footer>

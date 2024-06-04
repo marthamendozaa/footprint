@@ -71,13 +71,17 @@
   align-items: center;
 }
 
-.c-titulo-texto,
+.c-titulo-texto-tarea {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .c-titulo-input {
   display: flex;
   overflow: overlay;
 }
 
-.c-titulo-texto::-webkit-scrollbar,
 .c-titulo-input::-webkit-scrollbar {
   display: none;
 }
@@ -94,8 +98,9 @@
   font-size: 20px;
   font-weight: 600;
   color: #A0C1BF;
-  margin-left: 10px;
-  margin-top: 20px;
+  margin-left: 0px;
+  margin-top: -45px;
+  margin-left: 15px;
 }
 
 .c-btn-editar-titulo {
@@ -167,38 +172,32 @@ li.c-etiqueta-item:hover {
 
 .c-calendario {
   display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
   width: 100px;
   font-size: 25px;
   background-color: #A0C1BF;
   border-radius: 25px;
   cursor: pointer;
-  flex-direction: column;
-  align-items: center;
 }
 
 .c-calendario:hover {
   box-shadow: 0 0 0 3px #699AA0;
 }
 
-.c-icono-calendario {
-  width: 50px;
-  height: 50px;
-}
-
 .react-datepicker__input-container-create {
   width: 100px;
-  font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: 12px;
   text-align: center;
   background: none;
   border: 2px solid #699AA0;
-  border-radius: 3px;
+  border-radius: 15px;
 }
 
 .react-datepicker-2 {
   width: 100px;
-  font-family: "Inter", sans-serif;
   font-weight: 600;
   font-size: 12px;
   text-align: center;
@@ -227,11 +226,12 @@ li.c-etiqueta-item:hover {
 }
 
 .c-selecciona-dropdown {
+  display: flex;
+  align-items: center;
   position: relative;
-  display: inline-flex;
+  height: 44px;
   width: 180px;
-  padding: 8px 16px;
-  font-size: 20px;
+  font-size: 16px;
   font-weight: 600;
   background-color: #A0C1BF;
   border: none;
@@ -267,17 +267,20 @@ li.c-etiqueta-item:hover {
 }
 
 .c-dropdown-item {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 8px 16px;
   color: #4a5568;
   background-color: #ffffff;
   cursor: pointer;
   border-radius: 25px;
   user-select: none;
+  font-size: 14px;
 }
 
 .c-dropdown-item:hover {
-  background-color: #f7fafc;
+  background-color: #e8e8e8;
 }
 
 /* Búsqueda dropdown */
@@ -286,14 +289,14 @@ li.c-etiqueta-item:hover {
   padding: 8px 16px;
   font-size: 14px;
   color: #4a5568;
-  border: 1px solid #cbd5e0;
+  border: 1px solid #e8e8e8;
   border-radius: 25px;
   outline: none;
 }
 
 .c-dropdown-input:focus,
 .c-dropdown-input:hover {
-  border-color: #2563eb;
+  border-color: #b6b6b6;
 }
 
 /* Descripción */
@@ -303,47 +306,49 @@ li.c-etiqueta-item:hover {
   margin-top: 30px;
 }
 
+.c-container-conteo {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.c-desc-conteo {
+  position: absolute;
+  font-weight: 600;
+  font-size: 18px;
+  color: #121212;
+  right: 0;
+}
+
 .c-desc-texto {
   position: relative;
   width: 100%;
-  min-height: 136px;
   background-color: #A0C1BF;
   border-radius: 25px;
-  padding: 15px;
-  padding-bottom: 50px;
   text-align: left;
   font-weight: 600;
   font-size: 20px;
   color: #121212;
-  word-break: break-all;
-}
-
-.c-desc-input {
-  width: 100%;
+  word-break: break-word;
 }
 
 .c-desc-input-texto {
+  position: relative;
   width: 100%;
   background-color: transparent;
-  font-weight: 600;
-  color: #121212;
-  border: none;
+  border-radius: 0px;
   outline: none;
-  line-height: 1.5;
+  text-align: left;
+  font-weight: 600;
+  font-size: 20px;
+  color: #121212;
+  word-break: break-word;
   resize: none;
 }
 
 .c-desc-input-texto::-webkit-scrollbar {
   display: none;
-}
-
-.c-desc-conteo {
-  font-size: 20px;
-  font-weight: 600;
-  color: #121212;
-  position: absolute;
-  bottom: 15px;
-  right: 15px;
 }
 
 .c-btn-editar-desc {
@@ -379,10 +384,12 @@ li.c-etiqueta-item:hover {
 .c-btn-agregar-tarea,
 .c-btn-invitar-miembro {
   display: flex;
+  align-items: center;
   background-color: #A0C1BF;
   border-radius: 25px;
-  font-size: 17px;
-  padding: 10px 25px;
+  font-size: 16px;
+  padding: 0px 20px;
+  height: 44px;
   font-weight: 600;
 }
 
@@ -395,7 +402,6 @@ li.c-etiqueta-item:hover {
 
 .c-tarea {
   display: flex;
-  min-height: 120px;
   width: 100%;
   background-color: #E2EBF1;
   border-radius: 25px;
@@ -405,13 +411,16 @@ li.c-etiqueta-item:hover {
   align-items: flex-start;
   font-weight: 600;
   flex-direction: row;
+  overflow-x: auto;
 }
 
 .c-tarea-titulo {
+  display: flex;
+  flex-direction: row;
   font-size: 25px;
 }
 
-.c-tarea-titulo:focus-visible{
+.c-tarea-titulo:focus-visible {
   outline: none;
 }
 
@@ -419,18 +428,21 @@ input.c-tarea-titulo {
   background: none;
   border: none;
   padding: 0;
+  font-weight: 600;
+  min-width: 400px;
 }
 
 .c-tarea-texto {
-  font-size: 14px;
+  font-size: 16px;
   width: 100%;
+  white-space: nowrap;
 }
 
 .c-tarea-desc {
   display: flex;
   width: 100%;
   flex-wrap: wrap;
-  word-break: break-all;
+  word-break: break-word;
   text-align: left;
 }
 
@@ -452,7 +464,7 @@ input.c-tarea-titulo {
 .c-tarea-boton {
   background-color: #A0C1BF;
   border-radius: 25px;
-  font-size: 14px;
+  font-size: 12px;
   padding: 5px 10px;
   text-align: center;
 }
@@ -464,6 +476,7 @@ input.c-tarea-titulo {
   font-size: 15px;
   padding: 0;
   padding-left: 10px;
+  max-width: 400px;
 }
 
 /* Crear */
@@ -485,16 +498,20 @@ input.c-tarea-titulo {
 }
 
 .c-btn-crear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 25px;
   font-weight: 600;
-  width: 130px;
+  width: 135px;
+  height: 50px;
   padding: 10px 30px;
   background-color: #A0C1BF;
   border-radius: 30px;
 }
 
 .c-btn-crear:hover {
-  box-shadow: 0 0 0 3px #000;
+  background-color: #7d9795;
 }
 
 /* Modal subir imagen */
@@ -502,10 +519,29 @@ input.c-tarea-titulo {
   display: flex;
   padding: 20px;
   width: 500px;
-  font-family: "Inter", sans-serif;
+  justify-content: center;
+}
+
+.c-drag-drop {
+  display: flex;
+  width: 400px;
+  border: 2px dashed #ccc;
+  border-radius: 20px;
   justify-content: center;
   align-items: center;
-  flex-direction: row;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.c-drag-drop-image {
+  font-size: 50px;
+  color: #A0C1BF;
+  margin: 10px;
+  margin-bottom: 0px;
+}
+
+.c-drag-drop-text {
+  margin: 10px;
 }
 
 .c-custom-file-button {
@@ -565,7 +601,6 @@ input.c-tarea-titulo {
 
 .c-modal-body {
   padding: 16px;
-  font-family: "Inter", sans-serif;
 }
 
 .c-modal .modal-header,
@@ -587,7 +622,6 @@ input.c-tarea-titulo {
 .c-modal-title {
   font-weight: 600;
   font-size: 30px;
-  font-family: "Inter", sans-serif;
 }
 
 .c-modal .btn.btn-primary {

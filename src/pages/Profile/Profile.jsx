@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { FaPen } from 'react-icons/fa';
 import { useDropzone } from 'react-dropzone';
 import { useNavigate } from 'react-router-dom';
 import { Spinner, Button, Modal } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
-import { FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle } from 'react-icons/fa';
+import { FaPen, FaEye, FaEyeSlash, FaUser, FaEnvelope, FaCog, FaExclamationCircle, FaImages } from 'react-icons/fa';
 import PasswordStrengthBar from 'react-password-strength-bar';
+import PasswordInfo2 from './PasswordInfo2.jsx';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { autentificaUsuario, getUsuario, actualizaUsuario, actualizaContrasena, getHabilidades, getIntereses, subirImagen } from '../../api/api.js';
 import Usuario from '../../classes/Usuario.js';
@@ -246,6 +246,7 @@ export const Profile = () => {
 
   
   // Cargar imagen de perfil
+  const [imagenBloqueado, setImagenBloqueado] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [errorI, setErrorI] = useState('');
@@ -268,18 +269,22 @@ export const Profile = () => {
     }
   };
 
-  const handleUploadProfileImage = async () => {
+  useEffect(() => {
     if (!selectedImage) {
-      setErrorI('Selecciona una imagen');
+      setImagenBloqueado(true);
       return;
     }
 
-    if (selectedImage.size > 2 * 1024 * 1024) { // 2 MB en bytes
+    if (selectedImage.size > 2 * 1024 * 1024) {
       setErrorI('La imagen seleccionada supera el límite de tamaño de 2 MB');
-      setSelectedImage(null);
-      return;
+      setImagenBloqueado(true);
+    } else {
+      setErrorI('');
+      setImagenBloqueado(false);
     }
+  }, [selectedImage]);
 
+  const handleUploadProfileImage = async () => {
     setImagenDesactivado(true);
 
     try {
@@ -432,22 +437,30 @@ export const Profile = () => {
           {/* ----- Modales ----- */}
           
           {/* Modal para subir imagen */}
-          <Modal className="p-modal" show={showModal} onHide={closeModal}>
+          <Modal className="c-modal" show={showModal} onHide={closeModal}>
             <Modal.Header>
-              <div className='p-modal-title'>Foto de perfil</div>
+              <div className='c-modal-title'>Foto de perfil</div>
             </Modal.Header>
             
-            <div className="p-input-body">
-              <div {...getRootProps({ className: 'p-custom-file-button' })}>
+            <div className="c-input-body">
+              <div {...getRootProps({ className: "c-drag-drop" })}>
                 <input {...getInputProps()} />
-                Subir foto
+                <FaImages className="c-drag-drop-image"/>
+                {selectedImage ? (
+                  <div className="c-drag-drop-text">
+                    {selectedImage.name}
+                  </div>
+                ) : (
+                  <div className="c-drag-drop-text" style={{width: "150px"}}>
+                    <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra una imagen
+                  </div>
+                )}
               </div>
-              <span className="p-custom-file-text">{selectedImage ? selectedImage.name : "Ninguna imagen seleccionada"}</span>
             </div>
-            {errorI && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
+            {errorI && <span className='c-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
       
             <Modal.Footer>
-              <Button onClick={handleUploadProfileImage} disabled={imagenDesactivado} style={{width: "118px"}}>
+              <Button onClick={handleUploadProfileImage} disabled={imagenDesactivado || imagenBloqueado} style={{width: "130px"}}>
                 {imagenDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
               </Button>
               <Button onClick={closeModal}>Cerrar</Button>
@@ -489,7 +502,7 @@ export const Profile = () => {
                   }} 
                 />
                 <span className="p-ojo-contrasena" onClick={() => setShowPassword(!showPassword)}>
-                  {contrasenaActual !== '' && (showPassword ? <FaEyeSlash /> : <FaEye />)}
+                  {contrasenaActual && (showPassword ? <FaEyeSlash /> : <FaEye />)}
                 </span>
               </div>
 
@@ -514,9 +527,12 @@ export const Profile = () => {
                   }}
                 />
                 
-                <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
+                <div className="p-row-dos-iconos">
+                  {nuevaContrasena && <PasswordInfo2/>}
+                  <span className="p-ojo-contrasena" onClick={() => setShowNewPassword(!showNewPassword)}>
                     {nuevaContrasena && (showNewPassword ? <FaEyeSlash /> : <FaEye />)}
-                </span>
+                  </span>
+                </div>
 
                 {nuevaContrasena.length > 0 && 
                   <PasswordStrengthBar style={{position: "absolute", width: "100%", bottom: "-10px"}}
@@ -567,8 +583,8 @@ export const Profile = () => {
             {error && <p className='p-error-cc' style={{marginTop: '310px'}}><FaExclamationCircle className='p-fa-ec-2'/>{error}</p>}
             
             <Modal.Footer>
-              <Button onClick={handleSubmitPassword} style={{width: "118px"}} disabled={fieldsEmpty || passwordStrength < 4 || !passwordsMatch || contrasenaDesactivado}>
-                {contrasenaDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
+              <Button onClick={handleSubmitPassword} style={{width: '130px'}} disabled={fieldsEmpty || passwordStrength < 4 || !passwordsMatch || contrasenaDesactivado}>
+                {contrasenaDesactivado ? <ClipLoader size={20} color="#000" /> : 'Guardar'}
               </Button>
               <Button onClick={closeModalContrasena}>Cerrar</Button>
             </Modal.Footer>

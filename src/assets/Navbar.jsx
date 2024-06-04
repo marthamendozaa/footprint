@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { FaCompass, FaList, FaBell, FaUser, FaPlus } from 'react-icons/fa';
+import logo from './evertech.png';
+import logo2 from './evertech2.png';
 import './Navbar.css';
-import { FaHome, FaCompass, FaList, FaBell, FaUser, FaPlus } from 'react-icons/fa';
 
 const Navbar = ({ isCreateOpen, toggleCreate }) => {
   const [selectedTab, setSelectedTab] = useState('');
@@ -38,8 +40,16 @@ const Navbar = ({ isCreateOpen, toggleCreate }) => {
         </button>
       </div>
 
-      {/* Páginas */}
+      {/* Logo */}
+      <div style={{display: "flex", minHeight: "100px", marginBottom: "70px"}}>
+        {isCreateOpen ? (
+          <img src={logo} style={{width: "80%", paddingLeft: "10px", objectFit: "contain"}}/>
+        ) : (
+          <img src={logo2} style={{width: "100%", objectFit: "contain"}}/>
+        )}
+      </div>
 
+      {/* Páginas */}
       <li className={selectedTab === 'explore' ? 'selected' : ''} onClick={() => handleTabClick('explore')}>
         <Link to="/explore">
           <FaCompass /> {showText && 'Explora'}

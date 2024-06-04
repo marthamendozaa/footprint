@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaSearch } from 'react-icons/fa';
+import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch } from 'react-icons/fa';
+import { IoMdAddCircleOutline } from "react-icons/io";
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
 import DatePicker from "react-datepicker";
@@ -165,8 +166,11 @@ export const Create = () => {
   const [desc, setDesc] = useState("");
   const [editandoDesc, setEditandoDesc] = useState(false);
 
+  const textareaRef = useRef(null);
+
   const handleCambioDesc = (event) => {
     setDesc(event.target.value);
+    autoResizeTextarea();
   };
 
   const handleEditarDesc = () => {
@@ -177,6 +181,24 @@ export const Create = () => {
     setEditandoDesc(false);
   };
 
+  const autoResizeTextarea = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    if (editandoDesc) {
+      autoResizeTextarea();
+
+      if (editandoDesc && textareaRef.current) {
+        const length = textareaRef.current.value.length;
+        textareaRef.current.setSelectionRange(length, length);
+        textareaRef.current.focus();
+      }
+    }
+  }, [editandoDesc]);
 
   // Seleccionar etiquetas
   const [etiquetas, setEtiquetas] = useState(null);
@@ -195,10 +217,15 @@ export const Create = () => {
   
 
   // Cambiar fechas
+  const [today, setToday] = useState(new Date());
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [fechaCierre, setFechaCierre] = useState(new Date());
   const datePickerInicio = useRef(null);
   const datePickerCierre = useRef(null);
+
+  useEffect(() => {
+    setToday(new Date());
+  }, []);
 
   const handleCambioFechaInicio = () => {
     if (datePickerInicio.current) {
@@ -276,6 +303,7 @@ export const Create = () => {
   
 
   // Subir imagen
+  const [imagenBloqueado, setImagenBloqueado] = useState(true);
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
   const [imagenIniciativa, setImagenIniciativa] = useState(null);
   const [imagenPreview, setImagenPreview] = useState('https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg');
@@ -289,17 +317,22 @@ export const Create = () => {
     setErrorImagen("");
   };
 
-  const handleSubirImagen = () => {
+  useEffect(() => {
     if (!imagenSeleccionada) {
-      setErrorImagen("Por favor selecciona una imagen")
+      setImagenBloqueado(true);
       return;
     }
 
     if (imagenSeleccionada.size > 2 * 1024 * 1024) {
-      setErrorImagen("La imagen seleccionada supera el límite de tamaño de 2 MB")
-      return;
+      setErrorImagen('La imagen seleccionada supera el límite de tamaño de 2 MB');
+      setImagenBloqueado(true);
+    } else {
+      setErrorImagen('');
+      setImagenBloqueado(false);
     }
+  }, [imagenSeleccionada]);
 
+  const handleSubirImagen = () => {
     setImagenIniciativa(imagenSeleccionada);
     setImagenPreview(URL.createObjectURL(imagenSeleccionada));
     handleCerrarImagen();
@@ -327,17 +360,19 @@ export const Create = () => {
   const [invitarCargando, setInvitarCargando] = useState(false); //Implementar?
 
   useEffect(() => {
-    // Initialize button state
-    const estadoInicial = {};
-    usuarios.forEach(usuario => {
-      estadoInicial[usuario.idUsuario] = {
-        invitarDesactivado: false,
-        cancelarDesactivado: true
-      };
-    });
-    setEstadoBotones(estadoInicial);
-    console.log("estadoInicial", estadoInicial);
-  }, []);
+    if (usuarios) {
+      // Initialize button state
+      const estadoInicial = {};
+      usuarios.forEach(usuario => {
+        estadoInicial[usuario.idUsuario] = {
+          invitarDesactivado: false,
+          cancelarDesactivado: true
+        };
+      });
+      setEstadoBotones(estadoInicial);
+      console.log("estadoInicial", estadoInicial);
+    }
+  }, [usuarios]);
 
   const handleShowInvitarModal = () => {
     setShowInvitarModal(true);
@@ -507,6 +542,8 @@ export const Create = () => {
     }
   };
 
+  // Descripcion
+
 
   return (
     <div>
@@ -523,7 +560,7 @@ export const Create = () => {
               {/* Cambiar título */}
               <div className="c-titulo">
                 {editandoTitulo ? (
-                  <div className="c-titulo-input">
+                  <div className="c-titulo-input" style={{height: "105px"}}>
                     <input
                       type="text"
                       className="c-titulo-input-texto"
@@ -534,16 +571,22 @@ export const Create = () => {
                       autoFocus
                       maxLength={30}
                     />
+                    
+                  </div>
+                  ) : (
+                    <div className="c-titulo-texto-tarea">
+                      {titulo ? titulo : "Título"}
+                    </div>
+                  )}
+
+                  {editandoTitulo ? (
                     <div className="c-titulo-conteo">
                       {titulo ? `${titulo.length}/30` : `0/30`}
                     </div>
-                  </div>) : (
-                    <div className="c-titulo-texto">
-                      {titulo ? titulo : "Título"}
+                    ) : (
                       <button className="c-btn-editar-titulo" onClick={handleEditarTitulo}>
                         <FaPen />
                       </button>
-                    </div>
                   )}
               </div>
 
@@ -563,9 +606,7 @@ export const Create = () => {
                     {/* Fecha inicio */}
                     <div className="c-calendario-input">
                       <div className="c-calendario" onClick={handleCambioFechaInicio}>
-                        <div className="c-icono-calendario">
-                          <FaCalendar/>
-                        </div>
+                        <FaCalendar/>
                       </div>
                       <DatePicker
                         className='react-datepicker__input-container-create'
@@ -574,6 +615,11 @@ export const Create = () => {
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerInicio}
                         locale={es}
+                        showYearDropdown
+                        scrollableYearDropdown 
+                        yearDropdownItemNumber={66}
+                        showMonthDropdown
+                        minDate={today}
                       />
                     </div>
                     
@@ -583,9 +629,7 @@ export const Create = () => {
                     {/* Fecha cierre */}
                     <div className="c-calendario-input">
                       <div className="c-calendario" onClick={handleCambioFechaCierre}>
-                        <div className="c-icono-calendario">
-                          <FaCalendar/>
-                        </div>
+                        <FaCalendar/>
                       </div>
                       <DatePicker
                         className='react-datepicker__input-container-create'
@@ -594,14 +638,21 @@ export const Create = () => {
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerCierre}
                         locale={es}
+                        showYearDropdown
+                        scrollableYearDropdown 
+                        yearDropdownItemNumber={66}
+                        showMonthDropdown
+                        minDate={today}
                       />
                     </div>
+                    
                   </div>
                 </div>
 
                 {/* Seleccionar privacidad */}
                 <div className="c-dropdown-container" ref={dropdownPrivacidadRef}>
                   <button className="c-selecciona-dropdown" onClick={() => setDropdownPrivacidad(!dropdownPrivacidad)}>
+                    {esPublica ? <FaUnlockAlt style={{marginRight: "5px"}}/> : <FaLock style={{marginRight: "5px"}}/>}
                     <span>{esPublica ? "Pública" : "Privada"}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
                       <path fillRule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -619,6 +670,7 @@ export const Create = () => {
                 {/* Agregar región */}
                 <div className="c-dropdown-container" ref={dropdownRegionRef}>
                   <button className="c-selecciona-dropdown" onClick={() => setDropdownRegion(!dropdownRegion)}>
+                    <FaGlobe style={{marginRight: "5px"}}/>
                     <span className="mr-2">{region ? region : "Ubicación"}</span>
                       <svg xmlns="http://www.w3.org/2000/svg" className="c-dropdown-arrow" viewBox="0 0 20 20" aria-hidden="true">
                         <path fillRule="evenodd" d="M6.293 9.293a1 1 0 011.414 0L10 11.586l2.293-2.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -641,40 +693,70 @@ export const Create = () => {
 
           {/* Descripción */}
           <div className="c-desc">
-            <div className="c-desc-texto">
-              {editandoDesc ? (
-                <div className="c-desc-input">
-                  <textarea className="c-desc-input-texto"
-                    value={desc}
-                    onChange={handleCambioDesc}
-                    onBlur={handleGuardarDesc}
-                    onKeyDown={handleOnKeyDown}
-                    autoFocus
-                    maxLength={200} />
-                  <div className="c-desc-conteo">
-                    {desc ? `${desc.length}/200` : `0/200`}
-                  </div>
-              </div>) : (
-                <div style={desc ? {} : { color: '#677D7C' }}>
+            {editandoDesc ?(
+              <div className='c-container-conteo'>
+                <div className="c-desc-conteo" style={{top: "-30px"}}>
+                  {desc ? `${desc.length}/200` : `0/200`}
+                </div>
+                
+                <div className="c-desc-texto" style={{paddingTop: '10px', padding: '15px'}}>
+                  <style jsx>{`
+                    textarea {
+                      border-radius: 25px;
+                      position: relative;
+                      width: 100%;
+                      height: 25px;
+                      font-size: 20px;
+                      resize: none;
+                      outline: none;
+                    }
+                  `}
+                  </style>
+                  <textarea 
+                      ref={textareaRef}
+                      className="c-desc-input-texto"
+                      value={desc}
+                      onChange={handleCambioDesc}
+                      onBlur={handleGuardarDesc}
+                      onKeyDown={handleOnKeyDown}
+                      autoFocus
+                      maxLength={200} 
+                      style={{ borderColor: editandoDesc ? 'transparent' : 'transparent' }}
+                    />
+                </div>
+              </div>
+              ) : (
+              <div className="c-desc-texto" style={{paddingBottom: '10.5px', paddingLeft: '2px'}}>
+                <div style={desc ? {marginTop: '2px', padding: '15px'} : {marginTop: '2px', color: '#677D7C', padding: '15px'}}>
                   {desc ? desc : "Agrega tu descripción aquí..."}
                 </div>
-              )}
-              {!editandoDesc && (<button className="c-btn-editar-desc" onClick={handleEditarDesc}><FaPen /></button>)}
-            </div>
+
+                {!editandoDesc && (<button className="c-btn-editar-desc" onClick={handleEditarDesc}><FaPen /></button>)}
+              </div>
+            )}
           </div>
 
           {/* Tareas y Miembros*/}
           <div className="c-tareas-miembros">
             <div className="c-seccion-tareas">
+
+              {/* Agregar tarea */}
               <button type="button" className="c-btn-agregar-tarea" onClick={handleCrearTarea}>
+                <IoMdAddCircleOutline style={{marginRight: "5px"}}/>
                 Añadir tarea
               </button>
+
+              {/* Tarea */}
               <div className="c-tareas-container">
                 {tareas.map((tarea, idTarea) => (
                   <div className="c-tarea" key={idTarea}>
+                    
+                    {/* Titulo + descripción */}
                     <div className="c-tarea-info">
+
+                      {/* Titulo */}
                       <div className="c-tarea-titulo">
-                        {tarea.editandoTitulo ? (
+                        {tarea.editandoTitulo? (
                           <input
                             type="text"
                             className="c-tarea-titulo"
@@ -686,14 +768,23 @@ export const Create = () => {
                             maxLength={30}
                           />
                         ) : (
-                          <div className="c-titulo-texto">
+                          <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>
                             {tarea.titulo ? tarea.titulo : "Título"}
-                            <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
-                              <FaPen />
-                            </button>
                           </div>
                         )}
+
+                        {tarea.editandoTitulo? (
+                          <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
+                            {tarea.titulo ? `${tarea.titulo.length}/30` : `0/30`}
+                          </button>
+                        ) : (
+                          <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
+                            <FaPen />
+                          </button>
+                        )}
                       </div>
+                      
+                      {/* Descripcion */}
                       <div className="c-tarea-desc">
                         {tarea.editandoDesc ? (
                           <div className="c-tarea-texto">
@@ -717,9 +808,12 @@ export const Create = () => {
                             <FaPen />
                           </button>
                         )}
-                      </div>
+                      </div> 
                     </div>
+
+                    {/* Botones izquierda */}
                     <div className="c-tarea-botones">
+                      {/* Fecha */}
                       <div className="c-tarea-boton"><FaCalendar /> Fecha
                         <DatePicker
                           className='react-datepicker-2'
@@ -730,19 +824,23 @@ export const Create = () => {
                           locale={es}
                         />
                       </div>
-                      <div className="c-tarea-boton"><FaFolder /> Documento</div>
+
+                      {/* Documento */}
+                      <div className="c-tarea-boton" style={{marginTop: '5px'}}><FaFolder /> Documento</div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-
+            {/* Invitar mimebros */}
             <div className="c-seccion-miembros">
-              <button type='button' className="c-btn-invitar-miembro" onClick={handleShowInvitarModal}>Invitar miembro</button>
+              <div className="c-btn-invitar-miembro" onClick={handleShowInvitarModal}>
+                <IoMdAddCircleOutline style={{marginRight: "5px"}}/>
+                Invitar miembro
+              </div>
             </div>
           </div>
-          
           
           {/* Botón crear */}
           <div className="c-crear-container">
@@ -753,6 +851,8 @@ export const Create = () => {
             </div>
           </div>
 
+          {/* ----------------- Modales ----------------- */}
+
           {/* Subir imagen */}
           <Modal className="c-modal" show={modalImagen} onHide={handleCerrarImagen}>
             <Modal.Header>
@@ -760,16 +860,24 @@ export const Create = () => {
             </Modal.Header>
               
             <div className="c-input-body">
-              <div {...getRootProps({ className: 'c-custom-file-button' })}>
+              <div {...getRootProps({ className: "c-drag-drop" })}>
                 <input {...getInputProps()} />
-                Subir foto
+                <FaImages className="c-drag-drop-image"/>
+                {imagenSeleccionada ? (
+                  <div className="c-drag-drop-text">
+                    {imagenSeleccionada.name}
+                  </div>
+                ) : (
+                  <div className="c-drag-drop-text" style={{width: "150px"}}>
+                    <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra una imagen
+                  </div>
+                )}
               </div>
-              <span className="c-custom-file-text">{imagenSeleccionada ? imagenSeleccionada.name : "Ninguna imagen seleccionada"}</span>
             </div>
             {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
 
             <Modal.Footer>
-              <Button onClick={handleSubirImagen}>Guardar</Button>
+              <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
               <Button onClick={handleCerrarImagen}>Cerrar</Button>
             </Modal.Footer>
           </Modal>

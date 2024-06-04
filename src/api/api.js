@@ -5,7 +5,7 @@ const isEmulator = JSON.parse(import.meta.env.VITE_EMULATOR);
 // LECTURAS CON FIREBASE CLIENT
 
 // Firebase Client SDK
-import { query, where, doc, collection, getDoc, getDocs, connectFirestoreEmulator } from "firebase/firestore";
+import { query, where, orderBy, doc, collection, getDoc, getDocs, connectFirestoreEmulator } from "firebase/firestore";
 import firestore from "../api/firebase-config";
 
 if (isEmulator) {
@@ -107,7 +107,8 @@ export const getIniciativa = async (idIniciativa) => {
 // Información de todas las iniciativas
 export const getIniciativas = async () => {
   try {
-    const iniciativasRef = await getDocs(collection(firestore, "Iniciativas"));
+    const q = query(collection(firestore, "Iniciativas"), orderBy("fechaCreacion", "asc"));
+    const iniciativasRef = await getDocs(q);
     let iniciativas = [];
     for (const docRef of iniciativasRef.docs) {
       iniciativas.push(docRef.data());
@@ -376,7 +377,7 @@ export const eliminaIniciativa = async (iniciativa, user) => {
   });
   if (response.data.success) {
     console.log("Eliminar iniciativa exitoso");
-    return response.data.data;
+    return response.data.success;
   } else {
     console.log("Error eliminando iniciativa");
     throw new Error(response.data.error);
@@ -395,6 +396,21 @@ export const eliminarMiembro = async (iniciativa, user) => {
     return response.data.data;
   } else {
     console.log("Error eliminando miembro");
+    throw new Error(response.data.error);
+  }
+};
+
+
+// Eliminar una iniciativa
+export const eliminarSolicitud = async (idSolicitud) => {
+  const response = await axios.post(`${functionsURL}/eliminaSolicitud`, {
+    solicitud: idSolicitud,
+  });
+  if (response.data.success) {
+    console.log("Solicitud eliminada exitosamente");
+    return response.data.data;
+  } else {
+    console.log("Error eliminando solicitud");
     throw new Error(response.data.error);
   }
 };
@@ -485,23 +501,18 @@ export const actualizaSolicitud = async (data) => {
 
 
 // Enviar correo de notificación al eliminar iniciativa
-export const sendMail = async (idIniciativa) => {
-  const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
-  const iniciativaDoc = await getDoc(iniciativaRef);
-  const iniciativaData = iniciativaDoc.data();
-  const idAdmin = iniciativaData.idAdmin;
-  const titulo = iniciativaData.titulo;
+export const enviarCorreoIniciativa = async (iniciativa) => {
+  const adminRef = await getDoc(doc(firestore, "Usuarios", iniciativa.idAdmin));
+  const admin = adminRef.data();
 
-  const userRef = doc(firestore, "Usuarios", idAdmin);
-  const userDoc = await getDoc(userRef);
-  const userData = userDoc.data();
-  const adminEmail = userData.correo;
-  const nombre = userData.nombre;
+  const message = {
+    subject: `Notificación sobre la eliminación de tu iniciativa ${iniciativa.titulo}`,
+    text: `Estimado/a ${admin.nombre},\n\nLamentamos informarte que tu iniciativa ${iniciativa.titulo} ha sido borrada por los administradores debido a que no cumple con los estándares de la plataforma. Si tienes alguna duda sobre el motivo de esta decisión, te invitamos a ponerte en contacto con la administración para obtener más información.\n\nAgradecemos tu comprensión.\n\nSaludos cordiales,\nAdministración de Evertech`
+  }  
 
-  const response = await axios.post(`${functionsURL}/sendMails`, {
-    titulo: titulo,
-    nombre: nombre,
-    adminEmail: adminEmail
+  const response = await axios.post(`${functionsURL}/enviarCorreo`, {
+    email: admin.correo,
+    message: message
   });
 
   if (response.data.success) {
@@ -515,22 +526,15 @@ export const sendMail = async (idIniciativa) => {
 
 
 // Enviar correo de notificación al eliminar miembro de iniciativa
-export const sendRemoveMail = async (idIniciativa, idUsuario) => {
-  const iniciativaRef = doc(firestore, "Iniciativas", idIniciativa);
-  const iniciativaDoc = await getDoc(iniciativaRef);
-  const iniciativaData = iniciativaDoc.data();
-  const titulo = iniciativaData.titulo;
+export const enviarCorreoMiembro = async (iniciativa, miembro) => {
+  const message = {
+    subject: `Notificación sobre tu participación en la iniciativa ${iniciativa.titulo}`,
+    text: `Estimado/a ${miembro.nombre},\n\nLamentamos informarte que has sido removido/a de la iniciativa ${iniciativa.titulo}. Si tienes alguna duda sobre el motivo de esta decisión, te invitamos a ponerte en contacto con la persona a cargo de la iniciativa para obtener más información.\n\nAgradecemos tu comprensión.\n\nSaludos cordiales,\nAdministración de Evertech`
+  }
 
-  const userRef = doc(firestore, "Usuarios", idUsuario);
-  const userDoc = await getDoc(userRef);
-  const userData = userDoc.data();
-  const correo = userData.correo;
-  const nombre = userData.nombre;
-
-  const response = await axios.post(`${functionsURL}/sendRemoveMails`, {
-    titulo: titulo,
-    nombre: nombre,
-    correo: correo
+  const response = await axios.post(`${functionsURL}/enviarCorreo`, {
+    email: miembro.correo,
+    message: message
   });
 
   if (response.data.success) {
@@ -539,5 +543,32 @@ export const sendRemoveMail = async (idIniciativa, idUsuario) => {
   } else {
     console.log("Error enviando correo");
     throw new Error(response.data.error);
+  }
+}
+
+
+// Enviar correo de notificación al asignar miembro a una tarea
+export const enviarCorreoTarea = async (iniciativa, miembro, tarea) => {
+  try {
+    const message = {
+      subject: `Notificación sobre tu asignación a la tarea ${tarea.titulo}`,
+      text: `Estimado/a ${miembro.nombre},\n\nNos complace informarte que has sido asignado/a a la tarea ${tarea.titulo} en la iniciativa ${iniciativa.titulo}. Si tienes alguna duda, te invitamos a ponerte en contacto con la persona a cargo de la iniciativa.\n\nSaludos cordiales,\nAdministración de Evertech`
+    }
+
+    const response = await axios.post(`${functionsURL}/enviarCorreo`, {
+      email: miembro.correo,
+      message: message
+    });
+
+    if (response.data.success) {
+      console.log("Envio de correo exitoso");
+      return;
+    } else {
+      console.log("Error enviando correo");
+      throw new Error(response.data.error);
+    }
+  } catch (error) {
+    console.log("Error sending email");
+    throw new Error(error);
   }
 }

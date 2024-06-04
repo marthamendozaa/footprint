@@ -16,6 +16,10 @@ body::-webkit-scrollbar {
   align-items: flex-start;
 }
 
+.e-contenido {
+  width: 100%;
+}
+
 /* Barra de búsqueda */
 .e-searchBar {
   display: flex;
@@ -34,12 +38,15 @@ body::-webkit-scrollbar {
   padding: 15px;
   width: 100%;
   border-radius: 30px;
-  border: #000000 4px solid;
   padding-left: 45px;
+  border: 2px #e8e8e8 solid;
+  box-shadow: #e8e8e8 2px 4px 0px 0px;
 }
 
 .e-searchBarCaja:focus-visible {
   outline: none;
+  border: 2px #b6b6b6 solid;
+  box-shadow: #b6b6b6 2px 4px 0px 0px;
 }
 
 /* Filtros */
@@ -57,24 +64,46 @@ body::-webkit-scrollbar {
 }
 
 .e-filtros-borrar {
-  color: #A0C1BF;
+  color: #000;
+  user-select: none;
 }
 
 .e-filtros-borrar:hover {
-  color: #000000;
+  color: #b6b6b6;
   cursor: pointer;
 }
 
 /* Dropdown */
+.e-selecciona-dropdown {
+  position: relative;
+  display: inline-flex;
+  width: 180px;
+  padding: 8px 16px;
+  font-size: 20px;
+  font-weight: 600;
+  background-color: #fff;
+  border-radius: 25px;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  border: 2px #e8e8e8 solid;
+  box-shadow: #e8e8e8 2px 4px 0px 0px;
+  font-family: "Poppins", sans-serif;
+}
+
+.e-selecciona-dropdown:hover {
+  border: 2px #b6b6b6 solid;
+  box-shadow: #b6b6b6 2px 4px 0px 0px;
+}
+
 .e-dropdown-item {
   display: flex;
+  align-items: center;
   padding: 8px 16px;
   color: #4a5568;
   background-color: #ffffff;
   cursor: pointer;
   border-radius: 25px;
-  align-items: center;
   user-select: none;
+  font-size: 14px;
 }
 
 .e-dropdown-item input {
@@ -82,7 +111,7 @@ body::-webkit-scrollbar {
 }
 
 .e-dropdown-item:hover {
-  background-color: #f7fafc;
+  background-color: #e8e8e8;
 }
 
 /* Iniciativas */
@@ -91,6 +120,7 @@ body::-webkit-scrollbar {
   width: 100%;
   flex-wrap: wrap;
   overflow: overlay;
+  padding-bottom: 10px;
 }
 
 .e-iniciativa {
@@ -102,13 +132,15 @@ body::-webkit-scrollbar {
   margin-right: 5px;
   color: #212529;
   border-radius: 20px;
-  border: #A0C1BF 4px solid;
   position: relative;
   max-width: 240px;
+  border: 2px #e8e8e8 solid;
+  box-shadow: #e8e8e8 2px 4px 0px 0px;
 }
 
 .e-iniciativa:hover {
-  border: #000 4px solid;
+  border: 2px #b6b6b6 solid;
+  box-shadow: #b6b6b6 2px 4px 0px 0px;
 }
 
 .e-iniciativa-admin {
@@ -183,7 +215,6 @@ body::-webkit-scrollbar {
 
 .ea-modal-body {
   padding: 16px;
-  font-family: "Inter", sans-serif;
 }
 
 .ea-modal .modal-header,
@@ -205,7 +236,6 @@ body::-webkit-scrollbar {
 .ea-modal-title {
   font-weight: 600;
   font-size: 30px;
-  font-family: "Inter", sans-serif;
 }
 
 .ea-modal .btn.btn-primary {
