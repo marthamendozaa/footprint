@@ -454,7 +454,9 @@ export const Initiative = () => {
                     </div>
                   </div>
                 ) : (
-                  iniciativa.titulo
+                  <div className="i-titulo-normal">
+                    {iniciativa.titulo}
+                  </div>
                 )}
               </div>
   

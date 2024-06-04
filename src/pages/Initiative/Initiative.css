@@ -74,15 +74,20 @@ button.i-fa-pen:disabled {
 .i-titulo {
   display: flex;
   justify-content: space-between;
+  white-space: nowrap;
   font-size: 70px;
   font-weight: 600;
   text-align: left;
+}
+
+.i-titulo-normal{
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .i-titulo-texto {
   display: flex;
-  overflow: overlay;
 }
 
 .i-titulo-texto::-webkit-scrollbar {
@@ -93,6 +98,7 @@ button.i-fa-pen:disabled {
   outline: none;
   border: none;
   font-weight: 600;
+  width: 600px;
 }
 
 .i-titulo-conteo {
