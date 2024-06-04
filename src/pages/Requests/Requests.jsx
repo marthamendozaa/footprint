@@ -69,10 +69,10 @@ export const Requests = () => {
       let solicitudesEnviadasData = []
       let solicitudesRecibidasData = []
       for (const solicitud of solicitudes) {
-        if (solicitud.tipoInvitacion == "UsuarioAIniciativa") {
+        if (solicitud && solicitud.tipoInvitacion == "UsuarioAIniciativa") {
           solicitudesEnviadasData.push(solicitud);
         }
-        else if (solicitud.tipoInvitacion == "IniciativaAUsuario" && solicitud.estado == "Pendiente") {
+        else if (solicitud && solicitud.tipoInvitacion == "IniciativaAUsuario" && solicitud.estado == "Pendiente") {
           solicitudesRecibidasData.push(solicitud);
         }
       }

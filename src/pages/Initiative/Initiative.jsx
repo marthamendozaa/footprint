@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch } from 'react-icons/fa';
+import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass } from 'react-icons/fa';
 import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
 import { useAuth } from '../../contexts/AuthContext';
@@ -8,8 +8,10 @@ import { ClipLoader } from 'react-spinners';
 import { useParams } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import es from 'date-fns/locale/es';
-import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, existeSolicitud, subirImagen, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro } from '../../api/api.js';
+import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, existeSolicitud, subirImagen, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, crearSolicitud } from '../../api/api.js';
 import './Initiative.css';
+import Fuse from 'fuse.js';
+import Solicitud from '../../classes/Solicitud.js';
 
 export const Initiative = () => {
   //Búsqueda de usuarios para agregar miembros
@@ -87,7 +89,9 @@ export const Initiative = () => {
 
   const [showSolicitudesModal, setShowSolicitudesModal] = useState(false); 
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
+  const [solicitudesEnviadas, setSolicitudesEnviadas] = useState(null);
   const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
+  const [usuariosEnviados, setUsuariosEnviados] = useState(null);
 
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -210,12 +214,27 @@ export const Initiative = () => {
         }
         setSolicitudesRecibidas(solicitudesRecibidasData);
 
+        let solicitudesEnviadasData = []
+        for (const solicitud of solicitudes) {
+          if (solicitud.tipoInvitacion == "IniciativaAUsuario") {
+            solicitudesEnviadasData.push(solicitud);
+          }
+        }
+        setSolicitudesEnviadas(solicitudesRecibidasData);
+
         let usuariosRecibidosData = []
         for (const solicitud of solicitudesRecibidasData){
           const usuarioRecibido = await getUsuario(solicitud.idUsuario);
           usuariosRecibidosData.push(usuarioRecibido);
         }
         setUsuariosRecibidos(usuariosRecibidosData);
+
+        let usuariosEnviadosData = []
+        for (const solicitud of solicitudesEnviadasData){
+          const usuarioEnviado = await getUsuario(solicitud.idUsuario);
+          usuariosEnviadosData.push(usuarioEnviado);
+        }
+        setUsuariosEnviados(usuariosEnviadosData);
 
         const tareaPromises = iniciativaData.listaTareas.map(async (idTarea) => {
           const tareaData = await getMisTareas(idTarea);
@@ -306,7 +325,7 @@ export const Initiative = () => {
         setShowInvitarModal(false);
       }
     } catch (error) {
-      console.log("Error al enviar solicitud a la iniciativa");
+      console.log("Error al enviar solicitud al usuario");
     } finally {
       setInvitarCargando(false);
     }
@@ -824,13 +843,13 @@ export const Initiative = () => {
               className={paginaActual === 'solicitudes' ? 'active' : ''} 
               onClick={() => setPaginaActual('solicitudes')}
             >
-              Solicitudes
+              Solicitudes recibidas
             </button>
             <button 
               className={paginaActual === 'miembros' ? 'active' : ''} 
               onClick={() => setPaginaActual('miembros')}
             >
-              Miembros
+              Solicitudes enviadas
             </button>
           </div>
 
@@ -884,7 +903,31 @@ export const Initiative = () => {
             ) : (
               <div className="m-iniciativas-container">
                 {/* Contenido de miembros */}
-                Lista de los miembros
+                Invitaciones enviadas
+                <div>
+                {usuariosEnviados.map((usuario, index) => (
+                  <div key={index} className='rq-iniciativa'>
+                    {/* Imagen y título */}
+                    <div className='rq-iniciativa-imagen'>
+                        <img src={usuario.urlImagen} alt = {usuario.nombreUsuario} />
+                    </div>
+
+                    <div className='rq-iniciativa-texto'>
+                      <div className="rq-titulo">{usuario.nombreUsuario}</div>
+                      
+                      {/* Estado */}
+                      <div className='rq-estado'>
+                        <div>
+                          {solicitudesEnviadas[index].estado}
+                          {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
+                          {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
+                          {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
+                        </div>
+                      </div>
+                    </div>
+                  </div>    
+                ))}
+                </div>
               </div>
             )}
           </div>
