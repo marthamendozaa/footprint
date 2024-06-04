@@ -200,10 +200,15 @@ export const Create = () => {
   
 
   // Cambiar fechas
+  const [today, setToday] = useState(new Date());
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [fechaCierre, setFechaCierre] = useState(new Date());
   const datePickerInicio = useRef(null);
   const datePickerCierre = useRef(null);
+
+  useEffect(() => {
+    setToday(new Date());
+  }, []);
 
   const handleCambioFechaInicio = () => {
     if (datePickerInicio.current) {
@@ -487,6 +492,11 @@ export const Create = () => {
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerInicio}
                         locale={es}
+                        showYearDropdown
+                        scrollableYearDropdown 
+                        yearDropdownItemNumber={66}
+                        showMonthDropdown
+                        minDate={today}
                       />
                     </div>
                     
@@ -505,6 +515,11 @@ export const Create = () => {
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerCierre}
                         locale={es}
+                        showYearDropdown
+                        scrollableYearDropdown 
+                        yearDropdownItemNumber={66}
+                        showMonthDropdown
+                        minDate={today}
                       />
                     </div>
                     
@@ -557,7 +572,7 @@ export const Create = () => {
           <div className="c-desc">
             {editandoDesc ?(
               <div className='c-container-conteo'>
-                <div className="c-desc-conteo">
+                <div className="c-desc-conteo" style={{top: "-30px"}}>
                   {desc ? `${desc.length}/200` : `0/200`}
                 </div>
                 
