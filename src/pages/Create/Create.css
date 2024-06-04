@@ -71,13 +71,17 @@
   align-items: center;
 }
 
-.c-titulo-texto,
+.c-titulo-texto-tarea {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .c-titulo-input {
   display: flex;
   overflow: overlay;
 }
 
-.c-titulo-texto::-webkit-scrollbar,
 .c-titulo-input::-webkit-scrollbar {
   display: none;
 }
