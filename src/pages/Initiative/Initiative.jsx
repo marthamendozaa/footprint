@@ -676,7 +676,7 @@ export const Initiative = () => {
                       {miembros.map((miembro, idMiembro) => (
                         <div key={idMiembro}>
                           <div className="i-btn-miembro">
-                            <div className='i-btn-miembro-contenido' style={{width: '85%'}}>
+                            <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
                               {miembro.nombreUsuario}
                             </div>
 
