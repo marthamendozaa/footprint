@@ -357,6 +357,27 @@ export const Initiative = () => {
     setNuevaDescripcion(event.target.value);
   };
 
+  const textareaRef = useRef(null);
+
+  const autoResizeTextarea = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    if (editingCampos) {
+      autoResizeTextarea();
+
+      if (editingCampos && textareaRef.current) {
+        const length = textareaRef.current.value.length;
+        textareaRef.current.setSelectionRange(length, length);
+        textareaRef.current.focus();
+      }
+    }
+  }, [editingCampos, nuevaDescripcion]);
+
   // Guardar la información editada
   const [guardarCamposBloqueado, setGuardarCamposBloqueado] = useState(false);
 
@@ -555,21 +576,44 @@ export const Initiative = () => {
         </div>
 
         <div className="c-desc">
-          <div className="c-desc-texto">
-            {editingCampos ? (
-              <div className="c-desc-input">
-                <textarea className="c-desc-input-texto"
+          {editingCampos ? (
+            <div className='c-container-conteo'>
+              <div className="c-desc-conteo" style={{top: "-30px"}}>
+                {nuevaDescripcion ? `${nuevaDescripcion.length}/200` : `0/200`}
+              </div>
+
+              <div className="c-desc-texto" style={{paddingTop: '10px', padding: '15px'}}>
+                <style jsx>{`
+                  textarea {
+                    border-radius: 25px;
+                    position: relative;
+                    width: 100%;
+                    height: 25px;
+                    font-size: 20px;
+                    resize: none;
+                    outline: none;
+                  }
+                `}
+                </style>
+
+                <textarea
+                  ref={textareaRef}
+                  className="c-desc-input-texto"
                   value={nuevaDescripcion}
                   onChange={handleDescripcionCambios}
                   autoFocus
-                  maxLength={200} />
-                <div className="c-desc-conteo">
-                  {nuevaDescripcion ? `${nuevaDescripcion.length}/200` : `0/200`}
+                  maxLength={200} 
+                  style={{ borderColor: nuevaDescripcion ? 'transparent' : 'transparent' }}
+                />
+              </div>
+            </div>
+          ) : (
+            <div className="c-desc-texto" style={{paddingBottom: '10.5px', paddingLeft: '2px'}}>
+               <div style={{padding: '15px', marginTop: '2px'}}> 
+                  {iniciativa.descripcion}
                 </div>
-            </div>) : (
-                iniciativa.descripcion
-            )}
-          </div>
+            </div>
+          )}
         </div>
           
         {/* Tareas y Miembros*/}

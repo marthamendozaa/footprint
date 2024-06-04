@@ -220,6 +220,8 @@ li.i-etiqueta-item {
   display: flex;
   width: 100%;
   flex-direction: column;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 /* Barra de progreso */

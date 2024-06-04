@@ -142,7 +142,6 @@ export const MyInitiatives = () => {
                         </div>
                       <div className="m-iniciativa-texto">
                         <div className="m-titulo">{iniciativa.titulo}</div>
-
                       </div>
                     </div>
                   </Link>
