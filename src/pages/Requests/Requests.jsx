@@ -69,10 +69,10 @@ export const Requests = () => {
       let solicitudesEnviadasData = []
       let solicitudesRecibidasData = []
       for (const solicitud of solicitudes) {
-        if (solicitud.tipoInvitacion == "UsuarioAIniciativa") {
+        if (solicitud && solicitud.tipoInvitacion == "UsuarioAIniciativa") {
           solicitudesEnviadasData.push(solicitud);
         }
-        else if (solicitud.tipoInvitacion == "IniciativaAUsuario" && solicitud.estado == "Pendiente") {
+        else if (solicitud && solicitud.tipoInvitacion == "IniciativaAUsuario" && solicitud.estado == "Pendiente") {
           solicitudesRecibidasData.push(solicitud);
         }
       }
@@ -147,9 +147,9 @@ export const Requests = () => {
     const solicitud = solicitudesRecibidasNuevo[index];
 
     // Actualizar lista de solicitudes recibidas
-    let usuariosRecibidosNuevo = [...usuariosRecibidos];
-    usuariosRecibidosNuevo = usuariosRecibidosNuevo.filter(usuario => usuario.idUsuario !== solicitud.idUsuario);
-    setUsuariosRecibidos(usuariosRecibidosNuevo);
+    let iniciativasRecibidasNueva = [...iniciativasRecibidas];
+    iniciativasRecibidasNueva = iniciativasRecibidasNueva.filter(iniciativa => iniciativa.idIniciativa !== solicitud.idIniciativa);
+    setIniciativasRecibidas(iniciativasRecibidasNueva);
 
     setSolicitudesRecibidas(solicitudesRecibidasNuevo);
     await actualizaSolicitud(solicitud);

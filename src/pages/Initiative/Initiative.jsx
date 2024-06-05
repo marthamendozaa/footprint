@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch } from 'react-icons/fa';
+import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
@@ -46,7 +46,9 @@ export const Initiative = () => {
 
   // Información de solicitudes
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
+  const [solicitudesEnviadas, setSolicitudesEnviadas] = useState(null);
   const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
+  const [usuariosEnviados, setUsuariosEnviados] = useState([]);
   const [showSolicitudesModal, setShowSolicitudesModal] = useState(false);
   const [paginaActual, setPaginaActual] = useState('solicitudes');
 
@@ -84,44 +86,68 @@ export const Initiative = () => {
         setMiembros(usuariosMiembros);
         
         if (usuarioEsAdmin) {
-          // Obtiene información de los usuarios sin miembros
-          let usuariosSinMiembros = {...usuarios};
-
-          for (const usuario of Object.values(usuariosData)) {
-            if (!iniciativaData.listaMiembros.includes(usuario.idUsuario) && usuario.idUsuario != adminIniciativa.idUsuario && !usuario.esAdmin) {
-              usuariosSinMiembros[usuario.idUsuario] = {...usuario, invitarCargando: false, invitarDesactivado: false, cancelarDesactivado: true};
-            }
+          // Solo usar la página de enviadas si la iniciativa es pública
+          if (iniciativaData.esPublica) {
+            const nuevaPagina = 'miembros';
+            setPaginaActual(nuevaPagina);
           }
 
           // Obtiene información de solicitudes
           const solicitudes = await getSolicitudes("Iniciativas", idIniciativa);
-
+          
           let solicitudesRecibidasData = []
+          let solicitudesEnviadasData = []
           for (const solicitud of solicitudes) {
-            if (solicitud.estado == "Pendiente") {
-              usuariosSinMiembros[solicitud.idUsuario].invitarDesactivado = true;
-              usuariosSinMiembros[solicitud.idUsuario].cancelarDesactivado = false;
-
-              if (solicitud.tipoInvitacion == "UsuarioAIniciativa") {
-                solicitudesRecibidasData.push(solicitud);
-                delete usuariosSinMiembros[solicitud.idUsuario];
-              }
+            if (solicitud.tipoInvitacion == "UsuarioAIniciativa" && solicitud.estado == "Pendiente") {
+              solicitudesRecibidasData.push(solicitud);
+            } else if (solicitud.tipoInvitacion == "IniciativaAUsuario") {
+              solicitudesEnviadasData.push(solicitud);
             }
           }
           setSolicitudesRecibidas(solicitudesRecibidasData);
+          setSolicitudesEnviadas(solicitudesEnviadasData);
 
           // Obtiene información de usuarios asociados a solicitudes
           let usuariosRecibidosData = [];
-
-          for (const solicitud of solicitudesRecibidasData){
+          for (const solicitud of solicitudesRecibidasData) {
             const usuarioRecibido = await getUsuario(solicitud.idUsuario);
             const recibido = { ...usuarioRecibido, aceptarDesactivado: false, rechazarDesactivado: false};
             usuariosRecibidosData.push(recibido);
           }
 
+          let usuariosEnviadosData = []
+          for (const solicitud of solicitudesEnviadasData) {
+            const usuarioEnviado = await getUsuario(solicitud.idUsuario);
+            usuariosEnviadosData.push(usuarioEnviado);
+          }
+
+          // Obtiene información de los usuarios sin miembros ni solicitudes
+          let usuariosSinMiembros = {...usuarios};
+
+          for (const usuario of Object.values(usuariosData)) {
+            // No es miembro ni admin ni tiene solicitudes recibidass
+            if (!iniciativaData.listaMiembros.includes(usuario.idUsuario)
+              && !solicitudesRecibidasData.map((recibido) => recibido.idUsuario).includes(usuario.idUsuario)
+              && usuario.idUsuario != adminIniciativa.idUsuario && !usuario.esAdmin) {
+              // Si ya se envió una solicitud al usuario
+              const solicitudEnviada = solicitudesEnviadasData.find((enviado) => enviado.idUsuario === usuario.idUsuario);
+              if (solicitudEnviada) {
+                // Si la solicitud está pendiente, se puede cancelar la invitación
+                if (solicitudEnviada.estado == "Pendiente") {
+                  usuariosSinMiembros[usuario.idUsuario] = {...usuario, invitarCargando: false, invitarDesactivado: true, cancelarDesactivado: false};
+                }
+              }
+              // Si no se ha enviado, se puede invitar al usuario
+              else {
+                usuariosSinMiembros[usuario.idUsuario] = {...usuario, invitarCargando: false, invitarDesactivado: false, cancelarDesactivado: true};
+              }
+            }
+          }
+
           setUsuarios(usuariosSinMiembros);
           setUsuariosFiltrados(usuariosSinMiembros);
           setUsuariosRecibidos(usuariosRecibidosData);
+          setUsuariosEnviados(usuariosEnviadosData);
         }
 
         // Obtiene información de las tareas
@@ -251,46 +277,73 @@ export const Initiative = () => {
   
   // Invitar usuarios
   const handleInvitarUsuario = async (idUsuario) => {
-    let usuariosNuevo = {...usuarios};
+    let usuariosNuevo = {...usuariosFiltrados};
     usuariosNuevo[idUsuario].invitarDesactivado = true;
     usuariosNuevo[idUsuario].invitarCargando = true;
-    setUsuarios(usuariosNuevo);
+    setUsuariosFiltrados(usuariosNuevo);
     
     try {
       // Crear solicitud
       const solicitud = new Solicitud(idUsuario, idIniciativa, "Pendiente", "IniciativaAUsuario");
       await crearSolicitud(solicitud);
+
+      // Actualizar lista de solicitudes enviadas
+      let solicitudesEnviadasNuevo = [...solicitudesEnviadas];
+      solicitudesEnviadasNuevo.push(solicitud);
+      setSolicitudesEnviadas(solicitudesEnviadasNuevo);
+
+      let usuariosEnviadosNuevo = [...usuariosEnviados];
+      usuariosEnviadosNuevo.push(usuariosFiltrados[idUsuario]);
+      setUsuariosEnviados(usuariosEnviadosNuevo);
     } catch (error) {
-      console.log("Error al enviar solicitud al usuario");
+      console.error("Error al enviar solicitud al usuario");
     } finally {
-      console.log("Invitación enviada");
-      usuariosNuevo = {...usuarios};
+      usuariosNuevo = {...usuariosFiltrados};
       usuariosNuevo[idUsuario].invitarCargando = false;
       usuariosNuevo[idUsuario].cancelarDesactivado = false;
-      console.log(usuariosNuevo[idUsuario]);
-      setUsuarios(usuariosNuevo);
+      setUsuariosFiltrados(usuariosNuevo);
     }
   };
 
   // Cancelar invitación
   const handleCancelarUsuario = async (idUsuario) => {
-    let usuariosNuevo = {...usuarios};
-    usuariosNuevo[idUsuario].cancelarDesactivado = true;
-    usuariosNuevo[idUsuario].invitarCargando = true;
-    setUsuarios(usuariosNuevo);
+    let usuariosNuevo = {...usuariosFiltrados};
 
+    // Cancelar desde modal invitar miembros
+    if (usuariosNuevo[idUsuario]) {
+      usuariosNuevo[idUsuario].cancelarDesactivado = true;
+      usuariosNuevo[idUsuario].invitarCargando = true;
+      setUsuariosFiltrados(usuariosNuevo);
+    }
+    
     try {
-      // Actualizar estado de solicitud
+      // Eliminar solicitud
       const solicitud = await existeSolicitud(idUsuario, idIniciativa);
       await eliminarSolicitud(solicitud);
+
+      // Actualizar lista de solicitudes enviadas
+      let solicitudesEnviadasNuevo = [...solicitudesEnviadas];
+      solicitudesEnviadasNuevo = solicitudesEnviadasNuevo.filter((enviada) => enviada.idUsuario !== idUsuario);
+      setSolicitudesEnviadas(solicitudesEnviadasNuevo);
+
+      let usuariosEnviadosNuevo = [...usuariosEnviados];
+      usuariosEnviadosNuevo = usuariosEnviadosNuevo.filter((enviado) => enviado.idUsuario !== idUsuario);
+      setUsuariosEnviados(usuariosEnviadosNuevo);
     } catch (error) {
       console.error("Error al cancelar la solicitud");
     } finally {
-      console.log("Invitación cancelada");
-      usuariosNuevo = {...usuarios};
-      usuariosNuevo[idUsuario].invitarCargando = false;
-      usuariosNuevo[idUsuario].invitarDesactivado = false;
-      setUsuarios(usuariosNuevo);
+      usuariosNuevo = {...usuariosFiltrados};
+
+      if (usuariosNuevo[idUsuario]) {
+        usuariosNuevo[idUsuario].invitarCargando = false;
+        usuariosNuevo[idUsuario].invitarDesactivado = false;
+      } else {
+        // Eliminar solicitud desde el modal de solicitudes
+        const usuario = usuariosEnviados.find((enviado) => enviado.idUsuario == idUsuario);
+        usuariosNuevo[idUsuario] = {...usuario, invitarDesactivado: false, cancelarDesactivado: true};
+        console.log(usuariosNuevo[idUsuario]);
+      }
+      setUsuariosFiltrados(usuariosNuevo);
     }
   }
   
@@ -854,7 +907,7 @@ export const Initiative = () => {
               )}
             </div>
 
-            {!iniciativa.esPublica && esAdmin && (
+            {esAdmin && (
               <button type="button" className="i-btn-ver-solicitudes" onClick={() => setShowSolicitudesModal(true)}>
                 VER SOLICITUDES
               </button>
@@ -877,17 +930,19 @@ export const Initiative = () => {
 
           {/* Determinar en que página esta */}
           <div className="modal-nav">
-            <button 
-              className={paginaActual === 'solicitudes' ? 'active' : ''} 
-              onClick={() => setPaginaActual('solicitudes')}
-            >
-              Solicitudes
-            </button>
+            {iniciativa && !iniciativa.esPublica &&
+              <button 
+                className={paginaActual === 'solicitudes' ? 'active' : ''} 
+                onClick={() => setPaginaActual('solicitudes')}
+              >
+                Solicitudes recibidas
+              </button>
+            }
             <button 
               className={paginaActual === 'miembros' ? 'active' : ''} 
               onClick={() => setPaginaActual('miembros')}
             >
-              Miembros
+              Solicitudes enviadas
             </button>
           </div>
 
@@ -951,7 +1006,35 @@ export const Initiative = () => {
             ) : (
               <div className="m-iniciativas-container">
                 {/* Contenido de miembros */}
-                Lista de los miembros
+                <div>
+                {usuariosEnviados.map((usuario, index) => (
+                  <div key={index} className='rq-iniciativa'>
+                    {/* Imagen y título */}
+                    <div className='rq-iniciativa-imagen'>
+                        <img src={usuario.urlImagen} alt = {usuario.nombreUsuario} />
+                    </div>
+
+                    <div className='rq-iniciativa-texto'>
+                      <div className="rq-titulo">{usuario.nombreUsuario}</div>
+                      
+                      {/* Estado */}
+                      <div className='rq-estado'>
+                        <div>
+                          {solicitudesEnviadas[index].estado}
+                          {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
+                          {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
+                          {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
+                        </div>
+                      </div>
+
+                      {/* Basura */}
+                      <div className='fa-4' onClick={(e) => e.stopPropagation()}>
+                        <button className='fa-5-button'> <FaTrash onClick={() => handleCancelarUsuario(solicitudesEnviadas[index].idUsuario)} disabled={eliminaBloqueado}/> </button>
+                      </div>
+                    </div>
+                  </div>    
+                ))}
+                </div>
               </div>
             )}
           </div>
@@ -1066,7 +1149,7 @@ export const Initiative = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal para inivtar usuarios */}
+      {/* Modal para invitar usuarios */}
       <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
         <div className="modalcontainer">
           <Modal.Header closeButton>
