@@ -71,13 +71,17 @@
   align-items: center;
 }
 
-.c-titulo-texto,
+.c-titulo-texto-tarea {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .c-titulo-input {
   display: flex;
   overflow: overlay;
 }
 
-.c-titulo-texto::-webkit-scrollbar,
 .c-titulo-input::-webkit-scrollbar {
   display: none;
 }
@@ -94,8 +98,9 @@
   font-size: 20px;
   font-weight: 600;
   color: #A0C1BF;
-  margin-left: 10px;
-  margin-top: 20px;
+  margin-left: 0px;
+  margin-top: -45px;
+  margin-left: 15px;
 }
 
 .c-btn-editar-titulo {
@@ -302,6 +307,7 @@ li.c-etiqueta-item:hover {
 }
 
 .c-container-conteo {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -312,16 +318,14 @@ li.c-etiqueta-item:hover {
   font-weight: 600;
   font-size: 18px;
   color: #121212;
+  right: 0;
 }
 
 .c-desc-texto {
   position: relative;
   width: 100%;
-
   background-color: #A0C1BF;
-  
   border-radius: 25px;
-
   text-align: left;
   font-weight: 600;
   font-size: 20px;
@@ -329,24 +333,52 @@ li.c-etiqueta-item:hover {
   word-break: break-word;
 }
 
+.c-desc-texto-2 {
+  position: relative;
+  width: 100%;
+  border-radius: 25px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 16px;
+  color: #121212;
+  word-break: break-word;
+  margin-right: 20px;
+}
+
 .c-desc-input-texto {
   position: relative;
   width: 100%;
-
   background-color: transparent;
   border-radius: 0px;
   outline: none;
-
   text-align: left;
   font-weight: 600;
   font-size: 20px;
   color: #121212;
-  word-break: break-all;
-
+  word-break: break-word;
   resize: none;
 }
 
 .c-desc-input-texto::-webkit-scrollbar {
+  display: none;
+}
+
+.c-desc-input-texto-2 {
+  position: relative;
+  width: 100%;
+  background-color: transparent;
+  border-radius: 0px;
+  outline: none;
+  text-align: left;
+  font-weight: 600;
+  font-size: 16px;
+  color: #121212;
+  word-break: break-word;
+  resize: none;
+  padding-right: 20px;
+}
+
+.c-desc-input-texto-2::-webkit-scrollbar {
   display: none;
 }
 
@@ -395,8 +427,19 @@ li.c-etiqueta-item:hover {
 /* Tareas */
 .c-tareas-container {
   display: flex;
-  width: 80%;
+  width: 85%;
   flex-direction: column-reverse;
+}
+
+.c-tareas-container-2 {
+  display: flex;
+  align-items: center;
+}
+
+.c-fa-trash {
+  margin-left: 20px;
+  font-size: 30px;
+  cursor: pointer;
 }
 
 .c-tarea {
@@ -410,13 +453,16 @@ li.c-etiqueta-item:hover {
   align-items: flex-start;
   font-weight: 600;
   flex-direction: row;
+  overflow-x: auto;
 }
 
 .c-tarea-titulo {
+  display: flex;
+  flex-direction: row;
   font-size: 25px;
 }
 
-.c-tarea-titulo:focus-visible{
+.c-tarea-titulo:focus-visible {
   outline: none;
 }
 
@@ -425,19 +471,23 @@ input.c-tarea-titulo {
   border: none;
   padding: 0;
   font-weight: 600;
+  min-width: 400px;
 }
 
 .c-tarea-texto {
-  font-size: 16px;
+  position: relative;
   width: 100%;
+  text-align: left;
+  font-size: 16px;
+  word-break: break-word;
 }
 
 .c-tarea-desc {
   display: flex;
   width: 100%;
-  flex-wrap: wrap;
   word-break: break-word;
   text-align: left;
+  margin-top: 10px;
 }
 
 .c-tarea-info {
@@ -451,7 +501,7 @@ input.c-tarea-titulo {
   display: flex;
   height: 100%;
   width: 20%;
-  justify-content: space-around;
+  justify-content: space-evenly;
   flex-direction: column;
 }
 
@@ -466,10 +516,37 @@ input.c-tarea-titulo {
 .c-btn-editar-tarea {
   background: none;
   border: none;
-  color: #A0C1BF;
+  color: #000;
+  font-weight: 600;
   font-size: 15px;
   padding: 0;
   padding-left: 10px;
+  max-width: 400px;
+}
+
+.c-btn-editar-flex {
+  display: flex;
+  justify-content: flex-end;
+  max-width: 438px;
+  background: none;
+  border: none;
+  color: #000;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 0;
+  top: 10px;
+  padding-left: 10px;
+}
+
+.c-btn-editar-tarea-2 {
+  position: relative;
+  background: none;
+  border: none;
+  color: #000;
+  font-size: 15px;
+  padding: 0;
+  top: 10px;
+  left: 420px;
 }
 
 /* Crear */
@@ -507,14 +584,39 @@ input.c-tarea-titulo {
   background-color: #7d9795;
 }
 
+button.c-btn-crear:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 /* Modal subir imagen */
 .c-input-body {
   display: flex;
   padding: 20px;
   width: 500px;
   justify-content: center;
+}
+
+.c-drag-drop {
+  display: flex;
+  width: 400px;
+  border: 2px dashed #ccc;
+  border-radius: 20px;
+  justify-content: center;
   align-items: center;
-  flex-direction: row;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.c-drag-drop-image {
+  font-size: 50px;
+  color: #A0C1BF;
+  margin: 10px;
+  margin-bottom: 0px;
+}
+
+.c-drag-drop-text {
+  margin: 10px;
 }
 
 .c-custom-file-button {

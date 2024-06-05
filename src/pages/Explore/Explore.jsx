@@ -5,7 +5,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { FaHeart, FaRegHeart, FaSearch, FaTrash } from "react-icons/fa";
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
-import { getIniciativas, getUsuarios, getMisIniciativas, actualizaUsuario, crearSolicitud, suscribirseAIniciativa, existeSolicitud, eliminaIniciativa, sendMail, getIntereses, getRegiones } from '../../api/api.js';
+import { getIniciativas, getUsuarios, getMisIniciativas, actualizaUsuario, crearSolicitud, suscribirseAIniciativa, existeSolicitud, eliminaIniciativa, enviarCorreoIniciativa, getIntereses, getRegiones } from '../../api/api.js';
 import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
@@ -392,7 +392,7 @@ export const Explore = () => {
     setEliminaBloqueado(true);
 
     try {
-      await sendMail(seleccionada.idIniciativa);
+      await enviarCorreoIniciativa(seleccionada);
       await eliminaIniciativa(seleccionada.idIniciativa);
 
       const iniciativasData = iniciativas.filter(iniciativa => iniciativa.idIniciativa !== seleccionada.idIniciativa);
@@ -606,7 +606,7 @@ export const Explore = () => {
           </div>
         <Modal.Footer>
           <Button className="eliminar" onClick={handleEliminaIniciativa} disabled={eliminaBloqueado} style={{width: "128px"}}>
-            {eliminaBloqueado ? <ClipLoader color="white" size={15} /> : "Eliminar"}
+            {eliminaBloqueado ? <ClipLoader color="white" size={20} /> : "Eliminar"}
           </Button>
           <Button onClick={handleCerrarEliminar}>Cerrar</Button>
           </Modal.Footer>

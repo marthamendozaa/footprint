@@ -157,7 +157,7 @@ export const Register2 = ({ onPrev, onNext, usuario }) => {
                 placeholder="Ingresa tu usuario" 
                 value={username}  
                 onChange={(e) => {
-                  if (e.target.value.length <= 20) {
+                  if (e.target.value.length <= 15) {
                     setUsername(e.target.value);
                   }
                   setInvalidUsername(false);

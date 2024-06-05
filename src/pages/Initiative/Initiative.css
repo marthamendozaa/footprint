@@ -74,15 +74,20 @@ button.i-fa-pen:disabled {
 .i-titulo {
   display: flex;
   justify-content: space-between;
+  white-space: nowrap;
   font-size: 70px;
   font-weight: 600;
   text-align: left;
+}
+
+.i-titulo-normal{
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .i-titulo-texto {
   display: flex;
-  overflow: overlay;
 }
 
 .i-titulo-texto::-webkit-scrollbar {
@@ -93,6 +98,7 @@ button.i-fa-pen:disabled {
   outline: none;
   border: none;
   font-weight: 600;
+  width: 600px;
 }
 
 .i-titulo-conteo {
@@ -214,6 +220,8 @@ li.i-etiqueta-item {
   display: flex;
   width: 100%;
   flex-direction: column;
+  margin-top: 15px;
+  margin-bottom: 15px;
 }
 
 /* Barra de progreso */
@@ -284,8 +292,6 @@ li.i-etiqueta-item {
   display: flex;
   align-items: stretch;
   flex-direction: column;
-  justify-content: space-evenly;
-
 }
 
 .i-btn-ver-miembros {
@@ -298,8 +304,6 @@ li.i-etiqueta-item {
 }
 
 /* Tareas */
-
-
 .i-titulo-tareas {
   font-size: 25px;
   font-weight: 600;
@@ -327,8 +331,17 @@ li.i-etiqueta-item {
 
 /* Miembros */
 .i-tipo-miembro {
+  display: flex;
   font-size: 20px;
   font-weight: 600;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-agregar-miembros {
+  margin-left: 5px;
+  font-size: 25px;
+  cursor: pointer;
 }
 
 .i-btn-miembro {
@@ -382,6 +395,24 @@ li.i-etiqueta-item {
 
 .i-btn-ver-solicitudes:hover {
   background-color: #6b7780;
+}
+
+/* Modal Solicitudes */
+.i-botones-solicitud {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.i-btn-solicitud {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f2f2f2;
+  width: 110px;
+  height: 50px;
+  border-radius: 20px;
 }
 
 
@@ -493,9 +524,31 @@ input.i-tarea-titulo {
 }
 
 /* Modal */
+.e-modal .modal-content {
+  padding: 0px 10px 10px 10px !important;
+  border: none;
+}
+
 .i-modal-guardar {
   display: flex;
   align-items: center;
   text-align: center;
   justify-content: center;
+}
+
+.modal-nav {
+  display: flex;
+  justify-content: space-around;
+}
+
+.modal-nav button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.modal-nav .active {
+  font-weight: bold;
 }

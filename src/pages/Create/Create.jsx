@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock } from 'react-icons/fa';
+import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaTrash } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
@@ -10,9 +10,11 @@ import { format } from 'date-fns';
 import es from 'date-fns/locale/es';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import { useDropzone } from 'react-dropzone';
-import { getIntereses, getRegiones, crearIniciativa, actualizaIniciativa, subirImagen, crearTareas } from '../../api/api.js';
+import { getIntereses, getRegiones, crearIniciativa, actualizaIniciativa, subirImagen, crearTareas, getUsuarios, getUsuario, crearSolicitud } from '../../api/api.js';
 import Iniciativa from '../../classes/Iniciativa.js';
+import Solicitud from '../../classes/Solicitud.js'
 import Tarea from '../../classes/Tarea.js';
+import Fuse from 'fuse.js';
 import './Create.css';
 
 export const Create = () => {
@@ -27,13 +29,26 @@ export const Create = () => {
     }
   };
 
+  const { user } = useAuth();
+
   useEffect(() => {
     const fetchData = async () => {
+      // Obtiene información de etiquetas
       const etiquetasData = await getIntereses();
       setEtiquetas(etiquetasData);
-
+      
+      // Obtiene información de regiones
       const regionesData = await getRegiones();
       setRegiones(regionesData);
+
+      // Obtiene información de usuarios
+      const usuariosData = await getUsuarios();
+      const usuarios = Object.values(usuariosData).filter(usuario => 
+        usuario.idUsuario !== user && !usuario.esAdmin
+      );
+
+      setUsuarios(usuarios);
+      setUsuariosFiltrados(usuarios);
     };
     fetchData();
   }, []);
@@ -93,6 +108,30 @@ export const Create = () => {
     setTareas(tareasNuevo);
   };
 
+  const textareaRefs2 = useRef([null]);
+
+  const autoResizeTextarea2 = (idTarea) => {
+    const textarea = textareaRefs2.current[idTarea];
+    if (textarea) {
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    tareas.forEach((tarea, idTarea) => {
+      if (tarea.editandoDesc) {
+        autoResizeTextarea2(idTarea);
+
+        if (tarea.editandoDesc && textareaRefs2.current[idTarea]) {
+          const length = textareaRefs2.current[idTarea].value.length;
+          textareaRefs2.current[idTarea].setSelectionRange(length, length);
+          textareaRefs2.current[idTarea].focus();
+        }
+
+      }
+    });
+  }, [tareas]);
+
 
   // Cambiar fecha entrega Tarea
   const handleCambioFechaEntrega = (date, idTarea) => {
@@ -119,7 +158,20 @@ export const Create = () => {
     const tareasNuevo = [...tareas, new ItemTarea()];
     setTareas(tareasNuevo);
   };
+  
+  const [modalTarea2, setModalTarea2] = useState(false);
+  const handleCerrarTarea2 = () => setModalTarea2(false);
+  const handleMostrarTarea2 = () => setModalTarea2(true);
 
+  const handleBorrarTarea = async (tareaEliminarId) => {  
+    if (tareas.length==1) {
+      handleMostrarTarea2();
+      return;
+    }
+    
+    const tareasActualizadas = tareas.filter((tarea, index) => index !== tareaEliminarId);
+    setTareas(tareasActualizadas);
+  };  
 
   // Cambiar título
   const [titulo, setTitulo] = useState("");
@@ -149,8 +201,6 @@ export const Create = () => {
   const [desc, setDesc] = useState("");
   const [editandoDesc, setEditandoDesc] = useState(false);
 
-  const textareaRef = useRef(null);
-
   const handleCambioDesc = (event) => {
     setDesc(event.target.value);
     autoResizeTextarea();
@@ -163,6 +213,8 @@ export const Create = () => {
   const handleGuardarDesc = () => {
     setEditandoDesc(false);
   };
+
+  const textareaRef = useRef(null);
 
   const autoResizeTextarea = () => {
     const textarea = textareaRef.current;
@@ -183,6 +235,7 @@ export const Create = () => {
     }
   }, [editandoDesc]);
 
+
   // Seleccionar etiquetas
   const [etiquetas, setEtiquetas] = useState(null);
   const [etiquetasIniciativa, setEtiquetasIniciativa] = useState({});
@@ -200,10 +253,15 @@ export const Create = () => {
   
 
   // Cambiar fechas
+  const [today, setToday] = useState(new Date());
   const [fechaInicio, setFechaInicio] = useState(new Date());
   const [fechaCierre, setFechaCierre] = useState(new Date());
   const datePickerInicio = useRef(null);
   const datePickerCierre = useRef(null);
+
+  useEffect(() => {
+    setToday(new Date());
+  }, []);
 
   const handleCambioFechaInicio = () => {
     if (datePickerInicio.current) {
@@ -281,6 +339,7 @@ export const Create = () => {
   
 
   // Subir imagen
+  const [imagenBloqueado, setImagenBloqueado] = useState(true);
   const [imagenSeleccionada, setImagenSeleccionada] = useState(null);
   const [imagenIniciativa, setImagenIniciativa] = useState(null);
   const [imagenPreview, setImagenPreview] = useState('https://t3.ftcdn.net/jpg/02/68/55/60/360_F_268556012_c1WBaKFN5rjRxR2eyV33znK4qnYeKZjm.jpg');
@@ -294,17 +353,22 @@ export const Create = () => {
     setErrorImagen("");
   };
 
-  const handleSubirImagen = () => {
+  useEffect(() => {
     if (!imagenSeleccionada) {
-      setErrorImagen("Por favor selecciona una imagen")
+      setImagenBloqueado(true);
       return;
     }
 
     if (imagenSeleccionada.size > 2 * 1024 * 1024) {
-      setErrorImagen("La imagen seleccionada supera el límite de tamaño de 2 MB")
-      return;
+      setErrorImagen('La imagen seleccionada supera el límite de tamaño de 2 MB');
+      setImagenBloqueado(true);
+    } else {
+      setErrorImagen('');
+      setImagenBloqueado(false);
     }
+  }, [imagenSeleccionada]);
 
+  const handleSubirImagen = () => {
     setImagenIniciativa(imagenSeleccionada);
     setImagenPreview(URL.createObjectURL(imagenSeleccionada));
     handleCerrarImagen();
@@ -323,6 +387,71 @@ export const Create = () => {
     }
   });
 
+  const [showInvitarModal, setShowInvitarModal] = useState(false); 
+  const [usuarios, setUsuarios] = useState([]);
+  const [filtro, setFiltro] = useState('');
+  const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
+  const [estadoBotones, setEstadoBotones] = useState({});
+  const [solicitudesPorCrear, setSolicitudesPorCrear] = useState([]);
+
+  useEffect(() => {
+    if (usuarios) {
+      // Initialize button state
+      const estadoInicial = {};
+      usuarios.forEach(usuario => {
+        estadoInicial[usuario.idUsuario] = {
+          invitarDesactivado: false,
+          cancelarDesactivado: true
+        };
+      });
+      setEstadoBotones(estadoInicial);
+    }
+  }, [usuarios]);
+
+  const handleShowInvitarModal = () => {
+    setShowInvitarModal(true);
+  };
+
+  const buscarUsuario = (event) => {
+    const busqueda = event.target.value;
+    setFiltro(busqueda);
+
+    if (!busqueda) {
+      // Si el término de búsqueda está vacío, mostrar todos los usuarios
+      setUsuariosFiltrados(usuarios);
+      return;
+    }
+
+    const fuse = new Fuse(usuarios, {
+      keys: ['nombreUsuario', 'nombre'], // Especificar las claves para buscar
+      includeScore: true,
+      threshold: 0.4, // Ajustar el umbral según sea necesario
+    });
+
+    const resultado = fuse.search(busqueda);
+    const filtradas = resultado.map((item) => item.item);
+    setUsuariosFiltrados(filtradas);
+  };
+
+  const handleInvitarUsuario = (id) => {
+    const nuevoSolicitudes = [...solicitudesPorCrear, id];
+    setSolicitudesPorCrear(nuevoSolicitudes);
+
+    const nuevoEstados = {...estadoBotones};
+    nuevoEstados[id].invitarDesactivado = true;
+    nuevoEstados[id].cancelarDesactivado = false;
+    setEstadoBotones(nuevoEstados);
+  }
+
+  const handleCancelarUsuario = (id) => {
+    const nuevoSolicitudes = solicitudesPorCrear.filter(idUsuario => idUsuario != id);
+    setSolicitudesPorCrear(nuevoSolicitudes);
+
+    const nuevoEstados = {...estadoBotones};
+    nuevoEstados[id].invitarDesactivado = false;
+    nuevoEstados[id].cancelarDesactivado = true;
+    setEstadoBotones(nuevoEstados);
+  }
 
   // Crear iniciativa
   const [modalError, setModalError] = useState(false);
@@ -353,7 +482,6 @@ export const Create = () => {
 
 
   // Crear iniciativa
-  const { user } = useAuth();
   const [crearDesactivado, setCrearDesactivado] = useState(false);
 
   const handleCrearIniciativa = async () => {
@@ -404,6 +532,20 @@ export const Create = () => {
       }
       await crearTareas(tareasIniciativa);
 
+      // Crear solicitudes
+      console.log("solicitudesPorCrear:", solicitudesPorCrear);
+      if (!solicitudesPorCrear || solicitudesPorCrear.length === 0) {
+        console.log("No hay solicitudes por crear.");
+      }
+      else {
+        for (const idSolicitud of solicitudesPorCrear) {
+          // Crear cada solicitud
+          const solicitud = new Solicitud(idSolicitud, idIniciativa, "Pendiente", "IniciativaAUsuario");
+          const response = await crearSolicitud(solicitud);
+          console.log("Solicitud creada:", response.data);
+        }
+      }
+
       setIdIniciativaCreada(idIniciativa);
       handleMostrarCreada();
       setTiempoIniciativaCreada(tiempoActual);
@@ -413,8 +555,6 @@ export const Create = () => {
       setCrearDesactivado(false);
     }
   };
-
-  // Descripcion
 
 
   return (
@@ -443,16 +583,22 @@ export const Create = () => {
                       autoFocus
                       maxLength={30}
                     />
+                    
+                  </div>
+                  ) : (
+                    <div className="c-titulo-texto-tarea">
+                      {titulo ? titulo : "Título"}
+                    </div>
+                  )}
+
+                  {editandoTitulo ? (
                     <div className="c-titulo-conteo">
                       {titulo ? `${titulo.length}/30` : `0/30`}
                     </div>
-                  </div>) : (
-                    <div className="c-titulo-texto">
-                      {titulo ? titulo : "Título"}
+                    ) : (
                       <button className="c-btn-editar-titulo" onClick={handleEditarTitulo}>
                         <FaPen />
                       </button>
-                    </div>
                   )}
               </div>
 
@@ -481,6 +627,11 @@ export const Create = () => {
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerInicio}
                         locale={es}
+                        showYearDropdown
+                        scrollableYearDropdown 
+                        yearDropdownItemNumber={66}
+                        showMonthDropdown
+                        minDate={today}
                       />
                     </div>
                     
@@ -499,6 +650,11 @@ export const Create = () => {
                         dateFormat="dd/MM/yyyy"
                         ref={datePickerCierre}
                         locale={es}
+                        showYearDropdown
+                        scrollableYearDropdown 
+                        yearDropdownItemNumber={66}
+                        showMonthDropdown
+                        minDate={today}
                       />
                     </div>
                     
@@ -551,7 +707,7 @@ export const Create = () => {
           <div className="c-desc">
             {editandoDesc ?(
               <div className='c-container-conteo'>
-                <div className="c-desc-conteo" style={{marginTop: '-30px', marginLeft: '910px'}}>
+                <div className="c-desc-conteo" style={{top: "-30px"}}>
                   {desc ? `${desc.length}/200` : `0/200`}
                 </div>
                 
@@ -569,16 +725,16 @@ export const Create = () => {
                   `}
                   </style>
                   <textarea 
-                      ref={textareaRef}
-                      className="c-desc-input-texto"
-                      value={desc}
-                      onChange={handleCambioDesc}
-                      onBlur={handleGuardarDesc}
-                      onKeyDown={handleOnKeyDown}
-                      autoFocus
-                      maxLength={200} 
-                      style={{ borderColor: editandoDesc ? 'transparent' : 'transparent' }}
-                    />
+                    ref={textareaRef}
+                    className="c-desc-input-texto"
+                    value={desc}
+                    onChange={handleCambioDesc}
+                    onBlur={handleGuardarDesc}
+                    onKeyDown={handleOnKeyDown}
+                    autoFocus
+                    maxLength={200} 
+                    style={{ borderColor: 'transparent' }}
+                  />
                 </div>
               </div>
               ) : (
@@ -595,87 +751,136 @@ export const Create = () => {
           {/* Tareas y Miembros*/}
           <div className="c-tareas-miembros">
             <div className="c-seccion-tareas">
+
+              {/* Agregar tarea */}
               <button type="button" className="c-btn-agregar-tarea" onClick={handleCrearTarea}>
                 <IoMdAddCircleOutline style={{marginRight: "5px"}}/>
                 Añadir tarea
               </button>
+
+              {/* Tarea */}
               <div className="c-tareas-container">
                 {tareas.map((tarea, idTarea) => (
-                  <div className="c-tarea" key={idTarea}>
-                    <div className="c-tarea-info">
-                      <div className="c-tarea-titulo">
-                        {tarea.editandoTitulo ? (
-                          <input
-                            type="text"
-                            className="c-tarea-titulo"
-                            value={tarea.titulo}
-                            onChange={(e) => handleCambioTituloTarea(e, idTarea)}
-                            onBlur={() => handleGuardarTituloTarea(idTarea)}
-                            onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
-                            autoFocus
-                            maxLength={30}
-                          />
-                        ) : (
-                          <div className="c-titulo-texto">
-                            {tarea.titulo ? tarea.titulo : "Título"}
+                  <div className="c-tareas-container-2">
+                    <div className="c-tarea" key={idTarea}>
+                      
+                      {/* Titulo + descripción */}
+                      <div className="c-tarea-info">
+
+                        {/* Titulo */}
+                        <div className="c-tarea-titulo">
+                          {tarea.editandoTitulo? (
+                            <input
+                              type="text"
+                              className="c-tarea-titulo"
+                              value={tarea.titulo}
+                              onChange={(e) => handleCambioTituloTarea(e, idTarea)}
+                              onBlur={() => handleGuardarTituloTarea(idTarea)}
+                              onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
+                              autoFocus
+                              maxLength={30}
+                            />
+                          ) : (
+                            <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>
+                              {tarea.titulo ? tarea.titulo : "Título"}
+                            </div>
+                          )}
+
+                          {tarea.editandoTitulo? (
+                            <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
+                              {tarea.titulo ? `${tarea.titulo.length}/30` : `0/30`}
+                            </button>
+                          ) : (
                             <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
                               <FaPen />
                             </button>
-                          </div>
-                        )}
+                          )}
+                        </div>
+                        
+                        {/* Descripcion */}
+                        <div className="c-tarea-desc">
+                          {tarea.editandoDesc? (
+                            <div className='c-container-conteo'>
+                              <div className="c-tarea-texto" style={{paddingTop: '2px'}}>
+                                <style jsx>{`
+                                  textarea {
+                                    border-radius: 25px;
+                                    position: relative;
+                                    width: 100%;
+                                    height: 25px;
+                                    font-size: 16px;
+                                    resize: none;
+                                    outline: none;
+                                  }
+                                `}
+                                </style>
+                                <textarea
+                                  ref={el => textareaRefs2.current[idTarea] = el}
+                                  className="c-desc-input-texto-2"
+                                  value={tarea.descripcion}
+                                  onChange={(e) => handleCambioDescTarea(e, idTarea)}
+                                  onBlur={() => handleGuardarDescTarea(idTarea)}
+                                  onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
+                                  autoFocus
+                                  maxLength={200}
+                                  style={{ borderColor: 'transparent' }}
+                                />
+                              </div>
+
+                              <button className="c-btn-editar-flex" onClick={() => handleEditarDescTarea(idTarea)}>
+                                {tarea.descripcion ? `${tarea.descripcion.length}/200` : `0/200`}
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="c-desc-texto-2" style={{paddingBottom: '9.2px', paddingLeft: '2px'}}>
+                              <div style={tarea.descripcion ? {marginTop: '2px'} : {marginTop: '2px', color: '#677D7C'}}>
+                                {tarea.descripcion ? tarea.descripcion : "Agrega tu descripción aquí..."}
+                              </div>
+
+                              <button className="c-btn-editar-tarea-2" onClick={() => handleEditarDescTarea(idTarea)}>
+                                <FaPen />
+                              </button>
+                            </div>
+                          )}
+                        </div> 
                       </div>
-                      <div className="c-tarea-desc">
-                        {tarea.editandoDesc ? (
-                          <div className="c-tarea-texto">
-                            <textarea
-                              className="c-desc-input-texto"
-                              value={tarea.descripcion}
-                              onChange={(e) => handleCambioDescTarea(e, idTarea)}
-                              onBlur={() => handleGuardarDescTarea(idTarea)}
-                              onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
-                              autoFocus
-                              maxLength={200}
-                            />
-                          </div>
-                        ) : (
-                          <div style={tarea.descripcion ? {} : { color: '#677D7C' }}>
-                            {tarea.descripcion ? tarea.descripcion : "Agrega tu descripción aquí..."}
-                          </div>
-                        )}
-                        {!tarea.editandoDesc && (
-                          <button className="c-btn-editar-tarea" onClick={() => handleEditarDescTarea(idTarea)}>
-                            <FaPen />
-                          </button>
-                        )}
+
+                      {/* Botones izquierda */}
+                      <div className="c-tarea-botones">
+                        {/* Fecha */}
+                        <div className="c-tarea-boton"><FaCalendar /> Fecha
+                          <DatePicker
+                            className='react-datepicker-2'
+                            selected={tarea.fechaEntrega}
+                            onChange={(date) => handleCambioFechaEntrega(date, idTarea)}
+                            dateFormat="dd/MM/yyyy"
+                            ref={tarea.datePickerEntrega}
+                            locale={es}
+                          />
+                        </div>
+
+                        {/* Documento */}
+                        <div className="c-tarea-boton" style={{marginTop: '5px'}}><FaFolder /> Documento</div>
                       </div>
                     </div>
-                    <div className="c-tarea-botones">
-                      <div className="c-tarea-boton"><FaCalendar /> Fecha
-                        <DatePicker
-                          className='react-datepicker-2'
-                          selected={tarea.fechaEntrega}
-                          onChange={(date) => handleCambioFechaEntrega(date, idTarea)}
-                          dateFormat="dd/MM/yyyy"
-                          ref={tarea.datePickerEntrega}
-                          locale={es}
-                        />
-                      </div>
-                      <div className="c-tarea-boton"><FaFolder /> Documento</div>
+
+                    <div className='c-fa-trash'>
+                      <FaTrash onClick={() => handleBorrarTarea(idTarea)} />
                     </div>
                   </div>
                 ))}
               </div>
+
             </div>
 
-
+            {/* Invitar mimebros */}
             <div className="c-seccion-miembros">
-              <div className="c-btn-invitar-miembro">
+              <div className="c-btn-invitar-miembro" onClick={handleShowInvitarModal}>
                 <IoMdAddCircleOutline style={{marginRight: "5px"}}/>
                 Invitar miembro
               </div>
             </div>
           </div>
-          
           
           {/* Botón crear */}
           <div className="c-crear-container">
@@ -686,6 +891,8 @@ export const Create = () => {
             </div>
           </div>
 
+          {/* ----------------- Modales ----------------- */}
+
           {/* Subir imagen */}
           <Modal className="c-modal" show={modalImagen} onHide={handleCerrarImagen}>
             <Modal.Header>
@@ -693,16 +900,24 @@ export const Create = () => {
             </Modal.Header>
               
             <div className="c-input-body">
-              <div {...getRootProps({ className: 'c-custom-file-button' })}>
+              <div {...getRootProps({ className: "c-drag-drop" })}>
                 <input {...getInputProps()} />
-                Subir foto
+                <FaImages className="c-drag-drop-image"/>
+                {imagenSeleccionada ? (
+                  <div className="c-drag-drop-text">
+                    {imagenSeleccionada.name}
+                  </div>
+                ) : (
+                  <div className="c-drag-drop-text" style={{width: "150px"}}>
+                    <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra una imagen
+                  </div>
+                )}
               </div>
-              <span className="c-custom-file-text">{imagenSeleccionada ? imagenSeleccionada.name : "Ninguna imagen seleccionada"}</span>
             </div>
             {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
 
             <Modal.Footer>
-              <Button onClick={handleSubirImagen}>Guardar</Button>
+              <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
               <Button onClick={handleCerrarImagen}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
@@ -738,6 +953,19 @@ export const Create = () => {
               </div>
             <Modal.Footer>
               <Button onClick={handleCerrarTarea}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Tarea minimo una */}
+          <Modal className="c-modal" show={modalTarea2} onHide={handleCerrarTarea2}>
+            <Modal.Header>
+              <div className="c-modal-title">Error</div>
+            </Modal.Header>
+              <div className="c-modal-body" style={{textAlign:'left'}}>
+                Tienes que tener al menos una tarea
+              </div>
+            <Modal.Footer>
+              <Button onClick={handleCerrarTarea2}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
           
@@ -787,6 +1015,53 @@ export const Create = () => {
             <Modal.Footer>
               <Button onClick={handleCerrarTiempo}>Cerrar</Button>
             </Modal.Footer>
+          </Modal>
+
+          {/*Modal para inivtar usuarios*/}
+          <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
+            <div className="modalcontainer">
+              <Modal.Header closeButton>
+                <Modal.Title>Invitar Usuarios</Modal.Title>
+              </Modal.Header>
+                <Modal.Body>
+                  <div className='e-searchBar'>
+                    <FaSearch className="e-icons"/>
+                    <input
+                      type='search'
+                      placeholder='Buscar usuarios...'
+                      value={filtro}
+                      onChange={buscarUsuario}
+                      className='e-searchBarCaja'
+                    />
+                  </div>
+                  {usuariosFiltrados && usuariosFiltrados.length > 0 ? (
+                    <ul>
+                      {usuariosFiltrados.map((usuario, id) => (
+                        <li key={id} className='user-item'>
+                          <div className='user-info'>
+                            <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
+                          </div>
+                          
+                          {!estadoBotones[usuario.idUsuario].invitarDesactivado && (
+                            <Button variant="primary" onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
+                              Invitar
+                            </Button>
+                          )}
+                          {!estadoBotones[usuario.idUsuario].cancelarDesactivado && (
+                            <Button variant="primary" onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
+                              Cancelar
+                            </Button>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <div className="spinner">
+                      <Spinner animation="border" role="status"></Spinner>
+                    </div>
+                  )}
+                </Modal.Body>  
+            </div>
           </Modal>
         </div>
       ) : (

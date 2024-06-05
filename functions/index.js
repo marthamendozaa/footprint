@@ -113,7 +113,6 @@ exports.actualizaIniciativa = onRequest(async (req, res) => {
 });
 
 
-// DEPLOY
 // Elimina iniciativa
 exports.eliminaIniciativa = onRequest(async (req, res) => {
   cors(req, res, async () => {
@@ -324,7 +323,7 @@ exports.crearTareas = onRequest(async (req, res) => {
 });
 
 
-//Crea las solicitudes
+// Crea las solicitudes
 exports.crearSolicitud = onRequest(async (req, res) => {
   cors(req, res, async () => {
     const { solicitud } = req.body;
@@ -405,63 +404,15 @@ exports.eliminaSolicitud = onRequest(async (req, res) => {
   });
 });
 
-exports.sendMails = onRequest(async (req, res) =>{
+
+// Función para enviar correos de notificación
+exports.enviarCorreo = onRequest(async (req, res) =>{
   cors(req, res, async () => {
-    const { titulo, nombre, adminEmail } = req.body;
+    const { email, message } = req.body;
 
     try {
-      const email = {
-        to: adminEmail,
-        message: {
-          subject: "Tu iniciativa " + titulo + " ha sido borrada",
-          text: "Hola " + nombre + " lamentamos avisarte que tu iniciativa " + titulo + " ha sido borrada por los administradores debido a que no cumple con los estándares de la plataforma."
-        }
-      };
-      await getFirestore().collection('mail').add(email);
-      res.json({ success: true });
-    } catch (error) {
-      logger.info("Error enviando correo: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-exports.sendRemoveMails = onRequest(async (req, res) =>{
-  cors(req, res, async () => {
-    const { titulo, nombre, correo } = req.body;
-
-    try {
-      const email = {
-        to: correo,
-        message: {
-          subject: "Has sido eliminado de una iniciativa",
-          text: "Hola " + nombre + " te avisamos que has sido eliminado de la iniciativa " + titulo + ". Si tienes dudas sobre la razón puedes contactar al líder de la iniciativa."
-        }
-      };
-      await getFirestore().collection('mail').add(email);
-      res.json({ success: true });
-    } catch (error) {
-      logger.info("Error enviando correo: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
-
-
-// DEPLOY
-exports.sendTareaMails = onRequest(async (req, res) =>{
-  cors(req, res, async () => {
-    const { titulo, nombre, correo, tituloTarea } = req.body;
-
-    try {
-      const email = {
-        to: correo,
-        message: {
-          subject: "Has sido asignado una tarea",
-          text: "Hola " + nombre + " se te ha asignado la tarea " + tituloTarea + "en la iniciativa " + titulo + ". Si tienes dudas puedes contactar al lider de la iniciativa."
-        }
-      };
-      await getFirestore().collection('mail').add(email);
+      const mail = { to: email, message: message };
+      await getFirestore().collection('mail').add(mail);
       res.json({ success: true });
     } catch (error) {
       logger.info("Error enviando correo: ", error.message);
