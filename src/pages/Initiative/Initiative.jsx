@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass } from 'react-icons/fa';
+import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash } from 'react-icons/fa';
+import { IoMdAddCircleOutline } from "react-icons/io";
 import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
 import { useAuth } from '../../contexts/AuthContext';
@@ -8,76 +9,25 @@ import { ClipLoader } from 'react-spinners';
 import { useParams } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import es from 'date-fns/locale/es';
-import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, existeSolicitud, subirImagen, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, crearSolicitud } from '../../api/api.js';
-import './Initiative.css';
+import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud, actualizaTarea } from '../../api/api.js';
+import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
-import Solicitud from '../../classes/Solicitud.js';
+import './Initiative.css';
+import Tarea from '../../classes/Tarea.js';
 
 export const Initiative = () => {
-  //Búsqueda de usuarios para agregar miembros
-  const [showInvitarModal, setShowInvitarModal] = useState(false); 
-  const [usuarios, setUsuarios] = useState([]);
-  const [filtro, setFiltro] = useState('');
-  const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
-  const [invitarCargando, setInvitarCargando] = useState(false); //Implementar?
-  const [usuariosDesactivados, setUsuariosDesactivados] = useState({});
-
- // Miembro seleccionado a eliminar
- const [miembroEliminar, setMiembroEliminar] = useState(null);
-
- // Modal de confirmación de eliminación
- const [modalEliminar, setModalEliminar] = useState(false);
- const handleCerrarEliminar = () => setModalEliminar(false);
- const handleMostrarEliminar = (miembro) => {
-   setMiembroEliminar(miembro);
-   setModalEliminar(true);
- }
-
- // Modal de miembro eliminado
- const [modalEliminada, setModalEliminada] = useState(false);
- const handleMostrarEliminada = () => setModalEliminada(true);
- const handleCerrarEliminada = () => setModalEliminada(false);
-
- // Modal de error
- const [modalError, setModalError] = useState(false);
- const handleMostrarError = () => setModalError(true);
- const handleCerrarError = () => setModalError(false);
-
- // Eliminar miembro
- const [eliminaBloqueado, setEliminaBloqueado] = useState(false);
-
- const handleEliminaMiembro = async () => {
-   setEliminaBloqueado(true);
-
-   try {
-      await eliminarMiembro(idIniciativa, miembroEliminar.idUsuario);
-      await enviarCorreoMiembro(iniciativa, miembroEliminar);
-
-      const miembrosNuevo = miembros.filter((miembro) => miembro.idUsuario !== miembroEliminar.idUsuario);
-      setMiembros(miembrosNuevo);
-      
-      handleCerrarEliminar();
-      handleMostrarEliminada();
-   } catch(error) {
-      handleCerrarEliminar();
-      handleMostrarError();
-   } finally {
-      setEliminaBloqueado(false);
-   }
- };
-
   const { idIniciativa } = useParams();
+
+  // Información de la iniciativa
   const [iniciativa, setIniciativa] = useState(null);
-  const [infoAdmin, setInfoAdmin] = useState(null);
-  const [miembros, setMiembros] = useState(null);
-  const [tareas, setTareas] = useState(null);
-
   const [imagenPreview, setImagenPreview] = useState(null);
-  const [nuevaFechaFinal, setNuevaFechaFinal] = useState(null);
 
-  //LO QUE AÑADI DE CHECAR SI ES ADMIN
-  const { user } = useAuth();
-  const [esAdmin, setEsAdmin] = useState(false);
+  // Información de fecha de cierre
+  const [nuevaFechaFinal, setNuevaFechaFinal] = useState(null);
+  const parseDate = (dateString) => {
+    const [day, month, year] = dateString.split('/');
+    return new Date(year, month - 1, day);
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -87,83 +37,24 @@ export const Initiative = () => {
     return `${day}/${month}/${year}`;
   };
 
-  const [showSolicitudesModal, setShowSolicitudesModal] = useState(false); 
+  // Información de todos los usuarios
+  const { user } = useAuth();
+  const [infoAdmin, setInfoAdmin] = useState(null);
+  const [esAdmin, setEsAdmin] = useState(false);
+  const [miembros, setMiembros] = useState([]);
+  const [usuarios, setUsuarios] = useState({});
+  const [usuariosFiltrados, setUsuariosFiltrados] = useState({});
+
+  // Información de solicitudes
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
   const [solicitudesEnviadas, setSolicitudesEnviadas] = useState(null);
   const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
-  const [usuariosEnviados, setUsuariosEnviados] = useState(null);
+  const [usuariosEnviados, setUsuariosEnviados] = useState([]);
+  const [showSolicitudesModal, setShowSolicitudesModal] = useState(false);
+  const [paginaActual, setPaginaActual] = useState('solicitudes');
 
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [fileError, setFileError] = useState('');
-  const [uploadDisabled, setUploadDisabled] = useState(true);
-  const [cargandoTarea, setCargandoTarea] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState(null);
-
-  const openUploadModal = (taskId) => {
-    setShowUploadModal(true);
-    setFileError('');
-    setSelectedTaskId(taskId);
-  };
-
-  const closeUploadModal = () => {
-    setCargandoTarea(false);
-    setShowUploadModal(false);
-    setSelectedFile(null);
-    setSelectedTaskId(null);
-  };
-
-  useEffect(() => {
-    if (cargandoTarea) {
-      setUploadDisabled(true);
-    }
-
-    if (!selectedFile) {
-      setUploadDisabled(true);
-      return;
-    }
-    
-    if (selectedFile.size > 2 * 1024 * 1024) {
-      setFileError('El archivo seleccionado supera el límite de tamaño de 10 MB');
-      setSelectedFile(null);
-      setUploadDisabled(true);
-    } else {
-      setFileError('');
-      setUploadDisabled(false);
-    }
-  }, [selectedFile, cargandoTarea]);
-
-  const handleUploadFile = async () => {
-    setUploadDisabled(true);
-    setCargandoTarea(true);
-
-    try {
-      const fileUrl = await subirImagen(selectedFile, `Tareas/${selectedTaskId}`);
-      // Handle fileUrl appropriately in your application context
-      closeUploadModal();
-    } catch (error) {
-      console.error("Error al subir el archivo:", error.message);
-    } 
-  };
-
-  const { getRootProps: getRootPropsTarea, getInputProps: getInputPropsTarea } = useDropzone({
-    accept: {
-      'image/*': [],
-      'application/pdf': []
-    },
-    onDrop: (acceptedFiles) => {
-      if (acceptedFiles.length > 0) {
-        setSelectedFile(acceptedFiles[0]);
-        setFileError('');
-      }
-    }
-  });
-
-
-  const parseDate = (dateString) => {
-    const [day, month, year] = dateString.split('/');
-    return new Date(year, month - 1, day);
-  };
+  // Información de tareas
+  const [tareas, setTareas] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -176,73 +67,97 @@ export const Initiative = () => {
         // Obtiene información de fecha de cierre
         const fechaCierre = iniciativaData.fechaCierre ? parseDate(iniciativaData.fechaCierre) : null;
         setNuevaFechaFinal(fechaCierre);
-      
+
         // Obtiene información de todos los usuarios
         const usuariosData = await getUsuarios();
 
-        const usuariosSinMiembros = Object.values(usuariosData).filter(usuario => 
-          usuario.idUsuario !== iniciativaData.idAdmin &&
-          !iniciativaData.listaMiembros.includes(usuario.idUsuario) && !usuario.esAdmin
-        );
-
-        setUsuarios(usuariosSinMiembros);
-        setUsuariosFiltrados(usuariosSinMiembros);
-        console.log("usuarios:", usuariosSinMiembros);
-
         // Obtiene información del admin de la iniciativa
-        setInfoAdmin(usuariosData[iniciativaData.idAdmin]);
+        const adminIniciativa = usuariosData[iniciativaData.idAdmin];
+        const usuarioEsAdmin = usuariosData[user].idUsuario === iniciativaData.idAdmin;
+        setInfoAdmin(adminIniciativa);
+        setEsAdmin(usuarioEsAdmin);
 
-        // Obtiene información del usuario actual
-        setEsAdmin(usuariosData[user].idUsuario === iniciativaData.idAdmin)
-        
         // Obtiene información de los miembros de la iniciativa
-        const miembrosData = Object.values(usuariosData).filter(usuario =>
-          usuario.idUsuario !== iniciativaData.idAdmin &&
-          iniciativaData.listaMiembros.includes(usuario.idUsuario) && !usuario.esAdmin
-        );
+        let usuariosMiembros = [...Object.values(usuariosData)];
 
-        setMiembros(miembrosData);
+        usuariosMiembros = usuariosMiembros.filter((usuario) =>
+          iniciativaData.listaMiembros.includes(usuario.idUsuario) &&
+          usuario.idUsuario != adminIniciativa.idUsuario && !usuario.esAdmin);
+
+        setMiembros(usuariosMiembros);
         
-        // Obtiene información de solicitudes
-        const solicitudes = await getSolicitudes("Iniciativas", idIniciativa);
-
-        let solicitudesRecibidasData = []
-        for (const solicitud of solicitudes) {
-          if (solicitud.tipoInvitacion == "UsuarioAIniciativa" && solicitud.estado == "Pendiente") {
-            solicitudesRecibidasData.push(solicitud);
+        if (usuarioEsAdmin) {
+          // Solo usar la página de enviadas si la iniciativa es pública
+          if (iniciativaData.esPublica) {
+            const nuevaPagina = 'miembros';
+            setPaginaActual(nuevaPagina);
           }
-        }
-        setSolicitudesRecibidas(solicitudesRecibidasData);
 
-        let solicitudesEnviadasData = []
-        for (const solicitud of solicitudes) {
-          if (solicitud.tipoInvitacion == "IniciativaAUsuario") {
-            solicitudesEnviadasData.push(solicitud);
+          // Obtiene información de solicitudes
+          const solicitudes = await getSolicitudes("Iniciativas", idIniciativa);
+          
+          let solicitudesRecibidasData = []
+          let solicitudesEnviadasData = []
+          for (const solicitud of solicitudes) {
+            if (solicitud.tipoInvitacion == "UsuarioAIniciativa" && solicitud.estado == "Pendiente") {
+              solicitudesRecibidasData.push(solicitud);
+            } else if (solicitud.tipoInvitacion == "IniciativaAUsuario") {
+              solicitudesEnviadasData.push(solicitud);
+            }
           }
-        }
-        setSolicitudesEnviadas(solicitudesRecibidasData);
+          setSolicitudesRecibidas(solicitudesRecibidasData);
+          setSolicitudesEnviadas(solicitudesEnviadasData);
 
-        let usuariosRecibidosData = []
-        for (const solicitud of solicitudesRecibidasData){
-          const usuarioRecibido = await getUsuario(solicitud.idUsuario);
-          usuariosRecibidosData.push(usuarioRecibido);
-        }
-        setUsuariosRecibidos(usuariosRecibidosData);
+          // Obtiene información de usuarios asociados a solicitudes
+          let usuariosRecibidosData = [];
+          for (const solicitud of solicitudesRecibidasData) {
+            const usuarioRecibido = await getUsuario(solicitud.idUsuario);
+            const recibido = { ...usuarioRecibido, aceptarDesactivado: false, rechazarDesactivado: false};
+            usuariosRecibidosData.push(recibido);
+          }
 
-        let usuariosEnviadosData = []
-        for (const solicitud of solicitudesEnviadasData){
-          const usuarioEnviado = await getUsuario(solicitud.idUsuario);
-          usuariosEnviadosData.push(usuarioEnviado);
-        }
-        setUsuariosEnviados(usuariosEnviadosData);
+          let usuariosEnviadosData = []
+          for (const solicitud of solicitudesEnviadasData) {
+            const usuarioEnviado = await getUsuario(solicitud.idUsuario);
+            usuariosEnviadosData.push(usuarioEnviado);
+          }
 
+          // Obtiene información de los usuarios sin miembros ni solicitudes
+          let usuariosSinMiembros = {...usuarios};
+
+          for (const usuario of Object.values(usuariosData)) {
+            // No es miembro ni admin ni tiene solicitudes recibidass
+            if (!iniciativaData.listaMiembros.includes(usuario.idUsuario)
+              && !solicitudesRecibidasData.map((recibido) => recibido.idUsuario).includes(usuario.idUsuario)
+              && usuario.idUsuario != adminIniciativa.idUsuario && !usuario.esAdmin) {
+              // Si ya se envió una solicitud al usuario
+              const solicitudEnviada = solicitudesEnviadasData.find((enviado) => enviado.idUsuario === usuario.idUsuario);
+              if (solicitudEnviada) {
+                // Si la solicitud está pendiente, se puede cancelar la invitación
+                if (solicitudEnviada.estado == "Pendiente") {
+                  usuariosSinMiembros[usuario.idUsuario] = {...usuario, invitarCargando: false, invitarDesactivado: true, cancelarDesactivado: false};
+                }
+              }
+              // Si no se ha enviado, se puede invitar al usuario
+              else {
+                usuariosSinMiembros[usuario.idUsuario] = {...usuario, invitarCargando: false, invitarDesactivado: false, cancelarDesactivado: true};
+              }
+            }
+          }
+
+          setUsuarios(usuariosSinMiembros);
+          setUsuariosFiltrados(usuariosSinMiembros);
+          setUsuariosRecibidos(usuariosRecibidosData);
+          setUsuariosEnviados(usuariosEnviadosData);
+        }
+
+        // Obtiene información de las tareas
         const tareaPromises = iniciativaData.listaTareas.map(async (idTarea) => {
           const tareaData = await getMisTareas(idTarea);
           return tareaData;
         });
         const tareas = await Promise.all(tareaPromises);
         setTareas(tareas);
-
       } catch (error) {
         console.error("Error obteniendo información de la iniciativa:", error.message);
       }
@@ -250,21 +165,7 @@ export const Initiative = () => {
     fetchData();
   }, [idIniciativa]);
 
-  useEffect(() => {
-    const verificarSolicitudes = async () => {
-      let desactivados = {};
-      for (const usuario of usuariosFiltrados) {
-        const existe = await existeSolicitud(usuario.idUsuario, idIniciativa);
-        desactivados[usuario.idUsuario] = existe;
-      }
-      setUsuariosDesactivados(desactivados);
-    };
-  
-    if (usuariosFiltrados && usuariosFiltrados.length > 0) {
-      verificarSolicitudes();
-    }
-  }, [usuariosFiltrados]);
-
+  // Barra de progreso
   const ProgressBar = ({ progress }) => {
     return (
       <div className="progress-bar-container">
@@ -274,84 +175,217 @@ export const Initiative = () => {
     );
   };
 
-  const handleShowSolicitudesModal = () => {
-    setShowSolicitudesModal(true);
-  };
 
-  const handleShowInvitarModal = () => {
-    setShowInvitarModal(true);
-  };
+  // Búsqueda de usuarios para agregar miembros
+  const [showInvitarModal, setShowInvitarModal] = useState(false); 
+  const [filtro, setFiltro] = useState('');
 
   const buscarUsuario = (event) => {
     const busqueda = event.target.value;
     setFiltro(busqueda);
 
+    // Si el término de búsqueda está vacío, mostrar todos los usuarios
     if (!busqueda) {
-      // Si el término de búsqueda está vacío, mostrar todos los usuarios
       setUsuariosFiltrados(usuarios);
       return;
     }
 
-    const fuse = new Fuse(usuarios, {
-      keys: ['nombreUsuario', 'nombre'], // Especificar las claves para buscar
+    // Claves de búsqueda
+    const fuse = new Fuse(Object.values(usuarios), {
+      keys: ['nombreUsuario', 'nombre'],
       includeScore: true,
-      threshold: 0.4, // Ajustar el umbral según sea necesario
+      threshold: 0.4,
     });
 
     const resultado = fuse.search(busqueda);
-    const filtradas = resultado.map((item) => item.item);
+    const filtradas = {};
+    resultado.forEach((item) => {
+      filtradas[item.item.idUsuario] = item.item;
+    });
+
     setUsuariosFiltrados(filtradas);
-    console.log(usuariosFiltrados);
-    
   };
 
-  const handleInvitarUsuario = async (index, idUsuario) => {
-    let usuariosNuevo = [...usuarios];
+  
+  // Invitar usuarios
+  const handleInvitarUsuario = async (idUsuario) => {
+    let usuariosNuevo = {...usuariosFiltrados};
+    usuariosNuevo[idUsuario].invitarDesactivado = true;
+    usuariosNuevo[idUsuario].invitarCargando = true;
+    setUsuariosFiltrados(usuariosNuevo);
+    
     try {
       // Crear solicitud
-      setInvitarCargando(true);
       const solicitud = new Solicitud(idUsuario, idIniciativa, "Pendiente", "IniciativaAUsuario");
-      const response = await crearSolicitud(solicitud);
-  
-      // Actualizar la lista de solicitudes de la iniciativa y del miembro
-      if (response.success) {
-        iniciativa.listaSolicitudes.push(response.data);
-        usuariosNuevo[index].listaSolicitudes.push(response.data);
-  
-        // Actualizar el estado de desactivación
-        setUsuariosDesactivados((prev) => ({ ...prev, [idUsuario]: true }));
-  
-        // Cierra el modal
-        setShowInvitarModal(false);
-      }
+      await crearSolicitud(solicitud);
+
+      // Actualizar lista de solicitudes enviadas
+      let solicitudesEnviadasNuevo = [...solicitudesEnviadas];
+      solicitudesEnviadasNuevo.push(solicitud);
+      setSolicitudesEnviadas(solicitudesEnviadasNuevo);
+
+      let usuariosEnviadosNuevo = [...usuariosEnviados];
+      usuariosEnviadosNuevo.push(usuariosFiltrados[idUsuario]);
+      setUsuariosEnviados(usuariosEnviadosNuevo);
     } catch (error) {
-      console.log("Error al enviar solicitud al usuario");
+      console.error("Error al enviar solicitud al usuario");
     } finally {
-      setInvitarCargando(false);
+      usuariosNuevo = {...usuariosFiltrados};
+      usuariosNuevo[idUsuario].invitarCargando = false;
+      usuariosNuevo[idUsuario].cancelarDesactivado = false;
+      setUsuariosFiltrados(usuariosNuevo);
     }
   };
+
+  // Cancelar invitación
+  const handleCancelarUsuario = async (idUsuario) => {
+    let usuariosNuevo = {...usuariosFiltrados};
+
+    // Cancelar desde modal invitar miembros
+    if (usuariosNuevo[idUsuario]) {
+      usuariosNuevo[idUsuario].cancelarDesactivado = true;
+      usuariosNuevo[idUsuario].invitarCargando = true;
+      setUsuariosFiltrados(usuariosNuevo);
+    }
+    
+    try {
+      // Eliminar solicitud
+      const solicitud = await existeSolicitud(idUsuario, idIniciativa);
+      await eliminarSolicitud(solicitud);
+
+      // Actualizar lista de solicitudes enviadas
+      let solicitudesEnviadasNuevo = [...solicitudesEnviadas];
+      solicitudesEnviadasNuevo = solicitudesEnviadasNuevo.filter((enviada) => enviada.idUsuario !== idUsuario);
+      setSolicitudesEnviadas(solicitudesEnviadasNuevo);
+
+      let usuariosEnviadosNuevo = [...usuariosEnviados];
+      usuariosEnviadosNuevo = usuariosEnviadosNuevo.filter((enviado) => enviado.idUsuario !== idUsuario);
+      setUsuariosEnviados(usuariosEnviadosNuevo);
+    } catch (error) {
+      console.error("Error al cancelar la solicitud");
+    } finally {
+      usuariosNuevo = {...usuariosFiltrados};
+
+      if (usuariosNuevo[idUsuario]) {
+        usuariosNuevo[idUsuario].invitarCargando = false;
+        usuariosNuevo[idUsuario].invitarDesactivado = false;
+      } else {
+        // Eliminar solicitud desde el modal de solicitudes
+        const usuario = usuariosEnviados.find((enviado) => enviado.idUsuario == idUsuario);
+        usuariosNuevo[idUsuario] = {...usuario, invitarDesactivado: false, cancelarDesactivado: true};
+        console.log(usuariosNuevo[idUsuario]);
+      }
+      setUsuariosFiltrados(usuariosNuevo);
+    }
+  }
   
+  // Aceptar solicitudes de usuario
+  const handleAceptarSolicitud = async (index, usuario) => {
+    let usuariosRecibidosNuevo = [...usuariosRecibidos];
+    usuariosRecibidosNuevo[index].aceptarDesactivado = true;
+    setUsuariosRecibidos(usuariosRecibidosNuevo);
 
-  const handleAceptarSolicitud = async(index) => {
-    //Actualizar Estatus de solicitud
-    let solicitudesRecibidasNuevo = solicitudesRecibidas;
-    solicitudesRecibidasNuevo[index].estado = "Aceptada";
-    const solicitud = solicitudesRecibidasNuevo[index];
-    setSolicitudesRecibidas(solicitudesRecibidasNuevo);
-    await actualizaSolicitud(solicitud);
+    try {
+      // Actualizar lista de solicitudes recibidas
+      let solicitudesRecibidasNuevo = solicitudesRecibidas;
+      solicitudesRecibidasNuevo[index].estado = "Aceptada";
+      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+      
+      usuariosRecibidosNuevo = [...usuariosRecibidos];
+      usuariosRecibidosNuevo = usuariosRecibidosNuevo.filter((recibido) => recibido.idUsuario !== usuario.idUsuario);
+      setUsuariosRecibidos(usuariosRecibidosNuevo);
+      
+      // Actualizar estado de solicitud
+      const solicitud = solicitudesRecibidasNuevo[index];
+      await actualizaSolicitud(solicitud);
 
-    //Actualizar listaIniciativasMiembro del usuario que hizo la solicitud
-    const user = solicitudesRecibidasNuevo[index].idUsuario;
-    await suscribirseAIniciativa(user, idIniciativa);
+      // Actualizar listaIniciativasMiembro del usuario que hizo la solicitud
+      await suscribirseAIniciativa(usuario.idUsuario, idIniciativa);
+
+      // Actualizar lista de miembros
+      setMiembros([...miembros, usuario]);
+    } catch (error) {
+      console.error("Error al aceptar la solicitud");
+    }
   };
 
-  const handleRechazarSolicitud = async(index) => {
-    let solicitudesRecibidasNuevo = solicitudesRecibidas;
-    solicitudesRecibidasNuevo[index].estado = "Rechazada";
-    const solicitud = solicitudesRecibidasNuevo[index];
-    setSolicitudesRecibidas(solicitudesRecibidasNuevo);
-    await actualizaSolicitud(solicitud);
+
+  // Rechazar solicitudes de usuario
+  const handleRechazarSolicitud = async (index, usuario) => {
+    let usuariosRecibidosNuevo = [...usuariosRecibidos];
+    usuariosRecibidosNuevo[index].rechazarDesactivado = true;
+    setUsuariosRecibidos(usuariosRecibidosNuevo);
+
+    try {
+      // Actualizar lista de solicitudes recibidas
+      let solicitudesRecibidasNuevo = solicitudesRecibidas;
+      solicitudesRecibidasNuevo[index].estado = "Rechazada";
+      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+      
+      usuariosRecibidosNuevo = [...usuariosRecibidos];
+      usuariosRecibidosNuevo = usuariosRecibidosNuevo.filter((recibido) => recibido.idUsuario !== usuario.idUsuario);
+      setUsuariosRecibidos(usuariosRecibidosNuevo);
+      
+      // Actualizar estado de solicitud
+      const solicitud = solicitudesRecibidasNuevo[index];
+      await actualizaSolicitud(solicitud);
+    } catch (error) {
+      console.error("Error al rechazar la solicitud");
+    }
   };
+
+
+  // Miembro seleccionado a eliminar
+  const [miembroEliminar, setMiembroEliminar] = useState(null);
+
+  // Modal de confirmación de eliminación
+  const [modalEliminar, setModalEliminar] = useState(false);
+  const handleCerrarEliminar = () => setModalEliminar(false);
+  const handleMostrarEliminar = (miembro) => {
+    setMiembroEliminar(miembro);
+    setModalEliminar(true);
+  }
+
+  // Modal de miembro eliminado
+  const [modalEliminada, setModalEliminada] = useState(false);
+  const handleMostrarEliminada = () => setModalEliminada(true);
+  const handleCerrarEliminada = () => setModalEliminada(false);
+
+  // Modal de error
+  const [modalError, setModalError] = useState(false);
+  const handleMostrarError = () => setModalError(true);
+  const handleCerrarError = () => setModalError(false);
+
+  // Eliminar miembro
+  const [eliminaBloqueado, setEliminaBloqueado] = useState(false);
+
+  const handleEliminaMiembro = async () => {
+    setEliminaBloqueado(true);
+
+    try {
+      await eliminarMiembro(idIniciativa, miembroEliminar.idUsuario);
+      await enviarCorreoMiembro(iniciativa, miembroEliminar);
+
+      // Eliminar de la lista de miembros
+      const miembrosNuevo = miembros.filter((miembro) => miembro.idUsuario !== miembroEliminar.idUsuario);
+      setMiembros(miembrosNuevo);
+
+      // Regresar a la lista de usuarios
+      const usuariosNuevo = {...usuarios};
+      usuariosNuevo[miembroEliminar.idUsuario] = {...miembroEliminar, invitarCargando: false, invitarDesactivado: false, cancelarDesactivado: true};
+      setUsuarios(usuariosNuevo);
+      setUsuariosFiltrados(usuariosNuevo);
+      
+      handleCerrarEliminar();
+      handleMostrarEliminada();
+    } catch(error) {
+      handleCerrarEliminar();
+      handleMostrarError();
+    } finally {
+      setEliminaBloqueado(false);
+    }
+  };
+
 
   // Editar la información
   const [editingCampos, setEditingCampos] = useState(false);
@@ -366,6 +400,7 @@ export const Initiative = () => {
     setEditingCampos(true);
     setNuevoTitulo(iniciativa.titulo);
     setNuevaDescripcion(iniciativa.descripcion)
+    //tarea
 
     const nuevaEtiquetasIniciativa = {...etiquetasIniciativa};
     Object.values(iniciativa.listaEtiquetas).forEach((etiquetaExistente) => {
@@ -388,9 +423,11 @@ export const Initiative = () => {
   
   const handleCerrarImagen = () => {
     setModalImagen(false);
+    setModalEntregable(false);
     setImagenSeleccionada(null);
     setErrorImagen("");
   };
+
 
   useEffect(() => {
     if (!imagenSeleccionada) {
@@ -526,8 +563,142 @@ export const Initiative = () => {
     setEditingCampos(false);
   };
 
-  // Paginas modal mis solicitudes
-  const [paginaActual, setPaginaActual] = useState('solicitudes');
+
+
+  // TAREAS //
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileError, setFileError] = useState('');
+  const [uploadDisabled, setUploadDisabled] = useState(true);
+  const [cargandoTarea, setCargandoTarea] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [tarea, setTarea] = useState(new Tarea());
+  const [tareaUpload, setTareaUpload] = useState(new Tarea());
+  const [selectedTaskIndex, setSelectedTaskIndex] = useState(null);
+
+  const [selectedEntregable, setTareaEntregable] = useState(null);
+  const [modalEntregable, setModalEntregable] = useState(false);
+
+  const openUploadModal = (tarea, index) => {
+    console.log('ID ONE UPLOAD', tarea.idTarea);
+    setShowUploadModal(true);
+    setFileError('');
+    setTareaUpload(tarea);
+    setSelectedTaskIndex(index);
+
+    setSelectedTaskId(tarea.idTarea);
+  };
+
+  const handleMostrarEntregable = (tareaUrl) => {
+    
+    setModalEntregable(true);
+    setTareaEntregable(tareaUrl);
+  };
+
+
+
+  const closeUploadModal = () => {
+    setCargandoTarea(false);
+    setShowUploadModal(false);
+    setSelectedFile(null);
+    setSelectedTaskId(null);
+  };
+
+  useEffect(() => {
+    if (cargandoTarea) {
+      setUploadDisabled(true);
+    }
+
+    if (!selectedFile) {
+      setUploadDisabled(true);
+      return;
+    }
+    
+    if (selectedFile.size > 2 * 1024 * 1024) {
+      setFileError('El archivo seleccionado supera el límite de tamaño de 10 MB');
+      setSelectedFile(null);
+      setUploadDisabled(true);
+    } else {
+      setFileError('');
+      setUploadDisabled(false);
+    }
+  }, [selectedFile, cargandoTarea]);
+
+  const handleUploadFile = async (tarea, index) => {
+    console.log('TAREA ID', tareaUpload.idTarea);
+    console.log('TAREA INDEX', selectedTaskIndex);
+    setUploadDisabled(true);
+    setCargandoTarea(true);
+
+    try {
+      const fileUrl = await subirImagen(selectedFile, `Tareas/${selectedTaskId}`);
+      console.log(fileUrl);
+
+      const tareaNueva = { ...tareaUpload, urlEntrega: fileUrl, completada: true}
+      await actualizaTarea(tareaNueva);
+
+      const updatedTareas = [...tareas];
+      updatedTareas[selectedTaskIndex] = tareaNueva;
+
+      setTareas(updatedTareas);
+      setEditingTareaId(null);
+
+      closeUploadModal();
+
+      // Handle fileUrl appropriately in your application context
+
+    } catch (error) {
+      console.error("Error al subir el archivo:", error.message);
+    } 
+  };
+
+  const { getRootProps: getRootPropsTarea, getInputProps: getInputPropsTarea } = useDropzone({
+    accept: {
+      'image/*': [],
+      'application/pdf': []
+    },
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0) {
+        setSelectedFile(acceptedFiles[0]);
+        setFileError('');
+      }
+    }
+  });
+  
+  //EDITAR TAREAS 
+  const [editingTareaId, setEditingTareaId] = useState(null);
+  const [nuevoTituloTarea, setNuevoTituloTarea] = useState("");
+  const [nuevaDescripcionTarea, setNuevaDescripcionTarea] = useState("");
+
+
+  const startEditingTarea = (idTarea, titulo, descripcion) => {
+    setEditingTareaId(idTarea);
+    setNuevoTituloTarea(titulo);
+    setNuevaDescripcionTarea(descripcion);
+  };
+
+  const saveTareaChanges = async (tarea, index) => {
+    console.log('Editando tarea', tarea.idTarea);
+    try {
+      const tareaNueva = { ...tarea, titulo: nuevoTituloTarea, descripcion: nuevaDescripcionTarea}
+      await actualizaTarea(tareaNueva);
+
+      const updatedTareas = [...tareas];
+      updatedTareas[index] = tareaNueva;
+
+
+      setTareas(updatedTareas);
+      setEditingTareaId(null);
+    } catch (error) {
+      console.error("Error updating tarea:", error);
+    }
+  };
+
+  const cancelTareaEdit = () => {
+    setEditingTareaId(null);
+  };
+
+
 
   return (
     <div>
@@ -535,13 +706,13 @@ export const Initiative = () => {
         <div className="i-container">
           <div className="i-iniciativa-container">
             {/* Boton para editar todo */}
-            { editingCampos || esAdmin && (
+            {editingCampos || esAdmin && (
               <button className="i-fa-pen" onClick={handleCamposEdit}>
                 <FaPen />
               </button>
             )}
 
-            { !editingCampos || esAdmin && (
+            {!editingCampos || esAdmin && (
               <>
                 <button className="i-fa-pen" onClick={handleGuardarCampos} disabled={guardarCamposBloqueado}>
                   Guardar
@@ -703,7 +874,6 @@ export const Initiative = () => {
                     border-radius: 25px;
                     position: relative;
                     width: 100%;
-                    height: 25px;
                     font-size: 20px;
                     resize: none;
                     outline: none;
@@ -718,7 +888,7 @@ export const Initiative = () => {
                   onChange={handleDescripcionCambios}
                   autoFocus
                   maxLength={200} 
-                  style={{ borderColor: nuevaDescripcion ? 'transparent' : 'transparent' }}
+                  style={{ borderColor: 'transparent', height: '25px' }}
                 />
               </div>
             </div>
@@ -737,36 +907,120 @@ export const Initiative = () => {
             <div className="i-tareas-seccion">
               {/* Tarea asignada a mí */}
               <div className="i-titulo-tareas">Mis Tareas</div>
-                {tareas ? (
+
+              {tareas ? (
                   <div className='i-tareas-container'>
-                    {tareas.length === 0 ? (
+                    {tareas.filter(tarea => !tarea.completada).length === 0 ? (
                       <div className="m-error">
                       No hay tareas asignadas.
                       </div>
                     ) : (
-                    <div>
-                      {tareas.map((tarea, idTarea) => (
-                        <div className="i-tarea" key={idTarea}>
-                          <div className="i-tarea-info">
-                            <div className="i-tarea-texto">
-                              <div className="i-tarea-titulo">{tarea.titulo}</div>
-                              <div className="i-tarea-desc">{tarea.descripcion}</div>
-                            </div>
-                            <div className="i-tarea-botones">
-                              <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                              <div className="i-tarea-boton" style={{cursor: 'pointer'}} onClick={() => openUploadModal(tarea.idTarea)}><FaFolder /> Documento </div>
-                            </div>
+                      <div>
+                        {editingCampos ? (
+                          <div>
+                            {tareas.filter(tarea => !tarea.completada).map((tarea, index) => (
+                              <div className="i-tarea" key={tarea.idTarea}>
+                                <div className="i-tarea-info">
+                                  <div className="i-tarea-texto">
+                                    {editingTareaId === tarea.idTarea ? (
+                                      <div>
+                                        <input
+                                          type="text"
+                                          className="i-edit-titulo-box"
+                                          value={nuevoTituloTarea}
+                                          onChange={(e) => setNuevoTituloTarea(e.target.value)}
+                                          autoFocus
+                                          maxLength={30}
+                                        />
+                                        <input
+                                          type="text"
+                                          className="i-edit-desc-box"
+                                          value={nuevaDescripcionTarea}
+                                          onChange={(e) => setNuevaDescripcionTarea(e.target.value)}
+                                          maxLength={100}
+                                        />
+                                        <button onClick={() => saveTareaChanges(tarea, index)}>Save</button>
+                                        <button onClick={cancelTareaEdit}>Cancel</button>
+                                      </div>
+                                    ) : (
+                                      <div>
+                                        <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                        <div className="i-tarea-desc">{tarea.descripcion}</div>
+                                        <button onClick={() => startEditingTarea(tarea.idTarea, tarea.titulo, tarea.descripcion)}>Edit</button>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="i-tarea-botones">
+                                    <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                                    <div className="i-tarea-boton" style={{ cursor: 'pointer' }} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}  
                           </div>
+                        ) : (
+                        <div>
+                          {tareas.filter(tarea => !tarea.completada).map((tarea, idTarea) => (
+                            <div className="i-tarea" key={idTarea}>
+                              <div className="i-tarea-info">
+                                <div className="i-tarea-texto">
+                                  <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                  <div className="i-tarea-desc">{tarea.descripcion}</div>
+                                </div>
+                                <div className="i-tarea-botones">
+                                  <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                                  <div className="i-tarea-boton" style={{cursor: 'pointer'}} > <FaFolder /> Documento </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                        )}
+                      </div>
                     )}
+                    
                   </div>
                   ) : (
                   <div className="m-error">
-                  No hay tareas asignadas.
+                    No hay tareas asignadas.
                   </div>
                 )}
+
+            </div>
+
+            <div className="i-tareas-seccion">
+              {/* Tarea completadas publicas */}
+              <div className="i-titulo-tareas"> Tareas Completadas </div>
+              {tareas ? (
+                  <div className='i-tareas-container'>
+                    {tareas.filter(tarea => tarea.completada).length === 0 ? (
+                      <div className="m-error">
+                      No hay tareas completadas.
+                      </div>
+                    ) : (
+                      <div>
+                        {tareas.filter(tarea => tarea.completada).map((tarea, idTarea) => (
+                          <div className="i-tarea" key={idTarea}>
+                            <div className="i-tarea-info">
+                              <div className="i-tarea-texto">
+                                <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                <div className="i-tarea-desc">{tarea.descripcion}</div>
+                              </div>
+                              <div className="i-tarea-botones">
+                                <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                                <div className="i-tarea-boton" style={{ cursor: 'pointer' }} onClick={() => handleMostrarEntregable(tarea.urlEntrega)} > <FaFolder /> Documento </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>  
+                ) : (
+                  <div className="m-error">
+                  No hay tareas asignadas.
+                  </div>
+              )}
             </div>
           </div>
 
@@ -779,56 +1033,48 @@ export const Initiative = () => {
                   </div>
               </div>
             }
-            <div className="i-tipo-miembro">Miembros</div>
+            <div className="i-tipo-miembro">
+              Miembros {esAdmin && <IoMdAddCircleOutline className="i-agregar-miembros" onClick={() => setShowInvitarModal(true)}/>}
+            </div>
+            
+            {/* Miembros */}
             <div>
-              <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowInvitarModal}>
-                Agregar miembro
-              </button>
-            </div>
-            {miembros ? (
-                  <div>
-                    {miembros.length === 0 ? (
-                      <div>
-                      No hay miembros.
-                      </div>
-                    ) : (
-                    <div>
-                      {miembros.map((miembro, idMiembro) => (
-                        <div key={idMiembro}>
-                          <div className="i-btn-miembro">
-                            <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
-                              {miembro.nombreUsuario}
-                            </div>
-
-                            <div className='i-icon-estilos'>
-                              {esAdmin && (
-                                <FaTimesCircle  onClick={() => handleMostrarEliminar(miembro)} className="i-icon-times-circle" />
-                              )}
-                            </div>
-                          </div>
+              {miembros.length == 0 ? (
+                <div> No hay miembros. </div>
+              ) : (
+                <div>
+                  {miembros.map((miembro, idMiembro) => (
+                    <div key={idMiembro}>
+                      <div className="i-btn-miembro">
+                        <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
+                          {miembro.nombreUsuario}
                         </div>
-                      ))}
+
+                        <div className='i-icon-estilos'>
+                          {esAdmin && (
+                            <FaTimesCircle onClick={() => handleMostrarEliminar(miembro)} className="i-icon-times-circle" />
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    )}
-                  </div>
-                  ) : (
-                  <div className="m-error">
-                  No hay miembros.
-                  </div>
-                )}
-                {!iniciativa.esPublica && esAdmin && (
-                  <button type="button" className="i-btn-ver-solicitudes" onClick={handleShowSolicitudesModal}>
-                    VER SOLICITUDES
-                  </button>
-                )}
+                  ))}
+                </div>
+              )}
             </div>
+
+            {esAdmin && (
+              <button type="button" className="i-btn-ver-solicitudes" onClick={() => setShowSolicitudesModal(true)}>
+                VER SOLICITUDES
+              </button>
+            )}
           </div>
         </div>
-      ):(
+      </div>
+      ) : (
         <div className="spinner">
           <Spinner animation="border" role="status"></Spinner>
         </div>
-      ) }
+      )}
 
       {/* ----- Modales ----- */}
 
@@ -839,12 +1085,14 @@ export const Initiative = () => {
 
           {/* Determinar en que página esta */}
           <div className="modal-nav">
-            <button 
-              className={paginaActual === 'solicitudes' ? 'active' : ''} 
-              onClick={() => setPaginaActual('solicitudes')}
-            >
-              Solicitudes recibidas
-            </button>
+            {iniciativa && !iniciativa.esPublica &&
+              <button 
+                className={paginaActual === 'solicitudes' ? 'active' : ''} 
+                onClick={() => setPaginaActual('solicitudes')}
+              >
+                Solicitudes recibidas
+              </button>
+            }
             <button 
               className={paginaActual === 'miembros' ? 'active' : ''} 
               onClick={() => setPaginaActual('miembros')}
@@ -857,7 +1105,7 @@ export const Initiative = () => {
           <div className="modal-content">
             {/* Solicitudes */}
             {paginaActual === 'solicitudes' ? (
-              !usuariosRecibidos || usuariosRecibidos.length === 0 ? (
+              !usuariosRecibidos || usuariosRecibidos.length == 0 ? (
                 <div className="m-error">
                   {/* Ninguna solicitud */}
                   Esta iniciativa no ha recibido solicitudes.
@@ -890,9 +1138,19 @@ export const Initiative = () => {
                         </div>
 
                         {/* Aceptar / rechazar */}
-                        <div>
-                          <button onClick={() => handleAceptarSolicitud(index)}>Aceptar</button>
-                          <button onClick={() => handleRechazarSolicitud(index)}>Rechazar</button>
+                        <div className="i-botones-solicitud">
+                          <button className="i-btn-solicitud"
+                            onClick={() => handleAceptarSolicitud(index, usuario)}
+                            disabled={usuariosRecibidos[index].aceptarDesactivado}
+                          >
+                            {usuariosRecibidos[index].aceptarDesactivado ? <ClipLoader size={20} color="#000" /> : 'Aceptar'}
+                          </button>
+                          <button className="i-btn-solicitud"
+                            onClick={() => handleRechazarSolicitud(index, usuario)}
+                            disabled={usuariosRecibidos[index].rechazarDesactivado}
+                          >
+                            {usuariosRecibidos[index].rechazarDesactivado ? <ClipLoader size={20} color="#000" /> : 'Rechazar'}
+                          </button>
                         </div>
                       </div>
 
@@ -902,7 +1160,7 @@ export const Initiative = () => {
               )
             ) : (
               <div className="m-iniciativas-container">
-                {/* Contenido de miembros */}                
+                {/* Contenido de miembros */}
                 <div>
                 {usuariosEnviados.map((usuario, index) => (
                   <div key={index} className='rq-iniciativa'>
@@ -922,6 +1180,11 @@ export const Initiative = () => {
                           {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
                           {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
                         </div>
+                      </div>
+
+                      {/* Basura */}
+                      <div className='fa-4' onClick={(e) => e.stopPropagation()}>
+                        <button className='fa-5-button'> <FaTrash onClick={() => handleCancelarUsuario(solicitudesEnviadas[index].idUsuario)} disabled={eliminaBloqueado}/> </button>
                       </div>
                     </div>
                   </div>    
@@ -993,7 +1256,26 @@ export const Initiative = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal confirmar eliminar miembro*/}
+
+      {/* MOSTRAR ENTREGABLE TAREA */}
+      <Modal className="i-modal-doc" show={modalEntregable} onHide={handleCerrarImagen}>
+        <Modal.Header>
+          <div className="i-modal-doc-title">Archivo Entregado</div>
+        </Modal.Header>
+          
+        <div className="i-doc-body">
+
+          <iframe  src={selectedEntregable} frameborder="0" width="100%" height="100%"></iframe>
+          
+        </div>
+
+        <Modal.Footer>
+          <Button onClick={handleCerrarImagen}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+      
+
+      {/* Modal confirmar eliminar iniciativa*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
         <Modal.Header>
           <div className="ea-modal-title">Confirmar eliminación</div>
@@ -1011,7 +1293,7 @@ export const Initiative = () => {
         </Modal.Footer>
       </Modal>
       
-      {/* Modal miembro eliminado*/}
+      {/* Modal iniciativa eliminada*/}
       <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
         <Modal.Header>
           <div className="ea-modal-title">Éxito</div>
@@ -1041,7 +1323,7 @@ export const Initiative = () => {
         </Modal.Footer>
       </Modal>
 
-      {/*Modal para inivtar usuarios*/}
+      {/* Modal para invitar usuarios */}
       <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
         <div className="modalcontainer">
           <Modal.Header closeButton>
@@ -1058,24 +1340,39 @@ export const Initiative = () => {
                   className='e-searchBarCaja'
                 />
               </div>
-              {usuariosFiltrados && usuariosFiltrados.length > 0 ? (
-                <ul>
-                  {usuariosFiltrados.map((usuario, id) => (
-                    <li key={id} className='user-item'>
-                      <div className='user-info'>
-                        <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
-                      </div>
-                      <Button
-                        variant="primary"
-                        disabled={usuariosDesactivados[usuario.idUsuario]}
-                        onClick={() => handleInvitarUsuario(id, usuario.idUsuario)}
-                      >
-                        Invitar</Button>
-                    </li>
-                  ))}
-                </ul>
+              {usuariosFiltrados ? (
+                (Object.values(usuariosFiltrados).length == 0) ? (
+                  <div className="m-error">
+                    No se encontraron usuarios.
+                  </div>
+                ) : (
+                  <ul>
+                    {Object.values(usuariosFiltrados).map((usuario, id) => (
+                      <li key={id} className='user-item'>
+                        <div className='user-info'>
+                          <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
+                        </div>
+                        {!usuariosFiltrados[usuario.idUsuario].invitarDesactivado && (
+                          <Button variant="primary" onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
+                            Invitar
+                          </Button>
+                        )}
+                        {usuariosFiltrados[usuario.idUsuario].invitarCargando && (
+                          <Button variant="primary" disabled={true}>
+                            <ClipLoader size={16} color="#fff" />
+                          </Button>
+                        )}
+                        {!usuariosFiltrados[usuario.idUsuario].cancelarDesactivado && (
+                          <Button variant="primary" onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
+                            Cancelar
+                          </Button>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                )
               ) : (
-                <div className="spinner">
+                <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
                   <Spinner animation="border" role="status"></Spinner>
                 </div>
               )}

@@ -292,8 +292,6 @@ li.i-etiqueta-item {
   display: flex;
   align-items: stretch;
   flex-direction: column;
-  justify-content: space-evenly;
-
 }
 
 .i-btn-ver-miembros {
@@ -306,8 +304,6 @@ li.i-etiqueta-item {
 }
 
 /* Tareas */
-
-
 .i-titulo-tareas {
   font-size: 25px;
   font-weight: 600;
@@ -335,8 +331,17 @@ li.i-etiqueta-item {
 
 /* Miembros */
 .i-tipo-miembro {
+  display: flex;
   font-size: 20px;
   font-weight: 600;
+  align-items: center;
+  justify-content: center;
+}
+
+.i-agregar-miembros {
+  margin-left: 5px;
+  font-size: 25px;
+  cursor: pointer;
 }
 
 .i-btn-miembro {
@@ -390,6 +395,24 @@ li.i-etiqueta-item {
 
 .i-btn-ver-solicitudes:hover {
   background-color: #6b7780;
+}
+
+/* Modal Solicitudes */
+.i-botones-solicitud {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.i-btn-solicitud {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f2f2f2;
+  width: 110px;
+  height: 50px;
+  border-radius: 20px;
 }
 
 
@@ -500,12 +523,7 @@ input.i-tarea-titulo {
   text-align: center;
 }
 
-/* Modal */
-.e-modal .modal-content {
-  padding: 0px 10px 10px 10px !important;
-  border: none;
-}
-
+/* Modal Generico*/
 .i-modal-guardar {
   display: flex;
   align-items: center;
@@ -513,19 +531,137 @@ input.i-tarea-titulo {
   justify-content: center;
 }
 
-.modal-nav {
+.i-modal .modal-content {
   display: flex;
-  justify-content: space-around;
+  align-items: center;
+  border-radius: 20px;
+  padding: 10px;
+  font-size: 20px;
+  text-align: center;
 }
 
-.modal-nav button {
-  background: none;
+.fade.i-modal.modal.show {
+  display: flex !important;
+  align-items: center;
+}
+
+.i-input-body {
+  display: flex;
+  padding: 20px;
+  width: 500px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+}
+
+.i-modal .modal-header{
   border: none;
-  font-size: 16px;
-  padding: 10px 20px;
-  cursor: pointer;
+  padding: 0;
 }
 
-.modal-nav .active {
-  font-weight: bold;
+.i-modal .modal-footer {
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+
+.i-modal .modal-header .btn-close {
+  position: absolute;
+  right: 5%;
+}
+
+.i-modal-title {
+  font-weight: 600;
+  font-size: 30px;
+}
+
+.i-modal .btn.btn-primary {
+  color: #000;
+  background-color: #A0C1BF;
+  padding: 10px 30px;
+  font-weight: 600;
+  border: none;
+  border-radius: 30px;
+}
+
+.i-modal .btn.btn-primary:hover {
+  background-color: #699AA0;
+}
+
+.i-modal .btn.btn-primary a {
+  color: #000;
+}
+
+
+
+/* Modal Documento*/
+.i-modal-doc-guardar {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+}
+
+.i-modal-doc .modal-content {
+
+  display: flex;
+  align-items: center;
+  border-radius: 20px;
+  padding: 10px;
+  font-size: 20px;
+  text-align: center;
+  min-width: 500px;
+}
+
+.fade.i-modal-doc.modal.show {
+  display: flex !important;
+  align-items: center;
+}
+
+.i-doc-body {
+  display: flex;
+  padding: 20px;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+  width: 500px;
+  height: 500px;
+}
+
+.i-modal-doc .modal-header{
+  border: none;
+  padding: 0;
+}
+
+.i-modal-doc .modal-footer {
+  width: 100%;
+  justify-content: space-evenly;
+}
+
+
+.i-modal .modal-header .btn-close {
+  position: absolute;
+  right: 5%;
+}
+
+.i-modal-doc-title {
+  font-weight: 600;
+  font-size: 30px;
+}
+
+.i-modal-doc .btn.btn-primary {
+  color: #000;
+  background-color: #A0C1BF;
+  padding: 10px 30px;
+  font-weight: 600;
+  border: none;
+  border-radius: 30px;
+}
+
+.i-modal-doc .btn.btn-primary:hover {
+  background-color: #699AA0;
+}
+
+.i-modal-doc .btn.btn-primary a {
+  color: #000;
 }
