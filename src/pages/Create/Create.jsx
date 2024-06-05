@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages } from 'react-icons/fa';
+import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaTrash } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
@@ -654,109 +654,116 @@ export const Create = () => {
               {/* Tarea */}
               <div className="c-tareas-container">
                 {tareas.map((tarea, idTarea) => (
-                  <div className="c-tarea" key={idTarea}>
-                    
-                    {/* Titulo + descripción */}
-                    <div className="c-tarea-info">
-
-                      {/* Titulo */}
-                      <div className="c-tarea-titulo">
-                        {tarea.editandoTitulo? (
-                          <input
-                            type="text"
-                            className="c-tarea-titulo"
-                            value={tarea.titulo}
-                            onChange={(e) => handleCambioTituloTarea(e, idTarea)}
-                            onBlur={() => handleGuardarTituloTarea(idTarea)}
-                            onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
-                            autoFocus
-                            maxLength={30}
-                          />
-                        ) : (
-                          <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>
-                            {tarea.titulo ? tarea.titulo : "Título"}
-                          </div>
-                        )}
-
-                        {tarea.editandoTitulo? (
-                          <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
-                            {tarea.titulo ? `${tarea.titulo.length}/30` : `0/30`}
-                          </button>
-                        ) : (
-                          <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
-                            <FaPen />
-                          </button>
-                        )}
-                      </div>
+                  <div className="c-tareas-container-2">
+                    <div className="c-tarea" key={idTarea}>
                       
-                      {/* Descripcion */}
-                      <div className="c-tarea-desc">
-                        {tarea.editandoDesc? (
-                          <div className='c-container-conteo'>
-                            <div className="c-tarea-texto" style={{paddingTop: '2px'}}>
-                              <style jsx>{`
-                                textarea {
-                                  border-radius: 25px;
-                                  position: relative;
-                                  width: 100%;
-                                  height: 25px;
-                                  font-size: 16px;
-                                  resize: none;
-                                  outline: none;
-                                }
-                              `}
-                              </style>
-                              <textarea
-                                ref={el => textareaRefs2.current[idTarea] = el}
-                                className="c-desc-input-texto-2"
-                                value={tarea.descripcion}
-                                onChange={(e) => handleCambioDescTarea(e, idTarea)}
-                                onBlur={() => handleGuardarDescTarea(idTarea)}
-                                onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
-                                autoFocus
-                                maxLength={200}
-                                style={{ borderColor: 'transparent' }}
-                              />
-                            </div>
+                      {/* Titulo + descripción */}
+                      <div className="c-tarea-info">
 
-                            <button className="c-btn-editar-flex" onClick={() => handleEditarDescTarea(idTarea)}>
-                              {tarea.descripcion ? `${tarea.descripcion.length}/200` : `0/200`}
+                        {/* Titulo */}
+                        <div className="c-tarea-titulo">
+                          {tarea.editandoTitulo? (
+                            <input
+                              type="text"
+                              className="c-tarea-titulo"
+                              value={tarea.titulo}
+                              onChange={(e) => handleCambioTituloTarea(e, idTarea)}
+                              onBlur={() => handleGuardarTituloTarea(idTarea)}
+                              onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
+                              autoFocus
+                              maxLength={30}
+                            />
+                          ) : (
+                            <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>
+                              {tarea.titulo ? tarea.titulo : "Título"}
+                            </div>
+                          )}
+
+                          {tarea.editandoTitulo? (
+                            <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
+                              {tarea.titulo ? `${tarea.titulo.length}/30` : `0/30`}
                             </button>
-                          </div>
-                        ) : (
-                          <div className="c-desc-texto-2" style={{paddingBottom: '9.2px', paddingLeft: '2px'}}>
-                            <div style={tarea.descripcion ? {marginTop: '2px'} : {marginTop: '2px', color: '#677D7C'}}>
-                              {tarea.descripcion ? tarea.descripcion : "Agrega tu descripción aquí..."}
-                            </div>
-
-                            <button className="c-btn-editar-tarea-2" onClick={() => handleEditarDescTarea(idTarea)}>
+                          ) : (
+                            <button className="c-btn-editar-tarea" onClick={() => handleEditarTituloTarea(idTarea)}>
                               <FaPen />
                             </button>
-                          </div>
-                        )}
-                      </div> 
-                    </div>
+                          )}
+                        </div>
+                        
+                        {/* Descripcion */}
+                        <div className="c-tarea-desc">
+                          {tarea.editandoDesc? (
+                            <div className='c-container-conteo'>
+                              <div className="c-tarea-texto" style={{paddingTop: '2px'}}>
+                                <style jsx>{`
+                                  textarea {
+                                    border-radius: 25px;
+                                    position: relative;
+                                    width: 100%;
+                                    height: 25px;
+                                    font-size: 16px;
+                                    resize: none;
+                                    outline: none;
+                                  }
+                                `}
+                                </style>
+                                <textarea
+                                  ref={el => textareaRefs2.current[idTarea] = el}
+                                  className="c-desc-input-texto-2"
+                                  value={tarea.descripcion}
+                                  onChange={(e) => handleCambioDescTarea(e, idTarea)}
+                                  onBlur={() => handleGuardarDescTarea(idTarea)}
+                                  onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
+                                  autoFocus
+                                  maxLength={200}
+                                  style={{ borderColor: 'transparent' }}
+                                />
+                              </div>
 
-                    {/* Botones izquierda */}
-                    <div className="c-tarea-botones">
-                      {/* Fecha */}
-                      <div className="c-tarea-boton"><FaCalendar /> Fecha
-                        <DatePicker
-                          className='react-datepicker-2'
-                          selected={tarea.fechaEntrega}
-                          onChange={(date) => handleCambioFechaEntrega(date, idTarea)}
-                          dateFormat="dd/MM/yyyy"
-                          ref={tarea.datePickerEntrega}
-                          locale={es}
-                        />
+                              <button className="c-btn-editar-flex" onClick={() => handleEditarDescTarea(idTarea)}>
+                                {tarea.descripcion ? `${tarea.descripcion.length}/200` : `0/200`}
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="c-desc-texto-2" style={{paddingBottom: '9.2px', paddingLeft: '2px'}}>
+                              <div style={tarea.descripcion ? {marginTop: '2px'} : {marginTop: '2px', color: '#677D7C'}}>
+                                {tarea.descripcion ? tarea.descripcion : "Agrega tu descripción aquí..."}
+                              </div>
+
+                              <button className="c-btn-editar-tarea-2" onClick={() => handleEditarDescTarea(idTarea)}>
+                                <FaPen />
+                              </button>
+                            </div>
+                          )}
+                        </div> 
                       </div>
 
-                      {/* Documento */}
-                      <div className="c-tarea-boton" style={{marginTop: '5px'}}><FaFolder /> Documento</div>
+                      {/* Botones izquierda */}
+                      <div className="c-tarea-botones">
+                        {/* Fecha */}
+                        <div className="c-tarea-boton"><FaCalendar /> Fecha
+                          <DatePicker
+                            className='react-datepicker-2'
+                            selected={tarea.fechaEntrega}
+                            onChange={(date) => handleCambioFechaEntrega(date, idTarea)}
+                            dateFormat="dd/MM/yyyy"
+                            ref={tarea.datePickerEntrega}
+                            locale={es}
+                          />
+                        </div>
+
+                        {/* Documento */}
+                        <div className="c-tarea-boton" style={{marginTop: '5px'}}><FaFolder /> Documento</div>
+                      </div>
+                    </div>
+
+                    <div className='c-fa-trash'>
+                      <FaTrash/>
                     </div>
                   </div>
                 ))}
               </div>
+
             </div>
 
             {/* Invitar mimebros */}

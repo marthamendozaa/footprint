@@ -427,8 +427,18 @@ li.c-etiqueta-item:hover {
 /* Tareas */
 .c-tareas-container {
   display: flex;
-  width: 80%;
+  width: 85%;
   flex-direction: column-reverse;
+}
+
+.c-tareas-container-2 {
+  display: flex;
+  align-items: center;
+}
+
+.c-fa-trash {
+  margin-left: 20px;
+  font-size: 30px;
 }
 
 .c-tarea {
@@ -516,7 +526,7 @@ input.c-tarea-titulo {
 .c-btn-editar-flex {
   display: flex;
   justify-content: flex-end;
-  max-width: 447px;
+  max-width: 438px;
   background: none;
   border: none;
   color: #000;
@@ -535,7 +545,7 @@ input.c-tarea-titulo {
   font-size: 15px;
   padding: 0;
   top: 10px;
-  left: 430px;
+  left: 420px;
 }
 
 /* Crear */
