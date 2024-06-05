@@ -143,7 +143,20 @@ export const Create = () => {
     const tareasNuevo = [...tareas, new ItemTarea()];
     setTareas(tareasNuevo);
   };
+  
+  const [modalTarea2, setModalTarea2] = useState(false);
+  const handleCerrarTarea2 = () => setModalTarea2(false);
+  const handleMostrarTarea2 = () => setModalTarea2(true);
 
+  const handleBorrarTarea = async (tareaEliminarId) => {  
+    if (tareas.length==1) {
+      handleMostrarTarea2();
+      return;
+    }
+    
+    const tareasActualizadas = tareas.filter((tarea, index) => index !== tareaEliminarId);
+    setTareas(tareasActualizadas);
+  };  
 
   // Cambiar título
   const [titulo, setTitulo] = useState("");
@@ -758,7 +771,7 @@ export const Create = () => {
                     </div>
 
                     <div className='c-fa-trash'>
-                      <FaTrash/>
+                      <FaTrash onClick={() => handleBorrarTarea(idTarea)} />
                     </div>
                   </div>
                 ))}
@@ -846,6 +859,19 @@ export const Create = () => {
               </div>
             <Modal.Footer>
               <Button onClick={handleCerrarTarea}>Cerrar</Button>
+            </Modal.Footer>
+          </Modal>
+
+          {/* Tarea minimo una */}
+          <Modal className="c-modal" show={modalTarea2} onHide={handleCerrarTarea2}>
+            <Modal.Header>
+              <div className="c-modal-title">Error</div>
+            </Modal.Header>
+              <div className="c-modal-body" style={{textAlign:'left'}}>
+                Tienes que tener al menos una tarea
+              </div>
+            <Modal.Footer>
+              <Button onClick={handleCerrarTarea2}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
           
