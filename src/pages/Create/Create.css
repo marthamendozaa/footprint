@@ -505,7 +505,8 @@ input.c-tarea-titulo {
 .c-btn-editar-tarea {
   background: none;
   border: none;
-  color: #A0C1BF;
+  color: #000;
+  font-weight: 600;
   font-size: 15px;
   padding: 0;
   padding-left: 10px;
@@ -518,7 +519,8 @@ input.c-tarea-titulo {
   max-width: 447px;
   background: none;
   border: none;
-  color: #A0C1BF;
+  color: #000;
+  font-weight: 600;
   font-size: 15px;
   padding: 0;
   top: 10px;
@@ -529,7 +531,7 @@ input.c-tarea-titulo {
   position: relative;
   background: none;
   border: none;
-  color: #A0C1BF;
+  color: #000;
   font-size: 15px;
   padding: 0;
   top: 10px;
