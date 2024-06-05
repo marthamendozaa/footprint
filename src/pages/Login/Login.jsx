@@ -131,9 +131,11 @@ export const Login = () => {
           <div className='login-container-final'>
               {/* Cambiar contraseña */}
               <div className='cambiar-contrasena-container'>
-                  <button type="button" className="btn login-btn">
+                <Link to='/forgotpassword'>
+                  <button type="button" className="btn forgotpassword-btn">
                       ¿Olvidaste tu contraseña?
                   </button>
+                </Link>
               </div>
 
               {/* Botón de iniciar sesión */}
