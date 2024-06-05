@@ -761,8 +761,8 @@ export const Create = () => {
               {/* Tarea */}
               <div className="c-tareas-container">
                 {tareas.map((tarea, idTarea) => (
-                  <div className="c-tareas-container-2">
-                    <div className="c-tarea" key={idTarea}>
+                  <div className="c-tareas-container-2" key={idTarea}>
+                    <div className="c-tarea">
                       
                       {/* Titulo + descripción */}
                       <div className="c-tarea-info">
@@ -1034,29 +1034,35 @@ export const Create = () => {
                       className='e-searchBarCaja'
                     />
                   </div>
-                  {usuariosFiltrados && usuariosFiltrados.length > 0 ? (
-                    <ul>
-                      {usuariosFiltrados.map((usuario, id) => (
-                        <li key={id} className='user-item'>
-                          <div className='user-info'>
-                            <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
-                          </div>
-                          
-                          {!estadoBotones[usuario.idUsuario].invitarDesactivado && (
-                            <Button variant="primary" onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
-                              Invitar
-                            </Button>
-                          )}
-                          {!estadoBotones[usuario.idUsuario].cancelarDesactivado && (
-                            <Button variant="primary" onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
-                              Cancelar
-                            </Button>
-                          )}
-                        </li>
-                      ))}
-                    </ul>
+                  {usuariosFiltrados ? (
+                    (usuariosFiltrados.length == 0 || Object.keys(estadoBotones).length == 0) ? (
+                      <div className="m-error">
+                        No se encontraron usuarios.
+                      </div>
+                    ) : (
+                      <ul>
+                        {usuariosFiltrados.map((usuario, index) => (
+                          <li key={index} className='user-item'>
+                            <div className='user-info'>
+                              <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
+                            </div>
+                            
+                            {!estadoBotones[usuario.idUsuario].invitarDesactivado && (
+                              <Button variant="primary" onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
+                                Invitar
+                              </Button>
+                            )}
+                            {!estadoBotones[usuario.idUsuario].cancelarDesactivado && (
+                              <Button variant="primary" onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
+                                Cancelar
+                              </Button>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    )
                   ) : (
-                    <div className="spinner">
+                    <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
                       <Spinner animation="border" role="status"></Spinner>
                     </div>
                   )}
