@@ -439,6 +439,7 @@ li.c-etiqueta-item:hover {
 .c-fa-trash {
   margin-left: 20px;
   font-size: 30px;
+  cursor: pointer;
 }
 
 .c-tarea {
