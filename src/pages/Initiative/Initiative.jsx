@@ -902,8 +902,7 @@ export const Initiative = () => {
               )
             ) : (
               <div className="m-iniciativas-container">
-                {/* Contenido de miembros */}
-                Invitaciones enviadas
+                {/* Contenido de miembros */}                
                 <div>
                 {usuariosEnviados.map((usuario, index) => (
                   <div key={index} className='rq-iniciativa'>
