@@ -323,7 +323,23 @@ exports.crearTareas = onRequest(async (req, res) => {
 });
 
 
-// Crea las solicitudes
+// Actualiza información de iniciativa
+exports.actualizaTarea = onRequest(async (req, res) => {
+  cors(req, res, async () => {
+    const { data } = req.body;
+
+    try {
+      await getFirestore().doc(`Tareas/${data.idTarea}`).update(data);
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error actualizando tarea: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});
+
+
+//Crea las solicitudes
 exports.crearSolicitud = onRequest(async (req, res) => {
   cors(req, res, async () => {
     const { solicitud } = req.body;

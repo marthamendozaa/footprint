@@ -9,10 +9,11 @@ import { ClipLoader } from 'react-spinners';
 import { useParams } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import es from 'date-fns/locale/es';
-import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud } from '../../api/api.js';
+import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud, actualizaTarea } from '../../api/api.js';
 import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import './Initiative.css';
+import Tarea from '../../classes/Tarea.js';
 
 export const Initiative = () => {
   const { idIniciativa } = useParams();
@@ -163,75 +164,6 @@ export const Initiative = () => {
     };
     fetchData();
   }, [idIniciativa]);
-
-
-  // Subir archivos tareas
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [fileError, setFileError] = useState('');
-  const [uploadDisabled, setUploadDisabled] = useState(true);
-  const [cargandoTarea, setCargandoTarea] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState(null);
-
-  const openUploadModal = (taskId) => {
-    setShowUploadModal(true);
-    setFileError('');
-    setSelectedTaskId(taskId);
-  };
-
-  const closeUploadModal = () => {
-    setCargandoTarea(false);
-    setShowUploadModal(false);
-    setSelectedFile(null);
-    setSelectedTaskId(null);
-  };
-
-  useEffect(() => {
-    if (cargandoTarea) {
-      setUploadDisabled(true);
-    }
-
-    if (!selectedFile) {
-      setUploadDisabled(true);
-      return;
-    }
-    
-    if (selectedFile.size > 2 * 1024 * 1024) {
-      setFileError('El archivo seleccionado supera el límite de tamaño de 10 MB');
-      setSelectedFile(null);
-      setUploadDisabled(true);
-    } else {
-      setFileError('');
-      setUploadDisabled(false);
-    }
-  }, [selectedFile, cargandoTarea]);
-
-  const handleUploadFile = async () => {
-    setUploadDisabled(true);
-    setCargandoTarea(true);
-
-    try {
-      const fileUrl = await subirImagen(selectedFile, `Tareas/${selectedTaskId}`);
-      // Handle fileUrl appropriately in your application context
-      closeUploadModal();
-    } catch (error) {
-      console.error("Error al subir el archivo:", error.message);
-    } 
-  };
-
-  const { getRootProps: getRootPropsTarea, getInputProps: getInputPropsTarea } = useDropzone({
-    accept: {
-      'image/*': [],
-      'application/pdf': []
-    },
-    onDrop: (acceptedFiles) => {
-      if (acceptedFiles.length > 0) {
-        setSelectedFile(acceptedFiles[0]);
-        setFileError('');
-      }
-    }
-  });
-
 
   // Barra de progreso
   const ProgressBar = ({ progress }) => {
@@ -468,6 +400,7 @@ export const Initiative = () => {
     setEditingCampos(true);
     setNuevoTitulo(iniciativa.titulo);
     setNuevaDescripcion(iniciativa.descripcion)
+    //tarea
 
     const nuevaEtiquetasIniciativa = {...etiquetasIniciativa};
     Object.values(iniciativa.listaEtiquetas).forEach((etiquetaExistente) => {
@@ -490,9 +423,11 @@ export const Initiative = () => {
   
   const handleCerrarImagen = () => {
     setModalImagen(false);
+    setModalEntregable(false);
     setImagenSeleccionada(null);
     setErrorImagen("");
   };
+
 
   useEffect(() => {
     if (!imagenSeleccionada) {
@@ -627,6 +562,142 @@ export const Initiative = () => {
   const handleCancelarCampos = async () => {
     setEditingCampos(false);
   };
+
+
+
+  // TAREAS //
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileError, setFileError] = useState('');
+  const [uploadDisabled, setUploadDisabled] = useState(true);
+  const [cargandoTarea, setCargandoTarea] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [tarea, setTarea] = useState(new Tarea());
+  const [tareaUpload, setTareaUpload] = useState(new Tarea());
+  const [selectedTaskIndex, setSelectedTaskIndex] = useState(null);
+
+  const [selectedEntregable, setTareaEntregable] = useState(null);
+  const [modalEntregable, setModalEntregable] = useState(false);
+
+  const openUploadModal = (tarea, index) => {
+    console.log('ID ONE UPLOAD', tarea.idTarea);
+    setShowUploadModal(true);
+    setFileError('');
+    setTareaUpload(tarea);
+    setSelectedTaskIndex(index);
+
+    setSelectedTaskId(tarea.idTarea);
+  };
+
+  const handleMostrarEntregable = (tareaUrl) => {
+    
+    setModalEntregable(true);
+    setTareaEntregable(tareaUrl);
+  };
+
+
+
+  const closeUploadModal = () => {
+    setCargandoTarea(false);
+    setShowUploadModal(false);
+    setSelectedFile(null);
+    setSelectedTaskId(null);
+  };
+
+  useEffect(() => {
+    if (cargandoTarea) {
+      setUploadDisabled(true);
+    }
+
+    if (!selectedFile) {
+      setUploadDisabled(true);
+      return;
+    }
+    
+    if (selectedFile.size > 2 * 1024 * 1024) {
+      setFileError('El archivo seleccionado supera el límite de tamaño de 10 MB');
+      setSelectedFile(null);
+      setUploadDisabled(true);
+    } else {
+      setFileError('');
+      setUploadDisabled(false);
+    }
+  }, [selectedFile, cargandoTarea]);
+
+  const handleUploadFile = async (tarea, index) => {
+    console.log('TAREA ID', tareaUpload.idTarea);
+    console.log('TAREA INDEX', selectedTaskIndex);
+    setUploadDisabled(true);
+    setCargandoTarea(true);
+
+    try {
+      const fileUrl = await subirImagen(selectedFile, `Tareas/${selectedTaskId}`);
+      console.log(fileUrl);
+
+      const tareaNueva = { ...tareaUpload, urlEntrega: fileUrl, completada: true}
+      await actualizaTarea(tareaNueva);
+
+      const updatedTareas = [...tareas];
+      updatedTareas[selectedTaskIndex] = tareaNueva;
+
+      setTareas(updatedTareas);
+      setEditingTareaId(null);
+
+      closeUploadModal();
+
+      // Handle fileUrl appropriately in your application context
+
+    } catch (error) {
+      console.error("Error al subir el archivo:", error.message);
+    } 
+  };
+
+  const { getRootProps: getRootPropsTarea, getInputProps: getInputPropsTarea } = useDropzone({
+    accept: {
+      'image/*': [],
+      'application/pdf': []
+    },
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0) {
+        setSelectedFile(acceptedFiles[0]);
+        setFileError('');
+      }
+    }
+  });
+  
+  //EDITAR TAREAS 
+  const [editingTareaId, setEditingTareaId] = useState(null);
+  const [nuevoTituloTarea, setNuevoTituloTarea] = useState("");
+  const [nuevaDescripcionTarea, setNuevaDescripcionTarea] = useState("");
+
+
+  const startEditingTarea = (idTarea, titulo, descripcion) => {
+    setEditingTareaId(idTarea);
+    setNuevoTituloTarea(titulo);
+    setNuevaDescripcionTarea(descripcion);
+  };
+
+  const saveTareaChanges = async (tarea, index) => {
+    console.log('Editando tarea', tarea.idTarea);
+    try {
+      const tareaNueva = { ...tarea, titulo: nuevoTituloTarea, descripcion: nuevaDescripcionTarea}
+      await actualizaTarea(tareaNueva);
+
+      const updatedTareas = [...tareas];
+      updatedTareas[index] = tareaNueva;
+
+
+      setTareas(updatedTareas);
+      setEditingTareaId(null);
+    } catch (error) {
+      console.error("Error updating tarea:", error);
+    }
+  };
+
+  const cancelTareaEdit = () => {
+    setEditingTareaId(null);
+  };
+
 
 
   return (
@@ -836,36 +907,120 @@ export const Initiative = () => {
             <div className="i-tareas-seccion">
               {/* Tarea asignada a mí */}
               <div className="i-titulo-tareas">Mis Tareas</div>
-                {tareas ? (
+
+              {tareas ? (
                   <div className='i-tareas-container'>
-                    {tareas.length === 0 ? (
+                    {tareas.filter(tarea => !tarea.completada).length === 0 ? (
                       <div className="m-error">
                       No hay tareas asignadas.
                       </div>
                     ) : (
-                    <div>
-                      {tareas.map((tarea, idTarea) => (
-                        <div className="i-tarea" key={idTarea}>
-                          <div className="i-tarea-info">
-                            <div className="i-tarea-texto">
-                              <div className="i-tarea-titulo">{tarea.titulo}</div>
-                              <div className="i-tarea-desc">{tarea.descripcion}</div>
-                            </div>
-                            <div className="i-tarea-botones">
-                              <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                              <div className="i-tarea-boton" style={{cursor: 'pointer'}} onClick={() => openUploadModal(tarea.idTarea)}><FaFolder /> Documento </div>
-                            </div>
+                      <div>
+                        {editingCampos ? (
+                          <div>
+                            {tareas.filter(tarea => !tarea.completada).map((tarea, index) => (
+                              <div className="i-tarea" key={tarea.idTarea}>
+                                <div className="i-tarea-info">
+                                  <div className="i-tarea-texto">
+                                    {editingTareaId === tarea.idTarea ? (
+                                      <div>
+                                        <input
+                                          type="text"
+                                          className="i-edit-titulo-box"
+                                          value={nuevoTituloTarea}
+                                          onChange={(e) => setNuevoTituloTarea(e.target.value)}
+                                          autoFocus
+                                          maxLength={30}
+                                        />
+                                        <input
+                                          type="text"
+                                          className="i-edit-desc-box"
+                                          value={nuevaDescripcionTarea}
+                                          onChange={(e) => setNuevaDescripcionTarea(e.target.value)}
+                                          maxLength={100}
+                                        />
+                                        <button onClick={() => saveTareaChanges(tarea, index)}>Save</button>
+                                        <button onClick={cancelTareaEdit}>Cancel</button>
+                                      </div>
+                                    ) : (
+                                      <div>
+                                        <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                        <div className="i-tarea-desc">{tarea.descripcion}</div>
+                                        <button onClick={() => startEditingTarea(tarea.idTarea, tarea.titulo, tarea.descripcion)}>Edit</button>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="i-tarea-botones">
+                                    <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                                    <div className="i-tarea-boton" style={{ cursor: 'pointer' }} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento </div>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}  
                           </div>
+                        ) : (
+                        <div>
+                          {tareas.filter(tarea => !tarea.completada).map((tarea, idTarea) => (
+                            <div className="i-tarea" key={idTarea}>
+                              <div className="i-tarea-info">
+                                <div className="i-tarea-texto">
+                                  <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                  <div className="i-tarea-desc">{tarea.descripcion}</div>
+                                </div>
+                                <div className="i-tarea-botones">
+                                  <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                                  <div className="i-tarea-boton" style={{cursor: 'pointer'}} > <FaFolder /> Documento </div>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
+                        )}
+                      </div>
                     )}
+                    
                   </div>
                   ) : (
                   <div className="m-error">
                     No hay tareas asignadas.
                   </div>
                 )}
+
+            </div>
+
+            <div className="i-tareas-seccion">
+              {/* Tarea completadas publicas */}
+              <div className="i-titulo-tareas"> Tareas Completadas </div>
+              {tareas ? (
+                  <div className='i-tareas-container'>
+                    {tareas.filter(tarea => tarea.completada).length === 0 ? (
+                      <div className="m-error">
+                      No hay tareas completadas.
+                      </div>
+                    ) : (
+                      <div>
+                        {tareas.filter(tarea => tarea.completada).map((tarea, idTarea) => (
+                          <div className="i-tarea" key={idTarea}>
+                            <div className="i-tarea-info">
+                              <div className="i-tarea-texto">
+                                <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                <div className="i-tarea-desc">{tarea.descripcion}</div>
+                              </div>
+                              <div className="i-tarea-botones">
+                                <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                                <div className="i-tarea-boton" style={{ cursor: 'pointer' }} onClick={() => handleMostrarEntregable(tarea.urlEntrega)} > <FaFolder /> Documento </div>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>  
+                ) : (
+                  <div className="m-error">
+                  No hay tareas asignadas.
+                  </div>
+              )}
             </div>
           </div>
 
@@ -1101,7 +1256,26 @@ export const Initiative = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* Modal confirmar eliminar miembro*/}
+
+      {/* MOSTRAR ENTREGABLE TAREA */}
+      <Modal className="i-modal-doc" show={modalEntregable} onHide={handleCerrarImagen}>
+        <Modal.Header>
+          <div className="i-modal-doc-title">Archivo Entregado</div>
+        </Modal.Header>
+          
+        <div className="i-doc-body">
+
+          <iframe  src={selectedEntregable} frameborder="0" width="100%" height="100%"></iframe>
+          
+        </div>
+
+        <Modal.Footer>
+          <Button onClick={handleCerrarImagen}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+      
+
+      {/* Modal confirmar eliminar iniciativa*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
         <Modal.Header>
           <div className="ea-modal-title">Confirmar eliminación</div>
