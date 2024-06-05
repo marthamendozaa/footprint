@@ -515,6 +515,21 @@ export const actualizaSolicitud = async (data) => {
 };
 
 
+// Eliminar una iniciativa
+export const eliminarSolicitud = async (idSolicitud) => {
+  const response = await axios.post(`${functionsURL}/eliminaSolicitud`, {
+    solicitud: idSolicitud,
+  });
+  if (response.data.success) {
+    console.log("Solicitud eliminada exitosamente");
+    return response.data.data;
+  } else {
+    console.log("Error eliminando solicitud");
+    throw new Error(response.data.error);
+  }
+};
+
+
 // Enviar correo de notificación al eliminar iniciativa
 export const enviarCorreoIniciativa = async (iniciativa) => {
   const adminRef = await getDoc(doc(firestore, "Usuarios", iniciativa.idAdmin));
