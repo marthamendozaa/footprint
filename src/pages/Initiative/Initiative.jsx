@@ -750,7 +750,6 @@ export const Initiative = () => {
                     border-radius: 25px;
                     position: relative;
                     width: 100%;
-                    height: 25px;
                     font-size: 20px;
                     resize: none;
                     outline: none;
@@ -765,7 +764,7 @@ export const Initiative = () => {
                   onChange={handleDescripcionCambios}
                   autoFocus
                   maxLength={200} 
-                  style={{ borderColor: nuevaDescripcion ? 'transparent' : 'transparent' }}
+                  style={{ borderColor: 'transparent', height: '25px' }}
                 />
               </div>
             </div>
