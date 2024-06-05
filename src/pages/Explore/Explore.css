@@ -160,6 +160,12 @@ body::-webkit-scrollbar {
   margin-right: 10px;
 }
 
+.e-nombre-admin {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .e-iniciativa-imagen img {
   width: 236.9px;
   max-width: 100%;
