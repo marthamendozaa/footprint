@@ -436,24 +436,3 @@ exports.enviarCorreo = onRequest(async (req, res) =>{
     }
   });
 });
-
-exports.sendPasswordMails = onRequest(async (req, res) =>{
-  cors(req, res, async () => {
-    const { PasswordEmail } = req.body;
-
-    try {
-      const email = {
-        to: PasswordEmail,
-        message: {
-          subject: "Cambio de contraseña",
-          text: "Haz click aquí para cambiar de contraseña."
-        }
-      };
-      await getFirestore().collection('mail').add(email);
-      res.json({ success: true });
-    } catch (error) {
-      logger.info("Error enviando correo: ", error.message);
-      res.json({ success: false, error: error.message });
-    }
-  });
-});
