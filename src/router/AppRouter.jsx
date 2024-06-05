@@ -10,6 +10,7 @@ import { Profile } from '../pages/Profile/Profile.jsx';
 import { Create } from '../pages/Create/Create.jsx';
 import { Login } from '../pages/Login/Login.jsx';
 import { Register } from '../pages/Register/Register.jsx';
+import { ForgotPassword } from '../pages/ForgotPassword/ForgotPassword.jsx';
 import { useAuth } from '../contexts/AuthContext.jsx';
 
 export const AppRouter = () => {
@@ -36,6 +37,7 @@ export const AppRouter = () => {
 
     return (
         <Routes>
+            <Route path="/forgotpassword" element={<ForgotPassword />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 

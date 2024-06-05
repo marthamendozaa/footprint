@@ -1293,7 +1293,7 @@ export const Initiative = () => {
         </Modal.Footer>
       </Modal>
       
-      {/* Modal miembro eliminado*/}
+      {/* Modal iniciativa eliminada*/}
       <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
         <Modal.Header>
           <div className="ea-modal-title">Éxito</div>

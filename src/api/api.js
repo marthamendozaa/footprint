@@ -163,6 +163,7 @@ export const getUsuario = async (user) => {
   try {
     const usuario = await getDoc(doc(firestore, "Usuarios", user));
     console.log("Obtener usuario exitoso");
+    console.log(usuario.data());
     return usuario.data();
   } catch (error) {
     console.log("Error obteniendo usuario");
@@ -170,6 +171,22 @@ export const getUsuario = async (user) => {
   }
 };
 
+// Obtener usuario por ID
+export const getUsuarioID = async (correo) => {
+  try {
+    const q = query(collection(firestore, "Usuarios"), where('correo', '==', correo));
+    const querySnapshot = await getDocs(q);
+    let idUsuario = null;
+    querySnapshot.forEach(doc => {
+      idUsuario = doc.id;
+    });
+    console.log(idUsuario);
+    return idUsuario;
+  } catch (error) {
+    console.log("Error obteniendo id de usuario");
+    throw new Error(error);
+  }
+}
 
 // Información de todos los usuarios
 export const getUsuarios = async () => {
@@ -397,21 +414,6 @@ export const eliminarMiembro = async (iniciativa, user) => {
 };
 
 
-// Eliminar una iniciativa
-export const eliminarSolicitud = async (idSolicitud) => {
-  const response = await axios.post(`${functionsURL}/eliminaSolicitud`, {
-    solicitud: idSolicitud,
-  });
-  if (response.data.success) {
-    console.log("Solicitud eliminada exitosamente");
-    return response.data.data;
-  } else {
-    console.log("Error eliminando solicitud");
-    throw new Error(response.data.error);
-  }
-};
-
-
 // Subir imágenes a Storage
 export const subirImagen = async (imagen, path) => {
   const formData = new FormData();
@@ -562,27 +564,42 @@ export const enviarCorreoMiembro = async (iniciativa, miembro) => {
 
 // Enviar correo de notificación al asignar miembro a una tarea
 export const enviarCorreoTarea = async (iniciativa, miembro, tarea) => {
-  try {
-    const message = {
-      subject: `Notificación sobre tu asignación a la tarea ${tarea.titulo}`,
-      text: `Estimado/a ${miembro.nombre},\n\nNos complace informarte que has sido asignado/a a la tarea ${tarea.titulo} en la iniciativa ${iniciativa.titulo}. Si tienes alguna duda, te invitamos a ponerte en contacto con la persona a cargo de la iniciativa.\n\nSaludos cordiales,\nAdministración de Evertech`
-    }
+  const message = {
+    subject: `Notificación sobre tu asignación a la tarea ${tarea.titulo}`,
+    text: `Estimado/a ${miembro.nombre},\n\nNos complace informarte que has sido asignado/a a la tarea ${tarea.titulo} en la iniciativa ${iniciativa.titulo}. Si tienes alguna duda, te invitamos a ponerte en contacto con la persona a cargo de la iniciativa.\n\nSaludos cordiales,\nAdministración de Evertech`
+  }
 
-    const response = await axios.post(`${functionsURL}/enviarCorreo`, {
-      email: miembro.correo,
-      message: message
-    });
+  const response = await axios.post(`${functionsURL}/enviarCorreo`, {
+    email: miembro.correo,
+    message: message
+  });
 
-    if (response.data.success) {
-      console.log("Envio de correo exitoso");
-      return;
-    } else {
-      console.log("Error enviando correo");
-      throw new Error(response.data.error);
-    }
-  } catch (error) {
-    console.log("Error sending email");
-    throw new Error(error);
+  if (response.data.success) {
+    console.log("Envio de correo exitoso");
+    return;
+  } else {
+    console.log("Error enviando correo");
+    throw new Error(response.data.error);
   }
 }
 
+// Enviar correo para cambiar la contraseña
+export const sendPasswordMail = async (correo) => {
+  const message = {
+    subject: `Cambio de contraseña`,
+    text: `Haz click aquí para cambiar de contraseña.`
+  }
+
+  const response = await axios.post(`${functionsURL}/enviarCorreo`, {
+    email: correo,
+    message: message
+  });
+
+  if (response.data.success) {
+    console.log("Envio de correo exitoso");
+    return;
+  } else {
+    console.log("Error enviando correo");
+    throw new Error(response.data.error);
+  }
+}
