@@ -918,14 +918,14 @@ export const Initiative = () => {
 
 
       {/* MOSTRAR ENTREGABLE TAREA */}
-      <Modal className="c-modal" show={modalEntregable} onHide={handleCerrarImagen}>
+      <Modal className="i-modal-doc" show={modalEntregable} onHide={handleCerrarImagen}>
         <Modal.Header>
-          <div className="c-modal-title">Archivo Entregafo</div>
+          <div className="i-modal-doc-title">Archivo Entregado</div>
         </Modal.Header>
           
-        <div className="c-input-body">
+        <div className="i-doc-body">
 
-          <iframe src={selectedEntregable} frameborder="0" width="100%" height="100%"></iframe>
+          <iframe  src={selectedEntregable} frameborder="0" width="100%" height="100%"></iframe>
           
         </div>
 
