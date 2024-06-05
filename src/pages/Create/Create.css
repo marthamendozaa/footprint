@@ -584,6 +584,11 @@ input.c-tarea-titulo {
   background-color: #7d9795;
 }
 
+button.c-btn-crear:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
 /* Modal subir imagen */
 .c-input-body {
   display: flex;
