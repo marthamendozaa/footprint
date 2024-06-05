@@ -93,26 +93,26 @@ export const Create = () => {
     setTareas(tareasNuevo);
   };
 
-  const [tareasNuevo, setTareasNuevo] = useState([]);
-  const textareaRef2 = useRef(null);
-  const autoResizeTextarea2 = () => {
-    const textarea = textareaRef2.current;
+  const textareaRefs2 = useRef([]);
+
+  const autoResizeTextarea2 = (idTarea) => {
+    const textarea = textareaRefs2.current[idTarea];
     if (textarea) {
+      textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
 
   useEffect(() => {
-    if (tareasNuevo) {
-      autoResizeTextarea2();
-
-      if (tareasNuevo && textareaRef2.current) {
-        const length = textareaRef2.current.value.length;
-        textareaRef2.current.setSelectionRange(length, length);
-        textareaRef2.current.focus();
+    tareas.forEach((tarea, idTarea) => {
+      if (tarea.editandoDesc && textareaRefs2.current[idTarea]) {
+        const length = textareaRefs2.current[idTarea].value.length;
+        textareaRefs2.current[idTarea].setSelectionRange(length, length);
+        textareaRefs2.current[idTarea].focus();
+        autoResizeTextarea2(idTarea);
       }
-    }
-  }, [tareasNuevo]);
+    });
+  }, [tareas]);
 
 
   // Cambiar fecha entrega Tarea
@@ -704,7 +704,7 @@ export const Create = () => {
                               `}
                               </style>
                               <textarea
-                                ref={textareaRef2}
+                                ref={el => textareaRefs2.current[idTarea] = el}
                                 className="c-desc-input-texto-2"
                                 value={tarea.descripcion}
                                 onChange={(e) => handleCambioDescTarea(e, idTarea)}
