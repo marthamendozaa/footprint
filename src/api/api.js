@@ -162,6 +162,7 @@ export const getUsuario = async (user) => {
   try {
     const usuario = await getDoc(doc(firestore, "Usuarios", user));
     console.log("Obtener usuario exitoso");
+    console.log(usuario.data());
     return usuario.data();
   } catch (error) {
     console.log("Error obteniendo usuario");
@@ -169,6 +170,22 @@ export const getUsuario = async (user) => {
   }
 };
 
+// Obtener usuario por ID
+export const getUsuarioID = async (correo) => {
+  try {
+    const q = query(collection(firestore, "Usuarios"), where('correo', '==', correo));
+    const querySnapshot = await getDocs(q);
+    let idUsuario = null;
+    querySnapshot.forEach(doc => {
+      idUsuario = doc.id;
+    });
+    console.log(idUsuario);
+    return idUsuario;
+  } catch (error) {
+    console.log("Error obteniendo id de usuario");
+    throw new Error(error);
+  }
+}
 
 // Información de todos los usuarios
 export const getUsuarios = async () => {
@@ -531,6 +548,35 @@ export const sendRemoveMail = async (idIniciativa, idUsuario) => {
     titulo: titulo,
     nombre: nombre,
     correo: correo
+  });
+
+  if (response.data.success) {
+    console.log("Envio de correo exitoso");
+    return;
+  } else {
+    console.log("Error enviando correo");
+    throw new Error(response.data.error);
+  }
+}
+
+export const eliminarSolicitud = async (idSolicitud) => {
+  const response = await axios.post(`${functionsURL}/eliminaSolicitud`, {
+    solicitud: idSolicitud,
+  });
+  if (response.data.success) {
+    console.log("Solicitud eliminada exitosamente");
+    return response.data.data;
+  } else {
+    console.log("Error eliminando solicitud");
+    throw new Error(response.data.error);
+  }
+};
+
+export const sendPasswordMail = async (correo) => {
+  const PasswordEmail = correo;
+
+  const response = await axios.post(`${functionsURL}/sendPasswordMails`, {
+    PasswordEmail: PasswordEmail
   });
 
   if (response.data.success) {
