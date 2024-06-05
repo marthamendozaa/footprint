@@ -93,6 +93,27 @@ export const Create = () => {
     setTareas(tareasNuevo);
   };
 
+  const [tareasNuevo, setTareasNuevo] = useState([]);
+  const textareaRef2 = useRef(null);
+  const autoResizeTextarea2 = () => {
+    const textarea = textareaRef2.current;
+    if (textarea) {
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  useEffect(() => {
+    if (tareasNuevo) {
+      autoResizeTextarea2();
+
+      if (tareasNuevo && textareaRef2.current) {
+        const length = textareaRef2.current.value.length;
+        textareaRef2.current.setSelectionRange(length, length);
+        textareaRef2.current.focus();
+      }
+    }
+  }, [tareasNuevo]);
+
 
   // Cambiar fecha entrega Tarea
   const handleCambioFechaEntrega = (date, idTarea) => {
@@ -149,8 +170,6 @@ export const Create = () => {
   const [desc, setDesc] = useState("");
   const [editandoDesc, setEditandoDesc] = useState(false);
 
-  const textareaRef = useRef(null);
-
   const handleCambioDesc = (event) => {
     setDesc(event.target.value);
     autoResizeTextarea();
@@ -163,6 +182,8 @@ export const Create = () => {
   const handleGuardarDesc = () => {
     setEditandoDesc(false);
   };
+
+  const textareaRef = useRef(null);
 
   const autoResizeTextarea = () => {
     const textarea = textareaRef.current;
@@ -425,8 +446,6 @@ export const Create = () => {
     }
   };
 
-  // Descripcion
-
 
   return (
     <div>
@@ -596,16 +615,16 @@ export const Create = () => {
                   `}
                   </style>
                   <textarea 
-                      ref={textareaRef}
-                      className="c-desc-input-texto"
-                      value={desc}
-                      onChange={handleCambioDesc}
-                      onBlur={handleGuardarDesc}
-                      onKeyDown={handleOnKeyDown}
-                      autoFocus
-                      maxLength={200} 
-                      style={{ borderColor: editandoDesc ? 'transparent' : 'transparent' }}
-                    />
+                    ref={textareaRef}
+                    className="c-desc-input-texto"
+                    value={desc}
+                    onChange={handleCambioDesc}
+                    onBlur={handleGuardarDesc}
+                    onKeyDown={handleOnKeyDown}
+                    autoFocus
+                    maxLength={200} 
+                    style={{ borderColor: 'transparent' }}
+                  />
                 </div>
               </div>
               ) : (
@@ -669,27 +688,48 @@ export const Create = () => {
                       
                       {/* Descripcion */}
                       <div className="c-tarea-desc">
-                        {tarea.editandoDesc ? (
-                          <div className="c-tarea-texto">
-                            <textarea
-                              className="c-desc-input-texto"
-                              value={tarea.descripcion}
-                              onChange={(e) => handleCambioDescTarea(e, idTarea)}
-                              onBlur={() => handleGuardarDescTarea(idTarea)}
-                              onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
-                              autoFocus
-                              maxLength={200}
-                            />
+                        {tarea.editandoDesc? (
+                          <div className='c-container-conteo'>
+                            <div className="c-tarea-texto" style={{paddingTop: '2px'}}>
+                              <style jsx>{`
+                                textarea {
+                                  border-radius: 25px;
+                                  position: relative;
+                                  width: 100%;
+                                  height: 25px;
+                                  font-size: 20px;
+                                  resize: none;
+                                  outline: none;
+                                }
+                              `}
+                              </style>
+                              <textarea
+                                ref={textareaRef2}
+                                className="c-desc-input-texto-2"
+                                value={tarea.descripcion}
+                                onChange={(e) => handleCambioDescTarea(e, idTarea)}
+                                onBlur={() => handleGuardarDescTarea(idTarea)}
+                                onKeyDown={(e) => handleOnKeyDownTarea(e, idTarea)}
+                                autoFocus
+                                maxLength={200}
+                                style={{ borderColor: 'transparent' }}
+                              />
+                            </div>
+
+                            <button className="c-btn-editar-flex" onClick={() => handleEditarDescTarea(idTarea)}>
+                              {tarea.descripcion ? `${tarea.descripcion.length}/200` : `0/200`}
+                            </button>
                           </div>
                         ) : (
-                          <div style={tarea.descripcion ? {} : { color: '#677D7C' }}>
-                            {tarea.descripcion ? tarea.descripcion : "Agrega tu descripción aquí..."}
+                          <div className="c-desc-texto-2" style={{paddingBottom: '6px', paddingLeft: '2px'}}>
+                            <div style={tarea.descripcion ? {marginTop: '2px'} : {marginTop: '2px', color: '#677D7C'}}>
+                              {tarea.descripcion ? tarea.descripcion : "Agrega tu descripción aquí..."}
+                            </div>
+
+                            <button className="c-btn-editar-tarea-2" onClick={() => handleEditarDescTarea(idTarea)}>
+                              <FaPen />
+                            </button>
                           </div>
-                        )}
-                        {!tarea.editandoDesc && (
-                          <button className="c-btn-editar-tarea" onClick={() => handleEditarDescTarea(idTarea)}>
-                            <FaPen />
-                          </button>
                         )}
                       </div> 
                     </div>
