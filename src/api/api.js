@@ -480,6 +480,9 @@ export const actualizaTarea = async (data) => {
   }
 };
 
+
+
+
 // Crear solicitudes
 export const crearSolicitud = async (solicitud) => {
   const response = await axios.post(`${functionsURL}/crearSolicitud`, {
@@ -610,3 +613,4 @@ export const sendTareaMail = async (idIniciativa, idUsuario, idTarea) => {
     throw new Error(error);
   }
 }
+

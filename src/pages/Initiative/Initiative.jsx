@@ -83,98 +83,6 @@ export const Initiative = () => {
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
   const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
 
-
-  // TAREAS //
-
-  const [showUploadModal, setShowUploadModal] = useState(false);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [fileError, setFileError] = useState('');
-  const [uploadDisabled, setUploadDisabled] = useState(true);
-  const [cargandoTarea, setCargandoTarea] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState(null);
-  const [tarea, setTarea] = useState(new Tarea());
-  const [tareaUpload, setTareaUpload] = useState(new Tarea());
-  const [selectedTaskIndex, setSelectedTaskIndex] = useState(null);
-
-  const openUploadModal = (tarea, index) => {
-    console.log('ID OPNE UPLOAD', tarea.idTarea);
-    setShowUploadModal(true);
-    setFileError('');
-    setTareaUpload(tarea);
-    setSelectedTaskIndex(index);
-
-    setSelectedTaskId(tarea.idTarea);
-  };
-
-  const closeUploadModal = () => {
-    setCargandoTarea(false);
-    setShowUploadModal(false);
-    setSelectedFile(null);
-    setSelectedTaskId(null);
-  };
-
-  useEffect(() => {
-    if (cargandoTarea) {
-      setUploadDisabled(true);
-    }
-
-    if (!selectedFile) {
-      setUploadDisabled(true);
-      return;
-    }
-    
-    if (selectedFile.size > 2 * 1024 * 1024) {
-      setFileError('El archivo seleccionado supera el límite de tamaño de 10 MB');
-      setSelectedFile(null);
-      setUploadDisabled(true);
-    } else {
-      setFileError('');
-      setUploadDisabled(false);
-    }
-  }, [selectedFile, cargandoTarea]);
-
-  const handleUploadFile = async (tarea, index) => {
-    console.log('TAREA ID', tareaUpload.idTarea);
-    console.log('TAREA INDEX', selectedTaskIndex);
-    setUploadDisabled(true);
-    setCargandoTarea(true);
-
-    try {
-      const fileUrl = await subirImagen(selectedFile, `Tareas/${selectedTaskId}`);
-      console.log(fileUrl);
-
-      const tareaNueva = { ...tareaUpload, urlEntrega: fileUrl, completada: true}
-      await actualizaTarea(tareaNueva);
-
-      const updatedTareas = [...tareas];
-      updatedTareas[selectedTaskIndex] = tareaNueva;
-
-      setTareas(updatedTareas);
-      setEditingTareaId(null);
-
-      closeUploadModal();
-
-      // Handle fileUrl appropriately in your application context
-
-    } catch (error) {
-      console.error("Error al subir el archivo:", error.message);
-    } 
-  };
-
-  const { getRootProps: getRootPropsTarea, getInputProps: getInputPropsTarea } = useDropzone({
-    accept: {
-      'image/*': [],
-      'application/pdf': []
-    },
-    onDrop: (acceptedFiles) => {
-      if (acceptedFiles.length > 0) {
-        setSelectedFile(acceptedFiles[0]);
-        setFileError('');
-      }
-    }
-  });
-
-
   const parseDate = (dateString) => {
     const [day, month, year] = dateString.split('/');
     return new Date(year, month - 1, day);
@@ -308,9 +216,11 @@ export const Initiative = () => {
   
   const handleCerrarImagen = () => {
     setModalImagen(false);
+    setModalEntregable(false);
     setImagenSeleccionada(null);
     setErrorImagen("");
   };
+
 
   useEffect(() => {
     if (!imagenSeleccionada) {
@@ -425,6 +335,108 @@ export const Initiative = () => {
     setEditingCampos(false);
   };
 
+
+
+  // TAREAS //
+  const [showUploadModal, setShowUploadModal] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [fileError, setFileError] = useState('');
+  const [uploadDisabled, setUploadDisabled] = useState(true);
+  const [cargandoTarea, setCargandoTarea] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [tarea, setTarea] = useState(new Tarea());
+  const [tareaUpload, setTareaUpload] = useState(new Tarea());
+  const [selectedTaskIndex, setSelectedTaskIndex] = useState(null);
+
+  const [selectedEntregable, setTareaEntregable] = useState(null);
+  const [modalEntregable, setModalEntregable] = useState(false);
+
+  const openUploadModal = (tarea, index) => {
+    console.log('ID ONE UPLOAD', tarea.idTarea);
+    setShowUploadModal(true);
+    setFileError('');
+    setTareaUpload(tarea);
+    setSelectedTaskIndex(index);
+
+    setSelectedTaskId(tarea.idTarea);
+  };
+
+  const handleMostrarEntregable = (tareaUrl) => {
+    
+    setModalEntregable(true);
+    setTareaEntregable(tareaUrl);
+  };
+
+
+
+  const closeUploadModal = () => {
+    setCargandoTarea(false);
+    setShowUploadModal(false);
+    setSelectedFile(null);
+    setSelectedTaskId(null);
+  };
+
+  useEffect(() => {
+    if (cargandoTarea) {
+      setUploadDisabled(true);
+    }
+
+    if (!selectedFile) {
+      setUploadDisabled(true);
+      return;
+    }
+    
+    if (selectedFile.size > 2 * 1024 * 1024) {
+      setFileError('El archivo seleccionado supera el límite de tamaño de 10 MB');
+      setSelectedFile(null);
+      setUploadDisabled(true);
+    } else {
+      setFileError('');
+      setUploadDisabled(false);
+    }
+  }, [selectedFile, cargandoTarea]);
+
+  const handleUploadFile = async (tarea, index) => {
+    console.log('TAREA ID', tareaUpload.idTarea);
+    console.log('TAREA INDEX', selectedTaskIndex);
+    setUploadDisabled(true);
+    setCargandoTarea(true);
+
+    try {
+      const fileUrl = await subirImagen(selectedFile, `Tareas/${selectedTaskId}`);
+      console.log(fileUrl);
+
+      const tareaNueva = { ...tareaUpload, urlEntrega: fileUrl, completada: true}
+      await actualizaTarea(tareaNueva);
+
+      const updatedTareas = [...tareas];
+      updatedTareas[selectedTaskIndex] = tareaNueva;
+
+      setTareas(updatedTareas);
+      setEditingTareaId(null);
+
+      closeUploadModal();
+
+      // Handle fileUrl appropriately in your application context
+
+    } catch (error) {
+      console.error("Error al subir el archivo:", error.message);
+    } 
+  };
+
+  const { getRootProps: getRootPropsTarea, getInputProps: getInputPropsTarea } = useDropzone({
+    accept: {
+      'image/*': [],
+      'application/pdf': []
+    },
+    onDrop: (acceptedFiles) => {
+      if (acceptedFiles.length > 0) {
+        setSelectedFile(acceptedFiles[0]);
+        setFileError('');
+      }
+    }
+  });
+  
   //EDITAR TAREAS 
   const [editingTareaId, setEditingTareaId] = useState(null);
   const [nuevoTituloTarea, setNuevoTituloTarea] = useState("");
@@ -458,11 +470,7 @@ export const Initiative = () => {
     setEditingTareaId(null);
   };
 
-  const downloadFile = (url) => {
-    window.open(url, '_blank');
-  };
 
-  
 
   return (
     <div>
@@ -748,7 +756,7 @@ export const Initiative = () => {
                               </div>
                               <div className="i-tarea-botones">
                                 <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                                <div className="i-tarea-boton" style={{ cursor: 'pointer' }} onClick={() => downloadFile(tarea.urlEntrega)} > <FaFolder /> Documento </div>
+                                <div className="i-tarea-boton" style={{ cursor: 'pointer' }} onClick={() => handleMostrarEntregable(tarea.urlEntrega)} > <FaFolder /> Documento </div>
                               </div>
                             </div>
                           </div>
@@ -907,6 +915,25 @@ export const Initiative = () => {
           <Button onClick={closeUploadModal} style={{width: '115px'}}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
+
+
+      {/* MOSTRAR ENTREGABLE TAREA */}
+      <Modal className="c-modal" show={modalEntregable} onHide={handleCerrarImagen}>
+        <Modal.Header>
+          <div className="c-modal-title">Archivo Entregafo</div>
+        </Modal.Header>
+          
+        <div className="c-input-body">
+
+          <iframe src={selectedEntregable} frameborder="0" width="100%" height="100%"></iframe>
+          
+        </div>
+
+        <Modal.Footer>
+          <Button onClick={handleCerrarImagen}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+      
 
       {/* Modal confirmar eliminar iniciativa*/}
       <Modal className="ea-modal" show={modalEliminar} onHide={handleCerrarEliminar}>
