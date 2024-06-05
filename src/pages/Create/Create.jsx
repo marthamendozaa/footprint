@@ -697,7 +697,7 @@ export const Create = () => {
                                   position: relative;
                                   width: 100%;
                                   height: 25px;
-                                  font-size: 20px;
+                                  font-size: 16px;
                                   resize: none;
                                   outline: none;
                                 }
@@ -721,7 +721,7 @@ export const Create = () => {
                             </button>
                           </div>
                         ) : (
-                          <div className="c-desc-texto-2" style={{paddingBottom: '6px', paddingLeft: '2px'}}>
+                          <div className="c-desc-texto-2" style={{paddingBottom: '32.7px', paddingLeft: '2px'}}>
                             <div style={tarea.descripcion ? {marginTop: '2px'} : {marginTop: '2px', color: '#677D7C'}}>
                               {tarea.descripcion ? tarea.descripcion : "Agrega tu descripción aquí..."}
                             </div>
