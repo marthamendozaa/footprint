@@ -245,10 +245,10 @@ export const existeSolicitud = async (idUsuario, idIniciativa) => {
 
     if (querySnapshot.docs.length) {
       console.log("Solicitud ya existe");
-      return true;
+      return querySnapshot.docs[0].id;
     } else {
       console.log("Solicitud no existe");
-      return false;
+      return null;
     }
   } catch (error) {
     console.log("Error verificando solicitud");

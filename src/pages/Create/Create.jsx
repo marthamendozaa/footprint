@@ -13,8 +13,8 @@ import { useDropzone } from 'react-dropzone';
 import { getIntereses, getRegiones, crearIniciativa, actualizaIniciativa, subirImagen, crearTareas, getUsuarios, getUsuario, crearSolicitud } from '../../api/api.js';
 import Iniciativa from '../../classes/Iniciativa.js';
 import Solicitud from '../../classes/Solicitud.js'
-import Fuse from 'fuse.js';
 import Tarea from '../../classes/Tarea.js';
+import Fuse from 'fuse.js';
 import './Create.css';
 
 export const Create = () => {
@@ -33,24 +33,22 @@ export const Create = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      // Obtiene información de etiquetas
       const etiquetasData = await getIntereses();
       setEtiquetas(etiquetasData);
-
+      
+      // Obtiene información de regiones
       const regionesData = await getRegiones();
       setRegiones(regionesData);
 
-      const usuarioAdmin = await getUsuario(user);
-      const adminID = usuarioAdmin.idUsuario;
-
+      // Obtiene información de usuarios
       const usuariosData = await getUsuarios();
-
-      const usuariosSinMiembros = Object.values(usuariosData).filter(usuario => 
-        usuario.idUsuario !== adminID && !usuario.esAdmin
+      const usuarios = Object.values(usuariosData).filter(usuario => 
+        usuario.idUsuario !== user && !usuario.esAdmin
       );
 
-      setUsuarios(usuariosSinMiembros);
-      setUsuariosFiltrados(usuariosSinMiembros);
-      console.log("usuarios:", usuariosSinMiembros);
+      setUsuarios(usuarios);
+      setUsuariosFiltrados(usuarios);
     };
     fetchData();
   }, []);
@@ -199,6 +197,7 @@ export const Create = () => {
       }
     }
   }, [editandoDesc]);
+
 
   // Seleccionar etiquetas
   const [etiquetas, setEtiquetas] = useState(null);
@@ -357,7 +356,6 @@ export const Create = () => {
   const [usuariosFiltrados, setUsuariosFiltrados] = useState([]);
   const [estadoBotones, setEstadoBotones] = useState({});
   const [solicitudesPorCrear, setSolicitudesPorCrear] = useState([]);
-  const [invitarCargando, setInvitarCargando] = useState(false); //Implementar?
 
   useEffect(() => {
     if (usuarios) {
@@ -370,7 +368,6 @@ export const Create = () => {
         };
       });
       setEstadoBotones(estadoInicial);
-      console.log("estadoInicial", estadoInicial);
     }
   }, [usuarios]);
 
@@ -397,8 +394,6 @@ export const Create = () => {
     const resultado = fuse.search(busqueda);
     const filtradas = resultado.map((item) => item.item);
     setUsuariosFiltrados(filtradas);
-    console.log(usuariosFiltrados);
-    
   };
 
   const handleInvitarUsuario = (id) => {
@@ -500,37 +495,19 @@ export const Create = () => {
       }
       await crearTareas(tareasIniciativa);
 
+      // Crear solicitudes
       console.log("solicitudesPorCrear:", solicitudesPorCrear);
-        if (!solicitudesPorCrear || solicitudesPorCrear.length === 0) {
-            console.log("No hay solicitudes por crear.");
-        } else {
-            for (const idSolicitud of solicitudesPorCrear) {
-                // Crear cada solicitud
-                const solicitud = new Solicitud(idSolicitud, idIniciativa, "Pendiente", "IniciativaAUsuario");
-                const response = await crearSolicitud(solicitud);
-
-                // Log para depuración
-                console.log("Solicitud creada:", solicitud);
-                console.log("Respuesta de creación de solicitud:", response);
-
-                const usuarioSolicitud = await getUsuario(idSolicitud);
-                console.log("Usuario solicitud:", usuarioSolicitud);
-
-                // Verifica si response.success existe y es verdadero
-                if (response && response.success) {
-                    if (!iniciativa.listaSolicitudes) {
-                        iniciativa.listaSolicitudes = [];
-                    }
-                    if (!usuarioSolicitud.listaSolicitudes) {
-                        usuarioSolicitud.listaSolicitudes = [];
-                    }
-                    iniciativa.listaSolicitudes.push(response.data);
-                    usuarioSolicitud.listaSolicitudes.push(response.data);
-                } else {
-                    console.error("Error al crear solicitud:", response);
-                }
-              }
-            }
+      if (!solicitudesPorCrear || solicitudesPorCrear.length === 0) {
+        console.log("No hay solicitudes por crear.");
+      }
+      else {
+        for (const idSolicitud of solicitudesPorCrear) {
+          // Crear cada solicitud
+          const solicitud = new Solicitud(idSolicitud, idIniciativa, "Pendiente", "IniciativaAUsuario");
+          const response = await crearSolicitud(solicitud);
+          console.log("Solicitud creada:", response.data);
+        }
+      }
 
       setIdIniciativaCreada(idIniciativa);
       handleMostrarCreada();
@@ -541,8 +518,6 @@ export const Create = () => {
       setCrearDesactivado(false);
     }
   };
-
-  // Descripcion
 
 
   return (
@@ -988,10 +963,17 @@ export const Create = () => {
                           <div className='user-info'>
                             <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
                           </div>
-                          <Button variant="primary" disabled={estadoBotones[usuario.idUsuario]?.invitarDesactivado} onClick={() => handleInvitarUsuario(usuario.idUsuario)} >
-                            Invitar</Button>
-                          <Button variant="primary" disabled={estadoBotones[usuario.idUsuario]?.cancelarDesactivado} onClick={() => handleCancelarUsuario(usuario.idUsuario)} >
-                            Cancelar</Button>
+                          
+                          {!estadoBotones[usuario.idUsuario].invitarDesactivado && (
+                            <Button variant="primary" onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
+                              Invitar
+                            </Button>
+                          )}
+                          {!estadoBotones[usuario.idUsuario].cancelarDesactivado && (
+                            <Button variant="primary" onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
+                              Cancelar
+                            </Button>
+                          )}
                         </li>
                       ))}
                     </ul>
