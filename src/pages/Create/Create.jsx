@@ -93,23 +93,26 @@ export const Create = () => {
     setTareas(tareasNuevo);
   };
 
-  const textareaRefs2 = useRef([]);
+  const textareaRefs2 = useRef([null]);
 
   const autoResizeTextarea2 = (idTarea) => {
     const textarea = textareaRefs2.current[idTarea];
     if (textarea) {
-      textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
 
   useEffect(() => {
     tareas.forEach((tarea, idTarea) => {
-      if (tarea.editandoDesc && textareaRefs2.current[idTarea]) {
-        const length = textareaRefs2.current[idTarea].value.length;
-        textareaRefs2.current[idTarea].setSelectionRange(length, length);
-        textareaRefs2.current[idTarea].focus();
+      if (tarea.editandoDesc) {
         autoResizeTextarea2(idTarea);
+
+        if (tarea.editandoDesc && textareaRefs2.current[idTarea]) {
+          const length = textareaRefs2.current[idTarea].value.length;
+          textareaRefs2.current[idTarea].setSelectionRange(length, length);
+          textareaRefs2.current[idTarea].focus();
+        }
+
       }
     });
   }, [tareas]);
@@ -721,7 +724,7 @@ export const Create = () => {
                             </button>
                           </div>
                         ) : (
-                          <div className="c-desc-texto-2" style={{paddingBottom: '32.7px', paddingLeft: '2px'}}>
+                          <div className="c-desc-texto-2" style={{paddingBottom: '9.2px', paddingLeft: '2px'}}>
                             <div style={tarea.descripcion ? {marginTop: '2px'} : {marginTop: '2px', color: '#677D7C'}}>
                               {tarea.descripcion ? tarea.descripcion : "Agrega tu descripción aquí..."}
                             </div>
