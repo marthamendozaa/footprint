@@ -14,6 +14,9 @@ export const Login = () => {
   const [showModal, setShowModal] = useState(false);
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [changingEmail, setChangingEmail] = useState(true);
+  const [attempts, setAttempts] = useState(0);
+  const [attemptsExceeded, setAttemptsExceeded] = useState(false);
+  const maxAttempts = 4;
 
   // Fondo de color
   useEffect(() => {
@@ -43,6 +46,17 @@ export const Login = () => {
 
   const handleLogin = async (event) => {
     event.preventDefault();
+    
+    // Límite de intentos de inicio de sesión
+    setAttempts(prevAttempts => { return prevAttempts + 1; });
+
+    if (attempts >= maxAttempts) {
+      setAttemptsExceeded(true);
+      setError('Has excedido el número de intentos de inicio de sesión.<br>Por favor, intenta más tarde.');
+      setShowModal(true);
+      return;
+    }
+
     setLoginBloqueado(true);
     
     try {
@@ -101,7 +115,7 @@ export const Login = () => {
                 <div className="custom-alert bg-custom-color">
                   <FaExclamationCircle className='custom-alert-icon'/>
                   <span>Formato de correo inválido</span>
-                </div>        
+                </div>
                 )}
 
               </div>
@@ -140,7 +154,7 @@ export const Login = () => {
 
               {/* Botón de iniciar sesión */}
               <div className='iniciar-sesion-container'>
-                  <button type="submit" className="btn login-btn" disabled={loginBloqueado || !email || !password || invalidEmail}>
+                  <button type="submit" className="btn login-btn" disabled={loginBloqueado || !email || !password || invalidEmail || attemptsExceeded}>
                     {loginBloqueado ? <ClipLoader size={24} color="#fff" /> : 'Iniciar Sesión'}
                   </button>
               </div>
@@ -169,7 +183,7 @@ export const Login = () => {
         <div className='pop-up'>
           <div className='pop-up-3'>
             <h2 style={{textAlign: 'center'}}>Error</h2>
-            <p style={{textAlign: 'left', marginTop: '20px'}}>{error}</p>
+            <p style={{textAlign: 'center', marginTop: '20px'}} dangerouslySetInnerHTML={{ __html: error }}></p>
             <button onClick={() => setShowModal(false)}>Cerrar</button>
           </div>
         </div>

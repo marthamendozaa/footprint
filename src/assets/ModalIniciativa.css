@@ -66,6 +66,12 @@
   font-weight: bold;
 }
 
+.modalfechalimite {
+  display: flex;
+  align-items: center;
+  color: red;
+}
+
 .modalregion {
   display: flex;
   align-items: center;
