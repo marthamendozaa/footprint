@@ -56,7 +56,7 @@ button.i-fa-pen:disabled {
   width: 255px;
   margin: 15px;
   margin-bottom: 0px;
-  background-color: #699AA0;
+  /*background-color: #699AA0;*/
   border-radius: 50%;
   float: left;
   object-fit: cover;
@@ -646,7 +646,6 @@ input.i-tarea-titulo {
 }
 
 .i-modal-doc .modal-content {
-
   display: flex;
   align-items: center;
   border-radius: 20px;
@@ -788,15 +787,6 @@ input.i-tarea-titulo {
 }
 
 /* Agregar usuario modal */
-.i-modal-lista-usuarios {
-  max-height: 500px;
-  overflow: overlay;
-}
-
-.i-modal-lista-usuarios::-webkit-scrollbar {
-  display: none;
-}
-
 .i-invitar-usuarios {
   display: flex;
   flex-direction: row;
@@ -829,7 +819,7 @@ input.i-tarea-titulo {
 
 .i-invitar-usuarios-boton {
   width: 120px;
-  height: 70%;
+  height: 42px;
   border-radius: 30px;
   background-color: #A0C1BF;
   border: none;
@@ -860,9 +850,91 @@ input.i-tarea-titulo {
   flex-direction: column;
 }
 
-.linea {
-  width: 100%;
-  height: 2px;
-  background-color: #000;
-  margin: 20px 0;
+/* Agregar usuario modal */
+.i-nav {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.i-nav button {
+  background-color: transparent;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.i-nav button.paginaActual {
+  text-decoration: underline;
+  text-decoration-color: #000;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 10px;
+}
+
+.i-error-modal {
+  font-size: 18px;
+  font-weight: 600;
+  color: #7d7d7d;
+}
+
+.i-columna-pe {
+  display: flex;
+  flex-direction: column;
+}
+
+.i-etiquetas-2 {
+  display: flex;
+  list-style-type: none;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.i-etiquetas-2 li {
+  display: inline-block;
+  background-color: #f2f2f2;
+  padding: 0px 15px;
+  border-radius: 30px;
+  margin: 5px;
+}
+
+li.i-etiqueta-item-2 {
+  font-size: 12px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 30px;
+}
+
+.i-invitar-usuarios-boton-2 {
+  font-size: 25px;
+  background-color: transparent;
+  border: none;
+  color: #000;
+}
+
+.i-invitar-usuarios-boton-2:active,
+.i-invitar-usuarios-boton-2:focus-visible,
+.i-invitar-usuarios-boton-2:hover {
+  background-color: transparent !important;
+  color: #000 !important;
+  border: none !important;
+  box-shadow: 0px;
+}
+
+.i-invitar-usuarios-boton-2:disabled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: transparent;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.i-modal-lista-usuarios {
+  min-width: 585px;
+  max-width: 585px;
+  min-height: 500px;
+  max-height: 500px;
+  overflow: overlay;
+}
+
+.i-modal-lista-usuarios::-webkit-scrollbar {
+  display: none;
 }

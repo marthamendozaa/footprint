@@ -70,6 +70,7 @@
     border-color: #000000;
     border-style: solid;
     padding-left: 50px;
+    padding-right: 30px;
     background-color: #ffffff;
 }
 
@@ -163,6 +164,10 @@
     background-color: transparent;
     text-decoration: underline;
     border: none;
+}
+
+.cambiar-contrasena-container button.btn:hover {
+    color: #186279;
 }
 
 .iniciar-sesion-container {

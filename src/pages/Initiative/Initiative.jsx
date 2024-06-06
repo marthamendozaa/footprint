@@ -14,7 +14,6 @@ import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import './Initiative.css';
 import Tarea from '../../classes/Tarea.js';
-import { FiFilter } from 'react-icons/fi';
 
 export const Initiative = () => {
   const { idIniciativa } = useParams();
@@ -212,7 +211,6 @@ export const Initiative = () => {
     setUsuariosFiltrados(filtradas);
   };
   
-  // 
 
   const [filter, setFilter] = useState('');
   const buscarUsuarioAsignar = (event) => {
@@ -242,16 +240,6 @@ export const Initiative = () => {
   };
 
 
-  const [initialHeight, setInitialHeight] = useState(null);
-  const modalBodyRef = useRef(null);
-
-  useEffect(() => {
-    if (showInvitarModal && modalBodyRef.current && initialHeight === null) {
-      setInitialHeight(modalBodyRef.current.clientHeight);
-    }
-  }, [showInvitarModal]);
-
-  
   // Invitar usuarios
   const handleInvitarUsuario = async (idUsuario) => {
     let usuariosNuevo = {...usuariosFiltrados};
@@ -282,8 +270,13 @@ export const Initiative = () => {
     }
   };
 
+  
   // Cancelar invitación
-  const handleCancelarUsuario = async (idUsuario) => {
+  const [faTrashBloqueado, setFaTrashBloqueado] = useState(false);
+
+  const handleCancelarUsuario = async (index, idUsuario) => {
+    setFaTrashBloqueado(prevState => ({ ...prevState, [index]: true }));
+
     let usuariosNuevo = {...usuariosFiltrados};
 
     // Cancelar desde modal invitar miembros
@@ -292,23 +285,25 @@ export const Initiative = () => {
       usuariosNuevo[idUsuario].invitarCargando = true;
       setUsuariosFiltrados(usuariosNuevo);
     }
+
+    let solicitudesEnviadasNuevo = [...solicitudesEnviadas];
+    let usuariosEnviadosNuevo = [...usuariosEnviados];
     
     try {
+      // Actualizar lista de solicitudes enviadas
+      solicitudesEnviadasNuevo = solicitudesEnviadasNuevo.filter((enviada) => enviada.idUsuario !== idUsuario);
+      usuariosEnviadosNuevo = usuariosEnviadosNuevo.filter((enviado) => enviado.idUsuario !== idUsuario);
+
       // Eliminar solicitud
       const solicitud = await existeSolicitud(idUsuario, idIniciativa);
       await eliminarSolicitud(solicitud);
-
-      // Actualizar lista de solicitudes enviadas
-      let solicitudesEnviadasNuevo = [...solicitudesEnviadas];
-      solicitudesEnviadasNuevo = solicitudesEnviadasNuevo.filter((enviada) => enviada.idUsuario !== idUsuario);
-      setSolicitudesEnviadas(solicitudesEnviadasNuevo);
-
-      let usuariosEnviadosNuevo = [...usuariosEnviados];
-      usuariosEnviadosNuevo = usuariosEnviadosNuevo.filter((enviado) => enviado.idUsuario !== idUsuario);
-      setUsuariosEnviados(usuariosEnviadosNuevo);
     } catch (error) {
       console.error("Error al cancelar la solicitud");
     } finally {
+      setFaTrashBloqueado(prevState => ({ ...prevState, [index]: false }));
+      setSolicitudesEnviadas(solicitudesEnviadasNuevo);
+      setUsuariosEnviados(usuariosEnviadosNuevo);
+
       usuariosNuevo = {...usuariosFiltrados};
 
       if (usuariosNuevo[idUsuario]) {
@@ -318,27 +313,25 @@ export const Initiative = () => {
         // Eliminar solicitud desde el modal de solicitudes
         const usuario = usuariosEnviados.find((enviado) => enviado.idUsuario == idUsuario);
         usuariosNuevo[idUsuario] = {...usuario, invitarDesactivado: false, cancelarDesactivado: true};
-        console.log(usuariosNuevo[idUsuario]);
       }
       setUsuariosFiltrados(usuariosNuevo);
     }
   }
-  
+
+
   // Aceptar solicitudes de usuario
+  const [aceptarSolicitudD, setAceptarSolicitudD] = useState(false);
+
   const handleAceptarSolicitud = async (index, usuario) => {
+    setAceptarSolicitudD(prevState => ({ ...prevState, [index]: true }));
+
     let usuariosRecibidosNuevo = [...usuariosRecibidos];
-    usuariosRecibidosNuevo[index].aceptarDesactivado = true;
-    setUsuariosRecibidos(usuariosRecibidosNuevo);
+    let solicitudesRecibidasNuevo = [...solicitudesRecibidas];
 
     try {
       // Actualizar lista de solicitudes recibidas
-      let solicitudesRecibidasNuevo = solicitudesRecibidas;
       solicitudesRecibidasNuevo[index].estado = "Aceptada";
-      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
-      
-      usuariosRecibidosNuevo = [...usuariosRecibidos];
       usuariosRecibidosNuevo = usuariosRecibidosNuevo.filter((recibido) => recibido.idUsuario !== usuario.idUsuario);
-      setUsuariosRecibidos(usuariosRecibidosNuevo);
       
       // Actualizar estado de solicitud
       const solicitud = solicitudesRecibidasNuevo[index];
@@ -352,31 +345,37 @@ export const Initiative = () => {
       setTotalMiembros([...miembros, usuario]);
     } catch (error) {
       console.error("Error al aceptar la solicitud");
+    } finally {
+      setAceptarSolicitudD(prevState => ({ ...prevState, [index]: false }));
+      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+      setUsuariosRecibidos(usuariosRecibidosNuevo);
     }
   };
 
 
   // Rechazar solicitudes de usuario
+  const [rechazarSolicitudD, setRechazarSolicitudD] = useState(false);
+  
   const handleRechazarSolicitud = async (index, usuario) => {
+    setRechazarSolicitudD(prevState => ({ ...prevState, [index]: true }))
+
     let usuariosRecibidosNuevo = [...usuariosRecibidos];
-    usuariosRecibidosNuevo[index].rechazarDesactivado = true;
-    setUsuariosRecibidos(usuariosRecibidosNuevo);
+    let solicitudesRecibidasNuevo = [...solicitudesRecibidas];
 
     try {
       // Actualizar lista de solicitudes recibidas
-      let solicitudesRecibidasNuevo = solicitudesRecibidas;
       solicitudesRecibidasNuevo[index].estado = "Rechazada";
-      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
-      
-      usuariosRecibidosNuevo = [...usuariosRecibidos];
       usuariosRecibidosNuevo = usuariosRecibidosNuevo.filter((recibido) => recibido.idUsuario !== usuario.idUsuario);
-      setUsuariosRecibidos(usuariosRecibidosNuevo);
       
       // Actualizar estado de solicitud
       const solicitud = solicitudesRecibidasNuevo[index];
       await actualizaSolicitud(solicitud);
     } catch (error) {
       console.error("Error al rechazar la solicitud");
+    } finally {
+      setRechazarSolicitudD(prevState => ({ ...prevState, [index]: false }));
+      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+      setUsuariosRecibidos(usuariosRecibidosNuevo);
     }
   };
   
@@ -1252,21 +1251,22 @@ export const Initiative = () => {
 
       {/* ----- Ver solicitudes ----- */}
       <Modal show={showSolicitudesModal} onHide={() => setShowSolicitudesModal(false)} centered className='e-modal'>
-        <div className="modalcontainer">
+        <div className="modalcontainer, i-modal-lista-usuarios">
+          {/* X */}
           <Modal.Header closeButton style={{ border: "none" }}> </Modal.Header>
 
           {/* Determinar en que página esta */}
-          <div className="modal-nav">
+          <div className='i-nav'>
             {iniciativa && !iniciativa.esPublica &&
               <button 
-                className={paginaActual === 'solicitudes' ? 'active' : ''} 
+                className={paginaActual === 'solicitudes' ? 'paginaActual' : ''} 
                 onClick={() => setPaginaActual('solicitudes')}
               >
                 Solicitudes recibidas
               </button>
             }
             <button 
-              className={paginaActual === 'miembros' ? 'active' : ''} 
+              className={paginaActual === 'miembros' ? 'paginaActual' : ''} 
               onClick={() => setPaginaActual('miembros')}
             >
               Solicitudes enviadas
@@ -1274,97 +1274,128 @@ export const Initiative = () => {
           </div>
 
           {/* Contenido */}
-          <div className="modal-content">
+          <Modal.Body style={{paddingTop: '20px'}}>
             {/* Solicitudes */}
             {paginaActual === 'solicitudes' ? (
               !usuariosRecibidos || usuariosRecibidos.length == 0 ? (
-                <div className="m-error">
+                <div className="i-error-modal">
                   {/* Ninguna solicitud */}
                   Esta iniciativa no ha recibido solicitudes.
                 </div>
               ) : (
-                <div className="m-iniciativas-container">
+                <div>
                   {/* Lista de solicitudes */}
                   {usuariosRecibidos.map((usuario, index) => (
-                    <div key={index} className='e-iniciativa'>
-                      {/* Usuario */}
-                      <div className="e-desc">{usuario.nombreUsuario}</div>
+                    <React.Fragment key={index}>
+                      <div className='i-invitar-usuarios'>
+                        <div className='i-columna-pe'>
+                          <div className='i-informacion-usuarios'>
+                            {/* Imagen */}
+                            <img src={usuario.urlImagen} alt={usuario.nombreUsuario} />
 
-                      {/* Imagen */}
-                      <div className='e-iniciativa-imagen'>
-                        <img src={usuario.urlImagen} alt={usuario.nombreUsuario} />
-                      </div>
+                            {/* Usuario */}
+                            <div className='i-informacion-usuario'>
+                              <div style={{fontWeight: '600'}}>
+                                {usuario.nombreUsuario}
+                              </div>
 
-                      {/* Info extra */}
-                      <div className='e-iniciativa-texto'>
-                        {/* Nombre */}
-                        <div className="e-titulo">{usuario.nombre}</div>
-                        
-                        {/* Etiquetas */}
-                        <div className="i-etiquetas">
-                          {Object.values(usuario.listaHabilidades).map((habilidad, idHabilidad) => (
-                            <li key={idHabilidad} className={`i-etiqueta-item`}>
-                              {habilidad}
-                            </li>
-                          ))}
+                              <div>
+                                {usuario.nombre}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Etiquetas */}
+                          <div className="i-etiquetas-2">
+                              {Object.values(usuario.listaHabilidades).map((habilidad, idHabilidad) => (
+                                <li key={idHabilidad} className={`i-etiqueta-item-2`}>
+                                  {habilidad}
+                                </li>
+                              ))}
+                          </div>
                         </div>
 
-                        {/* Aceptar / rechazar */}
-                        <div className="i-botones-solicitud">
-                          <button className="i-btn-solicitud"
+                        {/* Botones */}
+                        <div className="i-btn-container">
+                          {/* Aceptar */}
+                          <button 
+                            className="i-invitar-usuarios-boton"
                             onClick={() => handleAceptarSolicitud(index, usuario)}
-                            disabled={usuariosRecibidos[index].aceptarDesactivado}
+                            disabled={aceptarSolicitudD[index]}
                           >
-                            {usuariosRecibidos[index].aceptarDesactivado ? <ClipLoader size={20} color="#000" /> : 'Aceptar'}
+                            {aceptarSolicitudD[index] ? <ClipLoader size={20} color="#000" /> : 'Aceptar'}
                           </button>
-                          <button className="i-btn-solicitud"
+                          
+                          {/* Rechazar */}
+                          <button 
+                            className="i-invitar-usuarios-boton"
+                            style={{marginLeft: '10px'}}
                             onClick={() => handleRechazarSolicitud(index, usuario)}
-                            disabled={usuariosRecibidos[index].rechazarDesactivado}
+                            disabled={rechazarSolicitudD[index]}
                           >
-                            {usuariosRecibidos[index].rechazarDesactivado ? <ClipLoader size={20} color="#000" /> : 'Rechazar'}
+                            {rechazarSolicitudD[index]? <ClipLoader size={20} color="#000" /> : 'Rechazar'}
                           </button>
                         </div>
                       </div>
 
-                    </div>
+                      {/* Línea entre elementos */}
+                      {index < Object.values(usuariosRecibidos).length - 1 && <hr/>}
+                    </React.Fragment>
                   ))}
                 </div>
               )
             ) : (
-              <div className="m-iniciativas-container">
-                {/* Contenido de miembros */}
+              !usuariosEnviados || usuariosEnviados.length === 0 ? (
+                <div className="i-error-modal">
+                  {/* Ninguna solicitud enviada */}
+                  Esta iniciativa no ha enviado solicitudes.
+                </div>
+              ) : (
                 <div>
-                {usuariosEnviados.map((usuario, index) => (
-                  <div key={index} className='rq-iniciativa'>
-                    {/* Imagen y título */}
-                    <div className='rq-iniciativa-imagen'>
-                        <img src={usuario.urlImagen} alt = {usuario.nombreUsuario} />
-                    </div>
+                  {/* Contenido de miembros */}
+                  <div>
+                  {usuariosEnviados.map((usuario, index) => (
+                    <React.Fragment key={index}>
+                      <div className='i-invitar-usuarios'>
+                        {/* Información usuario */}
+                        <div className='i-informacion-usuarios'>
+                          <img src = {usuario.urlImagen}/>
 
-                    <div className='rq-iniciativa-texto'>
-                      <div className="rq-titulo">{usuario.nombreUsuario}</div>
-                      
-                      {/* Estado */}
-                      <div className='rq-estado'>
-                        <div>
-                          {solicitudesEnviadas[index].estado}
-                          {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
-                          {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
-                          {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
+                          <div className='i-informacion-usuario'>
+                            <div style={{fontWeight: '600'}}>
+                              {usuario.nombreUsuario}
+                            </div>
+
+                            <div>
+                              {solicitudesEnviadas[index].estado}
+                              {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
+                              {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
+                              {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Basura */}
+                        <div className='i-btn-container' onClick={(e) => e.stopPropagation()}>
+                          <button 
+                            className='i-invitar-usuarios-boton-2' 
+                            onClick={() => handleCancelarUsuario(index, solicitudesEnviadas[index].idUsuario)} 
+                            disabled={faTrashBloqueado[index]}
+                          >
+                            {faTrashBloqueado[index] ? <ClipLoader size={20} color="#000" /> : <FaTrash/>}
+                          </button>
                         </div>
                       </div>
 
-                      {/* Basura */}
-                      <div className='fa-4' onClick={(e) => e.stopPropagation()}>
-                        <button className='fa-5-button'> <FaTrash onClick={() => handleCancelarUsuario(solicitudesEnviadas[index].idUsuario)} disabled={eliminaBloqueado}/> </button>
-                      </div>
-                    </div>
-                  </div>    
-                ))}
+                      {/* Línea entre elementos */}
+                      {index < Object.values(usuariosEnviados).length - 1 && <hr/>}
+                    </React.Fragment>    
+                  ))}
+                  </div>
                 </div>
-              </div>
+              )
             )}
-          </div>
+          </Modal.Body>
         </div>
       </Modal>
 
@@ -1572,10 +1603,7 @@ export const Initiative = () => {
           </Modal.Header>
 
           {/* Cuerpo */}
-          <Modal.Body 
-            style={{paddingTop: '0px', height: initialHeight ? `${initialHeight}px` : 'auto'}}
-            ref={modalBodyRef}
-          >
+          <Modal.Body style={{paddingTop: '0px'}}>
             {/* Searchbar */}
             <div className='e-searchBar' style={{marginBottom: '20px'}}>
               <FaSearch className="e-icons"/>
@@ -1635,7 +1663,7 @@ export const Initiative = () => {
                         {/* Boton cancelar */}
                         {!usuariosFiltrados[usuario.idUsuario].cancelarDesactivado && (
                           <div className='i-btn-container'>
-                            <Button className='i-invitar-usuarios-boton' onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
+                            <Button className='i-invitar-usuarios-boton' onClick={() => handleCancelarUsuario(id, usuario.idUsuario)}>
                               Cancelar
                             </Button>
                           </div>
@@ -1643,7 +1671,7 @@ export const Initiative = () => {
                       </div>
 
                       {/* Línea entre elementos */}
-                      {id < Object.values(usuariosFiltrados).length - 1 && <hr className='i-divider' />}
+                      {id < Object.values(usuariosFiltrados).length - 1 && <hr/>}
                     </React.Fragment>
                   ))}
                 </>
