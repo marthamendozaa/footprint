@@ -744,15 +744,6 @@ input.i-tarea-titulo {
 }
 
 /* Agregar usuario modal */
-.i-modal-lista-usuarios {
-  max-height: 500px;
-  overflow: overlay;
-}
-
-.i-modal-lista-usuarios::-webkit-scrollbar {
-  display: none;
-}
-
 .i-invitar-usuarios {
   display: flex;
   flex-direction: row;
@@ -893,7 +884,7 @@ li.i-etiqueta-item-2 {
   pointer-events: none;
 }
 
-.i-modal-lista-usuarios-2 {
+.i-modal-lista-usuarios {
   min-width: 585px;
   max-width: 585px;
   min-height: 500px;
@@ -901,6 +892,6 @@ li.i-etiqueta-item-2 {
   overflow: overlay;
 }
 
-.i-modal-lista-usuarios-2::-webkit-scrollbar {
+.i-modal-lista-usuarios::-webkit-scrollbar {
   display: none;
 }

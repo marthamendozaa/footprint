@@ -206,17 +206,7 @@ export const Initiative = () => {
     setUsuariosFiltrados(filtradas);
   };
   
-  // Height modal invitar usuarios
-  const [initialHeight, setInitialHeight] = useState(null);
-  const modalBodyRef = useRef(null);
 
-  useEffect(() => {
-    if (showInvitarModal && modalBodyRef.current && initialHeight === null) {
-      setInitialHeight(modalBodyRef.current.clientHeight);
-    }
-  }, [showInvitarModal]);
-
-  
   // Invitar usuarios
   const handleInvitarUsuario = async (idUsuario) => {
     let usuariosNuevo = {...usuariosFiltrados};
@@ -1111,7 +1101,7 @@ export const Initiative = () => {
 
       {/* ----- Ver solicitudes ----- */}
       <Modal show={showSolicitudesModal} onHide={() => setShowSolicitudesModal(false)} centered className='e-modal'>
-        <div className="modalcontainer, i-modal-lista-usuarios-2">
+        <div className="modalcontainer, i-modal-lista-usuarios">
           {/* X */}
           <Modal.Header closeButton style={{ border: "none" }}> </Modal.Header>
 
@@ -1388,17 +1378,14 @@ export const Initiative = () => {
 
       {/* Modal para invitar usuarios */}
       <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
-        <div className="modalcontainer, i-modal-lista-usuarios-2">
+        <div className="modalcontainer, i-modal-lista-usuarios">
           {/* Titulo + X */}
           <Modal.Header closeButton style={{border: 'none'}}>
             <Modal.Title>Invitar usuarios</Modal.Title>
           </Modal.Header>
 
           {/* Cuerpo */}
-          <Modal.Body 
-            style={{paddingTop: '0px', height: initialHeight ? `${initialHeight}px` : 'auto'}}
-            ref={modalBodyRef}
-          >
+          <Modal.Body style={{paddingTop: '0px'}}>
             {/* Searchbar */}
             <div className='e-searchBar' style={{marginBottom: '20px'}}>
               <FaSearch className="e-icons"/>

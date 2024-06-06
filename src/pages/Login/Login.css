@@ -166,6 +166,10 @@
     border: none;
 }
 
+.cambiar-contrasena-container button.btn:hover {
+    color: #186279;
+}
+
 .iniciar-sesion-container {
     display: flex;
     justify-content: center;
