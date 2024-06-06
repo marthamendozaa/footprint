@@ -149,7 +149,7 @@ export const Explore = () => {
       // No incluir iniciativas si la fecha de cierre ya pasó
       const fechaActual = new Date();
       let iniciativasNuevo = iniciativasData.filter(iniciativa => {
-        if (iniciativa.fechaCierre) {
+        if (iniciativa.fechaCierre && !admin) {
           const [day, month, year] = iniciativa.fechaCierre.split('/');
           const fechaCierre = new Date(year, month - 1, day);
           return fechaCierre >= fechaActual;
