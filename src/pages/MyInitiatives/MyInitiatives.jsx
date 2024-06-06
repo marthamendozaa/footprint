@@ -60,16 +60,28 @@ export const MyInitiatives = () => {
     fetchData();
   }, []);
 
+  const [animations, setAnimations] = useState({});
+
   // Eliminar iniciativa de lista de favoritos
   const eliminaFavorita = async (idIniciativa) => {
-    const iniciativasFavoritasNuevo = iniciativasFavoritas.filter(iniciativa => iniciativa.idIniciativa !== idIniciativa);
-    setIniciativasFavoritas(iniciativasFavoritasNuevo);
+    let iniciativasFavoritasNuevo = [...iniciativasFavoritas];
+    let usuarioNuevo = {...usuario};
 
-    const listaIniciativasFavoritas = iniciativasFavoritasNuevo.map(iniciativa => iniciativa.idIniciativa);
-    const usuarioNuevo = {...usuario};
-    usuarioNuevo.listaIniciativasFavoritas = listaIniciativasFavoritas;
+    setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
+    setTimeout(() => {
+      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
+
+      // Actualizar lista de iniciativas favoritas
+      iniciativasFavoritasNuevo = iniciativasFavoritasNuevo.filter(iniciativa => iniciativa.idIniciativa !== idIniciativa);
+      setIniciativasFavoritas(iniciativasFavoritasNuevo);
+
+      // Actualizar información del usuario
+      iniciativasFavoritasNuevo = iniciativasFavoritasNuevo.map(iniciativa => iniciativa.idIniciativa);
+      usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
+      setUsuario(usuarioNuevo);
+    }, 600);
+
     await actualizaUsuario(usuarioNuevo);
-    setUsuario(usuarioNuevo);
   };
 
   // Modal para mostrar información de la iniciativa
@@ -270,7 +282,10 @@ export const MyInitiatives = () => {
 
                         {/* Corazon */}
                         <div className='m-corazon'>
-                          <FaHeart onClick={(e) => { e.stopPropagation(); eliminaFavorita(iniciativa.idIniciativa); }} style={{ cursor: "pointer" }} />
+                          <FaHeart
+                            onClick={(e) => { e.stopPropagation(); eliminaFavorita(iniciativa.idIniciativa); }}
+                            className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
+                          />
                         </div>
                       </div>
                     ) : (
@@ -293,7 +308,10 @@ export const MyInitiatives = () => {
 
                         {/* Corazon */}
                         <div className='m-corazon'>
-                          <FaHeart onClick={(e) => { e.stopPropagation(); eliminaFavorita(iniciativa.idIniciativa); }} style={{ cursor: "pointer" }} />
+                          <FaHeart
+                            onClick={(e) => { e.stopPropagation(); eliminaFavorita(iniciativa.idIniciativa); }}
+                            className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
+                          />
                         </div>
                       </div>
                     )
