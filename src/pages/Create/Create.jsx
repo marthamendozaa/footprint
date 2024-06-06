@@ -433,6 +433,15 @@ export const Create = () => {
     setUsuariosFiltrados(filtradas);
   };
 
+  const [initialHeight, setInitialHeight] = useState(null);
+  const modalBodyRef = useRef(null);
+
+  useEffect(() => {
+    if (showInvitarModal && modalBodyRef.current && initialHeight === null) {
+      setInitialHeight(modalBodyRef.current.clientHeight);
+    }
+  }, [showInvitarModal]);
+
   const handleInvitarUsuario = (usuario) => {
     const nuevoSolicitudes = [...solicitudesPorCrear, usuario];
     setSolicitudesPorCrear(nuevoSolicitudes);
@@ -1038,56 +1047,88 @@ export const Create = () => {
             </Modal.Footer>
           </Modal>
 
-          {/*Modal para inivtar usuarios*/}
+          {/*Modal para invitar usuarios*/}
           <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
-            <div className="modalcontainer">
-              <Modal.Header closeButton>
-                <Modal.Title>Invitar Usuarios</Modal.Title>
+            <div className="modalcontainer, i-modal-lista-usuarios">
+              {/* Titulo + X */}
+              <Modal.Header closeButton style={{border: 'none'}}>
+                <Modal.Title>Invitar usuarios</Modal.Title>
               </Modal.Header>
-                <Modal.Body>
-                  <div className='e-searchBar'>
-                    <FaSearch className="e-icons"/>
-                    <input
-                      type='search'
-                      placeholder='Buscar usuarios...'
-                      value={filtro}
-                      onChange={buscarUsuario}
-                      className='e-searchBarCaja'
-                    />
-                  </div>
-                  {usuariosFiltrados ? (
-                    (usuariosFiltrados.length == 0 || Object.keys(estadoBotones).length == 0) ? (
-                      <div className="m-error">
-                        No se encontraron usuarios.
-                      </div>
-                    ) : (
-                      <ul>
-                        {usuariosFiltrados.map((usuario, index) => (
-                          <li key={index} className='user-item'>
-                            <div className='user-info'>
-                              <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
-                            </div>
-                            
-                            {!estadoBotones[usuario.idUsuario].invitarDesactivado && (
-                              <Button variant="primary" onClick={() => handleInvitarUsuario(usuario)}>
-                                Invitar
-                              </Button>
-                            )}
-                            {!estadoBotones[usuario.idUsuario].cancelarDesactivado && (
-                              <Button variant="primary" onClick={() => handleCancelarUsuario(usuario)}>
-                                Cancelar
-                              </Button>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    )
-                  ) : (
-                    <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
-                      <Spinner animation="border" role="status"></Spinner>
+
+              {/* Cuerpo */}
+              <Modal.Body 
+                style={{paddingTop: '0px', height: initialHeight ? `${initialHeight}px` : 'auto'}}
+                ref={modalBodyRef}
+              >
+                {/* Searchbar */}
+                <div className='e-searchBar' style={{marginBottom: '20px'}}>
+                  <FaSearch className="e-icons"/>
+                  <input
+                    type='search'
+                    placeholder='Buscar usuarios...'
+                    value={filtro}
+                    onChange={buscarUsuario}
+                    className='e-searchBarCaja'
+                  />
+                </div>
+
+                {/* Lista usuarios */}
+                {usuariosFiltrados ? (
+                  (usuariosFiltrados.length == 0 || Object.keys(estadoBotones).length == 0) ? (
+                    <div className="m-error">
+                      No se encontraron usuarios.
                     </div>
-                  )}
-                </Modal.Body>  
+                  ) : (
+                    <>
+                      {Object.values(usuariosFiltrados).map((usuario, id) => (
+                        <React.Fragment key={id}>
+                          <div className='i-invitar-usuarios'>
+                            {/* Información usuario */}
+                            <div className='i-informacion-usuarios'>
+                              <img src = {usuario.urlImagen}/>
+
+                              <div className='i-informacion-usuario'>
+                                <div style={{fontWeight: '600'}}>
+                                  {usuario.nombreUsuario}
+                                </div>
+
+                                <div>
+                                  {usuario.nombre}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Boton invitar */}
+                            {!estadoBotones[usuario.idUsuario].invitarDesactivado && (
+                              <div className='i-btn-container'>
+                                <Button className='i-invitar-usuarios-boton' onClick={() => handleInvitarUsuario(usuario)}>
+                                  Invitar
+                                </Button>
+                              </div>
+                            )}
+
+                            {/* Boton cancelar */}
+                            {!estadoBotones[usuario.idUsuario].cancelarDesactivado && (
+                              <div className='i-btn-container'>
+                                <Button className='i-invitar-usuarios-boton' onClick={() => handleCancelarUsuario(usuario)}>
+                                  Cancelar
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Línea entre elementos */}
+                          {id < Object.values(usuariosFiltrados).length - 1 && <hr className='i-divider' />}
+                        </React.Fragment>
+                      ))}
+                    </>
+                  )
+                ) : (
+                  <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
+                    <Spinner animation="border" role="status"></Spinner>
+                  </div>
+                )}
+              </Modal.Body>  
             </div>
           </Modal>
         </div>
