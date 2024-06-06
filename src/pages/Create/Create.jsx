@@ -1118,7 +1118,7 @@ export const Create = () => {
                           </div>
 
                           {/* Línea entre elementos */}
-                          {id < Object.values(usuariosFiltrados).length - 1 && <hr className='i-divider' />}
+                          {id < Object.values(usuariosFiltrados).length - 1 && <hr/>}
                         </React.Fragment>
                       ))}
                     </>

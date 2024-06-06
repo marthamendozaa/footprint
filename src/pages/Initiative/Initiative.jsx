@@ -14,6 +14,7 @@ import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import './Initiative.css';
 import Tarea from '../../classes/Tarea.js';
+import { FiFilter } from 'react-icons/fi';
 
 export const Initiative = () => {
   const { idIniciativa } = useParams();
@@ -44,6 +45,9 @@ export const Initiative = () => {
   const [miembros, setMiembros] = useState([]);
   const [usuarios, setUsuarios] = useState({});
   const [usuariosFiltrados, setUsuariosFiltrados] = useState({});
+  const [totalMiembros, setTotalMiembros] = useState(false);
+  const [usuariosTotal, setUsuariosTotales] = useState(false);
+  const [usuarioID, setUsuarioID] = useState(false);
 
   // Información de solicitudes
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
@@ -74,6 +78,7 @@ export const Initiative = () => {
         // Obtiene información del admin de la iniciativa
         const adminIniciativa = usuariosData[iniciativaData.idAdmin];
         const usuarioEsAdmin = usuariosData[user].idUsuario === iniciativaData.idAdmin;
+        setUsuarioID(usuariosData[user].idUsuario);
         setInfoAdmin(adminIniciativa);
         setEsAdmin(usuarioEsAdmin);
 
@@ -85,6 +90,8 @@ export const Initiative = () => {
           usuario.idUsuario != adminIniciativa.idUsuario && !usuario.esAdmin);
 
         setMiembros(usuariosMiembros);
+        setUsuariosTotales(usuariosMiembros);
+        setTotalMiembros(usuariosMiembros);
         
         if (usuarioEsAdmin) {
           // Solo usar la página de enviadas si la iniciativa es pública
@@ -175,7 +182,6 @@ export const Initiative = () => {
     );
   };
 
-
   // Búsqueda de usuarios para agregar miembros
   const [showInvitarModal, setShowInvitarModal] = useState(false); 
   const [filtro, setFiltro] = useState('');
@@ -206,6 +212,36 @@ export const Initiative = () => {
     setUsuariosFiltrados(filtradas);
   };
   
+  // 
+
+  const [filter, setFilter] = useState('');
+  const buscarUsuarioAsignar = (event) => {
+    const busqueda = event.target.value;
+    setFilter(busqueda);
+
+    // Si el término de búsqueda está vacío, mostrar todos los usuarios
+    if (!busqueda) {
+      setTotalMiembros(usuariosTotal);
+      return;
+    }
+
+    // Claves de búsqueda
+    const fuse2 = new Fuse(Object.values(miembros), {
+      keys: ['nombreUsuario', 'nombre'],
+      includeScore: true,
+      threshold: 0.4,
+    });
+
+    const resultado = fuse2.search(busqueda);
+    const filtradas = {};
+    resultado.forEach((item) => {
+      filtradas[item.item.idUsuario] = item.item;
+    });
+
+    setTotalMiembros(filtradas);
+  };
+
+
   const [initialHeight, setInitialHeight] = useState(null);
   const modalBodyRef = useRef(null);
 
@@ -313,6 +349,7 @@ export const Initiative = () => {
 
       // Actualizar lista de miembros
       setMiembros([...miembros, usuario]);
+      setTotalMiembros([...miembros, usuario]);
     } catch (error) {
       console.error("Error al aceptar la solicitud");
     }
@@ -708,19 +745,25 @@ export const Initiative = () => {
   const [editingTareaId, setEditingTareaId] = useState(null);
   const [nuevoTituloTarea, setNuevoTituloTarea] = useState("");
   const [nuevaDescripcionTarea, setNuevaDescripcionTarea] = useState("");
-
+  const [nuevoUsuarioAsignado, setNuevoUsuarioAsignado] = useState("");
 
   const startEditingTarea = (tarea) => {
     setEditingTareaId(tarea.idTarea);
     setNuevoTituloTarea(tarea.titulo);
     setNuevaDescripcionTarea(tarea.descripcion);
     setNuevaFechaTarea(tarea.fechaEntrega);
+    
   };
+
+  const updateUsuarioAsignado = (usuario) => {
+    setNuevoUsuarioAsignado(usuario.idUsuario);
+  }
+
 
   const saveTareaChanges = async (tarea, index) => {
     console.log('Editando tarea', tarea.idTarea);
     try {
-      const tareaNueva = { ...tarea, titulo: nuevoTituloTarea, descripcion: nuevaDescripcionTarea, fechaEntrega: nuevaFechaTarea }
+      const tareaNueva = { ...tarea, titulo: nuevoTituloTarea, descripcion: nuevaDescripcionTarea, fechaEntrega: nuevaFechaTarea, idAsignado: nuevoUsuarioAsignado}
       await actualizaTarea(tareaNueva);
 
       const updatedTareas = [...tareas];
@@ -732,6 +775,7 @@ export const Initiative = () => {
     } catch (error) {
       console.error("Error updating tarea:", error);
     }
+    
   };
 
   const cancelTareaEdit = () => {
@@ -898,7 +942,8 @@ export const Initiative = () => {
         {/* Descripción */}
         <div className="i-desc">
           <div className="i-progreso-texto">Progreso</div>
-          <ProgressBar progress={50} />
+
+          <ProgressBar progress={Math.round((tareas.filter(tarea => tarea.completada).length / tareas.length) * 100)} />
         </div>
 
         <div className="c-desc">
@@ -1072,8 +1117,40 @@ export const Initiative = () => {
 
               ) : (
 
-                <div className="m-error">
-                  AQUI VA CUANDO ERES USER SS
+                <div className='i-tareas-container'>
+
+                  {(tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada)) ? (
+
+                    <div>
+                    {tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada).map((tarea, index) => (
+                      <div className="i-tareas-container-2" key={tarea.idTarea}>
+                        <div className="i-tarea">
+
+                          <div className="i-tarea-info">
+                            <div className="i-tarea-titulo">{tarea.titulo}</div>
+                            <div className="i-tarea-desc">
+                              <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
+                                {tarea.descripcion}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="i-tarea-botones">
+                            <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                            <div className="i-tarea-boton" style={{marginTop: '5px', cursor:'pointer'}} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    </div>
+
+                  ) : (
+
+                    <div className="m-error">
+                    No hay tareas asignadas.
+                    </div>
+
+                  )}
+
                 </div>
 
               )}
@@ -1111,7 +1188,7 @@ export const Initiative = () => {
                   </div>  
                 ) : (
                   <div className="m-error">
-                  No hay tareas asignadas.
+                  No hay tareas completadas.
                   </div>
               )}
 
@@ -1352,9 +1429,9 @@ export const Initiative = () => {
       </Modal>
 
       {/* Asignar tarea a usuario */}
-      <Modal className="c-modal" show={showAsignarModal} onHide={closeUploadModal}>
+      <Modal className="modalcontainer, i-modal-lista-usuarios" show={showAsignarModal} onHide={closeUploadModal}>
         <Modal.Header>
-          <div className="c-modal-title">Asignar a usuario</div>
+          <Modal.Title>Asignar a usuario</Modal.Title>
         </Modal.Header>
         
         <div className="c-input-body">
@@ -1363,28 +1440,50 @@ export const Initiative = () => {
             <input
               type='search'
               placeholder='Buscar usuarios...'
-              value={filtro}
-              onChange={buscarUsuario}
+              value={filter}
+              onChange={buscarUsuarioAsignar}
               className='e-searchBarCaja'
             />
           </div>
         </div>
 
-        {usuariosFiltrados ? (
-          (Object.values(miembros).length == 0) ? (
+        {totalMiembros ? (
+          (Object.values(totalMiembros).length == 0) ? (
             <div className="m-error">
               No se encontraron usuarios.
             </div>
           ) : (
-            <ul>
-              {Object.values(miembros).map((usuario, id) => (
-                <li key={id} className='user-item'>
-                  <div className='user-info'>
-                    <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
+            <>
+              {Object.values(totalMiembros).map((usuario, index) => (
+                <React.Fragment key={usuario.idUsuario}>
+                  <div className='i-invitar-usuarios'>
+                    {/* Información usuario */}
+                    <div className='i-informacion-usuarios'>
+                      <img src = {usuario.urlImagen}/>
+
+                      <div className='i-informacion-usuario'>
+                        <div style={{fontWeight: '600'}}>
+                          {usuario.nombreUsuario}
+                        </div>
+                        <div>
+                          {usuario.nombre}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Boton invitar */}
+                      <div className='i-btn-container'>
+                        <Button className='i-invitar-usuarios-boton' onClick={() => updateUsuarioAsignado(usuario)}>
+                          Asignar
+                        </Button>
+                      </div>
+
                   </div>
-                </li>
+
+                  {usuario.idUsuario < Object.values(totalMiembros).length - 1 && <hr className='i-divider' />}
+                </React.Fragment>
               ))}
-            </ul>
+            </>
           )
         ) : (
           <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
