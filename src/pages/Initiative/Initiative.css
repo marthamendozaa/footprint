@@ -665,3 +665,83 @@ input.i-tarea-titulo {
 .i-modal-doc .btn.btn-primary a {
   color: #000;
 }
+
+/* Agregar usuario modal */
+.i-modal-lista-usuarios {
+  max-height: 500px;
+  overflow: overlay;
+}
+
+.i-modal-lista-usuarios::-webkit-scrollbar {
+  display: none;
+}
+
+.i-invitar-usuarios {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.i-informacion-usuarios {
+  display: flex;
+  flex-direction: row;
+}
+
+.i-informacion-usuarios img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.i-informacion-usuario {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.i-btn-container {
+  display: flex;
+  align-items: center;
+}
+
+.i-invitar-usuarios-boton {
+  width: 120px;
+  height: 70%;
+  border-radius: 30px;
+  background-color: #A0C1BF;
+  border: none;
+  color: #000;
+  font-weight: 600;
+}
+
+.i-invitar-usuarios-boton:active,
+.i-invitar-usuarios-boton:focus-visible,
+.i-invitar-usuarios-boton:hover {
+  background-color: #699AA0 !important;
+  color: #000 !important;
+  border: none !important;
+  box-shadow: 0px;
+}
+
+.i-invitar-usuarios-boton:disabled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #A0C1BF;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.i-linea-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.linea {
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+  margin: 20px 0;
+}
