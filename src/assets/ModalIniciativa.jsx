@@ -3,10 +3,10 @@ import Modal from 'react-bootstrap/Modal';
 import { ClipLoader } from 'react-spinners';
 import { Link } from 'react-router-dom';
 import './ModalIniciativa.css';
-import { FaCalendar, FaGlobe, FaUnlockAlt, FaLock } from "react-icons/fa";
+import { FaCalendar, FaGlobe, FaUnlockAlt, FaLock, FaExclamationCircle } from "react-icons/fa";
 
 
-const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCrearSolicitud, handleSuscribirse, esAdmin, esMiembro, suscribirDesactivado, setSuscribirDesactivado, suscribirCargando, pagina }) => {
+const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCrearSolicitud, handleSuscribirse, esAdmin, esMiembro, fechaLimite, suscribirDesactivado, setSuscribirDesactivado, suscribirCargando, pagina }) => {
     return (
         <Modal show={showModal} onHide={() => {setShowModal(false); setSuscribirDesactivado(false);}} centered className='e-modal'>
             <div className="modalcontainer">
@@ -30,11 +30,31 @@ const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCre
                                         </li>
                                     ))}
                                 </div>
+                                
+                                {/* Fechas */}
+                                <div className='modalfecha'> <FaCalendar style={{marginRight: '5px'}} />
+                                  {selectedIniciativa.fechaInicio} -&nbsp;
 
-                                <div className='modalfecha'> <FaCalendar style={{marginRight: '5px'}} />{selectedIniciativa.fechaInicio} - {selectedIniciativa.fechaCierre ? selectedIniciativa.fechaCierre : 'S.F.'} </div>
-                                <div className='modalregion'> <FaGlobe style={{marginRight: '5px'}} />{selectedIniciativa.region} </div>
+                                  {/* Fecha de cierre pasada */}
+                                  {fechaLimite ? (
+                                    <div className='modalfechalimite'>
+                                      <FaExclamationCircle style={{marginRight: '3px'}}/> {selectedIniciativa.fechaCierre} 
+                                    </div>
+                                  ) : (
+                                    <div>
+                                      {selectedIniciativa.fechaCierre ? selectedIniciativa.fechaCierre : 'S.F.'}
+                                    </div>
+                                  )}
+                                </div>
+                                
+                                {/* Región */}
+                                <div className='modalregion'> <FaGlobe style={{marginRight: '5px'}} />
+                                  {selectedIniciativa.region}
+                                </div>
+                                
+                                {/* Privacidad */}
                                 <div className='modalpublica'>
-                                    {selectedIniciativa.esPublica ? <><FaUnlockAlt style={{marginRight: '5px'}} />Pública</> : <><FaLock style={{marginRight: '5px'}} />Privada</>}
+                                  {selectedIniciativa.esPublica ? <><FaUnlockAlt style={{marginRight: '5px'}} />Pública</> : <><FaLock style={{marginRight: '5px'}} />Privada</>}
                                 </div>
 
                             </div>
@@ -58,11 +78,11 @@ const ModalIniciativa = ({showModal, setShowModal, selectedIniciativa, handleCre
                             </Link>
                         ) : (
                             selectedIniciativa && selectedIniciativa.esPublica ? (
-                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleSuscribirse} style={{width: "120px"}}>
+                                <button className='modalsusbotton' disabled={suscribirDesactivado || fechaLimite} onClick={handleSuscribirse} style={{width: "120px"}}>
                                   {suscribirCargando ? <ClipLoader size={24} color="#000" /> : 'Suscribirme'}
                                 </button>
                             ) : (
-                                <button className='modalsusbotton' disabled={suscribirDesactivado} onClick={handleCrearSolicitud} style={{width: "155px"}}>
+                                <button className='modalsusbotton' disabled={suscribirDesactivado || fechaLimite} onClick={handleCrearSolicitud} style={{width: "155px"}}>
                                   {suscribirCargando ? <ClipLoader size={24} color="#000" /> : 'Solicitar unirme'}
                                 </button>
                             )  

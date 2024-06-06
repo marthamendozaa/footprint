@@ -78,6 +78,7 @@ export const MyInitiatives = () => {
   const [selectedIniciativaIndex, setSelectedIniciativaIndex] = useState(null);
   const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
   const [suscribirCargando, setSuscribirCargando] = useState(false);
+  const [fechaLimite, setFechaLimite] = useState(false);
 
   const seleccionaIniciativa = async (iniciativa, index) => {
     // Verificar si el usuario ya envió una solicitud a la iniciativa
@@ -87,6 +88,19 @@ export const MyInitiatives = () => {
     } else {
       setSuscribirDesactivado(false);
     }
+
+    // Si la fecha de cierre ya pasó, no se puede suscribir
+    if (iniciativa.fechaCierre) {
+      const [day, month, year] = iniciativa.fechaCierre.split('/');
+      const fechaCierre = new Date(year, month - 1, day);
+      const fechaActual = new Date();
+      if (fechaCierre < fechaActual) {
+        setFechaLimite(true);
+      } else {
+        setFechaLimite(false);
+      }
+    }
+
     setSelectedIniciativa(iniciativa);
     setSelectedIniciativaIndex(index);
     setShowModal(true);
@@ -295,6 +309,7 @@ export const MyInitiatives = () => {
             handleSuscribirse={handleSuscribirse}
             esAdmin={false}
             esMiembro={false}
+            fechaLimite={fechaLimite}
             suscribirDesactivado={suscribirDesactivado}
             setSuscribirDesactivado={setSuscribirDesactivado}
             suscribirCargando={suscribirCargando}
