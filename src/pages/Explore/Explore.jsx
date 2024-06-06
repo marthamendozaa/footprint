@@ -288,8 +288,6 @@ export const Explore = () => {
         setUsuarioEsMiembro(false);
       }
     }
-
-    console.log("Iniciativa seleccionada: ", iniciativa);
     
     // Selecciona iniciativa
     setSeleccionada(iniciativa);
