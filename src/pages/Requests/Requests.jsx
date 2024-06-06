@@ -3,7 +3,7 @@ import { Spinner, Modal, Button } from 'react-bootstrap';
 import { FaCheckCircle, FaTimesCircle, FaHourglass, FaTrash } from 'react-icons/fa';
 import { ClipLoader } from 'react-spinners';
 import { useAuth } from '../../contexts/AuthContext.jsx';
-import { getSolicitudes, getIniciativa, suscribirseAIniciativa, actualizaSolicitud, eliminarSolicitud } from '../../api/api.js';
+import { getSolicitudes, getIniciativa, suscribirseAIniciativa, actualizaSolicitud, eliminarSolicitud, getUsuarios } from '../../api/api.js';
 import './Requests.css';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 
@@ -79,16 +79,29 @@ export const Requests = () => {
       setSolicitudesEnviadas(solicitudesEnviadasData);
       setSolicitudesRecibidas(solicitudesRecibidasData);
 
+      const usuariosData = await getUsuarios();
+
       let iniciativasEnviadasData = []
       for (const solicitud of solicitudesEnviadasData){
         const iniciativa = await getIniciativa(solicitud.idIniciativa);
-        iniciativasEnviadasData.push({ ...iniciativa, idSolicitud: solicitud.idSolicitud });
+        const admin = usuariosData[iniciativa.idAdmin];
+        iniciativasEnviadasData.push({ 
+          ...iniciativa, 
+          idSolicitud: solicitud.idSolicitud, 
+          nombreAdmin: admin.nombreUsuario, 
+          urlImagenAdmin: admin.urlImagen 
+        });
       }
 
       let iniciativasRecibidasData = []
       for (const solicitud of solicitudesRecibidasData){
         const iniciativa = await getIniciativa(solicitud.idIniciativa);
-        iniciativasRecibidasData.push(iniciativa);
+        const admin = usuariosData[iniciativa.idAdmin];
+        iniciativasRecibidasData.push({ 
+          ...iniciativa, 
+          nombreAdmin: admin.nombreUsuario, 
+          urlImagenAdmin: admin.urlImagen 
+        });
       }
 
       setIniciativasEnviadas(iniciativasEnviadasData);
@@ -174,6 +187,12 @@ export const Requests = () => {
                 {/* Lista de iniciativas enviadas */}
                 {iniciativasEnviadas.map((iniciativa, index) => (
                   <div key={index} className='rq-iniciativa' onClick={() => handleButtonClick(iniciativa, index)}>
+                    {/* Nombre y foto del usuario administrador*/}
+                    <div className='rq-iniciativa-admin'>
+                      <img src = {iniciativa.urlImagenAdmin} alt = {iniciativa.nombreAdmin} />
+                      <div className='rq-nombre-admin'>{iniciativa.nombreAdmin}</div>
+                    </div>
+                    
                     {/* Imagen y título */}
                     <div className='rq-iniciativa-imagen'>
                         <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
@@ -217,6 +236,12 @@ export const Requests = () => {
                 {/* Lista de inicativas enviadas */}
                 {iniciativasRecibidas.map((iniciativa, index) => (
                   <div key={index} className='rq-iniciativa' onClick={() => handleButtonClick(iniciativa, index)}>
+                    {/* Nombre y foto del usuario administrador */}
+                    <div className='rq-iniciativa-admin'>
+                      <img src = {iniciativa.urlImagenAdmin} alt = {iniciativa.nombreAdmin} />
+                      <div className='rq-nombre-admin'>{iniciativa.nombreAdmin}</div>
+                    </div>
+                    
                     {/* Imagen y título */}
                     <div className='rq-iniciativa-imagen'>
                         <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
