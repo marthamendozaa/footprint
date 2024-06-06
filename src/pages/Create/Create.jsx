@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaTrash } from 'react-icons/fa';
+import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaTrash, FaTimesCircle } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
@@ -433,23 +433,32 @@ export const Create = () => {
     setUsuariosFiltrados(filtradas);
   };
 
-  const handleInvitarUsuario = (id) => {
-    const nuevoSolicitudes = [...solicitudesPorCrear, id];
+  const [initialHeight, setInitialHeight] = useState(null);
+  const modalBodyRef = useRef(null);
+
+  useEffect(() => {
+    if (showInvitarModal && modalBodyRef.current && initialHeight === null) {
+      setInitialHeight(modalBodyRef.current.clientHeight);
+    }
+  }, [showInvitarModal]);
+
+  const handleInvitarUsuario = (usuario) => {
+    const nuevoSolicitudes = [...solicitudesPorCrear, usuario];
     setSolicitudesPorCrear(nuevoSolicitudes);
 
     const nuevoEstados = {...estadoBotones};
-    nuevoEstados[id].invitarDesactivado = true;
-    nuevoEstados[id].cancelarDesactivado = false;
+    nuevoEstados[usuario.idUsuario].invitarDesactivado = true;
+    nuevoEstados[usuario.idUsuario].cancelarDesactivado = false;
     setEstadoBotones(nuevoEstados);
   }
 
-  const handleCancelarUsuario = (id) => {
-    const nuevoSolicitudes = solicitudesPorCrear.filter(idUsuario => idUsuario != id);
+  const handleCancelarUsuario = (usuario) => {
+    const nuevoSolicitudes = solicitudesPorCrear.filter(solicitud => solicitud.idUsuario != usuario.idUsuario);
     setSolicitudesPorCrear(nuevoSolicitudes);
 
     const nuevoEstados = {...estadoBotones};
-    nuevoEstados[id].invitarDesactivado = false;
-    nuevoEstados[id].cancelarDesactivado = true;
+    nuevoEstados[usuario.idUsuario].invitarDesactivado = false;
+    nuevoEstados[usuario.idUsuario].cancelarDesactivado = true;
     setEstadoBotones(nuevoEstados);
   }
 
@@ -533,14 +542,13 @@ export const Create = () => {
       await crearTareas(tareasIniciativa);
 
       // Crear solicitudes
-      console.log("solicitudesPorCrear:", solicitudesPorCrear);
       if (!solicitudesPorCrear || solicitudesPorCrear.length === 0) {
         console.log("No hay solicitudes por crear.");
       }
       else {
-        for (const idSolicitud of solicitudesPorCrear) {
+        for (const usuario of solicitudesPorCrear) {
           // Crear cada solicitud
-          const solicitud = new Solicitud(idSolicitud, idIniciativa, "Pendiente", "IniciativaAUsuario");
+          const solicitud = new Solicitud(usuario.idUsuario, idIniciativa, "Pendiente", "IniciativaAUsuario");
           const response = await crearSolicitud(solicitud);
           console.log("Solicitud creada:", response.data);
         }
@@ -873,11 +881,33 @@ export const Create = () => {
 
             </div>
 
-            {/* Invitar mimebros */}
+            {/* Invitar miembros */}
             <div className="c-seccion-miembros">
               <div className="c-btn-invitar-miembro" onClick={handleShowInvitarModal}>
                 <IoMdAddCircleOutline style={{marginRight: "5px"}}/>
                 Invitar miembro
+              </div>
+
+              {/* Miembros */}
+              <div>
+                {solicitudesPorCrear.length == 0 ? (
+                  <div style={{marginTop: "10px"}}> No hay miembros invitados. </div>
+                ) : (
+                  <div>
+                    {solicitudesPorCrear.map((usuario, idUsuario) => (
+                      <div className="i-btn-miembro" key={idUsuario}>
+                        <div className='i-btn-miembro-contenido' style={{width: '85%'}}>
+                          {usuario.nombreUsuario}
+                        </div>
+
+                        <div className='i-icon-estilos'>
+                          <FaTimesCircle className="i-icon-times-circle"
+                          onClick={() => handleCancelarUsuario(usuario)}/>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1017,56 +1047,88 @@ export const Create = () => {
             </Modal.Footer>
           </Modal>
 
-          {/*Modal para inivtar usuarios*/}
+          {/*Modal para invitar usuarios*/}
           <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
-            <div className="modalcontainer">
-              <Modal.Header closeButton>
-                <Modal.Title>Invitar Usuarios</Modal.Title>
+            <div className="modalcontainer, i-modal-lista-usuarios">
+              {/* Titulo + X */}
+              <Modal.Header closeButton style={{border: 'none'}}>
+                <Modal.Title>Invitar usuarios</Modal.Title>
               </Modal.Header>
-                <Modal.Body>
-                  <div className='e-searchBar'>
-                    <FaSearch className="e-icons"/>
-                    <input
-                      type='search'
-                      placeholder='Buscar usuarios...'
-                      value={filtro}
-                      onChange={buscarUsuario}
-                      className='e-searchBarCaja'
-                    />
-                  </div>
-                  {usuariosFiltrados ? (
-                    (usuariosFiltrados.length == 0 || Object.keys(estadoBotones).length == 0) ? (
-                      <div className="m-error">
-                        No se encontraron usuarios.
-                      </div>
-                    ) : (
-                      <ul>
-                        {usuariosFiltrados.map((usuario, index) => (
-                          <li key={index} className='user-item'>
-                            <div className='user-info'>
-                              <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
-                            </div>
-                            
-                            {!estadoBotones[usuario.idUsuario].invitarDesactivado && (
-                              <Button variant="primary" onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
-                                Invitar
-                              </Button>
-                            )}
-                            {!estadoBotones[usuario.idUsuario].cancelarDesactivado && (
-                              <Button variant="primary" onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
-                                Cancelar
-                              </Button>
-                            )}
-                          </li>
-                        ))}
-                      </ul>
-                    )
-                  ) : (
-                    <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
-                      <Spinner animation="border" role="status"></Spinner>
+
+              {/* Cuerpo */}
+              <Modal.Body 
+                style={{paddingTop: '0px', height: initialHeight ? `${initialHeight}px` : 'auto'}}
+                ref={modalBodyRef}
+              >
+                {/* Searchbar */}
+                <div className='e-searchBar' style={{marginBottom: '20px'}}>
+                  <FaSearch className="e-icons"/>
+                  <input
+                    type='search'
+                    placeholder='Buscar usuarios...'
+                    value={filtro}
+                    onChange={buscarUsuario}
+                    className='e-searchBarCaja'
+                  />
+                </div>
+
+                {/* Lista usuarios */}
+                {usuariosFiltrados ? (
+                  (usuariosFiltrados.length == 0 || Object.keys(estadoBotones).length == 0) ? (
+                    <div className="m-error">
+                      No se encontraron usuarios.
                     </div>
-                  )}
-                </Modal.Body>  
+                  ) : (
+                    <>
+                      {Object.values(usuariosFiltrados).map((usuario, id) => (
+                        <React.Fragment key={id}>
+                          <div className='i-invitar-usuarios'>
+                            {/* Información usuario */}
+                            <div className='i-informacion-usuarios'>
+                              <img src = {usuario.urlImagen}/>
+
+                              <div className='i-informacion-usuario'>
+                                <div style={{fontWeight: '600'}}>
+                                  {usuario.nombreUsuario}
+                                </div>
+
+                                <div>
+                                  {usuario.nombre}
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Boton invitar */}
+                            {!estadoBotones[usuario.idUsuario].invitarDesactivado && (
+                              <div className='i-btn-container'>
+                                <Button className='i-invitar-usuarios-boton' onClick={() => handleInvitarUsuario(usuario)}>
+                                  Invitar
+                                </Button>
+                              </div>
+                            )}
+
+                            {/* Boton cancelar */}
+                            {!estadoBotones[usuario.idUsuario].cancelarDesactivado && (
+                              <div className='i-btn-container'>
+                                <Button className='i-invitar-usuarios-boton' onClick={() => handleCancelarUsuario(usuario)}>
+                                  Cancelar
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+
+                          {/* Línea entre elementos */}
+                          {id < Object.values(usuariosFiltrados).length - 1 && <hr/>}
+                        </React.Fragment>
+                      ))}
+                    </>
+                  )
+                ) : (
+                  <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
+                    <Spinner animation="border" role="status"></Spinner>
+                  </div>
+                )}
+              </Modal.Body>  
             </div>
           </Modal>
         </div>

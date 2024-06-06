@@ -279,15 +279,7 @@ li.i-etiqueta-item {
   margin-top: 20px;
 }
 
-.i-seccion-tareas {
-  width: 80%;
-  display: flex;
-  align-items: flex-start;
-  flex-direction: column;
-}
-
 .i-seccion-miembros {
-  position: relative;
   width: 20%;
   display: flex;
   align-items: stretch;
@@ -310,23 +302,21 @@ li.i-etiqueta-item {
   text-align: left;
 }
 
-
 .i-tarea-botones {
   display: flex;
   height: 100%;
-  width: 25%;
-  justify-content: space-around;
+  width: 20%;
+  justify-content: space-evenly;
   flex-direction: column;
 }
+
 
 .i-tarea-boton {
   background-color: #A0C1BF;
   border-radius: 25px;
-  font-size: 13px;
+  font-size: 12px;
   padding: 5px 10px;
   text-align: center;
-  margin-top: 5px;
-  margin-bottom: 5px;
 }
 
 /* Miembros */
@@ -350,13 +340,13 @@ li.i-etiqueta-item {
   justify-content: space-between;
   background-color: #E2EBF1;
   width: 200px;
-  height: 50px;
   border-radius: 25px;
-  margin-top: 5px;
-  margin-bottom: 5px;
   border: 1px solid transparent;
-  padding: 20px;
-  text-align: left
+  margin: 10px 0px 10px 0px;
+  padding: 10px 15px 10px 15px;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
 }
 
 .i-btn-miembro-contenido {
@@ -420,22 +410,25 @@ li.i-etiqueta-item {
 
 .i-seccion-tareas {
   width: 80%;
-  align-items: flex-start;
-}
-
-.i-tareas-seccion {
   display: flex;
-  width: 80%;
+  align-items: flex-start;
   flex-direction: column;
 }
 
 .i-tareas-container {
-  width: 100%;
+  display: flex;
+  width: 85%;
+  flex-direction: column-reverse;
+}
+
+
+.i-tareas-container-2 {
+  display: flex;
+  align-items: center;
 }
 
 .i-tarea {
   display: flex;
-  min-height: 120px;
   width: 100%;
   background-color: #E2EBF1;
   border-radius: 25px;
@@ -445,46 +438,96 @@ li.i-etiqueta-item {
   align-items: flex-start;
   font-weight: 600;
   flex-direction: row;
+  overflow-x: auto;
+
 }
 
-
 .i-tarea-titulo {
+  display: flex;
+  flex-direction: row;
   font-size: 25px;
 }
 
+.i-tarea-titulo:focus-visible {
+  outline: none;
+}
+
 input.i-tarea-titulo {
-  background: none;
+  background: #E2EBF1;
   border: none;
   padding: 0;
+  font-weight: 600;
+  min-width: 400px;
 }
 
 .i-tarea-texto {
-  font-size: 14px;
+  display: flex;
+}
+
+
+
+
+
+.i-desc-input-texto-2 {
+  position: relative;
   width: 100%;
+  background-color: transparent;
+  border-radius: 0px;
+  outline: none;
+  text-align: left;
+  font-weight: 600;
+  font-size: 16px;
+  color: #121212;
+  word-break: break-word;
+  resize: none;
+  padding-right: 20px;
 }
 
 .i-tarea-desc {
   display: flex;
   width: 100%;
-  flex-wrap: wrap;
   word-break: break-word;
   text-align: left;
+  margin-top: 10px;
+}
+
+.i-desc-texto-2 {
+  position: relative;
+  width: 100%;
+  border-radius: 25px;
+  text-align: left;
+  font-weight: 600;
+  font-size: 16px;
+  color: #121212;
+  word-break: break-word;
+  margin-right: 20px;
 }
 
 .i-tarea-info {
   display: flex;
-  flex-direction: row;
-  width: 100%;
-  align-items: flex-start;
-}
-
-.i-tarea-texto {
-  display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 80%;
   align-items: flex-start;
 }
 
+
+.i-edit-titulo-box {
+  outline: none;
+  border: none;
+  font-weight: 600;
+  width: 600px;
+}
+
+.i-tarea-conteo {
+  position: absolute;
+  font-size: 20px;
+  font-weight: 600;
+  color: #A0C1BF;
+  margin-right: auto;
+  margin-top: 0px;
+  margin-left: 170px;
+  padding-left: 500px;
+}
 
 .cuadro {
   height: 150px;
@@ -664,4 +707,162 @@ input.i-tarea-titulo {
 
 .i-modal-doc .btn.btn-primary a {
   color: #000;
+}
+
+/* Agregar usuario modal */
+.i-modal-lista-usuarios {
+  max-height: 500px;
+  overflow: overlay;
+}
+
+.i-modal-lista-usuarios::-webkit-scrollbar {
+  display: none;
+}
+
+.i-invitar-usuarios {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.i-informacion-usuarios {
+  display: flex;
+  flex-direction: row;
+}
+
+.i-informacion-usuarios img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.i-informacion-usuario {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.i-btn-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Modal Miembros*/
+.i-modal-miembro {
+  display: flex;
+  flex-direction: column;
+  margin: 20px;
+}
+
+.i-miembro-perfil {
+  display: flex;
+  align-items: center;
+}
+
+.i-miembro-info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-left: 20px;
+}
+
+.i-miembro-nombre {
+  font-size: 28px;
+  font-weight: bold;
+  word-wrap: break-word;
+  text-align: justify;
+  margin-bottom: 10px;
+}
+
+.i-miembro-habilidades {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 20px 0px 10px 10px;
+}
+
+.i-miembro-datos {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Agregar usuario modal */
+.i-modal-lista-usuarios {
+  max-height: 500px;
+  overflow: overlay;
+}
+
+.i-modal-lista-usuarios::-webkit-scrollbar {
+  display: none;
+}
+
+.i-invitar-usuarios {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.i-informacion-usuarios {
+  display: flex;
+  flex-direction: row;
+}
+
+.i-informacion-usuarios img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.i-informacion-usuario {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.i-btn-container {
+  display: flex;
+  align-items: center;
+}
+
+.i-invitar-usuarios-boton {
+  width: 120px;
+  height: 70%;
+  border-radius: 30px;
+  background-color: #A0C1BF;
+  border: none;
+  color: #000;
+  font-weight: 600;
+}
+
+.i-invitar-usuarios-boton:active,
+.i-invitar-usuarios-boton:focus-visible,
+.i-invitar-usuarios-boton:hover {
+  background-color: #699AA0 !important;
+  color: #000 !important;
+  border: none !important;
+  box-shadow: 0px;
+}
+
+.i-invitar-usuarios-boton:disabled {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #A0C1BF;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.i-linea-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.linea {
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+  margin: 20px 0;
 }

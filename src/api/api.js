@@ -163,7 +163,6 @@ export const getUsuario = async (user) => {
   try {
     const usuario = await getDoc(doc(firestore, "Usuarios", user));
     console.log("Obtener usuario exitoso");
-    console.log(usuario.data());
     return usuario.data();
   } catch (error) {
     console.log("Error obteniendo usuario");
