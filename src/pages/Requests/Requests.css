@@ -52,6 +52,7 @@
   max-width: 200px;
   border: 2px #e8e8e8 solid;
   box-shadow: #e8e8e8 2px 4px 0px 0px;
+  cursor: pointer;
 }
 
 .rq-iniciativa:hover {

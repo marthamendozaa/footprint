@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash } from 'react-icons/fa';
+import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash, FaUser, FaEnvelope } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
@@ -205,6 +205,15 @@ export const Initiative = () => {
 
     setUsuariosFiltrados(filtradas);
   };
+  
+  const [initialHeight, setInitialHeight] = useState(null);
+  const modalBodyRef = useRef(null);
+
+  useEffect(() => {
+    if (showInvitarModal && modalBodyRef.current && initialHeight === null) {
+      setInitialHeight(modalBodyRef.current.clientHeight);
+    }
+  }, [showInvitarModal]);
 
   
   // Invitar usuarios
@@ -333,7 +342,15 @@ export const Initiative = () => {
       console.error("Error al rechazar la solicitud");
     }
   };
+  
+  // Ver perfil del miembro
+  const [miembroSeleccionado, setMiembroSeleccionado] = useState(null);
+  const [modalMiembro, setModalMiembro] = useState(false);
 
+  const handleMostrarMiembro = (miembro) => {
+    setMiembroSeleccionado(miembro);
+    setModalMiembro(true);
+  };
 
   // Miembro seleccionado a eliminar
   const [miembroEliminar, setMiembroEliminar] = useState(null);
@@ -1103,7 +1120,7 @@ export const Initiative = () => {
           <div className="i-seccion-miembros">
             <div className="i-tipo-miembro">Dueño</div>
             {infoAdmin &&
-              <div className="i-btn-miembro">
+              <div className="i-btn-miembro" onClick={() => handleMostrarMiembro(infoAdmin)}>
                   <div className='i-btn-miembro-contenido'>
                     {infoAdmin.nombreUsuario}
                   </div>
@@ -1120,17 +1137,19 @@ export const Initiative = () => {
               ) : (
                 <div>
                   {miembros.map((miembro, idMiembro) => (
-                    <div key={idMiembro}>
-                      <div className="i-btn-miembro">
-                        <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
-                          {miembro.nombreUsuario}
-                        </div>
+                    <div className="i-btn-miembro" key={idMiembro} onClick={() => handleMostrarMiembro(miembro)}>
+                      <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
+                        {miembro.nombreUsuario}
+                      </div>
 
-                        <div className='i-icon-estilos'>
-                          {esAdmin && (
-                            <FaTimesCircle onClick={() => handleMostrarEliminar(miembro)} className="i-icon-times-circle" />
-                          )}
-                        </div>
+                      <div className='i-icon-estilos'>
+                        {esAdmin && (
+                          <FaTimesCircle className="i-icon-times-circle"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMostrarEliminar(miembro);
+                          }}/>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -1447,61 +1466,150 @@ export const Initiative = () => {
 
       {/* Modal para invitar usuarios */}
       <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
-        <div className="modalcontainer">
-          <Modal.Header closeButton>
-            <Modal.Title>Invitar Usuarios</Modal.Title>
+        <div className="modalcontainer, i-modal-lista-usuarios">
+          {/* Titulo + X */}
+          <Modal.Header closeButton style={{border: 'none'}}>
+            <Modal.Title>Invitar usuarios</Modal.Title>
           </Modal.Header>
-            <Modal.Body>
-              <div className='e-searchBar'>
-                <FaSearch className="e-icons"/>
-                <input
-                  type='search'
-                  placeholder='Buscar usuarios...'
-                  value={filtro}
-                  onChange={buscarUsuario}
-                  className='e-searchBarCaja'
-                />
-              </div>
-              {usuariosFiltrados ? (
-                (Object.values(usuariosFiltrados).length == 0) ? (
-                  <div className="m-error">
-                    No se encontraron usuarios.
-                  </div>
-                ) : (
-                  <ul>
-                    {Object.values(usuariosFiltrados).map((usuario, id) => (
-                      <li key={id} className='user-item'>
-                        <div className='user-info'>
-                          <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
-                        </div>
-                        {!usuariosFiltrados[usuario.idUsuario].invitarDesactivado && (
-                          <Button variant="primary" onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
-                            Invitar
-                          </Button>
-                        )}
-                        {usuariosFiltrados[usuario.idUsuario].invitarCargando && (
-                          <Button variant="primary" disabled={true}>
-                            <ClipLoader size={16} color="#fff" />
-                          </Button>
-                        )}
-                        {!usuariosFiltrados[usuario.idUsuario].cancelarDesactivado && (
-                          <Button variant="primary" onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
-                            Cancelar
-                          </Button>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )
-              ) : (
-                <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
-                  <Spinner animation="border" role="status"></Spinner>
+
+          {/* Cuerpo */}
+          <Modal.Body 
+            style={{paddingTop: '0px', height: initialHeight ? `${initialHeight}px` : 'auto'}}
+            ref={modalBodyRef}
+          >
+            {/* Searchbar */}
+            <div className='e-searchBar' style={{marginBottom: '20px'}}>
+              <FaSearch className="e-icons"/>
+              <input
+                type='search'
+                placeholder='Buscar usuarios...'
+                value={filtro}
+                onChange={buscarUsuario}
+                className='e-searchBarCaja'
+              />
+            </div>
+
+            {/* Lista usuarios */}
+            {usuariosFiltrados ? (
+              (Object.values(usuariosFiltrados).length == 0) ? (
+                <div className="m-error">
+                  No se encontraron usuarios.
                 </div>
-              )}
-            </Modal.Body>  
+              ) : (
+                <>
+                  {Object.values(usuariosFiltrados).map((usuario, id) => (
+                    <React.Fragment key={id}>
+                      <div className='i-invitar-usuarios'>
+                        {/* Información usuario */}
+                        <div className='i-informacion-usuarios'>
+                          <img src = {usuario.urlImagen}/>
+
+                          <div className='i-informacion-usuario'>
+                            <div style={{fontWeight: '600'}}>
+                              {usuario.nombreUsuario}
+                            </div>
+
+                            <div>
+                              {usuario.nombre}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Boton invitar */}
+                        {!usuariosFiltrados[usuario.idUsuario].invitarDesactivado && (
+                          <div className='i-btn-container'>
+                            <Button className='i-invitar-usuarios-boton' onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
+                              Invitar
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Spinner */}
+                        {usuariosFiltrados[usuario.idUsuario].invitarCargando && (
+                          <div className='i-btn-container'>
+                            <Button className='i-invitar-usuarios-boton' disabled={true}>
+                              <ClipLoader size={16} color="#fff" />
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Boton cancelar */}
+                        {!usuariosFiltrados[usuario.idUsuario].cancelarDesactivado && (
+                          <div className='i-btn-container'>
+                            <Button className='i-invitar-usuarios-boton' onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
+                              Cancelar
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Línea entre elementos */}
+                      {id < Object.values(usuariosFiltrados).length - 1 && <hr className='i-divider' />}
+                    </React.Fragment>
+                  ))}
+                </>
+              )
+            ) : (
+              <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
+                <Spinner animation="border" role="status"></Spinner>
+              </div>
+            )}
+          </Modal.Body>  
         </div>
       </Modal>
 
+      {/* Modal para ver información de miembro */}
+      <Modal show={modalMiembro} onHide={() => setModalMiembro(false)} centered className='e-modal'>
+        <div className="modalcontainer">
+          <Modal.Header style={{ border: "none" }} closeButton> </Modal.Header>
+          
+          {miembroSeleccionado && (
+            <div className="i-modal-miembro">
+              <div className="i-miembro-perfil">
+                {/* Foto de perfil */}
+                <div className="modalhead">
+                  <img src={miembroSeleccionado.urlImagen} alt={miembroSeleccionado.nombre} className="modalimg" />
+                </div>
+                
+                {/* Nombre */}
+                <div className="i-miembro-info">
+                  <div className='i-miembro-nombre'>{miembroSeleccionado.nombre}</div>
+
+                  <div className="i-miembro-datos">
+                    {/* Edad */}
+                    <div style={{display: "flex", marginBottom: "10px"}}>
+                      <span style={{fontWeight: "bold"}}>Edad:&nbsp;</span> {miembroSeleccionado.edad} años
+                    </div>
+
+                    {/* Usuario */}
+                    <div style={{display: "flex", marginBottom: "10px"}}>
+                      <FaUser style={{marginRight: "5px", marginTop: "4px"}}/>
+                      <span style={{fontWeight: "bold"}}>Usuario:&nbsp;</span> {miembroSeleccionado.nombreUsuario}
+                    </div>
+                    
+                    {/* Correo */}
+                    <div>
+                      <FaEnvelope style={{marginRight: "5px"}}/>
+                      <span style={{fontWeight: "bold"}}>Correo:</span> <span style={{textDecoration: "underline"}}>{miembroSeleccionado.correo}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Habilidades */}
+              <div className='i-miembro-habilidades'>
+                Habilidades
+              </div>
+
+              <div className="m-etiquetas" style={{marginBottom: "20px"}}>
+                {Object.values(miembroSeleccionado.listaHabilidades).map((etiqueta, idEtiqueta) => (
+                  <li key={idEtiqueta} className={'m-etiqueta-item'}>{etiqueta}</li>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };
