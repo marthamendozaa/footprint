@@ -145,16 +145,28 @@ export const Explore = () => {
       // Obtiene todos los usuarios e iniciativas
       const usuariosData = await getUsuarios();
       const iniciativasData = await getIniciativas();
+      
+      // No incluir iniciativas si la fecha de cierre ya pasó
+      const fechaActual = new Date();
+      let iniciativasNuevo = iniciativasData.filter(iniciativa => {
+        if (iniciativa.fechaCierre) {
+          const [day, month, year] = iniciativa.fechaCierre.split('/');
+          const fechaCierre = new Date(year, month - 1, day);
+          return fechaCierre >= fechaActual;
+        } else {
+          return true;
+        }
+      });
 
       // Asigna el nombre y la imagen del admin a cada iniciativa
-      for (let i = 0; i < iniciativasData.length; i++) {
-        const admin = usuariosData[iniciativasData[i].idAdmin];
-        iniciativasData[i].nombreAdmin = admin.nombreUsuario;
-        iniciativasData[i].urlImagenAdmin = admin.urlImagen;
+      for (let i = 0; i < iniciativasNuevo.length; i++) {
+        const admin = usuariosData[iniciativasNuevo[i].idAdmin];
+        iniciativasNuevo[i].nombreAdmin = admin.nombreUsuario;
+        iniciativasNuevo[i].urlImagenAdmin = admin.urlImagen;
       }
 
-      setIniciativas(iniciativasData);
-      setIniciativasFiltradas(iniciativasData);
+      setIniciativas(iniciativasNuevo);
+      setIniciativasFiltradas(iniciativasNuevo);
       setUsuario(usuariosData[user]);
       
       // Obtiene las iniciativas favoritas del usuario
@@ -254,7 +266,6 @@ export const Explore = () => {
   const [usuarioEsMiembro, setUsuarioEsMiembro] = useState(false);
   const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
   const [suscribirCargando, setSuscribirCargando] = useState(false);
-  const [fechaLimite, setFechaLimite] = useState(false);
 
 
   const seleccionaIniciativa = async (iniciativa, indice) => {
@@ -278,17 +289,7 @@ export const Explore = () => {
       }
     }
 
-    // Si la fecha de cierre ya pasó, no se puede suscribir
-    if (iniciativa.fechaCierre) {
-      const [day, month, year] = iniciativa.fechaCierre.split('/');
-      const fechaCierre = new Date(year, month - 1, day);
-      const fechaActual = new Date();
-      if (fechaCierre < fechaActual) {
-        setFechaLimite(true);
-      } else {
-        setFechaLimite(false);
-      }
-    }
+    console.log("Iniciativa seleccionada: ", iniciativa);
     
     // Selecciona iniciativa
     setSeleccionada(iniciativa);
@@ -554,48 +555,52 @@ export const Explore = () => {
 
           {/* Iniciativas */}
           <div className='e-iniciativas-container'>
-            {iniciativasFiltradas.map((iniciativa, indice) => (
-              <div key={indice} className='e-iniciativa' onClick={() => seleccionaIniciativa(iniciativa, indice)}>
+            {iniciativasFiltradas.length == 0 ? (
+              <div className="m-error">No hay iniciativas disponibles.</div>
+            ) : (
+              <>
+                {iniciativasFiltradas.map((iniciativa, indice) => (
+                  <div key={indice} className='e-iniciativa' onClick={() => seleccionaIniciativa(iniciativa, indice)}>
 
-                {/* Nombre y foto del usuario administrador*/}
-                <div className='e-iniciativa-admin'>
-                  <img src={iniciativa.urlImagenAdmin} alt = {iniciativa.nombreAdmin} />
-                  <div className='e-nombre-admin'>{iniciativa.nombreAdmin}</div>
-                </div>
-                
-                {/* Imagen de la iniciativa */}
-                <div className='e-iniciativa-imagen'>
-                  <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
-                </div>
-                
-                {/* Titulo, descripción, y botón */}
-                <div className='e-iniciativa-contenido'>
-                  <div className="e-titulo">{iniciativa.titulo}</div>
-                  <div className="e-desc">{iniciativa.descripcion}</div>
+                    {/* Nombre y foto del usuario administrador*/}
+                    <div className='e-iniciativa-admin'>
+                      <img src={iniciativa.urlImagenAdmin} alt = {iniciativa.nombreAdmin} />
+                      <div className='e-nombre-admin'>{iniciativa.nombreAdmin}</div>
+                    </div>
+                    
+                    {/* Imagen de la iniciativa */}
+                    <div className='e-iniciativa-imagen'>
+                      <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
+                    </div>
+                    
+                    {/* Titulo, descripción, y botón */}
+                    <div className='e-iniciativa-contenido'>
+                      <div className="e-titulo">{iniciativa.titulo}</div>
+                      <div className="e-desc">{iniciativa.descripcion}</div>
 
-                  {/* Botón */}
-                  <div className='e-boton' onClick={(e) => e.stopPropagation()}>
-                    {admin ? (
-                      <FaTrash onClick={() => handleMostrarEliminar(iniciativa)} style={{ cursor: "pointer" }} />
-                    ) : (
-                      iniciativasFavoritas.includes(iniciativa.idIniciativa) ? (
-                        <FaHeart
-                          onClick={() => handleToggleFavorita(iniciativa.idIniciativa)}
-                          className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
-                        />
-                      ) : (
-                        <FaRegHeart
-                          onClick={() => handleToggleFavorita(iniciativa.idIniciativa)}
-                          className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
-                        />
-                      )
-                    )}
+                      {/* Botón */}
+                      <div className='e-boton' onClick={(e) => e.stopPropagation()}>
+                        {admin ? (
+                          <FaTrash onClick={() => handleMostrarEliminar(iniciativa)} style={{ cursor: "pointer" }} />
+                        ) : (
+                          iniciativasFavoritas.includes(iniciativa.idIniciativa) ? (
+                            <FaHeart
+                              onClick={() => handleToggleFavorita(iniciativa.idIniciativa)}
+                              className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
+                            />
+                          ) : (
+                            <FaRegHeart
+                              onClick={() => handleToggleFavorita(iniciativa.idIniciativa)}
+                              className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
+                            />
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-              </div>
-            ))
-          }
+                ))}
+              </>
+            )}
           </div>
         </div>
         ) : (
@@ -613,7 +618,7 @@ export const Explore = () => {
           handleSuscribirse = {handleSuscribirse}
           esAdmin={usuarioEsAdmin}
           esMiembro={usuarioEsMiembro}
-          fechaLimite={fechaLimite}
+          fechaLimite={false}
           suscribirDesactivado={suscribirDesactivado}
           setSuscribirDesactivado={setSuscribirDesactivado}
           suscribirCargando={suscribirCargando}
