@@ -67,7 +67,7 @@ export const ForgotPassword1 = ({ onNext, usuario }) => {
           <div className='container-register-3'>
 
             {/* Email */}
-            <div className='container-correo-register'>
+            <div className='container-correo-register' style={{marginTop: '20px'}}>
               <p className='correo-texto-register'>Correo</p>
 
               {/* Caja de correo */}
@@ -105,10 +105,13 @@ export const ForgotPassword1 = ({ onNext, usuario }) => {
                 )}
               </div>
             </div>
+
+            <p style={{marginLeft: '50px', marginRight: '50px', marginTop: '50px',textAlign: 'left'}}>Se te enviará un código para cambiar tu contraseña</p>
+
           </div>
           
-          <p className='pass-texto-login'>Se te enviará un código para cambiar tu contraseña</p>
           <div className="divider"></div>
+
           {/* Botones */}
           <div className='flecha-register-container'>
             {/* Regreso a inicio */}
