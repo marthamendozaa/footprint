@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
-import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaTrash } from 'react-icons/fa';
+import { FaCalendar, FaFolder, FaPen, FaExclamationCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaTrash, FaTimesCircle } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { Modal, Button, Spinner } from 'react-bootstrap';
 import { ClipLoader } from 'react-spinners';
@@ -433,23 +433,23 @@ export const Create = () => {
     setUsuariosFiltrados(filtradas);
   };
 
-  const handleInvitarUsuario = (id) => {
-    const nuevoSolicitudes = [...solicitudesPorCrear, id];
+  const handleInvitarUsuario = (usuario) => {
+    const nuevoSolicitudes = [...solicitudesPorCrear, usuario];
     setSolicitudesPorCrear(nuevoSolicitudes);
 
     const nuevoEstados = {...estadoBotones};
-    nuevoEstados[id].invitarDesactivado = true;
-    nuevoEstados[id].cancelarDesactivado = false;
+    nuevoEstados[usuario.idUsuario].invitarDesactivado = true;
+    nuevoEstados[usuario.idUsuario].cancelarDesactivado = false;
     setEstadoBotones(nuevoEstados);
   }
 
-  const handleCancelarUsuario = (id) => {
-    const nuevoSolicitudes = solicitudesPorCrear.filter(idUsuario => idUsuario != id);
+  const handleCancelarUsuario = (usuario) => {
+    const nuevoSolicitudes = solicitudesPorCrear.filter(solicitud => solicitud.idUsuario != usuario.idUsuario);
     setSolicitudesPorCrear(nuevoSolicitudes);
 
     const nuevoEstados = {...estadoBotones};
-    nuevoEstados[id].invitarDesactivado = false;
-    nuevoEstados[id].cancelarDesactivado = true;
+    nuevoEstados[usuario.idUsuario].invitarDesactivado = false;
+    nuevoEstados[usuario.idUsuario].cancelarDesactivado = true;
     setEstadoBotones(nuevoEstados);
   }
 
@@ -533,14 +533,13 @@ export const Create = () => {
       await crearTareas(tareasIniciativa);
 
       // Crear solicitudes
-      console.log("solicitudesPorCrear:", solicitudesPorCrear);
       if (!solicitudesPorCrear || solicitudesPorCrear.length === 0) {
         console.log("No hay solicitudes por crear.");
       }
       else {
-        for (const idSolicitud of solicitudesPorCrear) {
+        for (const usuario of solicitudesPorCrear) {
           // Crear cada solicitud
-          const solicitud = new Solicitud(idSolicitud, idIniciativa, "Pendiente", "IniciativaAUsuario");
+          const solicitud = new Solicitud(usuario.idUsuario, idIniciativa, "Pendiente", "IniciativaAUsuario");
           const response = await crearSolicitud(solicitud);
           console.log("Solicitud creada:", response.data);
         }
@@ -873,11 +872,33 @@ export const Create = () => {
 
             </div>
 
-            {/* Invitar mimebros */}
+            {/* Invitar miembros */}
             <div className="c-seccion-miembros">
               <div className="c-btn-invitar-miembro" onClick={handleShowInvitarModal}>
                 <IoMdAddCircleOutline style={{marginRight: "5px"}}/>
                 Invitar miembro
+              </div>
+
+              {/* Miembros */}
+              <div>
+                {solicitudesPorCrear.length == 0 ? (
+                  <div style={{marginTop: "10px"}}> No hay miembros invitados. </div>
+                ) : (
+                  <div>
+                    {solicitudesPorCrear.map((usuario, idUsuario) => (
+                      <div className="i-btn-miembro" key={idUsuario}>
+                        <div className='i-btn-miembro-contenido' style={{width: '85%'}}>
+                          {usuario.nombreUsuario}
+                        </div>
+
+                        <div className='i-icon-estilos'>
+                          <FaTimesCircle className="i-icon-times-circle"
+                          onClick={() => handleCancelarUsuario(usuario)}/>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1048,12 +1069,12 @@ export const Create = () => {
                             </div>
                             
                             {!estadoBotones[usuario.idUsuario].invitarDesactivado && (
-                              <Button variant="primary" onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
+                              <Button variant="primary" onClick={() => handleInvitarUsuario(usuario)}>
                                 Invitar
                               </Button>
                             )}
                             {!estadoBotones[usuario.idUsuario].cancelarDesactivado && (
-                              <Button variant="primary" onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
+                              <Button variant="primary" onClick={() => handleCancelarUsuario(usuario)}>
                                 Cancelar
                               </Button>
                             )}

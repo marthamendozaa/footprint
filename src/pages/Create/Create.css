@@ -422,6 +422,7 @@ li.c-etiqueta-item:hover {
   padding: 0px 20px;
   height: 44px;
   font-weight: 600;
+  cursor: pointer;
 }
 
 /* Tareas */
