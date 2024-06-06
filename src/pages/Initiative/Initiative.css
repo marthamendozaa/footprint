@@ -350,13 +350,13 @@ li.i-etiqueta-item {
   justify-content: space-between;
   background-color: #E2EBF1;
   width: 200px;
-  height: 50px;
   border-radius: 25px;
-  margin-top: 5px;
-  margin-bottom: 5px;
   border: 1px solid transparent;
-  padding: 20px;
-  text-align: left
+  margin: 10px 0px 10px 0px;
+  padding: 10px 15px 10px 15px;
+  text-align: left;
+  cursor: pointer;
+  user-select: none;
 }
 
 .i-btn-miembro-contenido {
@@ -663,6 +663,84 @@ input.i-tarea-titulo {
 
 .i-modal-doc .btn.btn-primary a {
   color: #000;
+}
+
+/* Agregar usuario modal */
+.i-modal-lista-usuarios {
+  max-height: 500px;
+  overflow: overlay;
+}
+
+.i-modal-lista-usuarios::-webkit-scrollbar {
+  display: none;
+}
+
+.i-invitar-usuarios {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.i-informacion-usuarios {
+  display: flex;
+  flex-direction: row;
+}
+
+.i-informacion-usuarios img {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.i-informacion-usuario {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.i-btn-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Modal Miembros*/
+.i-modal-miembro {
+  display: flex;
+  flex-direction: column;
+  margin: 20px;
+}
+
+.i-miembro-perfil {
+  display: flex;
+  align-items: center;
+}
+
+.i-miembro-info {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-left: 20px;
+}
+
+.i-miembro-nombre {
+  font-size: 28px;
+  font-weight: bold;
+  word-wrap: break-word;
+  text-align: justify;
+  margin-bottom: 10px;
+}
+
+.i-miembro-habilidades {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 20px 0px 10px 10px;
+}
+
+.i-miembro-datos {
+  display: flex;
+  flex-direction: column;
 }
 
 /* Agregar usuario modal */

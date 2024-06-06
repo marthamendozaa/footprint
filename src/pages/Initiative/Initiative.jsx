@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash } from 'react-icons/fa';
+import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash, FaUser, FaEnvelope } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
@@ -354,7 +354,15 @@ export const Initiative = () => {
       setUsuariosRecibidos(usuariosRecibidosNuevo);
     }
   };
+  
+  // Ver perfil del miembro
+  const [miembroSeleccionado, setMiembroSeleccionado] = useState(null);
+  const [modalMiembro, setModalMiembro] = useState(false);
 
+  const handleMostrarMiembro = (miembro) => {
+    setMiembroSeleccionado(miembro);
+    setModalMiembro(true);
+  };
 
   // Miembro seleccionado a eliminar
   const [miembroEliminar, setMiembroEliminar] = useState(null);
@@ -1048,7 +1056,7 @@ export const Initiative = () => {
           <div className="i-seccion-miembros">
             <div className="i-tipo-miembro">Dueño</div>
             {infoAdmin &&
-              <div className="i-btn-miembro">
+              <div className="i-btn-miembro" onClick={() => handleMostrarMiembro(infoAdmin)}>
                   <div className='i-btn-miembro-contenido'>
                     {infoAdmin.nombreUsuario}
                   </div>
@@ -1065,17 +1073,19 @@ export const Initiative = () => {
               ) : (
                 <div>
                   {miembros.map((miembro, idMiembro) => (
-                    <div key={idMiembro}>
-                      <div className="i-btn-miembro">
-                        <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
-                          {miembro.nombreUsuario}
-                        </div>
+                    <div className="i-btn-miembro" key={idMiembro} onClick={() => handleMostrarMiembro(miembro)}>
+                      <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
+                        {miembro.nombreUsuario}
+                      </div>
 
-                        <div className='i-icon-estilos'>
-                          {esAdmin && (
-                            <FaTimesCircle onClick={() => handleMostrarEliminar(miembro)} className="i-icon-times-circle" />
-                          )}
-                        </div>
+                      <div className='i-icon-estilos'>
+                        {esAdmin && (
+                          <FaTimesCircle className="i-icon-times-circle"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMostrarEliminar(miembro);
+                          }}/>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -1470,6 +1480,58 @@ export const Initiative = () => {
         </div>
       </Modal>
 
+      {/* Modal para ver información de miembro */}
+      <Modal show={modalMiembro} onHide={() => setModalMiembro(false)} centered className='e-modal'>
+        <div className="modalcontainer">
+          <Modal.Header style={{ border: "none" }} closeButton> </Modal.Header>
+          
+          {miembroSeleccionado && (
+            <div className="i-modal-miembro">
+              <div className="i-miembro-perfil">
+                {/* Foto de perfil */}
+                <div className="modalhead">
+                  <img src={miembroSeleccionado.urlImagen} alt={miembroSeleccionado.nombre} className="modalimg" />
+                </div>
+                
+                {/* Nombre */}
+                <div className="i-miembro-info">
+                  <div className='i-miembro-nombre'>{miembroSeleccionado.nombre}</div>
+
+                  <div className="i-miembro-datos">
+                    {/* Edad */}
+                    <div style={{display: "flex", marginBottom: "10px"}}>
+                      <span style={{fontWeight: "bold"}}>Edad:&nbsp;</span> {miembroSeleccionado.edad} años
+                    </div>
+
+                    {/* Usuario */}
+                    <div style={{display: "flex", marginBottom: "10px"}}>
+                      <FaUser style={{marginRight: "5px", marginTop: "4px"}}/>
+                      <span style={{fontWeight: "bold"}}>Usuario:&nbsp;</span> {miembroSeleccionado.nombreUsuario}
+                    </div>
+                    
+                    {/* Correo */}
+                    <div>
+                      <FaEnvelope style={{marginRight: "5px"}}/>
+                      <span style={{fontWeight: "bold"}}>Correo:</span> <span style={{textDecoration: "underline"}}>{miembroSeleccionado.correo}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Habilidades */}
+              <div className='i-miembro-habilidades'>
+                Habilidades
+              </div>
+
+              <div className="m-etiquetas" style={{marginBottom: "20px"}}>
+                {Object.values(miembroSeleccionado.listaHabilidades).map((etiqueta, idEtiqueta) => (
+                  <li key={idEtiqueta} className={'m-etiqueta-item'}>{etiqueta}</li>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };

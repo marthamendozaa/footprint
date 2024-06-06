@@ -347,9 +347,15 @@ export const Explore = () => {
     }
   }
 
+  const [animations, setAnimations] = useState({});
 
   // Toggle de icono de favoritos
   const handleToggleFavorita = async (idIniciativa) => {
+    setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
+    setTimeout(() => {
+      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
+    }, 600);
+
     let iniciativasFavoritasNuevo = [...iniciativasFavoritas];
 
     if (iniciativasFavoritas.includes(idIniciativa)) {
@@ -560,9 +566,15 @@ export const Explore = () => {
                       <FaTrash onClick={() => handleMostrarEliminar(iniciativa)} style={{ cursor: "pointer" }} />
                     ) : (
                       iniciativasFavoritas.includes(iniciativa.idIniciativa) ? (
-                        <FaHeart onClick={() => handleToggleFavorita(iniciativa.idIniciativa)} style={{ cursor: "pointer" }} />
+                        <FaHeart
+                          onClick={() => handleToggleFavorita(iniciativa.idIniciativa)}
+                          className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
+                        />
                       ) : (
-                        <FaRegHeart onClick={() => handleToggleFavorita(iniciativa.idIniciativa)} style={{ cursor: "pointer" }} />
+                        <FaRegHeart
+                          onClick={() => handleToggleFavorita(iniciativa.idIniciativa)}
+                          className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
+                        />
                       )
                     )}
                   </div>
