@@ -1156,7 +1156,7 @@ export const Initiative = () => {
                               </div>
                               <div className="i-tarea-botones">
                                 <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                                <div className="i-tarea-boton" style={{marginTop: '5px', cursor:'pointer'}} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento</div>
+                                <div className="i-tarea-boton" style={{marginTop: '5px'}} ><FaFolder /> Documento</div>
                               </div>
                             </div>
                           </div>
@@ -1174,8 +1174,8 @@ export const Initiative = () => {
 
                 <div className='i-tareas-container'>
 
-                  {(tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada)) ? (
-
+                  {tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada).length > 0 ? (
+                    
                     <div>
                     {tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada).map((tarea, index) => (
                       <div className="i-tareas-container-2" key={tarea.idTarea}>
