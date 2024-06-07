@@ -366,25 +366,32 @@ export const Explore = () => {
 
   // Toggle de icono de favoritos
   const handleToggleFavorita = async (idIniciativa) => {
-    setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
-    setTimeout(() => {
-      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
-    }, 600);
-
     let iniciativasFavoritasNuevo = [...iniciativasFavoritas];
+    let usuarioNuevo = {...usuario};
 
-    if (iniciativasFavoritas.includes(idIniciativa)) {
-      iniciativasFavoritasNuevo = iniciativasFavoritas.filter(favorita => favorita !== idIniciativa);
-    } else {
-      iniciativasFavoritasNuevo.push(idIniciativa);
+    try {
+      // Comienza animación
+      setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
+
+      // Actualiza lista de iniciativas favoritas
+      if (iniciativasFavoritas.includes(idIniciativa)) {
+        iniciativasFavoritasNuevo = iniciativasFavoritas.filter(favorita => favorita !== idIniciativa);
+      } else {
+        iniciativasFavoritasNuevo.push(idIniciativa);
+      }
+
+      // Actualiza información del usuario
+      usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
+
+      await actualizaUsuario(usuarioNuevo);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // Termina animación
+      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
+      setIniciativasFavoritas(iniciativasFavoritasNuevo);
+      setUsuario(usuarioNuevo);
     }
-    setIniciativasFavoritas(iniciativasFavoritasNuevo);
-
-    // Actualiza información del usuario con lista de favoritas nueva
-    const usuarioNuevo = {...usuario};
-    usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
-    await actualizaUsuario(usuarioNuevo);
-    setUsuario(usuarioNuevo);
   };
 
 
