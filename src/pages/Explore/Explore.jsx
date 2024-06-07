@@ -146,23 +146,31 @@ export const Explore = () => {
       const usuariosData = await getUsuarios();
       const iniciativasData = await getIniciativas();
       
-      // No incluir iniciativas si la fecha de cierre ya pasó
       const fechaActual = new Date();
-      let iniciativasNuevo = iniciativasData.filter(iniciativa => {
-        if (iniciativa.fechaCierre && !admin) {
+      let iniciativasNuevo = iniciativasData.map(iniciativa => {
+        // Verifica si la fecha de cierre de la iniciativa ya pasó
+        let fechaLimite = false;
+
+        if (iniciativa.fechaCierre) {
           const [day, month, year] = iniciativa.fechaCierre.split('/');
           const fechaCierre = new Date(year, month - 1, day);
-          return fechaCierre >= fechaActual;
-        } else {
-          return true;
+          fechaLimite = (fechaCierre <= fechaActual) ? true : false;
         }
+      
+        // Asigna el nombre y la imagen del admin a cada iniciativa
+        const admin = usuariosData[iniciativa.idAdmin];
+        
+        return {
+          ...iniciativa,
+          nombreAdmin: admin.nombreUsuario,
+          urlImagenAdmin: admin.urlImagen,
+          fechaLimite: fechaLimite
+        };
       });
 
-      // Asigna el nombre y la imagen del admin a cada iniciativa
-      for (let i = 0; i < iniciativasNuevo.length; i++) {
-        const admin = usuariosData[iniciativasNuevo[i].idAdmin];
-        iniciativasNuevo[i].nombreAdmin = admin.nombreUsuario;
-        iniciativasNuevo[i].urlImagenAdmin = admin.urlImagen;
+      // Filtrar iniciativas sin fecha de cierre para usuarios no administradores
+      if (!admin) {
+        iniciativasNuevo = iniciativasNuevo.filter(iniciativa => !iniciativa.fechaLimite);
       }
 
       setIniciativas(iniciativasNuevo);
@@ -288,7 +296,7 @@ export const Explore = () => {
         setUsuarioEsMiembro(false);
       }
     }
-    
+
     // Selecciona iniciativa
     setSeleccionada(iniciativa);
     setSeleccionadaIndice(indice);
@@ -616,7 +624,6 @@ export const Explore = () => {
           handleSuscribirse = {handleSuscribirse}
           esAdmin={usuarioEsAdmin}
           esMiembro={usuarioEsMiembro}
-          fechaLimite={false}
           suscribirDesactivado={suscribirDesactivado}
           setSuscribirDesactivado={setSuscribirDesactivado}
           suscribirCargando={suscribirCargando}
