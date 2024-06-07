@@ -13,8 +13,9 @@ export const ForgotPassword = () => {
   const [changingEmail, setChangingEmail] = useState(true);
   const [invalidEmail, setInvalidEmail] = useState(false);
   const [emailExists, setEmailExists] = useState(false);
-  const [emailSent, setEmailSent] = useState(false);
   const [sendingEmail, setSendingEmail] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [popupEmail, setPopupEmail] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('register-body');
@@ -52,6 +53,7 @@ export const ForgotPassword = () => {
     } finally {
       setSendingEmail(false);
       setEmailSent(true);
+      setPopupEmail(true);
     }
   };
 
@@ -102,32 +104,39 @@ export const ForgotPassword = () => {
               </div>
             </div>
           </div>
-            
-          {/* Correo enviado */}
-          <div className="f-correo-enviado-container">
-            {emailSent && (
-              <div className="f-correo-enviado">Revisa tu correo para cambiar la contraseña</div>
-            )}
-          </div>
 
           {/* Botones */}
           <div className='f-flecha-register-container'>
-            {/* Regreso a inicio */}
-            <div className='f-flecha-register-container-start'>
-              <button type="submit" className="btn flecha-btn" onClick={handleRegresar}>
-                <FaArrowLeft />
-              </button>
+            <div className="f-flechas">
+              {/* Regreso a inicio */}
+              <div className='f-flecha-register-container-start'>
+                <button type="submit" className="btn flecha-btn" onClick={handleRegresar}>
+                  <FaArrowLeft />
+                </button>
+              </div>
+              {/* Continuar con cambio de contraseña */}
+              <div className='flecha-register4-container-end'>
+                <button type="submit" className="btn flecha-btn" disabled={!email || invalidEmail || !emailExists || emailSent || sendingEmail} style={{width: "90px"}}>
+                  {sendingEmail ? <ClipLoader size={24} color="#6b6b6b" /> : 'Enviar'}
+                </button>
+              </div>
             </div>
-            {/* Continuar con cambio de contraseña */}
-            <div className='flecha-register4-container-end'>
-              <button type="submit" className="btn flecha-btn" disabled={!email || invalidEmail || !emailExists || emailSent || sendingEmail}>
-                {sendingEmail ? <ClipLoader size={24} color="#6b6b6b" /> : 'Enviar'}
-              </button>
-            </div>
+            
           </div>
 
         </form>
       </div>
+      
+      {/* Popup */}
+      {popupEmail && (
+        <div className='pop-up'>
+          <div className='pop-up-3'>
+            <h2 style={{textAlign: 'center'}}>Correo enviado</h2>
+            <p style={{textAlign: 'center', marginTop: '20px'}}>Revisa tu correo para cambiar la contraseña</p>
+            <button onClick={() => {setPopupEmail(false); navigate('/login');}}>Cerrar</button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
