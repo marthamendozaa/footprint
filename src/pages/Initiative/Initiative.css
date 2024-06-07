@@ -21,7 +21,8 @@
   cursor: pointer;
   color: #A0C1BF;
   font-size: 20px;
-  margin-top: -20px;
+  margin-top: -10px;
+  margin-left: 970px;
 }
 
 .i-fa-pen:hover{
@@ -282,8 +283,32 @@ li.i-etiqueta-item {
 .i-seccion-miembros {
   width: 20%;
   display: flex;
-  align-items: stretch;
   flex-direction: column;
+  justify-content: space-between;
+}
+
+.i-seccion-1 {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.i-guardar-cerrar {
+  display: flex;
+  flex-direction: row;
+}
+
+.i-guardar-cerrar button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #000;
+  background-color: #909da4;
+  font-weight: bold;
+  border-radius: 20px;
+}
+
+.i-guardar-cerrar button:hover {
+  background-color: #6b7780
 }
 
 .i-btn-ver-miembros {
@@ -380,7 +405,7 @@ li.i-etiqueta-item {
 
 .i-btn-ver-solicitudes {
   bottom: 0;
-  background-color: #909da4; 
+  background-color: #A0C1BF; 
   border: none; 
   padding: 10px 20px; 
   font-size: 16px;
@@ -394,7 +419,7 @@ li.i-etiqueta-item {
 }
 
 .i-btn-ver-solicitudes:hover {
-  background-color: #6b7780;
+  background-color: #699AA0;
 }
 
 /* Modal Solicitudes */
@@ -479,9 +504,16 @@ input.i-tarea-titulo {
   display: flex;
 }
 
+.i-edit-tarea-box {
+  background: transparent;
+  font-weight: 600;
+  border: none;
+  overflow: none;
+}
 
-
-
+.i-edit-tarea-box:focus-visible {
+  outline: none;
+}
 
 .i-desc-input-texto-2 {
   position: relative;

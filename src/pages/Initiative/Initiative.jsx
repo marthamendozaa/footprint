@@ -764,9 +764,7 @@ export const Initiative = () => {
     setNuevoUsuarioAsignado(usuario.idUsuario);
   }
 
-
   const saveTareaChanges = async (tarea, index) => {
-    console.log('Editando tarea', tarea.idTarea);
     try {
       const tareaNueva = { ...tarea, titulo: nuevoTituloTarea, descripcion: nuevaDescripcionTarea, fechaEntrega: nuevaFechaTarea, idAsignado: nuevoUsuarioAsignado}
       await actualizaTarea(tareaNueva);
@@ -780,7 +778,6 @@ export const Initiative = () => {
     } catch (error) {
       console.error("Error updating tarea:", error);
     }
-    
   };
 
   const cancelTareaEdit = () => {
@@ -830,18 +827,6 @@ export const Initiative = () => {
               <button className="i-fa-pen" onClick={handleCamposEdit}>
                 <FaPen />
               </button>
-            )}
-
-            {!editingCampos || esAdmin && (
-              <>
-                <button className="i-fa-pen" onClick={handleGuardarCampos} disabled={guardarCamposBloqueado}>
-                  Guardar
-                </button>
-
-                <button className="i-fa-pen-2" onClick={handleCancelarCampos}>
-                  Cerrar
-                </button>
-              </>
             )}
 
             {/* Foto de iniciativa */}
@@ -1049,36 +1034,17 @@ export const Initiative = () => {
                                     <div className="i-tarea-info">
                                       
                                       {/* Tarea titulo */}
-                                      <div className='c-container-conteo'>
-                                        <div className="c-tarea-texto" style={{paddingTop: '2px'}}>
-                                          <style jsx>{`
-                                            textarea {
-                                              border-radius: 25px;
-                                              position: relative;
-                                              width: 100%;
-                                              height: 50px;
-                                              font-size: 16px;
-                                              resize: none;
-                                              outline: none;
-                                            }
-                                          `}
-                                          </style>
-                                          <textarea
-                                            ref={el => textareaRefs3.current[index] = el}
-                                            className="i-input-titulo-tarea"
+                                      <div className="i-tarea-titulo">
+                                        <div className="i-tarea-texto">
+                                          <input
+                                            type="text"
+                                            className="i-edit-tarea-box"
                                             value={nuevoTituloTarea}
-                                            onChange={(e) => {
-                                              setNuevoTituloTarea(e.target.value);
-                                              autoResizeTextarea3(index);
-                                            }}
+                                            onChange={(e) => setNuevoTituloTarea(e.target.value)}
+                                            autoFocus
                                             maxLength={30}
-                                            style={{borderColor: 'transparent', fontSize: '25px'}}
                                           />
                                         </div>
-
-                                        <button className="c-btn-editar-flex" style={{marginRight: '20px'}} onClick={() => handleEditarDescTarea(idTarea)}>
-                                          {nuevoTituloTarea ? `${nuevoTituloTarea.length}/30` : `0/30`}
-                                        </button>
                                       </div>
 
                                       {/* Descripción */}
@@ -1156,7 +1122,6 @@ export const Initiative = () => {
                                 <div className='i-row-tarea'>
                                   <div className="i-tarea">
                                     <div className="i-tarea-info">
-                                      <div className="i-tarea-titulo">{tarea.titulo}</div>
                                       <div className="i-tarea-desc" >{tarea.descripcion}</div>
                                     </div>
                                     <div className="i-tarea-botones">
@@ -1182,7 +1147,7 @@ export const Initiative = () => {
                           <div className="i-tareas-container-2" key={tarea.idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
-                                <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                                 <div className="i-tarea-desc">
                                   <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                     {tarea.descripcion}
@@ -1217,7 +1182,7 @@ export const Initiative = () => {
                         <div className="i-tarea">
 
                           <div className="i-tarea-info">
-                            <div className="i-tarea-titulo">{tarea.titulo}</div>
+                            <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                             <div className="i-tarea-desc">
                               <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                 {tarea.descripcion}
@@ -1260,7 +1225,7 @@ export const Initiative = () => {
                           <div className="i-tarea-container-2" key={idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
-                                <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                                 <div className="i-tarea-desc">{tarea.descripcion}
                                 </div>
                                 
@@ -1285,51 +1250,69 @@ export const Initiative = () => {
           </div>
 
           <div className="i-seccion-miembros">
-            <div className="i-tipo-miembro">Dueño</div>
-            {infoAdmin &&
-              <div className="i-btn-miembro" onClick={() => handleMostrarMiembro(infoAdmin)}>
-                  <div className='i-btn-miembro-contenido'>
-                    {infoAdmin.nombreUsuario}
-                  </div>
-              </div>
-            }
-            <div className="i-tipo-miembro">
-              Miembros {esAdmin && <IoMdAddCircleOutline className="i-agregar-miembros" onClick={() => setShowInvitarModal(true)}/>}
-            </div>
-            
-            {/* Miembros */}
-            <div>
-              {miembros.length == 0 ? (
-                <div> No hay miembros. </div>
-              ) : (
-                <div>
-                  {miembros.map((miembro, idMiembro) => (
-                    <div className="i-btn-miembro" key={idMiembro} onClick={() => handleMostrarMiembro(miembro)}>
-                      <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
-                        {miembro.nombreUsuario}
-                      </div>
-
-                      <div className='i-icon-estilos'>
-                        {esAdmin && (
-                          <FaTimesCircle className="i-icon-times-circle"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleMostrarEliminar(miembro);
-                          }}/>
-                        )}
-                      </div>
+            <div className='i-seccion-1'>
+              <div className="i-tipo-miembro">Dueño</div>
+              {infoAdmin &&
+                <div className="i-btn-miembro" onClick={() => handleMostrarMiembro(infoAdmin)}>
+                    <div className='i-btn-miembro-contenido'>
+                      {infoAdmin.nombreUsuario}
                     </div>
-                  ))}
                 </div>
+              }
+              <div className="i-tipo-miembro">
+                Miembros {esAdmin && <IoMdAddCircleOutline className="i-agregar-miembros" onClick={() => setShowInvitarModal(true)}/>}
+              </div>
+              
+              {/* Miembros */}
+              <div>
+                {miembros.length == 0 ? (
+                  <div> No hay miembros. </div>
+                ) : (
+                  <div>
+                    {miembros.map((miembro, idMiembro) => (
+                      <div className="i-btn-miembro" key={idMiembro} onClick={() => handleMostrarMiembro(miembro)}>
+                        <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
+                          {miembro.nombreUsuario}
+                        </div>
+
+                        <div className='i-icon-estilos'>
+                          {esAdmin && (
+                            <FaTimesCircle className="i-icon-times-circle"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMostrarEliminar(miembro);
+                            }}/>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {esAdmin && (
+                <button type="button" className="i-btn-ver-solicitudes" onClick={() => setShowSolicitudesModal(true)}>
+                  VER SOLICITUDES
+                </button>
               )}
             </div>
 
-            {esAdmin && (
-              <button type="button" className="i-btn-ver-solicitudes" onClick={() => setShowSolicitudesModal(true)}>
-                VER SOLICITUDES
-              </button>
-            )}
+            <div className='i-guardar-cerrar'>
+              {!editingCampos || esAdmin && (
+                <>
+                  <button onClick={handleCancelarCampos}>
+                    Cerrar
+                  </button>
+
+                  <button style={{marginLeft: '10px'}} onClick={handleGuardarCampos} disabled={guardarCamposBloqueado}>
+                    Guardar
+                  </button>
+                </>
+              )}
+            </div>
+
           </div>
+
         </div>
       </div>
       ) : (
