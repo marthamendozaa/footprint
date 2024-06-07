@@ -228,12 +228,7 @@ export const Explore = () => {
 
       // Filtrar por etiquetas
       const etiquetasIniciativa = Object.values(iniciativa.listaEtiquetas);
-      for (let etiqueta of etiquetasIniciativa) {
-        if (etiquetasSeleccionadas.includes(etiqueta)) {
-          filtroEtiqueta = true;
-          break;
-        }
-      };
+      filtroEtiqueta = etiquetasSeleccionadas.every(etiqueta => etiquetasIniciativa.includes(etiqueta));
       
       // Filtrar por privacidad
       const privacidadIniciativa = iniciativa.esPublica ? "Pública" : "Privada";
