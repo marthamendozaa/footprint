@@ -41,12 +41,23 @@ export const MyInitiatives = () => {
         };
       });
 
+      const fechaActual = new Date();
       const iniciativasFavoritasData = iniciativasData.iniciativasFavoritas.map(iniciativa => {
+        // Verifica si la fecha de cierre de la iniciativa ya pasó
+        let fechaLimite = false;
+
+        if (iniciativa.fechaCierre) {
+          const [day, month, year] = iniciativa.fechaCierre.split('/');
+          const fechaCierre = new Date(year, month - 1, day);
+          fechaLimite = (fechaCierre <= fechaActual) ? true : false;
+        }
+
         const admin = usuariosData[iniciativa.idAdmin];
         return {
             ...iniciativa,
             nombreAdmin: admin.nombreUsuario,
-            urlImagenAdmin: admin.urlImagen
+            urlImagenAdmin: admin.urlImagen,
+            fechaLimite: fechaLimite
         };
       });
 
@@ -90,7 +101,6 @@ export const MyInitiatives = () => {
   const [selectedIniciativaIndex, setSelectedIniciativaIndex] = useState(null);
   const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
   const [suscribirCargando, setSuscribirCargando] = useState(false);
-  const [fechaLimite, setFechaLimite] = useState(false);
 
   const seleccionaIniciativa = async (iniciativa, index) => {
     // Verificar si el usuario ya envió una solicitud a la iniciativa
@@ -99,18 +109,6 @@ export const MyInitiatives = () => {
       setSuscribirDesactivado(true);
     } else {
       setSuscribirDesactivado(false);
-    }
-
-    // Si la fecha de cierre ya pasó, no se puede suscribir
-    if (iniciativa.fechaCierre) {
-      const [day, month, year] = iniciativa.fechaCierre.split('/');
-      const fechaCierre = new Date(year, month - 1, day);
-      const fechaActual = new Date();
-      if (fechaCierre < fechaActual) {
-        setFechaLimite(true);
-      } else {
-        setFechaLimite(false);
-      }
     }
 
     setSelectedIniciativa(iniciativa);
@@ -327,7 +325,6 @@ export const MyInitiatives = () => {
             handleSuscribirse={handleSuscribirse}
             esAdmin={false}
             esMiembro={false}
-            fechaLimite={fechaLimite}
             suscribirDesactivado={suscribirDesactivado}
             setSuscribirDesactivado={setSuscribirDesactivado}
             suscribirCargando={suscribirCargando}
