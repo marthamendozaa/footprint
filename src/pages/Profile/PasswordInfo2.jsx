@@ -30,8 +30,14 @@ const PasswordInfo2 = () => {
     <span className="d-inline-block">
       <FaInfoCircle className='fa-info-icon2'
         onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
       />
-      {showPopover && <div className="password-info-popover2" onMouseLeave={handleMouseLeave}>{passwordRules}</div>}
+      {showPopover && (
+        <div className="password-info-popover2"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}>
+        {passwordRules}
+      </div>)}
     </span>
   );
 };
