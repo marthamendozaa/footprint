@@ -21,7 +21,8 @@
   cursor: pointer;
   color: #A0C1BF;
   font-size: 20px;
-  margin-top: -20px;
+  margin-top: -10px;
+  margin-left: 970px;
 }
 
 .i-fa-pen:hover{
@@ -282,8 +283,32 @@ li.i-etiqueta-item {
 .i-seccion-miembros {
   width: 20%;
   display: flex;
-  align-items: stretch;
   flex-direction: column;
+  justify-content: space-between;
+}
+
+.i-seccion-1 {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.i-guardar-cerrar {
+  display: flex;
+  flex-direction: row;
+}
+
+.i-guardar-cerrar button {
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #000;
+  background-color: #909da4;
+  font-weight: bold;
+  border-radius: 20px;
+}
+
+.i-guardar-cerrar button:hover {
+  background-color: #6b7780
 }
 
 .i-btn-ver-miembros {
@@ -317,6 +342,16 @@ li.i-etiqueta-item {
   font-size: 12px;
   padding: 5px 10px;
   text-align: center;
+}
+
+.react-datepicker-2 {
+  width: 100px;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+  background: none;
+  border: none;
+  border-radius: 3px;
 }
 
 /* Miembros */
@@ -370,7 +405,7 @@ li.i-etiqueta-item {
 
 .i-btn-ver-solicitudes {
   bottom: 0;
-  background-color: #909da4; 
+  background-color: #A0C1BF; 
   border: none; 
   padding: 10px 20px; 
   font-size: 16px;
@@ -384,7 +419,7 @@ li.i-etiqueta-item {
 }
 
 .i-btn-ver-solicitudes:hover {
-  background-color: #6b7780;
+  background-color: #699AA0;
 }
 
 /* Modal Solicitudes */
@@ -409,7 +444,7 @@ li.i-etiqueta-item {
 /*TAREAS MARTHA*/
 
 .i-seccion-tareas {
-  width: 80%;
+  width: 100%;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
@@ -417,7 +452,7 @@ li.i-etiqueta-item {
 
 .i-tareas-container {
   display: flex;
-  width: 85%;
+  width: 100%;
   flex-direction: column-reverse;
 }
 
@@ -429,23 +464,28 @@ li.i-etiqueta-item {
 
 .i-tarea {
   display: flex;
-  width: 100%;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 80%;
   background-color: #E2EBF1;
   border-radius: 25px;
   margin-top: 10px;
   margin-bottom: 10px;
   padding: 10px 25px;
-  align-items: flex-start;
   font-weight: 600;
-  flex-direction: row;
-  overflow-x: auto;
-
 }
 
 .i-tarea-titulo {
   display: flex;
   flex-direction: row;
   font-size: 25px;
+  overflow: overlay;
+  max-width: 390px;
+  text-align: left;
+}
+
+.i-tarea-titulo::-webkit-scrollbar {
+  display: none;
 }
 
 .i-tarea-titulo:focus-visible {
@@ -464,9 +504,16 @@ input.i-tarea-titulo {
   display: flex;
 }
 
+.i-edit-tarea-box {
+  background: transparent;
+  font-weight: 600;
+  border: none;
+  overflow: none;
+}
 
-
-
+.i-edit-tarea-box:focus-visible {
+  outline: none;
+}
 
 .i-desc-input-texto-2 {
   position: relative;
@@ -937,4 +984,56 @@ li.i-etiqueta-item-2 {
 
 .i-modal-lista-usuarios::-webkit-scrollbar {
   display: none;
+}
+
+/* Isa estilos */
+.i-edit-tarea {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.i-edit-tarea button {
+  color: #000;
+}
+
+.i-edit-tarea-2 button {
+  color: #000;
+  font-size: 20px;
+  background: transparent;
+  padding: 0px;
+}
+
+.i-edit-tarea button:hover,
+.i-edit-tarea-2 button:hover {
+  color: #A0C1BF;
+}
+
+.i-row-tarea {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-edit-tarea-2 {
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+}
+
+.i-input-titulo-tarea {
+  position: relative;
+  width: 100%;
+  background-color: transparent;
+  border-radius: 0px;
+  outline: none;
+  text-align: left;
+  font-weight: 600;
+  font-size: 25px;
+  color: #121212;
+  word-break: break-word;
+  resize: none;
+  padding-right: 20px; 
 }
