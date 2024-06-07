@@ -9,7 +9,7 @@ import { ClipLoader } from 'react-spinners';
 import { useParams } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import es from 'date-fns/locale/es';
-import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud, actualizaTarea } from '../../api/api.js';
+import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud, actualizaTarea, enviarCorreoTarea } from '../../api/api.js';
 import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import './Initiative.css';
@@ -756,6 +756,11 @@ export const Initiative = () => {
 
   const updateUsuarioAsignado = (usuario) => {
     setNuevoUsuarioAsignado(usuario.idUsuario);
+    console.log("setNuevoUsuarioAsignado");
+    console.log(idIniciativa);
+    console.log(usuario.correo);
+    console.log(tarea.titulo);
+    enviarCorreoTarea(iniciativa, usuario);
   }
 
 
