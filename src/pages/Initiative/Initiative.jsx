@@ -1118,8 +1118,8 @@ export const Initiative = () => {
 
                 <div className='i-tareas-container'>
 
-                  {(tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada)) ? (
-
+                  {tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada).length > 0 ? (
+                    
                     <div>
                     {tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada).map((tarea, index) => (
                       <div className="i-tareas-container-2" key={tarea.idTarea}>
