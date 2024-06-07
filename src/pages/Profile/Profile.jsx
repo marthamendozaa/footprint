@@ -583,7 +583,7 @@ export const Profile = () => {
             {error && <p className='p-error-cc' style={{marginTop: '310px'}}><FaExclamationCircle className='p-fa-ec-2'/>{error}</p>}
             
             <Modal.Footer>
-              <Button onClick={handleSubmitPassword} style={{width: '130px'}} disabled={fieldsEmpty || passwordStrength < 4 || !passwordsMatch || contrasenaDesactivado}>
+              <Button onClick={handleSubmitPassword} style={{width: '130px'}} disabled={fieldsEmpty || passwordStrength < 2 || !passwordsMatch || contrasenaDesactivado}>
                 {contrasenaDesactivado ? <ClipLoader size={20} color="#000" /> : 'Guardar'}
               </Button>
               <Button onClick={closeModalContrasena}>Cerrar</Button>
