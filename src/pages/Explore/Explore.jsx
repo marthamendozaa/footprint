@@ -153,7 +153,9 @@ export const Explore = () => {
 
         if (iniciativa.fechaCierre) {
           const [day, month, year] = iniciativa.fechaCierre.split('/');
+          // Verifica fecha hasta el final del día
           const fechaCierre = new Date(year, month - 1, day);
+          fechaCierre.setHours(23, 59, 59, 999);
           fechaLimite = (fechaCierre <= fechaActual) ? true : false;
         }
       
