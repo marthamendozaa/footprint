@@ -1100,7 +1100,7 @@ export const Initiative = () => {
                               </div>
                               <div className="i-tarea-botones">
                                 <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                                <div className="i-tarea-boton" style={{marginTop: '5px', cursor:'pointer'}} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento</div>
+                                <div className="i-tarea-boton" style={{marginTop: '5px'}} ><FaFolder /> Documento</div>
                               </div>
                             </div>
                           </div>
