@@ -170,22 +170,6 @@ export const getUsuario = async (user) => {
   }
 };
 
-// Obtener usuario por ID
-export const getUsuarioID = async (correo) => {
-  try {
-    const q = query(collection(firestore, "Usuarios"), where('correo', '==', correo));
-    const querySnapshot = await getDocs(q);
-    let idUsuario = null;
-    querySnapshot.forEach(doc => {
-      idUsuario = doc.id;
-    });
-    console.log(idUsuario);
-    return idUsuario;
-  } catch (error) {
-    console.log("Error obteniendo id de usuario");
-    throw new Error(error);
-  }
-}
 
 // Información de todos los usuarios
 export const getUsuarios = async () => {
@@ -597,16 +581,11 @@ export const enviarCorreoTarea = async (iniciativa, miembro, tarea) => {
   }
 }
 
-// Enviar correo para cambiar la contraseña
-export const sendPasswordMail = async (correo) => {
-  const message = {
-    subject: `Cambio de contraseña`,
-    text: `Haz click aquí para cambiar de contraseña.`
-  }
 
-  const response = await axios.post(`${functionsURL}/enviarCorreo`, {
-    email: correo,
-    message: message
+// Enviar correo para cambiar la contraseña
+export const enviarCorreoContrasena = async (correo) => {
+  const response = await axios.post(`${functionsURL}/enviarCorreoContrasena`, {
+    email: correo
   });
 
   if (response.data.success) {
