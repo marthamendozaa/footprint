@@ -9,7 +9,7 @@ import { ClipLoader } from 'react-spinners';
 import { useParams } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import es from 'date-fns/locale/es';
-import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud, actualizaTarea } from '../../api/api.js';
+import { getIntereses, getIniciativa, actualizaIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud, actualizaTarea } from '../../api/api.js';
 import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import './Initiative.css';
@@ -612,16 +612,31 @@ export const Initiative = () => {
   }, [imagenPreview, nuevoTitulo, nuevaDescripcion, Object.keys(etiquetasIniciativa)]);
 
   const handleGuardarCampos = async () => {
-    if (guardarCamposBloqueado) {
-      return
-    }
-
-    setEditingCampos(false);
+    setGuardarCamposBloqueado(true);
+    let nuevaIniciativa = {...iniciativa};
 
     try {
+      // Actualiza información de la iniciativa
+      nuevaIniciativa = {
+        ...nuevaIniciativa,
+        titulo: nuevoTitulo,
+        descripcion: nuevaDescripcion,
+        listaEtiquetas: etiquetasIniciativa,
+        fechaCierre: formatDate(nuevaFechaFinal)
+      };
 
+      setNuevoTitulo(nuevoTitulo);
+      setNuevaDescripcion(nuevaDescripcion);
+      setEtiquetasIniciativa(etiquetasIniciativa);
+      setNuevaFechaFinal(nuevaFechaFinal);
+      setIniciativa(nuevaIniciativa);
+      
+      await actualizaIniciativa(nuevaIniciativa);
     } catch (error) {
-
+      console.log(error);
+    } finally {
+      setEditingCampos(false);
+      setGuardarCamposBloqueado(false);
     }
   };
 
@@ -1292,22 +1307,16 @@ export const Initiative = () => {
 
               {esAdmin && (
                 <button type="button" className="i-btn-ver-solicitudes" onClick={() => setShowSolicitudesModal(true)}>
-                  VER SOLICITUDES
+                  <FaEnvelope style={{marginRight: "5px"}}/> Solicitudes
                 </button>
               )}
             </div>
 
-            <div className='i-guardar-cerrar'>
+            <div className='i-guardar'>
               {!editingCampos || esAdmin && (
-                <>
-                  <button onClick={handleCancelarCampos}>
-                    Cerrar
-                  </button>
-
-                  <button style={{marginLeft: '10px'}} onClick={handleGuardarCampos} disabled={guardarCamposBloqueado}>
-                    Guardar
-                  </button>
-                </>
+                <button className="i-btn-guardar" onClick={handleGuardarCampos} disabled={guardarCamposBloqueado}>
+                  {guardarCamposBloqueado ? <ClipLoader size={20} color="#000" /> : 'Guardar'}
+                </button>
               )}
             </div>
 
