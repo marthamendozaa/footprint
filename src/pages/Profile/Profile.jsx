@@ -460,10 +460,10 @@ export const Profile = () => {
             {errorI && <span className='c-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{errorI}</span>}
       
             <Modal.Footer>
+              <Button onClick={closeModal}>Cerrar</Button>
               <Button onClick={handleUploadProfileImage} disabled={imagenDesactivado || imagenBloqueado} style={{width: "130px"}}>
                 {imagenDesactivado ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
               </Button>
-              <Button onClick={closeModal}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
 
@@ -583,10 +583,10 @@ export const Profile = () => {
             {error && <p className='p-error-cc' style={{marginTop: '310px'}}><FaExclamationCircle className='p-fa-ec-2'/>{error}</p>}
             
             <Modal.Footer>
+              <Button onClick={closeModalContrasena}>Cerrar</Button>
               <Button onClick={handleSubmitPassword} style={{width: '130px'}} disabled={fieldsEmpty || passwordStrength < 4 || !passwordsMatch || contrasenaDesactivado}>
                 {contrasenaDesactivado ? <ClipLoader size={20} color="#000" /> : 'Guardar'}
               </Button>
-              <Button onClick={closeModalContrasena}>Cerrar</Button>
             </Modal.Footer>
           </Modal>
 
@@ -599,8 +599,8 @@ export const Profile = () => {
             <p className='p-modal-body'>Si deseas salir has clic en Cerrar Sesión o en Cancelar para continuar trabajando</p>
             
             <Modal.Footer>
-              <Button className="btn-salir-sesion" onClick={botonCerrarSesion}>Cerrar Sesión</Button>
               <Button onClick={closeModalSesionCerrada}>Cancelar</Button>
+              <Button className="btn-salir-sesion" onClick={botonCerrarSesion}>Cerrar Sesión</Button>
             </Modal.Footer>
           </Modal>
 

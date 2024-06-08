@@ -1497,8 +1497,8 @@ export const Initiative = () => {
         {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
 
         <Modal.Footer>
-          <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
           <Button onClick={handleCerrarImagen}>Cerrar</Button>
+          <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
         </Modal.Footer>
       </Modal>
 
@@ -1526,10 +1526,10 @@ export const Initiative = () => {
         {fileError && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{fileError}</span>}
   
         <Modal.Footer>
+          <Button onClick={closeUploadModal} style={{width: '115px'}}>Cerrar</Button>
           <Button className='i-modal-guardar' onClick={handleUploadFile} disabled={uploadDisabled} style={{width: '115px'}}>
             {cargandoTarea ? <ClipLoader size={24} color="#fff"/> : 'Guardar'}
           </Button>
-          <Button onClick={closeUploadModal} style={{width: '115px'}}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
 
@@ -1632,10 +1632,10 @@ export const Initiative = () => {
             </div>
           )}
         <Modal.Footer>
+          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
           <Button className="eliminar" onClick={handleEliminaMiembro} disabled={eliminaBloqueado} style={{width: "127px"}}>
             {eliminaBloqueado ? <ClipLoader size={20} color="#fff" /> : 'Eliminar'}
           </Button>
-          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
       
