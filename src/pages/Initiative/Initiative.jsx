@@ -41,6 +41,7 @@ export const Initiative = () => {
   const { user } = useAuth();
   const [infoAdmin, setInfoAdmin] = useState(null);
   const [esAdmin, setEsAdmin] = useState(false);
+  const [usuariosTodos, setUsuariosTodos] = useState({});
   const [miembros, setMiembros] = useState([]);
   const [usuarios, setUsuarios] = useState({});
   const [usuariosFiltrados, setUsuariosFiltrados] = useState({});
@@ -74,6 +75,7 @@ export const Initiative = () => {
 
         // Obtiene información de todos los usuarios
         const usuariosData = await getUsuarios();
+        setUsuariosTodos(usuariosData);
 
         // Obtiene información del admin de la iniciativa
         const adminIniciativa = usuariosData[iniciativaData.idAdmin];
@@ -637,10 +639,6 @@ export const Initiative = () => {
     }
   };
 
-  const handleCancelarCampos = async () => {
-    setEditingCampos(false);
-  };
-
 
 
   // TAREAS //
@@ -727,19 +725,17 @@ export const Initiative = () => {
       const tareaNueva = { ...tareaUpload, urlEntrega: fileUrl, completada: true}
       await actualizaTarea(tareaNueva);
 
-      const updatedTareas = [...tareas];
-      updatedTareas[selectedTaskIndex] = tareaNueva;
+      const updatedTareas = tareas.filter((tarea, i) => i !== selectedTaskIndex);
+      const updatedTareasCompletadas = [...tareasCompletadas, tareaNueva];
 
       setTareas(updatedTareas);
-      setEditingTareaId(null);
-
-      closeUploadModal();
-
-      // Handle fileUrl appropriately in your application context
-
+      setTareasCompletadas(updatedTareasCompletadas);
     } catch (error) {
       console.error("Error al subir el archivo:", error.message);
-    } 
+    } finally {
+      setCargandoTarea(false);
+      closeUploadModal();
+    }
   };
 
   const { getRootProps: getRootPropsTarea, getInputProps: getInputPropsTarea } = useDropzone({
@@ -935,7 +931,7 @@ export const Initiative = () => {
         <div className="i-desc">
           <div className="i-progreso-texto">Progreso</div>
 
-          <ProgressBar progress={Math.round((tareas.filter(tarea => tarea.completada).length / tareas.length) * 100)} />
+          <ProgressBar progress={Math.round((tareasCompletadas.length / (tareas.length + tareasCompletadas.length)) * 100)} />
         </div>
 
         <div className="c-desc">
@@ -997,7 +993,7 @@ export const Initiative = () => {
                       {/* VISTA TAREAS DE ADMIN EDITANDO */}
                       {editingCampos ? (
                         <div>
-                          {tareas.filter(tarea => !tarea.completada).map((tarea, index) => (
+                          {tareas.map((tarea, index) => (
                             <div className="i-tarea-container-2" key={tarea.idTarea}>
                               <div className="i-row-tarea">
                                 <div className="i-tarea">
@@ -1077,8 +1073,8 @@ export const Initiative = () => {
                                     
                                     {/* Asignar */}
                                     <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openAsignarTarea(tarea, index)}>
-                                      {tarea.idAsignado ? (
-                                        <>{miembros.find((miembro) => tarea.idAsignado == miembro.idUsuario).nombreUsuario}</>
+                                      {tarea.idAsignado && usuariosTodos ? (
+                                        <>{usuariosTodos[tarea.idAsignado].nombreUsuario}</>
                                       ) : (
                                         <><FaUserPlus /> Asignar</>
                                       )}
@@ -1110,8 +1106,8 @@ export const Initiative = () => {
                                 {/* Asignar */}
                                 <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
                                 <div className="i-tarea-boton" style={{ marginTop: '5px' }}>
-                                  {tarea.idAsignado ? (
-                                    <>{miembros.find((miembro) => tarea.idAsignado == miembro.idUsuario).nombreUsuario}</>
+                                  {tarea.idAsignado && usuariosTodos ? (
+                                    <>{usuariosTodos[tarea.idAsignado].nombreUsuario}</>
                                   ) : (
                                     <><FaUserPlus /> Sin Asignar</>
                                   )}
@@ -1150,7 +1146,7 @@ export const Initiative = () => {
                           </div>
                           <div className="i-tarea-botones">
                             <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                            <div className="i-tarea-boton" style={{marginTop: '5px', cursor:'pointer'}} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento</div>
+                            <div className="i-tarea-boton" style={{marginTop: '5px', cursor:'pointer'}} onClick={() => openUploadModal(tarea, index)}><LuUpload /> Entregar</div>
                           </div>
                         </div>
                       </div>
@@ -1192,6 +1188,7 @@ export const Initiative = () => {
                                 <div className="i-tarea-botones">
                                   <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
                                   <div className="i-tarea-boton" style={{marginTop: '5px', cursor: 'pointer' }} onClick={() => handleMostrarEntregable(tarea.urlEntrega)} > <FaFolder /> Documento </div>
+                                  <div className="i-tarea-boton" style={{marginTop: '5px'}} > {tarea.idAsignado && usuariosTodos && <>{usuariosTodos[tarea.idAsignado].nombreUsuario}</>} </div>
                                 </div>
                               
                             </div>
