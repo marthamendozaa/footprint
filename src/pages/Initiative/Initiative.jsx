@@ -588,6 +588,7 @@ export const Initiative = () => {
 
   // Guardar la información editada
   const [guardarCamposBloqueado, setGuardarCamposBloqueado] = useState(false);
+  const [guardarCargando, setGuardarCargando] = useState(false);
 
   useEffect(() => {
     const verificarCampos = () => {
@@ -602,7 +603,7 @@ export const Initiative = () => {
   }, [imagenPreview, nuevoTitulo, nuevaDescripcion, Object.keys(etiquetasIniciativa)]);
 
   const handleGuardarCampos = async () => {
-    setGuardarCamposBloqueado(true);
+    setGuardarCargando(true);
     let nuevaIniciativa = {...iniciativa};
 
     try {
@@ -622,11 +623,17 @@ export const Initiative = () => {
       setIniciativa(nuevaIniciativa);
       
       await actualizaIniciativa(nuevaIniciativa);
+
+      // Actualiza tareas de la iniciativa
+      const tareasPromises = tareas.map(async (tarea) => {
+        await actualizaTarea(tarea);
+      });
+      await Promise.all(tareasPromises);
     } catch (error) {
       console.log(error);
     } finally {
+      setGuardarCargando(false);
       setEditingCampos(false);
-      setGuardarCamposBloqueado(false);
     }
   };
 
@@ -666,12 +673,9 @@ export const Initiative = () => {
     setTareaUpload(tarea);
     setSelectedTaskIndex(index);
     setSelectedTaskId(tarea.idTarea);
-    console.log("selectedTaskIndex", index);
-    console.log("miembros", miembros);
   };
 
   const handleMostrarEntregable = (tareaUrl) => {
-    
     setModalEntregable(true);
     setTareaEntregable(tareaUrl);
   };
@@ -978,7 +982,7 @@ export const Initiative = () => {
         <div className="i-tareas-miembros">
           <div className="i-seccion-tareas">
               {/* Tarea asignada a mí */}
-              <div className="i-titulo-tareas">Mis Tareas</div>
+              <div className="i-titulo-tareas">{esAdmin ? 'Tareas' : 'Mis Tareas'}</div>
               
               {(tareas && tareas.length > 0 && esAdmin) ? (
                 
@@ -1070,8 +1074,6 @@ export const Initiative = () => {
                                         />
                                       </div>
                                     </>
-                                    {/* Documento */}
-                                    <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento </div>
                                     
                                     {/* Asignar */}
                                     <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openAsignarTarea(tarea, index)}>
@@ -1093,7 +1095,7 @@ export const Initiative = () => {
 
                       /* VISTA TAREAS TOTALES ADMIN */
                       <div>
-                        {tareas.filter(tarea => !tarea.completada).map((tarea, index) => (
+                        {tareas.map((tarea, index) => (
                           <div className="i-tareas-container-2" key={tarea.idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
@@ -1105,8 +1107,15 @@ export const Initiative = () => {
                                 </div>
                               </div>
                               <div className="i-tarea-botones">
+                                {/* Asignar */}
                                 <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                                <div className="i-tarea-boton" style={{marginTop: '5px'}} ><FaFolder /> Documento</div>
+                                <div className="i-tarea-boton" style={{ marginTop: '5px' }}>
+                                  {tarea.idAsignado ? (
+                                    <>{miembros.find((miembro) => tarea.idAsignado == miembro.idUsuario).nombreUsuario}</>
+                                  ) : (
+                                    <><FaUserPlus /> Sin Asignar</>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -1249,8 +1258,8 @@ export const Initiative = () => {
 
             <div className='i-guardar'>
               {!editingCampos || esAdmin && (
-                <button className="i-btn-guardar" onClick={handleGuardarCampos} disabled={guardarCamposBloqueado}>
-                  {guardarCamposBloqueado ? <ClipLoader size={20} color="#000" /> : 'Guardar'}
+                <button className="i-btn-guardar" onClick={handleGuardarCampos} disabled={guardarCamposBloqueado || guardarCargando}>
+                  {guardarCargando ? <ClipLoader size={20} color="#000" /> : 'Guardar'}
                 </button>
               )}
             </div>
