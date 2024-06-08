@@ -800,6 +800,12 @@ export const Initiative = () => {
               </button>
             )}
 
+            {!editingCampos || esAdmin && (
+              <button className="i-fa-pen" onClick={handleCancelarCampos}>
+                <FaTimes />
+              </button>
+            )}
+
             {/* Foto de iniciativa */}
             {editingCampos ? (
               <div className="c-foto-iniciativa" onClick={handleMostrarImagen}>
