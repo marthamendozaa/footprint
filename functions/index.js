@@ -279,17 +279,45 @@ exports.eliminarMiembro = onRequest(async (req, res) => {
     const { user, iniciativa } = req.body;
 
     try {
+      // Información del usuario
       const usuarioRef = await getFirestore().doc(`Usuarios/${user}`).get();
-      const usuario = usuarioRef.data();
-      const listaUsuarioNueva = usuario.listaIniciativasMiembro.filter(id => id !== iniciativa);
-      const usuarioNuevo = { ...usuario, listaIniciativasMiembro: listaUsuarioNueva };
-      await getFirestore().doc(`Usuarios/${user}`).update(usuarioNuevo);
+      let usuarioData = usuarioRef.data();
 
+      // Información de la iniciativa
       const iniciativaRef = await getFirestore().doc(`Iniciativas/${iniciativa}`).get();
-      const iniciativaData = iniciativaRef.data();
-      const listaIniciativaNueva = iniciativaData.listaMiembros.filter(id => id !== user);
-      const iniciativaNueva = { ...iniciativaData, listaMiembros: listaIniciativaNueva };
-      await getFirestore().doc(`Iniciativas/${iniciativa}`).update(iniciativaNueva);
+      let iniciativaData = iniciativaRef.data();
+
+      // Eliminar iniciativa del miembro
+      usuarioData.listaIniciativasMiembro = usuarioData.listaIniciativasMiembro.filter(id => id !== iniciativa);
+      // Eliminar miembro de la iniciativa
+      iniciativaData.listaMiembros = iniciativaData.listaMiembros.filter(id => id !== user);
+
+      // Eliminar solicitudes del miembro en la iniciativa
+      const solicitudesQuery = await getFirestore().collection('Solicitudes')
+      .where('idUsuario', '==', user)
+      .where('idIniciativa', '==', iniciativa)
+      .get();
+
+      for (const solicitud of solicitudesQuery.docs) {
+        usuarioData.listaSolicitudes = usuarioData.listaSolicitudes.filter(id => id !== solicitud.id);
+        iniciativaData.listaSolicitudes = iniciativaData.listaSolicitudes.filter(id => id !== solicitud.id);
+        await getFirestore().doc(`Solicitudes/${solicitud.id}`).delete();
+      }
+      
+      await getFirestore().doc(`Usuarios/${user}`).update(usuarioData);
+      await getFirestore().doc(`Iniciativas/${iniciativa}`).update(iniciativaData);
+
+      // Reasignar tareas pendientes del miembro en la iniciativa
+      const tareasQuery = await getFirestore().collection('Tareas')
+        .where('idAsignado', '==', user)
+        .where('idIniciativa', '==', iniciativa)
+        .where('completada', '==', false)
+        .get();
+      
+      for (const tarea of tareasQuery.docs) {
+        const tareaNueva = { ...tarea.data(), idAsignado: null };
+        await getFirestore().doc(`Tareas/${tarea.id}`).update(tareaNueva);
+      }
 
       res.json({ success: true });
     } catch (error) {

@@ -426,12 +426,23 @@ export const Initiative = () => {
       // Eliminar de la lista de miembros
       const miembrosNuevo = miembros.filter((miembro) => miembro.idUsuario !== miembroEliminar.idUsuario);
       setMiembros(miembrosNuevo);
+      const totalMiembrosNuevo = totalMiembros.filter((miembro) => miembro.idUsuario !== miembroEliminar.idUsuario);
+      setTotalMiembros(totalMiembrosNuevo);
 
       // Regresar a la lista de usuarios
       const usuariosNuevo = {...usuarios};
       usuariosNuevo[miembroEliminar.idUsuario] = {...miembroEliminar, invitarCargando: false, invitarDesactivado: false, cancelarDesactivado: true};
       setUsuarios(usuariosNuevo);
       setUsuariosFiltrados(usuariosNuevo);
+
+      // Actualizar tareas sin miembro
+      let tareasNuevo = [...tareas];
+      for (const tarea of tareasNuevo) {
+        if (tarea.idAsignado === miembroEliminar.idUsuario) {
+          tarea.idAsignado = null;
+        }
+      }
+      setTareas(tareasNuevo);
       
       handleCerrarEliminar();
       handleMostrarEliminada();
@@ -628,6 +639,9 @@ export const Initiative = () => {
 
       // Actualiza tareas de la iniciativa
       const tareasPromises = tareas.map(async (tarea) => {
+        if (!miembros.some(miembro => miembro.idUsuario === tarea.idAsignado)) {
+          tarea.idAsignado = null;
+        }
         await actualizaTarea(tarea);
       });
       await Promise.all(tareasPromises);
