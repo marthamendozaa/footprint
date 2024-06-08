@@ -584,7 +584,7 @@ export const Profile = () => {
             
             <Modal.Footer>
               <Button onClick={closeModalContrasena}>Cerrar</Button>
-              <Button onClick={handleSubmitPassword} style={{width: '130px'}} disabled={fieldsEmpty || passwordStrength < 4 || !passwordsMatch || contrasenaDesactivado}>
+              <Button onClick={handleSubmitPassword} style={{width: '130px'}} disabled={fieldsEmpty || passwordStrength < 2 || !passwordsMatch || contrasenaDesactivado}>
                 {contrasenaDesactivado ? <ClipLoader size={20} color="#000" /> : 'Guardar'}
               </Button>
             </Modal.Footer>

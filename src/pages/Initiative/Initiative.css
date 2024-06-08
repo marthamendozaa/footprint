@@ -293,22 +293,31 @@ li.i-etiqueta-item {
   align-items: stretch;
 }
 
-.i-guardar-cerrar {
+.i-guardar {
   display: flex;
-  flex-direction: row;
+  justify-content: center;
 }
 
-.i-guardar-cerrar button {
-  padding: 10px 20px;
-  font-size: 16px;
-  color: #000;
-  background-color: #909da4;
-  font-weight: bold;
-  border-radius: 20px;
+.i-btn-guardar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: 600;
+  width: 169px;
+  height: 50px;
+  padding: 10px 30px;
+  background-color: #bbb;
+  border-radius: 30px;
 }
 
-.i-guardar-cerrar button:hover {
-  background-color: #6b7780
+.i-btn-guardar:hover {
+  background-color: #989898;
+}
+
+button.i-btn-guardar:disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .i-btn-ver-miembros {
@@ -404,15 +413,18 @@ li.i-etiqueta-item {
 }
 
 .i-btn-ver-solicitudes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   bottom: 0;
   background-color: #A0C1BF; 
   border: none; 
   padding: 10px 20px; 
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 600;
   color: #000000;
-  font-weight: bold; 
   transition: background-color 0.3s ease;
-  border-radius: 20px;
+  border-radius: 25px;
   margin-top: 20px;
   margin-bottom: 5px;
   width: 100%;
@@ -758,6 +770,7 @@ input.i-tarea-titulo {
 /* Agregar usuario modal */
 .i-modal-lista-usuarios {
   max-height: 500px;
+  max-width: 100% !important;
   overflow: overlay;
 }
 

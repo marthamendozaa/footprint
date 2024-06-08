@@ -41,12 +41,25 @@ export const MyInitiatives = () => {
         };
       });
 
+      const fechaActual = new Date();
       const iniciativasFavoritasData = iniciativasData.iniciativasFavoritas.map(iniciativa => {
+        // Verifica si la fecha de cierre de la iniciativa ya pasó
+        let fechaLimite = false;
+
+        if (iniciativa.fechaCierre) {
+          const [day, month, year] = iniciativa.fechaCierre.split('/');
+          // Verifica fecha hasta el final del día
+          const fechaCierre = new Date(year, month - 1, day);
+          fechaCierre.setHours(23, 59, 59, 999);
+          fechaLimite = (fechaCierre <= fechaActual) ? true : false;
+        }
+
         const admin = usuariosData[iniciativa.idAdmin];
         return {
             ...iniciativa,
             nombreAdmin: admin.nombreUsuario,
-            urlImagenAdmin: admin.urlImagen
+            urlImagenAdmin: admin.urlImagen,
+            fechaLimite: fechaLimite
         };
       });
 
@@ -67,21 +80,26 @@ export const MyInitiatives = () => {
     let iniciativasFavoritasNuevo = [...iniciativasFavoritas];
     let usuarioNuevo = {...usuario};
 
-    setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
-    setTimeout(() => {
-      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
+    try {
+      // Comienza animación
+      setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
 
-      // Actualizar lista de iniciativas favoritas
+      // Actualiza lista de iniciativas favoritas
       iniciativasFavoritasNuevo = iniciativasFavoritasNuevo.filter(iniciativa => iniciativa.idIniciativa !== idIniciativa);
+
+      // Actualiza información del usuario
+      let usuarioIniciativasFavoritas = iniciativasFavoritasNuevo.map(iniciativa => iniciativa.idIniciativa);
+      usuarioNuevo.listaIniciativasFavoritas = usuarioIniciativasFavoritas;
+
+      await actualizaUsuario(usuarioNuevo);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // Termina animación
+      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
       setIniciativasFavoritas(iniciativasFavoritasNuevo);
-
-      // Actualizar información del usuario
-      iniciativasFavoritasNuevo = iniciativasFavoritasNuevo.map(iniciativa => iniciativa.idIniciativa);
-      usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
       setUsuario(usuarioNuevo);
-    }, 600);
-
-    await actualizaUsuario(usuarioNuevo);
+    }
   };
 
   // Modal para mostrar información de la iniciativa
@@ -90,7 +108,6 @@ export const MyInitiatives = () => {
   const [selectedIniciativaIndex, setSelectedIniciativaIndex] = useState(null);
   const [suscribirDesactivado, setSuscribirDesactivado] = useState(false);
   const [suscribirCargando, setSuscribirCargando] = useState(false);
-  const [fechaLimite, setFechaLimite] = useState(false);
 
   const seleccionaIniciativa = async (iniciativa, index) => {
     // Verificar si el usuario ya envió una solicitud a la iniciativa
@@ -99,18 +116,6 @@ export const MyInitiatives = () => {
       setSuscribirDesactivado(true);
     } else {
       setSuscribirDesactivado(false);
-    }
-
-    // Si la fecha de cierre ya pasó, no se puede suscribir
-    if (iniciativa.fechaCierre) {
-      const [day, month, year] = iniciativa.fechaCierre.split('/');
-      const fechaCierre = new Date(year, month - 1, day);
-      const fechaActual = new Date();
-      if (fechaCierre < fechaActual) {
-        setFechaLimite(true);
-      } else {
-        setFechaLimite(false);
-      }
     }
 
     setSelectedIniciativa(iniciativa);
@@ -327,7 +332,6 @@ export const MyInitiatives = () => {
             handleSuscribirse={handleSuscribirse}
             esAdmin={false}
             esMiembro={false}
-            fechaLimite={fechaLimite}
             suscribirDesactivado={suscribirDesactivado}
             setSuscribirDesactivado={setSuscribirDesactivado}
             suscribirCargando={suscribirCargando}

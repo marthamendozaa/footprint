@@ -62,8 +62,8 @@
     display: flex;
     flex-wrap: wrap;
     height: min-content;
-    gap: 15px;
-    justify-content: flex-start;
+    gap: 8px;
+    justify-content: space-around;
 }
   
 .r4-etiquetas li {
@@ -141,7 +141,7 @@ li.r4-etiquetas-item:hover {
 }
 
 .flecha-register4-container-end button.btn:active {
-  border: none;
+    border: none;
 }
 
 .pop-up-register4 {
@@ -173,7 +173,7 @@ li.r4-etiquetas-item:hover {
     padding: 10px 30px;
     font-weight: 600;
     border: none;
-    border-radius: 10px;
+    border-radius: 30px;
 }
 
 .pop-up-4-register4 button:hover {

@@ -146,23 +146,33 @@ export const Explore = () => {
       const usuariosData = await getUsuarios();
       const iniciativasData = await getIniciativas();
       
-      // No incluir iniciativas si la fecha de cierre ya pasó
       const fechaActual = new Date();
-      let iniciativasNuevo = iniciativasData.filter(iniciativa => {
+      let iniciativasNuevo = iniciativasData.map(iniciativa => {
+        // Verifica si la fecha de cierre de la iniciativa ya pasó
+        let fechaLimite = false;
+
         if (iniciativa.fechaCierre) {
           const [day, month, year] = iniciativa.fechaCierre.split('/');
+          // Verifica fecha hasta el final del día
           const fechaCierre = new Date(year, month - 1, day);
-          return fechaCierre >= fechaActual;
-        } else {
-          return true;
+          fechaCierre.setHours(23, 59, 59, 999);
+          fechaLimite = (fechaCierre <= fechaActual) ? true : false;
         }
+      
+        // Asigna el nombre y la imagen del admin a cada iniciativa
+        const admin = usuariosData[iniciativa.idAdmin];
+        
+        return {
+          ...iniciativa,
+          nombreAdmin: admin.nombreUsuario,
+          urlImagenAdmin: admin.urlImagen,
+          fechaLimite: fechaLimite
+        };
       });
 
-      // Asigna el nombre y la imagen del admin a cada iniciativa
-      for (let i = 0; i < iniciativasNuevo.length; i++) {
-        const admin = usuariosData[iniciativasNuevo[i].idAdmin];
-        iniciativasNuevo[i].nombreAdmin = admin.nombreUsuario;
-        iniciativasNuevo[i].urlImagenAdmin = admin.urlImagen;
+      // Filtrar iniciativas sin fecha de cierre para usuarios no administradores
+      if (!admin) {
+        iniciativasNuevo = iniciativasNuevo.filter(iniciativa => !iniciativa.fechaLimite);
       }
 
       setIniciativas(iniciativasNuevo);
@@ -220,12 +230,7 @@ export const Explore = () => {
 
       // Filtrar por etiquetas
       const etiquetasIniciativa = Object.values(iniciativa.listaEtiquetas);
-      for (let etiqueta of etiquetasIniciativa) {
-        if (etiquetasSeleccionadas.includes(etiqueta)) {
-          filtroEtiqueta = true;
-          break;
-        }
-      };
+      filtroEtiqueta = etiquetasSeleccionadas.every(etiqueta => etiquetasIniciativa.includes(etiqueta));
       
       // Filtrar por privacidad
       const privacidadIniciativa = iniciativa.esPublica ? "Pública" : "Privada";
@@ -288,7 +293,7 @@ export const Explore = () => {
         setUsuarioEsMiembro(false);
       }
     }
-    
+
     // Selecciona iniciativa
     setSeleccionada(iniciativa);
     setSeleccionadaIndice(indice);
@@ -363,25 +368,32 @@ export const Explore = () => {
 
   // Toggle de icono de favoritos
   const handleToggleFavorita = async (idIniciativa) => {
-    setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
-    setTimeout(() => {
-      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
-    }, 600);
-
     let iniciativasFavoritasNuevo = [...iniciativasFavoritas];
+    let usuarioNuevo = {...usuario};
 
-    if (iniciativasFavoritas.includes(idIniciativa)) {
-      iniciativasFavoritasNuevo = iniciativasFavoritas.filter(favorita => favorita !== idIniciativa);
-    } else {
-      iniciativasFavoritasNuevo.push(idIniciativa);
+    try {
+      // Comienza animación
+      setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
+
+      // Actualiza lista de iniciativas favoritas
+      if (iniciativasFavoritas.includes(idIniciativa)) {
+        iniciativasFavoritasNuevo = iniciativasFavoritas.filter(favorita => favorita !== idIniciativa);
+      } else {
+        iniciativasFavoritasNuevo.push(idIniciativa);
+      }
+
+      // Actualiza información del usuario
+      usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
+
+      await actualizaUsuario(usuarioNuevo);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // Termina animación
+      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
+      setIniciativasFavoritas(iniciativasFavoritasNuevo);
+      setUsuario(usuarioNuevo);
     }
-    setIniciativasFavoritas(iniciativasFavoritasNuevo);
-
-    // Actualiza información del usuario con lista de favoritas nueva
-    const usuarioNuevo = {...usuario};
-    usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
-    await actualizaUsuario(usuarioNuevo);
-    setUsuario(usuarioNuevo);
   };
 
 
@@ -616,7 +628,6 @@ export const Explore = () => {
           handleSuscribirse = {handleSuscribirse}
           esAdmin={usuarioEsAdmin}
           esMiembro={usuarioEsMiembro}
-          fechaLimite={false}
           suscribirDesactivado={suscribirDesactivado}
           setSuscribirDesactivado={setSuscribirDesactivado}
           suscribirCargando={suscribirCargando}

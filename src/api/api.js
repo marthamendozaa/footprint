@@ -170,22 +170,6 @@ export const getUsuario = async (user) => {
   }
 };
 
-// Obtener usuario por ID
-export const getUsuarioID = async (correo) => {
-  try {
-    const q = query(collection(firestore, "Usuarios"), where('correo', '==', correo));
-    const querySnapshot = await getDocs(q);
-    let idUsuario = null;
-    querySnapshot.forEach(doc => {
-      idUsuario = doc.id;
-    });
-    console.log(idUsuario);
-    return idUsuario;
-  } catch (error) {
-    console.log("Error obteniendo id de usuario");
-    throw new Error(error);
-  }
-}
 
 // Información de todos los usuarios
 export const getUsuarios = async () => {
@@ -536,7 +520,7 @@ export const enviarCorreoIniciativa = async (iniciativa) => {
 
   const message = {
     subject: `Notificación sobre la eliminación de tu iniciativa ${iniciativa.titulo}`,
-    text: `Estimado/a ${admin.nombre},\n\nLamentamos informarte que tu iniciativa ${iniciativa.titulo} ha sido borrada por los administradores debido a que no cumple con los estándares de la plataforma. Si tienes alguna duda sobre el motivo de esta decisión, te invitamos a ponerte en contacto con la administración para obtener más información.\n\nAgradecemos tu comprensión.\n\nSaludos cordiales,\nAdministración de Evertech`
+    text: `Estimado/a ${admin.nombre},\n\nLamentamos informarte que tu iniciativa ${iniciativa.titulo} ha sido eliminada debido a que no cumple con los estándares de la plataforma.\n\nSaludos cordiales,\nAdministración de Evertech`
   }  
 
   const response = await axios.post(`${functionsURL}/enviarCorreo`, {
@@ -558,7 +542,7 @@ export const enviarCorreoIniciativa = async (iniciativa) => {
 export const enviarCorreoMiembro = async (iniciativa, miembro) => {
   const message = {
     subject: `Notificación sobre tu participación en la iniciativa ${iniciativa.titulo}`,
-    text: `Estimado/a ${miembro.nombre},\n\nLamentamos informarte que has sido removido/a de la iniciativa ${iniciativa.titulo}. Si tienes alguna duda sobre el motivo de esta decisión, te invitamos a ponerte en contacto con la persona a cargo de la iniciativa para obtener más información.\n\nAgradecemos tu comprensión.\n\nSaludos cordiales,\nAdministración de Evertech`
+    text: `Estimado/a ${miembro.nombre},\n\nLamentamos informarte que has sido removido/a de la iniciativa ${iniciativa.titulo}. Si tienes alguna duda sobre el motivo de esta decisión, te invitamos a ponerte en contacto con la persona a cargo de la iniciativa para obtener más información.\n\nSaludos cordiales,\nAdministración de Evertech`
   }
 
   const response = await axios.post(`${functionsURL}/enviarCorreo`, {
@@ -580,7 +564,7 @@ export const enviarCorreoMiembro = async (iniciativa, miembro) => {
 export const enviarCorreoTarea = async (iniciativa, miembro, tarea) => {
   const message = {
     subject: `Notificación sobre tu asignación a la tarea ${tarea.titulo}`,
-    text: `Estimado/a ${miembro.nombre},\n\nNos complace informarte que has sido asignado/a a la tarea ${tarea.titulo} en la iniciativa ${iniciativa.titulo}. Si tienes alguna duda, te invitamos a ponerte en contacto con la persona a cargo de la iniciativa.\n\nSaludos cordiales,\nAdministración de Evertech`
+    text: `Estimado/a ${miembro.nombre},\n\nNos complace informarte que has sido asignado/a a la tarea ${tarea.titulo} en la iniciativa ${iniciativa.titulo}.\n\nSaludos cordiales,\nAdministración de Evertech`
   }
 
   const response = await axios.post(`${functionsURL}/enviarCorreo`, {
@@ -597,16 +581,11 @@ export const enviarCorreoTarea = async (iniciativa, miembro, tarea) => {
   }
 }
 
-// Enviar correo para cambiar la contraseña
-export const sendPasswordMail = async (correo) => {
-  const message = {
-    subject: `Cambio de contraseña`,
-    text: `Haz click aquí para cambiar de contraseña.`
-  }
 
-  const response = await axios.post(`${functionsURL}/enviarCorreo`, {
-    email: correo,
-    message: message
+// Enviar correo para cambiar la contraseña
+export const enviarCorreoContrasena = async (correo) => {
+  const response = await axios.post(`${functionsURL}/enviarCorreoContrasena`, {
+    email: correo
   });
 
   if (response.data.success) {

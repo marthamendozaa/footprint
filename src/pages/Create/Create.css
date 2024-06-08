@@ -577,12 +577,12 @@ input.c-tarea-titulo {
   width: 135px;
   height: 50px;
   padding: 10px 30px;
-  background-color: #A0C1BF;
+  background-color: #bbb;
   border-radius: 30px;
 }
 
 .c-btn-crear:hover {
-  background-color: #7d9795;
+  background-color: #989898;
 }
 
 button.c-btn-crear:disabled {
