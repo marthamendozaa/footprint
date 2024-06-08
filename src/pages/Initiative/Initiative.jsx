@@ -1097,7 +1097,7 @@ export const Initiative = () => {
                           <div className="i-tareas-container-2" key={tarea.idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
-                                <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+                                <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                                 <div className="i-tarea-desc">
                                   <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                     {tarea.descripcion}
@@ -1132,7 +1132,7 @@ export const Initiative = () => {
                         <div className="i-tarea">
 
                           <div className="i-tarea-info">
-                            <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+                            <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                             <div className="i-tarea-desc">
                               <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                 {tarea.descripcion}
@@ -1175,7 +1175,7 @@ export const Initiative = () => {
                           <div className="i-tarea-container-2" key={idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
-                                <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+                                <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                                 <div className="i-tarea-desc">{tarea.descripcion}
                                 </div>
                                 
