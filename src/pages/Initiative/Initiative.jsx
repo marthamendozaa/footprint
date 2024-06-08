@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaUserPlus, FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash, FaUser, FaEnvelope } from 'react-icons/fa';
+import { FaUserPlus, FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTimes, FaUser, FaEnvelope } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
@@ -1078,7 +1078,7 @@ export const Initiative = () => {
                                     {/* Asignar */}
                                     <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openAsignarTarea(tarea, index)}>
                                       {tarea.idAsignado ? (
-                                        <>{miembros.find((miembro) => tarea.idAsignado == miembro.idUsuario).nombreUsuario}</>
+                                        <div className='i-titulo-normal'>{miembros.find((miembro) => tarea.idAsignado == miembro.idUsuario).nombreUsuario}</div>
                                       ) : (
                                         <><FaUserPlus /> Asignar</>
                                       )}
@@ -1111,7 +1111,7 @@ export const Initiative = () => {
                                 <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
                                 <div className="i-tarea-boton" style={{ marginTop: '5px' }}>
                                   {tarea.idAsignado ? (
-                                    <>{miembros.find((miembro) => tarea.idAsignado == miembro.idUsuario).nombreUsuario}</>
+                                    <div className='i-titulo-normal'>{miembros.find((miembro) => tarea.idAsignado == miembro.idUsuario).nombreUsuario}</div>
                                   ) : (
                                     <><FaUserPlus /> Sin Asignar</>
                                   )}
@@ -1258,7 +1258,7 @@ export const Initiative = () => {
 
             <div className='i-guardar'>
               {!editingCampos || esAdmin && (
-                <button className="i-btn-guardar" onClick={handleGuardarCampos} disabled={guardarCamposBloqueado || guardarCargando}>
+                <button className="i-btn-guardar" style={{marginTop: '20px'}} onClick={handleGuardarCampos} disabled={guardarCamposBloqueado || guardarCargando}>
                   {guardarCargando ? <ClipLoader size={20} color="#000" /> : 'Guardar'}
                 </button>
               )}
@@ -1409,7 +1409,7 @@ export const Initiative = () => {
                             onClick={() => handleCancelarUsuario(index, solicitudesEnviadas[index].idUsuario)} 
                             disabled={faTrashBloqueado[index]}
                           >
-                            {faTrashBloqueado[index] ? <ClipLoader size={20} color="#000" /> : <FaTrash/>}
+                            {faTrashBloqueado[index] ? <ClipLoader size={20} color="#000" /> : <FaTimes/>}
                           </button>
                         </div>
                       </div>

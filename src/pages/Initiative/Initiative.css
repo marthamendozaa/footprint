@@ -81,7 +81,7 @@ button.i-fa-pen:disabled {
   text-align: left;
 }
 
-.i-titulo-normal{
+.i-titulo-normal {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
