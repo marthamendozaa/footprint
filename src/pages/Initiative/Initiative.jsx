@@ -765,6 +765,14 @@ export const Initiative = () => {
     }
   });
 
+  const tareaFechaLimite = (fechaEntrega) => {
+    const fechaActual = new Date();
+    const fecha = new Date(fechaEntrega);
+    fecha.setHours(23, 59, 59, 999);
+
+    return fecha < fechaActual;
+  };
+
 
   // Tareas height
   // Titulo
@@ -1067,7 +1075,7 @@ export const Initiative = () => {
                                   <div className="i-tarea-botones">
                                     {/* Fecha */}
                                     <>
-                                      <div className="i-tarea-boton">
+                                      <div className="i-tarea-boton" style={tareaFechaLimite(tarea.fechaEntrega) ? {backgroundColor: "#f09e9e"} : {}}>
                                         <FaCalendar/> Fecha
                                         <DatePicker
                                           className='react-datepicker-2'
@@ -1118,7 +1126,9 @@ export const Initiative = () => {
                               </div>
                               <div className="i-tarea-botones">
                                 {/* Asignar */}
-                                <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                                <div className="i-tarea-boton" style={tareaFechaLimite(tarea.fechaEntrega) ? {backgroundColor: "#f09e9e"} : {}}>
+                                  <FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}
+                                </div>
                                 <div className="i-tarea-boton" style={{ marginTop: '5px' }}>
                                   {tarea.idAsignado && usuariosTodos ? (
                                     <>{usuariosTodos[tarea.idAsignado].nombreUsuario}</>
@@ -1142,9 +1152,9 @@ export const Initiative = () => {
               ) : (
 
                 <div className='i-tareas-container'>
-
-                  {tareas.filter(tarea => tarea.idAsignado === user).length > 0 ? (
-                    
+                  
+                  {/* VISTA TAREAS ASIGNADAS A MI */}
+                  {tareas.filter(tarea => tarea.idAsignado === user).length > 0 ? (  
                     <div>
                     {tareas.filter(tarea => tarea.idAsignado === user).map((tarea, index) => (
                       <div className="i-tareas-container-2" key={tarea.idTarea}>
@@ -1159,8 +1169,17 @@ export const Initiative = () => {
                             </div>
                           </div>
                           <div className="i-tarea-botones">
-                            <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                            <div className="i-tarea-boton" style={{marginTop: '5px', cursor:'pointer'}} onClick={() => openUploadModal(tarea, index)}><LuUpload /> Entregar</div>
+                            <div className="i-tarea-boton" style={tareaFechaLimite(tarea.fechaEntrega) ? {backgroundColor: "#f09e9e"} : {}}>
+                              <FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}
+                            </div>
+
+                            {/* Entregar tarea se desactiva si se pasa la fecha de entrega */}
+                            <button className="i-tarea-boton"
+                              style={tareaFechaLimite(tarea.fechaEntrega) ? {marginTop: '5px', cursor: 'default'} : {marginTop: '5px'}}
+                              disabled={tareaFechaLimite(tarea.fechaEntrega)}
+                              onClick={() => openUploadModal(tarea, index)}>
+                                <LuUpload /> Entregar
+                            </button>
                           </div>
                         </div>
                       </div>

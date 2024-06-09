@@ -349,8 +349,15 @@ button.i-btn-guardar:disabled {
   background-color: #A0C1BF;
   border-radius: 25px;
   font-size: 12px;
+  font-weight: 600;
+  color: #212529;
   padding: 5px 10px;
   text-align: center;
+}
+
+.i-tarea-boton:disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .react-datepicker-2 {
