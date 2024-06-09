@@ -1175,7 +1175,7 @@ export const Initiative = () => {
 
                             {/* Entregar tarea se desactiva si se pasa la fecha de entrega */}
                             <button className="i-tarea-boton"
-                              style={tareaFechaLimite(tarea.fechaEntrega) ? {marginTop: '5px', cursor: 'default'} : {marginTop: '5px'}}
+                              style={{marginTop: '5px'}}
                               disabled={tareaFechaLimite(tarea.fechaEntrega)}
                               onClick={() => openUploadModal(tarea, index)}>
                                 <LuUpload /> Entregar
