@@ -563,6 +563,7 @@ export const enviarCorreoMiembro = async (iniciativa, miembro) => {
 // Enviar correo de notificación al asignar miembro a una tarea
 export const enviarCorreoTarea = async (iniciativa, miembro, tarea) => {
   const message = {
+
     subject: `Notificación sobre tu asignación a la tarea ${tarea.titulo}`,
     text: `Estimado/a ${miembro.nombre},\n\nNos complace informarte que has sido asignado/a a la tarea ${tarea.titulo} en la iniciativa ${iniciativa.titulo}.\n\nSaludos cordiales,\nAdministración de Evertech`
   }

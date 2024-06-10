@@ -774,6 +774,54 @@ export const Initiative = () => {
   };
 
 
+  //EDITAR TAREAS 
+  const [editingTareaId, setEditingTareaId] = useState(null);
+  const [nuevoTituloTarea, setNuevoTituloTarea] = useState("");
+  const [nuevaDescripcionTarea, setNuevaDescripcionTarea] = useState("");
+  const [nuevoUsuarioAsignado, setNuevoUsuarioAsignado] = useState("");
+
+  const startEditingTarea = (tarea) => {
+    setEditingTareaId(tarea.idTarea);
+    setNuevoTituloTarea(tarea.titulo);
+    setNuevaDescripcionTarea(tarea.descripcion);
+    setNuevaFechaTarea(tarea.fechaEntrega);
+    
+  };
+
+  const updateUsuarioAsignado = (usuario) => {
+    setNuevoUsuarioAsignado(usuario.idUsuario);
+    console.log("setNuevoUsuarioAsignado");
+    console.log(idIniciativa);
+    console.log(usuario.correo);
+    console.log(tarea.titulo);
+    enviarCorreoTarea(iniciativa, usuario);
+  }
+
+
+  const saveTareaChanges = async (tarea, index) => {
+    console.log('Editando tarea', tarea.idTarea);
+    try {
+      const tareaNueva = { ...tarea, titulo: nuevoTituloTarea, descripcion: nuevaDescripcionTarea, fechaEntrega: nuevaFechaTarea, idAsignado: nuevoUsuarioAsignado}
+      await actualizaTarea(tareaNueva);
+
+      const updatedTareas = [...tareas];
+      updatedTareas[index] = tareaNueva;
+
+
+      setTareas(updatedTareas);
+      setEditingTareaId(null);
+    } catch (error) {
+      console.error("Error updating tarea:", error);
+    }
+    
+  };
+
+  const cancelTareaEdit = () => {
+    setEditingTareaId(null);
+  };
+
+
+
   // Tareas height
   // Titulo
   const textareaRefs3 = useRef([null]);
