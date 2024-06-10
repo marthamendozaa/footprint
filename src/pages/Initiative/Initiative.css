@@ -20,8 +20,9 @@
   border: none;
   cursor: pointer;
   color: #A0C1BF;
-  font-size: 20px;
-  margin-top: -20px;
+  font-size: 30px;
+  margin-top: -25px;
+  margin-left: 1000px;
 }
 
 .i-fa-pen:hover{
@@ -80,7 +81,7 @@ button.i-fa-pen:disabled {
   text-align: left;
 }
 
-.i-titulo-normal{
+.i-titulo-normal {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -282,8 +283,41 @@ li.i-etiqueta-item {
 .i-seccion-miembros {
   width: 20%;
   display: flex;
-  align-items: stretch;
   flex-direction: column;
+  justify-content: space-between;
+}
+
+.i-seccion-1 {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.i-guardar {
+  display: flex;
+  justify-content: center;
+}
+
+.i-btn-guardar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: 600;
+  width: 169px;
+  height: 50px;
+  padding: 10px 30px;
+  background-color: #bbb;
+  border-radius: 30px;
+}
+
+.i-btn-guardar:hover {
+  background-color: #989898;
+}
+
+button.i-btn-guardar:disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .i-btn-ver-miembros {
@@ -379,22 +413,25 @@ li.i-etiqueta-item {
 }
 
 .i-btn-ver-solicitudes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   bottom: 0;
-  background-color: #909da4; 
+  background-color: #A0C1BF; 
   border: none; 
   padding: 10px 20px; 
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 600;
   color: #000000;
-  font-weight: bold; 
   transition: background-color 0.3s ease;
-  border-radius: 20px;
+  border-radius: 25px;
   margin-top: 20px;
   margin-bottom: 5px;
   width: 100%;
 }
 
 .i-btn-ver-solicitudes:hover {
-  background-color: #6b7780;
+  background-color: #699AA0;
 }
 
 /* Modal Solicitudes */
@@ -479,9 +516,16 @@ input.i-tarea-titulo {
   display: flex;
 }
 
+.i-edit-tarea-box {
+  background: transparent;
+  font-weight: 600;
+  border: none;
+  overflow: none;
+}
 
-
-
+.i-edit-tarea-box:focus-visible {
+  outline: none;
+}
 
 .i-desc-input-texto-2 {
   position: relative;
@@ -726,6 +770,7 @@ input.i-tarea-titulo {
 /* Agregar usuario modal */
 .i-modal-lista-usuarios {
   max-height: 500px;
+  max-width: 100% !important;
   overflow: overlay;
 }
 

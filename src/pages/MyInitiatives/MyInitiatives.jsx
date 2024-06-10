@@ -48,7 +48,9 @@ export const MyInitiatives = () => {
 
         if (iniciativa.fechaCierre) {
           const [day, month, year] = iniciativa.fechaCierre.split('/');
+          // Verifica fecha hasta el final del día
           const fechaCierre = new Date(year, month - 1, day);
+          fechaCierre.setHours(23, 59, 59, 999);
           fechaLimite = (fechaCierre <= fechaActual) ? true : false;
         }
 
@@ -78,21 +80,26 @@ export const MyInitiatives = () => {
     let iniciativasFavoritasNuevo = [...iniciativasFavoritas];
     let usuarioNuevo = {...usuario};
 
-    setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
-    setTimeout(() => {
-      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
+    try {
+      // Comienza animación
+      setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
 
-      // Actualizar lista de iniciativas favoritas
+      // Actualiza lista de iniciativas favoritas
       iniciativasFavoritasNuevo = iniciativasFavoritasNuevo.filter(iniciativa => iniciativa.idIniciativa !== idIniciativa);
+
+      // Actualiza información del usuario
+      let usuarioIniciativasFavoritas = iniciativasFavoritasNuevo.map(iniciativa => iniciativa.idIniciativa);
+      usuarioNuevo.listaIniciativasFavoritas = usuarioIniciativasFavoritas;
+
+      await actualizaUsuario(usuarioNuevo);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // Termina animación
+      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
       setIniciativasFavoritas(iniciativasFavoritasNuevo);
-
-      // Actualizar información del usuario
-      iniciativasFavoritasNuevo = iniciativasFavoritasNuevo.map(iniciativa => iniciativa.idIniciativa);
-      usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
       setUsuario(usuarioNuevo);
-    }, 600);
-
-    await actualizaUsuario(usuarioNuevo);
+    }
   };
 
   // Modal para mostrar información de la iniciativa
