@@ -1,3 +1,4 @@
+/* Pagina general */
 .rq-container {
   display: flex;
   width: 1000px;
@@ -11,12 +12,23 @@
   align-items: flex-start;
 }
 
+/* Titulo de las secciones */
 .rq-iniciativas-titulo {
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   text-align: left;
 }
 
+/* Error */
+.rq-error {
+  font-size: 20px;
+  font-weight: 600;
+  color: #7d7d7d;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Iniciativas */
 .rq-iniciativas-container {
   display: flex;
   width: 100%;
@@ -40,6 +52,7 @@
   max-width: 200px;
   border: 2px #e8e8e8 solid;
   box-shadow: #e8e8e8 2px 4px 0px 0px;
+  cursor: pointer;
 }
 
 .rq-iniciativa:hover {
@@ -47,9 +60,58 @@
   box-shadow: #b6b6b6 2px 4px 0px 0px;
 }
 
+/* Creador de la iniciativa */
+.rq-iniciativa-admin {
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  align-items: center;
+  padding: 10px;
+  font-weight: 600;
+}
+
+.rq-iniciativa-admin img {
+  width: 22px;
+  height: 22px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.rq-nombre-admin {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+/* Imagen general iniciativa */
+.rq-iniciativa-imagen img {
+  width: 200px;
+  max-width: 100%;
+  height: 110px;
+  object-fit: cover;
+}
+
+/* Contenido iniciativa */
+.rq-iniciativa-texto {
+  width: 100%;
+  height: 100%;
+  padding: 13px;
+  display: flex;
+  flex-direction: column;
+}
+
+.rq-titulo {
+  font-size: 13px;
+  font-weight: bold;
+  word-break: break-word;
+}
+
+/* Botones de abajo */
 .rq-estado {
   align-items: center;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
 }
 
@@ -62,6 +124,7 @@
   font-weight: 600;
 }
 
+/* Iconos */
 .fa-1 {
   color: green;
   margin-left: 8px;
@@ -83,45 +146,14 @@
   height: 100%;
   justify-content: flex-end;
   align-items: flex-end;
-  font-size: 25px;
+  font-size: 20px;
 }
 
 .fa-5 {
-  font-size: 25px;
+  font-size: 20px;
 }
 
 .fa-5-button {
   background-color: transparent;
   padding: 0px;
-}
-
-.rq-iniciativa-imagen img {
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
-  width: 200px;
-  max-width: 100%;
-  height: 130px;
-  object-fit: cover;
-}
-
-.rq-iniciativa-texto {
-  width: 100%;
-  height: 100%;
-  padding: 13px;
-  display: flex;
-  flex-direction: column;
-}
-
-.rq-titulo {
-  font-size: 15px;
-  font-weight: bold;
-  word-break: break-word;
-}
-
-.rq-error {
-  font-size: 20px;
-  font-weight: 600;
-  color: #7d7d7d;
-  margin-top: 20px;
-  margin-bottom: 20px;
 }

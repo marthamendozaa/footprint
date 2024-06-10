@@ -436,3 +436,28 @@ exports.enviarCorreo = onRequest(async (req, res) =>{
     }
   });
 });
+
+
+// Función para enviar correo de cambio de contraseña
+exports.enviarCorreoContrasena = onRequest(async (req, res) =>{
+  cors(req, res, async () => {
+    const { email } = req.body;
+
+    try {
+      const link = await auth.generatePasswordResetLink(email);
+
+      const message = {
+        subject: `Restablece tu contraseña de Evertech`,
+        text: `Hola:\n\nVisita este vínculo para restablecer la contraseña de Evertech para tu cuenta de ${email}.\n\nSi no solicitaste el restablecimiento de tu contraseña, puedes ignorar este correo electrónico.\n\n${link}`
+      }
+
+      const mail = { to: email, message: message };
+      await getFirestore().collection('mail').add(mail);
+      
+      res.json({ success: true });
+    } catch (error) {
+      logger.info("Error enviando correo: ", error.message);
+      res.json({ success: false, error: error.message });
+    }
+  });
+});

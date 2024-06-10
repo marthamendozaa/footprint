@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash } from 'react-icons/fa';
+import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash, FaUser, FaEnvelope } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
@@ -9,7 +9,7 @@ import { ClipLoader } from 'react-spinners';
 import { useParams } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import es from 'date-fns/locale/es';
-import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud, actualizaTarea } from '../../api/api.js';
+import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud, actualizaTarea, enviarCorreoTarea } from '../../api/api.js';
 import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import './Initiative.css';
@@ -44,6 +44,9 @@ export const Initiative = () => {
   const [miembros, setMiembros] = useState([]);
   const [usuarios, setUsuarios] = useState({});
   const [usuariosFiltrados, setUsuariosFiltrados] = useState({});
+  const [totalMiembros, setTotalMiembros] = useState(false);
+  const [usuariosTotal, setUsuariosTotales] = useState(false);
+  const [usuarioID, setUsuarioID] = useState(false);
 
   // Información de solicitudes
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
@@ -74,6 +77,7 @@ export const Initiative = () => {
         // Obtiene información del admin de la iniciativa
         const adminIniciativa = usuariosData[iniciativaData.idAdmin];
         const usuarioEsAdmin = usuariosData[user].idUsuario === iniciativaData.idAdmin;
+        setUsuarioID(usuariosData[user].idUsuario);
         setInfoAdmin(adminIniciativa);
         setEsAdmin(usuarioEsAdmin);
 
@@ -85,6 +89,8 @@ export const Initiative = () => {
           usuario.idUsuario != adminIniciativa.idUsuario && !usuario.esAdmin);
 
         setMiembros(usuariosMiembros);
+        setUsuariosTotales(usuariosMiembros);
+        setTotalMiembros(usuariosMiembros);
         
         if (usuarioEsAdmin) {
           // Solo usar la página de enviadas si la iniciativa es pública
@@ -175,7 +181,6 @@ export const Initiative = () => {
     );
   };
 
-
   // Búsqueda de usuarios para agregar miembros
   const [showInvitarModal, setShowInvitarModal] = useState(false); 
   const [filtro, setFiltro] = useState('');
@@ -205,8 +210,36 @@ export const Initiative = () => {
 
     setUsuariosFiltrados(filtradas);
   };
-
   
+
+  const [filter, setFilter] = useState('');
+  const buscarUsuarioAsignar = (event) => {
+    const busqueda = event.target.value;
+    setFilter(busqueda);
+
+    // Si el término de búsqueda está vacío, mostrar todos los usuarios
+    if (!busqueda) {
+      setTotalMiembros(usuariosTotal);
+      return;
+    }
+
+    // Claves de búsqueda
+    const fuse2 = new Fuse(Object.values(miembros), {
+      keys: ['nombreUsuario', 'nombre'],
+      includeScore: true,
+      threshold: 0.4,
+    });
+
+    const resultado = fuse2.search(busqueda);
+    const filtradas = {};
+    resultado.forEach((item) => {
+      filtradas[item.item.idUsuario] = item.item;
+    });
+
+    setTotalMiembros(filtradas);
+  };
+
+
   // Invitar usuarios
   const handleInvitarUsuario = async (idUsuario) => {
     let usuariosNuevo = {...usuariosFiltrados};
@@ -237,8 +270,13 @@ export const Initiative = () => {
     }
   };
 
+  
   // Cancelar invitación
-  const handleCancelarUsuario = async (idUsuario) => {
+  const [faTrashBloqueado, setFaTrashBloqueado] = useState(false);
+
+  const handleCancelarUsuario = async (index, idUsuario) => {
+    setFaTrashBloqueado(prevState => ({ ...prevState, [index]: true }));
+
     let usuariosNuevo = {...usuariosFiltrados};
 
     // Cancelar desde modal invitar miembros
@@ -247,23 +285,25 @@ export const Initiative = () => {
       usuariosNuevo[idUsuario].invitarCargando = true;
       setUsuariosFiltrados(usuariosNuevo);
     }
+
+    let solicitudesEnviadasNuevo = [...solicitudesEnviadas];
+    let usuariosEnviadosNuevo = [...usuariosEnviados];
     
     try {
+      // Actualizar lista de solicitudes enviadas
+      solicitudesEnviadasNuevo = solicitudesEnviadasNuevo.filter((enviada) => enviada.idUsuario !== idUsuario);
+      usuariosEnviadosNuevo = usuariosEnviadosNuevo.filter((enviado) => enviado.idUsuario !== idUsuario);
+
       // Eliminar solicitud
       const solicitud = await existeSolicitud(idUsuario, idIniciativa);
       await eliminarSolicitud(solicitud);
-
-      // Actualizar lista de solicitudes enviadas
-      let solicitudesEnviadasNuevo = [...solicitudesEnviadas];
-      solicitudesEnviadasNuevo = solicitudesEnviadasNuevo.filter((enviada) => enviada.idUsuario !== idUsuario);
-      setSolicitudesEnviadas(solicitudesEnviadasNuevo);
-
-      let usuariosEnviadosNuevo = [...usuariosEnviados];
-      usuariosEnviadosNuevo = usuariosEnviadosNuevo.filter((enviado) => enviado.idUsuario !== idUsuario);
-      setUsuariosEnviados(usuariosEnviadosNuevo);
     } catch (error) {
       console.error("Error al cancelar la solicitud");
     } finally {
+      setFaTrashBloqueado(prevState => ({ ...prevState, [index]: false }));
+      setSolicitudesEnviadas(solicitudesEnviadasNuevo);
+      setUsuariosEnviados(usuariosEnviadosNuevo);
+
       usuariosNuevo = {...usuariosFiltrados};
 
       if (usuariosNuevo[idUsuario]) {
@@ -273,27 +313,25 @@ export const Initiative = () => {
         // Eliminar solicitud desde el modal de solicitudes
         const usuario = usuariosEnviados.find((enviado) => enviado.idUsuario == idUsuario);
         usuariosNuevo[idUsuario] = {...usuario, invitarDesactivado: false, cancelarDesactivado: true};
-        console.log(usuariosNuevo[idUsuario]);
       }
       setUsuariosFiltrados(usuariosNuevo);
     }
   }
-  
+
+
   // Aceptar solicitudes de usuario
+  const [aceptarSolicitudD, setAceptarSolicitudD] = useState(false);
+
   const handleAceptarSolicitud = async (index, usuario) => {
+    setAceptarSolicitudD(prevState => ({ ...prevState, [index]: true }));
+
     let usuariosRecibidosNuevo = [...usuariosRecibidos];
-    usuariosRecibidosNuevo[index].aceptarDesactivado = true;
-    setUsuariosRecibidos(usuariosRecibidosNuevo);
+    let solicitudesRecibidasNuevo = [...solicitudesRecibidas];
 
     try {
       // Actualizar lista de solicitudes recibidas
-      let solicitudesRecibidasNuevo = solicitudesRecibidas;
       solicitudesRecibidasNuevo[index].estado = "Aceptada";
-      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
-      
-      usuariosRecibidosNuevo = [...usuariosRecibidos];
       usuariosRecibidosNuevo = usuariosRecibidosNuevo.filter((recibido) => recibido.idUsuario !== usuario.idUsuario);
-      setUsuariosRecibidos(usuariosRecibidosNuevo);
       
       // Actualizar estado de solicitud
       const solicitud = solicitudesRecibidasNuevo[index];
@@ -304,36 +342,51 @@ export const Initiative = () => {
 
       // Actualizar lista de miembros
       setMiembros([...miembros, usuario]);
+      setTotalMiembros([...miembros, usuario]);
     } catch (error) {
       console.error("Error al aceptar la solicitud");
+    } finally {
+      setAceptarSolicitudD(prevState => ({ ...prevState, [index]: false }));
+      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+      setUsuariosRecibidos(usuariosRecibidosNuevo);
     }
   };
 
 
   // Rechazar solicitudes de usuario
+  const [rechazarSolicitudD, setRechazarSolicitudD] = useState(false);
+  
   const handleRechazarSolicitud = async (index, usuario) => {
+    setRechazarSolicitudD(prevState => ({ ...prevState, [index]: true }))
+
     let usuariosRecibidosNuevo = [...usuariosRecibidos];
-    usuariosRecibidosNuevo[index].rechazarDesactivado = true;
-    setUsuariosRecibidos(usuariosRecibidosNuevo);
+    let solicitudesRecibidasNuevo = [...solicitudesRecibidas];
 
     try {
       // Actualizar lista de solicitudes recibidas
-      let solicitudesRecibidasNuevo = solicitudesRecibidas;
       solicitudesRecibidasNuevo[index].estado = "Rechazada";
-      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
-      
-      usuariosRecibidosNuevo = [...usuariosRecibidos];
       usuariosRecibidosNuevo = usuariosRecibidosNuevo.filter((recibido) => recibido.idUsuario !== usuario.idUsuario);
-      setUsuariosRecibidos(usuariosRecibidosNuevo);
       
       // Actualizar estado de solicitud
       const solicitud = solicitudesRecibidasNuevo[index];
       await actualizaSolicitud(solicitud);
     } catch (error) {
       console.error("Error al rechazar la solicitud");
+    } finally {
+      setRechazarSolicitudD(prevState => ({ ...prevState, [index]: false }));
+      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+      setUsuariosRecibidos(usuariosRecibidosNuevo);
     }
   };
+  
+  // Ver perfil del miembro
+  const [miembroSeleccionado, setMiembroSeleccionado] = useState(null);
+  const [modalMiembro, setModalMiembro] = useState(false);
 
+  const handleMostrarMiembro = (miembro) => {
+    setMiembroSeleccionado(miembro);
+    setModalMiembro(true);
+  };
 
   // Miembro seleccionado a eliminar
   const [miembroEliminar, setMiembroEliminar] = useState(null);
@@ -502,6 +555,18 @@ export const Initiative = () => {
     }
   };
 
+  // Editar fecha de tarea
+  const [nuevaFechaTarea, setNuevaFechaTarea] = useState(new Date());
+
+  const datePickerCierreTarea = useRef(null);
+
+  const handleCambioFechaCierreTarea = () => {
+    if (datePickerCierreTarea.current) {
+      datePickerCierreTarea.current.setOpen(true);
+    }
+  };
+
+
   // Editar descripción
   const [nuevaDescripcion, setNuevaDescripcion] = useState("");
 
@@ -567,6 +632,7 @@ export const Initiative = () => {
 
   // TAREAS //
   const [showUploadModal, setShowUploadModal] = useState(false);
+  const [showAsignarModal, setShowAsignarModal] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [fileError, setFileError] = useState('');
   const [uploadDisabled, setUploadDisabled] = useState(true);
@@ -589,6 +655,14 @@ export const Initiative = () => {
     setSelectedTaskId(tarea.idTarea);
   };
 
+  const openAsignarTarea = (tarea, index) => {
+    console.log('ID ONE Tarea', tarea.idTarea);
+    setShowAsignarModal(true);
+    setTareaUpload(tarea);
+    setSelectedTaskIndex(index);
+    setSelectedTaskId(tarea.idTarea);
+  };
+
   const handleMostrarEntregable = (tareaUrl) => {
     
     setModalEntregable(true);
@@ -602,6 +676,7 @@ export const Initiative = () => {
     setShowUploadModal(false);
     setSelectedFile(null);
     setSelectedTaskId(null);
+    setShowAsignarModal(false);
   };
 
   useEffect(() => {
@@ -669,18 +744,30 @@ export const Initiative = () => {
   const [editingTareaId, setEditingTareaId] = useState(null);
   const [nuevoTituloTarea, setNuevoTituloTarea] = useState("");
   const [nuevaDescripcionTarea, setNuevaDescripcionTarea] = useState("");
+  const [nuevoUsuarioAsignado, setNuevoUsuarioAsignado] = useState("");
 
-
-  const startEditingTarea = (idTarea, titulo, descripcion) => {
-    setEditingTareaId(idTarea);
-    setNuevoTituloTarea(titulo);
-    setNuevaDescripcionTarea(descripcion);
+  const startEditingTarea = (tarea) => {
+    setEditingTareaId(tarea.idTarea);
+    setNuevoTituloTarea(tarea.titulo);
+    setNuevaDescripcionTarea(tarea.descripcion);
+    setNuevaFechaTarea(tarea.fechaEntrega);
+    
   };
+
+  const updateUsuarioAsignado = (usuario) => {
+    setNuevoUsuarioAsignado(usuario.idUsuario);
+    console.log("setNuevoUsuarioAsignado");
+    console.log(idIniciativa);
+    console.log(usuario.correo);
+    console.log(tarea.titulo);
+    enviarCorreoTarea(iniciativa, usuario);
+  }
+
 
   const saveTareaChanges = async (tarea, index) => {
     console.log('Editando tarea', tarea.idTarea);
     try {
-      const tareaNueva = { ...tarea, titulo: nuevoTituloTarea, descripcion: nuevaDescripcionTarea}
+      const tareaNueva = { ...tarea, titulo: nuevoTituloTarea, descripcion: nuevaDescripcionTarea, fechaEntrega: nuevaFechaTarea, idAsignado: nuevoUsuarioAsignado}
       await actualizaTarea(tareaNueva);
 
       const updatedTareas = [...tareas];
@@ -692,6 +779,7 @@ export const Initiative = () => {
     } catch (error) {
       console.error("Error updating tarea:", error);
     }
+    
   };
 
   const cancelTareaEdit = () => {
@@ -858,7 +946,8 @@ export const Initiative = () => {
         {/* Descripción */}
         <div className="i-desc">
           <div className="i-progreso-texto">Progreso</div>
-          <ProgressBar progress={50} />
+
+          <ProgressBar progress={Math.round((tareas.filter(tarea => tarea.completada).length / tareas.length) * 100)} />
         </div>
 
         <div className="c-desc">
@@ -904,91 +993,173 @@ export const Initiative = () => {
         {/* Tareas y Miembros*/}
         <div className="i-tareas-miembros">
           <div className="i-seccion-tareas">
-            <div className="i-tareas-seccion">
               {/* Tarea asignada a mí */}
               <div className="i-titulo-tareas">Mis Tareas</div>
+              
+              {(tareas && tareas.length > 0 && esAdmin) ? (
+                
+                <div className='i-tareas-container'>
+                  {/* Lista de TOTAL de Tareas Asignadas */}
+                  {tareas.filter(tarea => !tarea.completada).length === 0 ? (
+                    <div className="m-error">
+                    No hay tareas asignadas.
+                    </div>
+                  ) : (
+                    <div>
+                      {/* VISTA TAREAS DE ADMIN EDITANDO */}
+                      {editingCampos ? (
+                        <div>
+                          {tareas.filter(tarea => !tarea.completada).map((tarea, index) => (
+                            <div className="i-tarea-container-2" key={tarea.idTarea}>
+                              
+                              {editingTareaId === tarea.idTarea ? (
+                              
+                                <div className="i-tarea">
 
-              {tareas ? (
-                  <div className='i-tareas-container'>
-                    {tareas.filter(tarea => !tarea.completada).length === 0 ? (
-                      <div className="m-error">
-                      No hay tareas asignadas.
-                      </div>
-                    ) : (
-                      <div>
-                        {editingCampos ? (
-                          <div>
-                            {tareas.filter(tarea => !tarea.completada).map((tarea, index) => (
-                              <div className="i-tarea" key={tarea.idTarea}>
-                                <div className="i-tarea-info">
-                                  <div className="i-tarea-texto">
-                                    {editingTareaId === tarea.idTarea ? (
-                                      <div>
-                                        <input
-                                          type="text"
-                                          className="i-edit-titulo-box"
-                                          value={nuevoTituloTarea}
-                                          onChange={(e) => setNuevoTituloTarea(e.target.value)}
-                                          autoFocus
-                                          maxLength={30}
-                                        />
-                                        <input
-                                          type="text"
-                                          className="i-edit-desc-box"
-                                          value={nuevaDescripcionTarea}
-                                          onChange={(e) => setNuevaDescripcionTarea(e.target.value)}
-                                          maxLength={100}
-                                        />
-                                        <button onClick={() => saveTareaChanges(tarea, index)}>Save</button>
-                                        <button onClick={cancelTareaEdit}>Cancel</button>
+                                  <div className="i-tarea-info">
+                                    <div className="i-tarea-titulo">
+                                      <div className="i-tarea-texto">
+                                      <input
+                                        type="text"
+                                        className="i-edit-tarea-box"
+                                        value={nuevoTituloTarea}
+                                        onChange={(e) => setNuevoTituloTarea(e.target.value)}
+                                        autoFocus
+                                        maxLength={30}
+                                      />
                                       </div>
-                                    ) : (
-                                      <div>
-                                        <div className="i-tarea-titulo">{tarea.titulo}</div>
-                                        <div className="i-tarea-desc">{tarea.descripcion}</div>
-                                        <button onClick={() => startEditingTarea(tarea.idTarea, tarea.titulo, tarea.descripcion)}>Edit</button>
-                                      </div>
-                                    )}
+                                    </div>
+                                      <input
+                                        type="text"
+                                        className="i-edit-desc-box"
+                                        value={nuevaDescripcionTarea}
+                                        onChange={(e) => setNuevaDescripcionTarea(e.target.value)}
+                                        maxLength={100}
+                                      />
+
+                                      <button onClick={() => saveTareaChanges(tarea, index)}>Save</button>
+                                      <button onClick={cancelTareaEdit}>Cancel</button>
+                                  
+                                  </div>
+
+                                  <div className="i-tarea-botones">
+                                    <>
+                                    <div className="i-tarea-boton" onClick={handleCambioFechaCierreTarea}>
+                                      <FaCalendar/> Fecha
+                                      <DatePicker
+                                      className='react-datepicker__input-container-create'
+                                      selected={nuevaFechaTarea}
+                                      onChange={(date) => setNuevaFechaTarea(date)}
+                                      dateFormat="dd/MM/yyyy"
+                                      ref={datePickerCierreTarea}
+                                      locale={es}
+                                      showYearDropdown
+                                      scrollableYearDropdown 
+                                      yearDropdownItemNumber={66}
+                                      showMonthDropdown
+                                      minDate={today}
+                                      />
+                                    </div>
+                                    
+                                  </>
+                                    <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento </div>
+                                    <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openAsignarTarea(tarea, index)}><FaFolder /> Asignar </div>
+                                  </div>
+
+                                </div>
+
+                              ) : (
+                                <div className="i-tarea">
+                                  <div className="i-tarea-info">
+                                    <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                    <div className="i-tarea-desc" >{tarea.descripcion}</div>
+                                    <button className="c-btn-editar-tarea-2" onClick={() => startEditingTarea(tarea)}><FaPen /></button>
                                   </div>
                                   <div className="i-tarea-botones">
                                     <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                                    <div className="i-tarea-boton" style={{ cursor: 'pointer' }} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento </div>
+                                    <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento </div>
+                                  </div>
+                                </div>
+
+                              )}
+
+                            </div>
+                          ))}  
+                        </div>
+
+                      ) : (
+
+                      /* VISTA TAREAS TOTALES ADMIN */
+                      <div>
+                        {tareas.filter(tarea => !tarea.completada).map((tarea, index) => (
+                          <div className="i-tareas-container-2" key={tarea.idTarea}>
+                            <div className="i-tarea">
+
+                              <div className="i-tarea-info">
+                                <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                <div className="i-tarea-desc">
+                                  <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
+                                    {tarea.descripcion}
                                   </div>
                                 </div>
                               </div>
-                            ))}  
-                          </div>
-                        ) : (
-                        <div>
-                          {tareas.filter(tarea => !tarea.completada).map((tarea, idTarea) => (
-                            <div className="i-tarea" key={idTarea}>
-                              <div className="i-tarea-info">
-                                <div className="i-tarea-texto">
-                                  <div className="i-tarea-titulo">{tarea.titulo}</div>
-                                  <div className="i-tarea-desc">{tarea.descripcion}</div>
-                                </div>
-                                <div className="i-tarea-botones">
-                                  <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                                  <div className="i-tarea-boton" style={{cursor: 'pointer'}} > <FaFolder /> Documento </div>
-                                </div>
+                              <div className="i-tarea-botones">
+                                <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                                <div className="i-tarea-boton" style={{marginTop: '5px', cursor:'pointer'}} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento</div>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                        )}
+                          </div>
+                        ))}
                       </div>
-                    )}
+                      )}
+
+                    </div>
+                  )}
+       
+                </div>
+                
+
+              ) : (
+
+                <div className='i-tareas-container'>
+
+                  {tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada).length > 0 ? (
                     
-                  </div>
+                    <div>
+                    {tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada).map((tarea, index) => (
+                      <div className="i-tareas-container-2" key={tarea.idTarea}>
+                        <div className="i-tarea">
+
+                          <div className="i-tarea-info">
+                            <div className="i-tarea-titulo">{tarea.titulo}</div>
+                            <div className="i-tarea-desc">
+                              <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
+                                {tarea.descripcion}
+                              </div>
+                            </div>
+                          </div>
+                          <div className="i-tarea-botones">
+                            <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                            <div className="i-tarea-boton" style={{marginTop: '5px', cursor:'pointer'}} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento</div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    </div>
+
                   ) : (
-                  <div className="m-error">
+
+                    <div className="m-error">
                     No hay tareas asignadas.
-                  </div>
-                )}
+                    </div>
 
-            </div>
+                  )}
 
-            <div className="i-tareas-seccion">
+                </div>
+
+              )}
+
+          
               {/* Tarea completadas publicas */}
               <div className="i-titulo-tareas"> Tareas Completadas </div>
               {tareas ? (
@@ -1000,16 +1171,19 @@ export const Initiative = () => {
                     ) : (
                       <div>
                         {tareas.filter(tarea => tarea.completada).map((tarea, idTarea) => (
-                          <div className="i-tarea" key={idTarea}>
-                            <div className="i-tarea-info">
-                              <div className="i-tarea-texto">
+                          <div className="i-tarea-container-2" key={idTarea}>
+                            <div className="i-tarea">
+                              <div className="i-tarea-info">
                                 <div className="i-tarea-titulo">{tarea.titulo}</div>
-                                <div className="i-tarea-desc">{tarea.descripcion}</div>
+                                <div className="i-tarea-desc">{tarea.descripcion}
+                                </div>
+                                
                               </div>
-                              <div className="i-tarea-botones">
-                                <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                                <div className="i-tarea-boton" style={{ cursor: 'pointer' }} onClick={() => handleMostrarEntregable(tarea.urlEntrega)} > <FaFolder /> Documento </div>
-                              </div>
+                                <div className="i-tarea-botones">
+                                  <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
+                                  <div className="i-tarea-boton" style={{marginTop: '5px', cursor: 'pointer' }} onClick={() => handleMostrarEntregable(tarea.urlEntrega)} > <FaFolder /> Documento </div>
+                                </div>
+                              
                             </div>
                           </div>
                         ))}
@@ -1018,16 +1192,16 @@ export const Initiative = () => {
                   </div>  
                 ) : (
                   <div className="m-error">
-                  No hay tareas asignadas.
+                  No hay tareas completadas.
                   </div>
               )}
-            </div>
+
           </div>
 
           <div className="i-seccion-miembros">
             <div className="i-tipo-miembro">Dueño</div>
             {infoAdmin &&
-              <div className="i-btn-miembro">
+              <div className="i-btn-miembro" onClick={() => handleMostrarMiembro(infoAdmin)}>
                   <div className='i-btn-miembro-contenido'>
                     {infoAdmin.nombreUsuario}
                   </div>
@@ -1044,17 +1218,19 @@ export const Initiative = () => {
               ) : (
                 <div>
                   {miembros.map((miembro, idMiembro) => (
-                    <div key={idMiembro}>
-                      <div className="i-btn-miembro">
-                        <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
-                          {miembro.nombreUsuario}
-                        </div>
+                    <div className="i-btn-miembro" key={idMiembro} onClick={() => handleMostrarMiembro(miembro)}>
+                      <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
+                        {miembro.nombreUsuario}
+                      </div>
 
-                        <div className='i-icon-estilos'>
-                          {esAdmin && (
-                            <FaTimesCircle onClick={() => handleMostrarEliminar(miembro)} className="i-icon-times-circle" />
-                          )}
-                        </div>
+                      <div className='i-icon-estilos'>
+                        {esAdmin && (
+                          <FaTimesCircle className="i-icon-times-circle"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleMostrarEliminar(miembro);
+                          }}/>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -1080,21 +1256,22 @@ export const Initiative = () => {
 
       {/* ----- Ver solicitudes ----- */}
       <Modal show={showSolicitudesModal} onHide={() => setShowSolicitudesModal(false)} centered className='e-modal'>
-        <div className="modalcontainer">
+        <div className="modalcontainer, i-modal-lista-usuarios">
+          {/* X */}
           <Modal.Header closeButton style={{ border: "none" }}> </Modal.Header>
 
           {/* Determinar en que página esta */}
-          <div className="modal-nav">
+          <div className='i-nav'>
             {iniciativa && !iniciativa.esPublica &&
               <button 
-                className={paginaActual === 'solicitudes' ? 'active' : ''} 
+                className={paginaActual === 'solicitudes' ? 'paginaActual' : ''} 
                 onClick={() => setPaginaActual('solicitudes')}
               >
                 Solicitudes recibidas
               </button>
             }
             <button 
-              className={paginaActual === 'miembros' ? 'active' : ''} 
+              className={paginaActual === 'miembros' ? 'paginaActual' : ''} 
               onClick={() => setPaginaActual('miembros')}
             >
               Solicitudes enviadas
@@ -1102,97 +1279,128 @@ export const Initiative = () => {
           </div>
 
           {/* Contenido */}
-          <div className="modal-content">
+          <Modal.Body style={{paddingTop: '20px'}}>
             {/* Solicitudes */}
             {paginaActual === 'solicitudes' ? (
               !usuariosRecibidos || usuariosRecibidos.length == 0 ? (
-                <div className="m-error">
+                <div className="i-error-modal">
                   {/* Ninguna solicitud */}
                   Esta iniciativa no ha recibido solicitudes.
                 </div>
               ) : (
-                <div className="m-iniciativas-container">
+                <div>
                   {/* Lista de solicitudes */}
                   {usuariosRecibidos.map((usuario, index) => (
-                    <div key={index} className='e-iniciativa'>
-                      {/* Usuario */}
-                      <div className="e-desc">{usuario.nombreUsuario}</div>
+                    <React.Fragment key={index}>
+                      <div className='i-invitar-usuarios'>
+                        <div className='i-columna-pe'>
+                          <div className='i-informacion-usuarios'>
+                            {/* Imagen */}
+                            <img src={usuario.urlImagen} alt={usuario.nombreUsuario} />
 
-                      {/* Imagen */}
-                      <div className='e-iniciativa-imagen'>
-                        <img src={usuario.urlImagen} alt={usuario.nombreUsuario} />
-                      </div>
+                            {/* Usuario */}
+                            <div className='i-informacion-usuario'>
+                              <div style={{fontWeight: '600'}}>
+                                {usuario.nombreUsuario}
+                              </div>
 
-                      {/* Info extra */}
-                      <div className='e-iniciativa-texto'>
-                        {/* Nombre */}
-                        <div className="e-titulo">{usuario.nombre}</div>
-                        
-                        {/* Etiquetas */}
-                        <div className="i-etiquetas">
-                          {Object.values(usuario.listaHabilidades).map((habilidad, idHabilidad) => (
-                            <li key={idHabilidad} className={`i-etiqueta-item`}>
-                              {habilidad}
-                            </li>
-                          ))}
+                              <div>
+                                {usuario.nombre}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Etiquetas */}
+                          <div className="i-etiquetas-2">
+                              {Object.values(usuario.listaHabilidades).map((habilidad, idHabilidad) => (
+                                <li key={idHabilidad} className={`i-etiqueta-item-2`}>
+                                  {habilidad}
+                                </li>
+                              ))}
+                          </div>
                         </div>
 
-                        {/* Aceptar / rechazar */}
-                        <div className="i-botones-solicitud">
-                          <button className="i-btn-solicitud"
+                        {/* Botones */}
+                        <div className="i-btn-container">
+                          {/* Aceptar */}
+                          <button 
+                            className="i-invitar-usuarios-boton"
                             onClick={() => handleAceptarSolicitud(index, usuario)}
-                            disabled={usuariosRecibidos[index].aceptarDesactivado}
+                            disabled={aceptarSolicitudD[index]}
                           >
-                            {usuariosRecibidos[index].aceptarDesactivado ? <ClipLoader size={20} color="#000" /> : 'Aceptar'}
+                            {aceptarSolicitudD[index] ? <ClipLoader size={20} color="#000" /> : 'Aceptar'}
                           </button>
-                          <button className="i-btn-solicitud"
+                          
+                          {/* Rechazar */}
+                          <button 
+                            className="i-invitar-usuarios-boton"
+                            style={{marginLeft: '10px'}}
                             onClick={() => handleRechazarSolicitud(index, usuario)}
-                            disabled={usuariosRecibidos[index].rechazarDesactivado}
+                            disabled={rechazarSolicitudD[index]}
                           >
-                            {usuariosRecibidos[index].rechazarDesactivado ? <ClipLoader size={20} color="#000" /> : 'Rechazar'}
+                            {rechazarSolicitudD[index]? <ClipLoader size={20} color="#000" /> : 'Rechazar'}
                           </button>
                         </div>
                       </div>
 
-                    </div>
+                      {/* Línea entre elementos */}
+                      {index < Object.values(usuariosRecibidos).length - 1 && <hr/>}
+                    </React.Fragment>
                   ))}
                 </div>
               )
             ) : (
-              <div className="m-iniciativas-container">
-                {/* Contenido de miembros */}
+              !usuariosEnviados || usuariosEnviados.length === 0 ? (
+                <div className="i-error-modal">
+                  {/* Ninguna solicitud enviada */}
+                  Esta iniciativa no ha enviado solicitudes.
+                </div>
+              ) : (
                 <div>
-                {usuariosEnviados.map((usuario, index) => (
-                  <div key={index} className='rq-iniciativa'>
-                    {/* Imagen y título */}
-                    <div className='rq-iniciativa-imagen'>
-                        <img src={usuario.urlImagen} alt = {usuario.nombreUsuario} />
-                    </div>
+                  {/* Contenido de miembros */}
+                  <div>
+                  {usuariosEnviados.map((usuario, index) => (
+                    <React.Fragment key={index}>
+                      <div className='i-invitar-usuarios'>
+                        {/* Información usuario */}
+                        <div className='i-informacion-usuarios'>
+                          <img src = {usuario.urlImagen}/>
 
-                    <div className='rq-iniciativa-texto'>
-                      <div className="rq-titulo">{usuario.nombreUsuario}</div>
-                      
-                      {/* Estado */}
-                      <div className='rq-estado'>
-                        <div>
-                          {solicitudesEnviadas[index].estado}
-                          {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
-                          {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
-                          {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
+                          <div className='i-informacion-usuario'>
+                            <div style={{fontWeight: '600'}}>
+                              {usuario.nombreUsuario}
+                            </div>
+
+                            <div>
+                              {solicitudesEnviadas[index].estado}
+                              {solicitudesEnviadas[index].estado === 'Aceptada' && <FaCheckCircle className='fa-1'/>}
+                              {solicitudesEnviadas[index].estado === 'Rechazada' && <FaTimesCircle className='fa-2'/>}
+                              {solicitudesEnviadas[index].estado === 'Pendiente' && <FaHourglass className='fa-3'/>}
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Basura */}
+                        <div className='i-btn-container' onClick={(e) => e.stopPropagation()}>
+                          <button 
+                            className='i-invitar-usuarios-boton-2' 
+                            onClick={() => handleCancelarUsuario(index, solicitudesEnviadas[index].idUsuario)} 
+                            disabled={faTrashBloqueado[index]}
+                          >
+                            {faTrashBloqueado[index] ? <ClipLoader size={20} color="#000" /> : <FaTrash/>}
+                          </button>
                         </div>
                       </div>
 
-                      {/* Basura */}
-                      <div className='fa-4' onClick={(e) => e.stopPropagation()}>
-                        <button className='fa-5-button'> <FaTrash onClick={() => handleCancelarUsuario(solicitudesEnviadas[index].idUsuario)} disabled={eliminaBloqueado}/> </button>
-                      </div>
-                    </div>
-                  </div>    
-                ))}
+                      {/* Línea entre elementos */}
+                      {index < Object.values(usuariosEnviados).length - 1 && <hr/>}
+                    </React.Fragment>    
+                  ))}
+                  </div>
                 </div>
-              </div>
+              )
             )}
-          </div>
+          </Modal.Body>
         </div>
       </Modal>
 
@@ -1252,6 +1460,74 @@ export const Initiative = () => {
           <Button className='i-modal-guardar' onClick={handleUploadFile} disabled={uploadDisabled} style={{width: '115px'}}>
             {cargandoTarea ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
           </Button>
+          <Button onClick={closeUploadModal} style={{width: '115px'}}>Cerrar</Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Asignar tarea a usuario */}
+      <Modal className="modalcontainer, i-modal-lista-usuarios" show={showAsignarModal} onHide={closeUploadModal}>
+        <Modal.Header>
+          <Modal.Title>Asignar a usuario</Modal.Title>
+        </Modal.Header>
+        
+        <div className="c-input-body">
+          <div className='e-searchBar'>
+            <FaSearch className="e-icons"/>
+            <input
+              type='search'
+              placeholder='Buscar usuarios...'
+              value={filter}
+              onChange={buscarUsuarioAsignar}
+              className='e-searchBarCaja'
+            />
+          </div>
+        </div>
+
+        {totalMiembros ? (
+          (Object.values(totalMiembros).length == 0) ? (
+            <div className="m-error">
+              No se encontraron usuarios.
+            </div>
+          ) : (
+            <>
+              {Object.values(totalMiembros).map((usuario, index) => (
+                <React.Fragment key={usuario.idUsuario}>
+                  <div className='i-invitar-usuarios'>
+                    {/* Información usuario */}
+                    <div className='i-informacion-usuarios'>
+                      <img src = {usuario.urlImagen}/>
+
+                      <div className='i-informacion-usuario'>
+                        <div style={{fontWeight: '600'}}>
+                          {usuario.nombreUsuario}
+                        </div>
+                        <div>
+                          {usuario.nombre}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Boton invitar */}
+                      <div className='i-btn-container'>
+                        <Button className='i-invitar-usuarios-boton' onClick={() => updateUsuarioAsignado(usuario)}>
+                          Asignar
+                        </Button>
+                      </div>
+
+                  </div>
+
+                  {usuario.idUsuario < Object.values(totalMiembros).length - 1 && <hr className='i-divider' />}
+                </React.Fragment>
+              ))}
+            </>
+          )
+        ) : (
+          <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
+            <Spinner animation="border" role="status"></Spinner>
+          </div>
+        )}
+
+        <Modal.Footer>
           <Button onClick={closeUploadModal} style={{width: '115px'}}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
@@ -1325,61 +1601,147 @@ export const Initiative = () => {
 
       {/* Modal para invitar usuarios */}
       <Modal show={showInvitarModal} onHide={() => setShowInvitarModal(false)} centered className='e-modal'>
-        <div className="modalcontainer">
-          <Modal.Header closeButton>
-            <Modal.Title>Invitar Usuarios</Modal.Title>
+        <div className="modalcontainer, i-modal-lista-usuarios">
+          {/* Titulo + X */}
+          <Modal.Header closeButton style={{border: 'none'}}>
+            <Modal.Title>Invitar usuarios</Modal.Title>
           </Modal.Header>
-            <Modal.Body>
-              <div className='e-searchBar'>
-                <FaSearch className="e-icons"/>
-                <input
-                  type='search'
-                  placeholder='Buscar usuarios...'
-                  value={filtro}
-                  onChange={buscarUsuario}
-                  className='e-searchBarCaja'
-                />
-              </div>
-              {usuariosFiltrados ? (
-                (Object.values(usuariosFiltrados).length == 0) ? (
-                  <div className="m-error">
-                    No se encontraron usuarios.
-                  </div>
-                ) : (
-                  <ul>
-                    {Object.values(usuariosFiltrados).map((usuario, id) => (
-                      <li key={id} className='user-item'>
-                        <div className='user-info'>
-                          <span>{usuario.nombreUsuario}</span> ({usuario.nombre})
-                        </div>
-                        {!usuariosFiltrados[usuario.idUsuario].invitarDesactivado && (
-                          <Button variant="primary" onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
-                            Invitar
-                          </Button>
-                        )}
-                        {usuariosFiltrados[usuario.idUsuario].invitarCargando && (
-                          <Button variant="primary" disabled={true}>
-                            <ClipLoader size={16} color="#fff" />
-                          </Button>
-                        )}
-                        {!usuariosFiltrados[usuario.idUsuario].cancelarDesactivado && (
-                          <Button variant="primary" onClick={() => handleCancelarUsuario(usuario.idUsuario)}>
-                            Cancelar
-                          </Button>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                )
-              ) : (
-                <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
-                  <Spinner animation="border" role="status"></Spinner>
+
+          {/* Cuerpo */}
+          <Modal.Body style={{paddingTop: '0px'}}>
+            {/* Searchbar */}
+            <div className='e-searchBar' style={{marginBottom: '20px'}}>
+              <FaSearch className="e-icons"/>
+              <input
+                type='search'
+                placeholder='Buscar usuarios...'
+                value={filtro}
+                onChange={buscarUsuario}
+                className='e-searchBarCaja'
+              />
+            </div>
+
+            {/* Lista usuarios */}
+            {usuariosFiltrados ? (
+              (Object.values(usuariosFiltrados).length == 0) ? (
+                <div className="m-error">
+                  No se encontraron usuarios.
                 </div>
-              )}
-            </Modal.Body>  
+              ) : (
+                <>
+                  {Object.values(usuariosFiltrados).map((usuario, id) => (
+                    <React.Fragment key={id}>
+                      <div className='i-invitar-usuarios'>
+                        {/* Información usuario */}
+                        <div className='i-informacion-usuarios'>
+                          <img src = {usuario.urlImagen}/>
+
+                          <div className='i-informacion-usuario'>
+                            <div style={{fontWeight: '600'}}>
+                              {usuario.nombreUsuario}
+                            </div>
+
+                            <div>
+                              {usuario.nombre}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Boton invitar */}
+                        {!usuariosFiltrados[usuario.idUsuario].invitarDesactivado && (
+                          <div className='i-btn-container'>
+                            <Button className='i-invitar-usuarios-boton' onClick={() => handleInvitarUsuario(usuario.idUsuario)}>
+                              Invitar
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Spinner */}
+                        {usuariosFiltrados[usuario.idUsuario].invitarCargando && (
+                          <div className='i-btn-container'>
+                            <Button className='i-invitar-usuarios-boton' disabled={true}>
+                              <ClipLoader size={16} color="#fff" />
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* Boton cancelar */}
+                        {!usuariosFiltrados[usuario.idUsuario].cancelarDesactivado && (
+                          <div className='i-btn-container'>
+                            <Button className='i-invitar-usuarios-boton' onClick={() => handleCancelarUsuario(id, usuario.idUsuario)}>
+                              Cancelar
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Línea entre elementos */}
+                      {id < Object.values(usuariosFiltrados).length - 1 && <hr/>}
+                    </React.Fragment>
+                  ))}
+                </>
+              )
+            ) : (
+              <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
+                <Spinner animation="border" role="status"></Spinner>
+              </div>
+            )}
+          </Modal.Body>  
         </div>
       </Modal>
 
+      {/* Modal para ver información de miembro */}
+      <Modal show={modalMiembro} onHide={() => setModalMiembro(false)} centered className='e-modal'>
+        <div className="modalcontainer">
+          <Modal.Header style={{ border: "none" }} closeButton> </Modal.Header>
+          
+          {miembroSeleccionado && (
+            <div className="i-modal-miembro">
+              <div className="i-miembro-perfil">
+                {/* Foto de perfil */}
+                <div className="modalhead">
+                  <img src={miembroSeleccionado.urlImagen} alt={miembroSeleccionado.nombre} className="modalimg" />
+                </div>
+                
+                {/* Nombre */}
+                <div className="i-miembro-info">
+                  <div className='i-miembro-nombre'>{miembroSeleccionado.nombre}</div>
+
+                  <div className="i-miembro-datos">
+                    {/* Edad */}
+                    <div style={{display: "flex", marginBottom: "10px"}}>
+                      <span style={{fontWeight: "bold"}}>Edad:&nbsp;</span> {miembroSeleccionado.edad} años
+                    </div>
+
+                    {/* Usuario */}
+                    <div style={{display: "flex", marginBottom: "10px"}}>
+                      <FaUser style={{marginRight: "5px", marginTop: "4px"}}/>
+                      <span style={{fontWeight: "bold"}}>Usuario:&nbsp;</span> {miembroSeleccionado.nombreUsuario}
+                    </div>
+                    
+                    {/* Correo */}
+                    <div>
+                      <FaEnvelope style={{marginRight: "5px"}}/>
+                      <span style={{fontWeight: "bold"}}>Correo:</span> <span style={{textDecoration: "underline"}}>{miembroSeleccionado.correo}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Habilidades */}
+              <div className='i-miembro-habilidades'>
+                Habilidades
+              </div>
+
+              <div className="m-etiquetas" style={{marginBottom: "20px"}}>
+                {Object.values(miembroSeleccionado.listaHabilidades).map((etiqueta, idEtiqueta) => (
+                  <li key={idEtiqueta} className={'m-etiqueta-item'}>{etiqueta}</li>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };

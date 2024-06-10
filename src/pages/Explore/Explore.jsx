@@ -145,16 +145,36 @@ export const Explore = () => {
       // Obtiene todos los usuarios e iniciativas
       const usuariosData = await getUsuarios();
       const iniciativasData = await getIniciativas();
+      
+      const fechaActual = new Date();
+      let iniciativasNuevo = iniciativasData.map(iniciativa => {
+        // Verifica si la fecha de cierre de la iniciativa ya pasó
+        let fechaLimite = false;
 
-      // Asigna el nombre y la imagen del admin a cada iniciativa
-      for (let i = 0; i < iniciativasData.length; i++) {
-        const admin = usuariosData[iniciativasData[i].idAdmin];
-        iniciativasData[i].nombreAdmin = admin.nombreUsuario;
-        iniciativasData[i].urlImagenAdmin = admin.urlImagen;
+        if (iniciativa.fechaCierre) {
+          const [day, month, year] = iniciativa.fechaCierre.split('/');
+          const fechaCierre = new Date(year, month - 1, day);
+          fechaLimite = (fechaCierre <= fechaActual) ? true : false;
+        }
+      
+        // Asigna el nombre y la imagen del admin a cada iniciativa
+        const admin = usuariosData[iniciativa.idAdmin];
+        
+        return {
+          ...iniciativa,
+          nombreAdmin: admin.nombreUsuario,
+          urlImagenAdmin: admin.urlImagen,
+          fechaLimite: fechaLimite
+        };
+      });
+
+      // Filtrar iniciativas sin fecha de cierre para usuarios no administradores
+      if (!admin) {
+        iniciativasNuevo = iniciativasNuevo.filter(iniciativa => !iniciativa.fechaLimite);
       }
 
-      setIniciativas(iniciativasData);
-      setIniciativasFiltradas(iniciativasData);
+      setIniciativas(iniciativasNuevo);
+      setIniciativasFiltradas(iniciativasNuevo);
       setUsuario(usuariosData[user]);
       
       // Obtiene las iniciativas favoritas del usuario
@@ -276,7 +296,7 @@ export const Explore = () => {
         setUsuarioEsMiembro(false);
       }
     }
-    
+
     // Selecciona iniciativa
     setSeleccionada(iniciativa);
     setSeleccionadaIndice(indice);
@@ -347,9 +367,15 @@ export const Explore = () => {
     }
   }
 
+  const [animations, setAnimations] = useState({});
 
   // Toggle de icono de favoritos
   const handleToggleFavorita = async (idIniciativa) => {
+    setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
+    setTimeout(() => {
+      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
+    }, 600);
+
     let iniciativasFavoritasNuevo = [...iniciativasFavoritas];
 
     if (iniciativasFavoritas.includes(idIniciativa)) {
@@ -535,42 +561,52 @@ export const Explore = () => {
 
           {/* Iniciativas */}
           <div className='e-iniciativas-container'>
-            {iniciativasFiltradas.map((iniciativa, indice) => (
-              <div key={indice} className='e-iniciativa' onClick={() => seleccionaIniciativa(iniciativa, indice)}>
+            {iniciativasFiltradas.length == 0 ? (
+              <div className="m-error">No hay iniciativas disponibles.</div>
+            ) : (
+              <>
+                {iniciativasFiltradas.map((iniciativa, indice) => (
+                  <div key={indice} className='e-iniciativa' onClick={() => seleccionaIniciativa(iniciativa, indice)}>
 
-                {/* Nombre y foto del usuario administrador*/}
-                <div className='e-iniciativa-admin'>
-                  <img src={iniciativa.urlImagenAdmin} alt = {iniciativa.nombreAdmin} />
-                  <div className='e-nombre-admin'>{iniciativa.nombreAdmin}</div>
-                </div>
-                
-                {/* Imagen de la iniciativa */}
-                <div className='e-iniciativa-imagen'>
-                  <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
-                </div>
-                
-                {/* Titulo, descripción, y botón */}
-                <div className='e-iniciativa-contenido'>
-                  <div className="e-titulo">{iniciativa.titulo}</div>
-                  <div className="e-desc">{iniciativa.descripcion}</div>
+                    {/* Nombre y foto del usuario administrador*/}
+                    <div className='e-iniciativa-admin'>
+                      <img src={iniciativa.urlImagenAdmin} alt = {iniciativa.nombreAdmin} />
+                      <div className='e-nombre-admin'>{iniciativa.nombreAdmin}</div>
+                    </div>
+                    
+                    {/* Imagen de la iniciativa */}
+                    <div className='e-iniciativa-imagen'>
+                      <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
+                    </div>
+                    
+                    {/* Titulo, descripción, y botón */}
+                    <div className='e-iniciativa-contenido'>
+                      <div className="e-titulo">{iniciativa.titulo}</div>
+                      <div className="e-desc">{iniciativa.descripcion}</div>
 
-                  {/* Botón */}
-                  <div className='e-boton' onClick={(e) => e.stopPropagation()}>
-                    {admin ? (
-                      <FaTrash onClick={() => handleMostrarEliminar(iniciativa)} style={{ cursor: "pointer" }} />
-                    ) : (
-                      iniciativasFavoritas.includes(iniciativa.idIniciativa) ? (
-                        <FaHeart onClick={() => handleToggleFavorita(iniciativa.idIniciativa)} style={{ cursor: "pointer" }} />
-                      ) : (
-                        <FaRegHeart onClick={() => handleToggleFavorita(iniciativa.idIniciativa)} style={{ cursor: "pointer" }} />
-                      )
-                    )}
+                      {/* Botón */}
+                      <div className='e-boton' onClick={(e) => e.stopPropagation()}>
+                        {admin ? (
+                          <FaTrash onClick={() => handleMostrarEliminar(iniciativa)} style={{ cursor: "pointer" }} />
+                        ) : (
+                          iniciativasFavoritas.includes(iniciativa.idIniciativa) ? (
+                            <FaHeart
+                              onClick={() => handleToggleFavorita(iniciativa.idIniciativa)}
+                              className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
+                            />
+                          ) : (
+                            <FaRegHeart
+                              onClick={() => handleToggleFavorita(iniciativa.idIniciativa)}
+                              className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
+                            />
+                          )
+                        )}
+                      </div>
+                    </div>
                   </div>
-                </div>
-
-              </div>
-            ))
-          }
+                ))}
+              </>
+            )}
           </div>
         </div>
         ) : (

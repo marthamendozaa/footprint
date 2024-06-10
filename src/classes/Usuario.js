@@ -14,6 +14,7 @@ export default class Usuario {
     this.listaHabilidades = [];
     this.listaIntereses = [];
     this.listaSolicitudes = [];
+    this.listaTareas = [];
     this.fechaCreacion = new Date();
   }
 }

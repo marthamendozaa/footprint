@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 import { useAuth } from '../../contexts/AuthContext.jsx';
 import Solicitud from '../../classes/Solicitud.js'
-import { getMisIniciativas, getUsuario, actualizaUsuario, crearSolicitud, suscribirseAIniciativa, existeSolicitud } from '../../api/api.js';
+import { getMisIniciativas, getUsuario, actualizaUsuario, crearSolicitud, suscribirseAIniciativa, existeSolicitud, getUsuarios } from '../../api/api.js';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 import { FaHeart} from "react-icons/fa";
 import './MyInitiatives.css';
@@ -20,9 +20,50 @@ export const MyInitiatives = () => {
   useEffect(() => {
     const fetchData = async () => {
       const iniciativasData = await getMisIniciativas(user);
-      setIniciativasMiembro(iniciativasData.iniciativasMiembro);
-      setIniciativasAdmin(iniciativasData.iniciativasAdmin);
-      setIniciativasFavoritas(iniciativasData.iniciativasFavoritas);
+
+      const usuariosData = await getUsuarios();
+
+      const iniciativasMiembroData = iniciativasData.iniciativasMiembro.map(iniciativa => {
+        const admin = usuariosData[iniciativa.idAdmin];
+        return {
+            ...iniciativa,
+            nombreAdmin: admin.nombreUsuario,
+            urlImagenAdmin: admin.urlImagen
+        };
+      });
+
+      const iniciativasAdminData = iniciativasData.iniciativasAdmin.map(iniciativa => {
+        const admin = usuariosData[iniciativa.idAdmin];
+        return {
+            ...iniciativa,
+            nombreAdmin: admin.nombreUsuario,
+            urlImagenAdmin: admin.urlImagen
+        };
+      });
+
+      const fechaActual = new Date();
+      const iniciativasFavoritasData = iniciativasData.iniciativasFavoritas.map(iniciativa => {
+        // Verifica si la fecha de cierre de la iniciativa ya pasó
+        let fechaLimite = false;
+
+        if (iniciativa.fechaCierre) {
+          const [day, month, year] = iniciativa.fechaCierre.split('/');
+          const fechaCierre = new Date(year, month - 1, day);
+          fechaLimite = (fechaCierre <= fechaActual) ? true : false;
+        }
+
+        const admin = usuariosData[iniciativa.idAdmin];
+        return {
+            ...iniciativa,
+            nombreAdmin: admin.nombreUsuario,
+            urlImagenAdmin: admin.urlImagen,
+            fechaLimite: fechaLimite
+        };
+      });
+
+      setIniciativasMiembro(iniciativasMiembroData);
+      setIniciativasAdmin(iniciativasAdminData);
+      setIniciativasFavoritas(iniciativasFavoritasData);
 
       const usuarioData = await getUsuario(user);
       setUsuario(usuarioData);
@@ -30,16 +71,28 @@ export const MyInitiatives = () => {
     fetchData();
   }, []);
 
+  const [animations, setAnimations] = useState({});
+
   // Eliminar iniciativa de lista de favoritos
   const eliminaFavorita = async (idIniciativa) => {
-    const iniciativasFavoritasNuevo = iniciativasFavoritas.filter(iniciativa => iniciativa.idIniciativa !== idIniciativa);
-    setIniciativasFavoritas(iniciativasFavoritasNuevo);
+    let iniciativasFavoritasNuevo = [...iniciativasFavoritas];
+    let usuarioNuevo = {...usuario};
 
-    const listaIniciativasFavoritas = iniciativasFavoritasNuevo.map(iniciativa => iniciativa.idIniciativa);
-    const usuarioNuevo = {...usuario};
-    usuarioNuevo.listaIniciativasFavoritas = listaIniciativasFavoritas;
+    setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
+    setTimeout(() => {
+      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
+
+      // Actualizar lista de iniciativas favoritas
+      iniciativasFavoritasNuevo = iniciativasFavoritasNuevo.filter(iniciativa => iniciativa.idIniciativa !== idIniciativa);
+      setIniciativasFavoritas(iniciativasFavoritasNuevo);
+
+      // Actualizar información del usuario
+      iniciativasFavoritasNuevo = iniciativasFavoritasNuevo.map(iniciativa => iniciativa.idIniciativa);
+      usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
+      setUsuario(usuarioNuevo);
+    }, 600);
+
     await actualizaUsuario(usuarioNuevo);
-    setUsuario(usuarioNuevo);
   };
 
   // Modal para mostrar información de la iniciativa
@@ -57,6 +110,7 @@ export const MyInitiatives = () => {
     } else {
       setSuscribirDesactivado(false);
     }
+
     setSelectedIniciativa(iniciativa);
     setSelectedIniciativaIndex(index);
     setShowModal(true);
@@ -126,20 +180,29 @@ export const MyInitiatives = () => {
         <div className="m-container">
           
           <div className="m-seccion-container">
+            {/* Iniciativas donde soy miembro */}
             <div className="m-iniciativas-titulo">Iniciativas donde soy miembro</div>
-  
-            {iniciativasMiembro.length == 0 ? (
-              <div className="m-error">
-                Aún no eres miembro de una iniciativa.
-              </div>
-            ) : (
+              {iniciativasMiembro.length == 0 ? (
+                <div className="m-error">
+                  Aún no eres miembro de una iniciativa.
+                </div>
+              ) : (
               <div className="m-iniciativas-container">
                 {iniciativasMiembro.map((iniciativa, index) => (
                   <Link key={iniciativa.idIniciativa} to={`/initiative/${iniciativa.idIniciativa}`}>
                     <div className="m-iniciativa" style={{height: '90%'}}>
-                        <div className="m-iniciativa-imagen">
-                          <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
-                        </div>
+                      {/* Nombre y foto del usuario administrador */}
+                      <div className='rq-iniciativa-admin'>
+                        <img src={iniciativa.urlImagenAdmin} alt={iniciativa.nombreAdmin} />
+                        <div className='rq-nombre-admin'>{iniciativa.nombreAdmin}</div>
+                      </div>
+
+                      {/* Imagen general */}
+                      <div className="m-iniciativa-imagen">
+                        <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
+                      </div>
+
+                      {/* Contenido */}
                       <div className="m-iniciativa-texto">
                         <div className="m-titulo">{iniciativa.titulo}</div>
                       </div>
@@ -151,20 +214,29 @@ export const MyInitiatives = () => {
           </div>
   
           <div className="m-seccion-container">
+            {/* Iniciativas creadas */}
             <div className="m-iniciativas-titulo">Iniciativas creadas</div>
-  
-            {iniciativasAdmin.length == 0 ? (
-              <div className="m-error">
-                Aún no has creado una iniciativa.
-              </div>
-            ) : (
+              {iniciativasAdmin.length == 0 ? (
+                <div className="m-error">
+                  Aún no has creado una iniciativa.
+                </div>
+              ) : (
               <div className="m-iniciativas-container">
                 {iniciativasAdmin.map((iniciativa, index) => (
                   <Link key={iniciativa.idIniciativa} to={`/initiative/${iniciativa.idIniciativa}`}>
                     <div className="m-iniciativa" style={{height: '90%'}}>
-                        <div className="m-iniciativa-imagen">
-                          <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
-                        </div>
+                      {/* Nombre y foto del usuario administrador */}
+                      <div className='rq-iniciativa-admin'>
+                        <img src={iniciativa.urlImagenAdmin} alt={iniciativa.nombreAdmin} />
+                        <div className='rq-nombre-admin'>{iniciativa.nombreAdmin}</div>
+                      </div>
+                      
+                      {/* Imagen general */}
+                      <div className="m-iniciativa-imagen">
+                        <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
+                      </div>
+
+                      {/* Contenido */}
                       <div className="m-iniciativa-texto">
                         <div className="m-titulo">{iniciativa.titulo}</div>
                       </div>
@@ -176,40 +248,68 @@ export const MyInitiatives = () => {
           </div>
 
           <div className="m-seccion-container">
+            {/* Iniciativas favoritas */}
             <div className="m-iniciativas-titulo">Iniciativas favoritas</div>
-  
-            {iniciativasFavoritas.length == 0 ? (
-              <div className="m-error">
-                Aún no tienes iniciativas favoritas.
-              </div>
-            ) : (
+              {iniciativasFavoritas.length == 0 ? (
+                <div className="m-error">
+                  Aún no tienes iniciativas favoritas.
+                </div>
+              ) : (
               <div className="m-iniciativas-container">
                 {/* Mostrar iniciativa con link si es admin o miembro, si no mostrar modal */}
                 {iniciativasFavoritas.map((iniciativa, index) => (
                     (iniciativa.idAdmin === user) || (iniciativa.listaMiembros.includes(user)) ? (
                       <div key={iniciativa.idIniciativa} className="m-iniciativa" >
                         <Link to={`/initiative/${iniciativa.idIniciativa}`}>
+                          {/* Nombre y foto del usuario administrador */}
+                          <div className='rq-iniciativa-admin'>
+                            <img src={iniciativa.urlImagenAdmin} alt={iniciativa.nombreAdmin} />
+                            <div className='rq-nombre-admin'>{iniciativa.nombreAdmin}</div>
+                          </div>
+
+                          {/* Imagen general */}
                           <div className='m-iniciativa-imagen'>
                             <img src={iniciativa.urlImagen} alt = {iniciativa.titulo} />
                           </div>
+
+                          {/* Contenido */}
                           <div className='m-iniciativa-contenido'>
                             <div className="m-titulo">{iniciativa.titulo}</div>
                           </div>
                         </Link>
+
+                        {/* Corazon */}
                         <div className='m-corazon'>
-                          <FaHeart onClick={(e) => { e.stopPropagation(); eliminaFavorita(iniciativa.idIniciativa); }} style={{ cursor: "pointer" }} />
+                          <FaHeart
+                            onClick={(e) => { e.stopPropagation(); eliminaFavorita(iniciativa.idIniciativa); }}
+                            className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
+                          />
                         </div>
                       </div>
                     ) : (
                       <div key={iniciativa.idIniciativa} className='m-iniciativa' onClick={() => seleccionaIniciativa(iniciativa, index)}>
+                        {/* Nombre y foto del usuario administrador */}
+                        <div className='rq-iniciativa-admin'>
+                          <img src={iniciativa.urlImagenAdmin} alt={iniciativa.nombreAdmin} />
+                          <div className='rq-nombre-admin'>{iniciativa.nombreAdmin}</div>
+                        </div>
+
+                        {/* Imagen general */}
                         <div className='m-iniciativa-imagen'>
                           <img src={iniciativa.urlImagen} alt={iniciativa.titulo} />
                         </div>
+
+                        {/* Contenido */}
                         <div className='m-iniciativa-contenido'>
                           <div className="m-titulo">{iniciativa.titulo}</div>
                         </div>
+
+                        {/* Corazon */}
                         <div className='m-corazon'>
-                          <FaHeart onClick={(e) => { e.stopPropagation(); eliminaFavorita(iniciativa.idIniciativa); }} style={{ cursor: "pointer" }} />
+                          <FaHeart
+                            onClick={(e) => { e.stopPropagation(); eliminaFavorita(iniciativa.idIniciativa); }}
+                            className={`heart ${animations[iniciativa.idIniciativa] ? 'animate' : ''}`}
+                          />
                         </div>
                       </div>
                     )
