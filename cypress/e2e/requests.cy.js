@@ -21,7 +21,7 @@ describe('Pruebas de la vista explora', () => {
     });
     cy.url().should('include', '/requests');
   }); 
-/*
+
   it('solicitudVisualizacion1 - Verificar que "Agua Iniciativa" exista con estatus "Pendiente"', () => {
     // Verificar que la iniciativa "Agua Iniciativa" con estatus "Pendiente" esté presente
     cy.contains('.rq-titulo', 'Agua Iniciativa')
@@ -47,7 +47,7 @@ describe('Pruebas de la vista explora', () => {
     cy.contains('.rq-titulo', 'Huella de Carbono').click();
 
     // Verificar que la descripción esté visible
-    cy.contains('fdffddffd')
+    cy.contains('Iniciativa dirigida a disminuir la huella de carbono dentro de oficinas de Guadalajara. Buscamos gente con mucho compromiso con el medio ambiente.')
       .should('be.visible');
 
     cy.get('body').click(0, 0); // Simula un clic en la esquina superior izquierda de la página
@@ -72,29 +72,4 @@ describe('Pruebas de la vista explora', () => {
     cy.contains('.rq-titulo', 'Huella de Carbono').should('not.exist');
   });
   
-  it('solicitudVisualizacion2 - Rechazar una invitación', () => {
-    cy.contains('.rq-titulo', 'NUEVAINICIATIVA')
-      .should('be.visible')
-
-    cy.contains('.rq-titulo', 'NUEVAINICIATIVA')
-      .should('be.visible')
-      .parent()
-      .within(() => {
-        // Hacer clic en el botón de rechazar
-        cy.get('button.fa-5-button')
-          .filter(':has(svg.fa-times-circle)')
-          .click();
-      });
-
-    cy.wait(5000);
-
-    // Refrescar la página
-    cy.reload();
-
-    // Esperar a que la página se recargue completamente
-    cy.wait(5000);
-
-    // Verificar que la iniciativa "NUEVAINICIATIVA" ya no esté presente
-    cy.contains('.rq-titulo', 'NUEVAINICIATIVA').should('not.exist');
-  });*/
 });
