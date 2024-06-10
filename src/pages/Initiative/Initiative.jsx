@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaUserPlus, FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash, FaUser, FaEnvelope } from 'react-icons/fa';
+import { FaUserPlus, FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTimes, FaUser, FaEnvelope } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
@@ -818,6 +818,12 @@ export const Initiative = () => {
               </button>
             )}
 
+            {!editingCampos || esAdmin && (
+              <button className="i-fa-pen" onClick={handleCancelarCampos}>
+                <FaTimes />
+              </button>
+            )}
+
             {/* Foto de iniciativa */}
             {editingCampos ? (
               <div className="c-foto-iniciativa" onClick={handleMostrarImagen}>
@@ -1117,7 +1123,7 @@ export const Initiative = () => {
                           <div className="i-tareas-container-2" key={tarea.idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
-                                <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+                                <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                                 <div className="i-tarea-desc">
                                   <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                     {tarea.descripcion}
@@ -1161,7 +1167,7 @@ export const Initiative = () => {
                         <div className="i-tarea">
 
                           <div className="i-tarea-info">
-                            <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+                            <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                             <div className="i-tarea-desc">
                               <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                 {tarea.descripcion}
@@ -1213,7 +1219,7 @@ export const Initiative = () => {
                           <div className="i-tarea-container-2" key={idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
-                                <div className="c-titulo-texto-tarea" style={{maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+                                <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                                 <div className="i-tarea-desc">{tarea.descripcion}
                                 </div>
                                 
@@ -1288,7 +1294,7 @@ export const Initiative = () => {
 
             <div className='i-guardar'>
               {!editingCampos || esAdmin && (
-                <button className="i-btn-guardar" onClick={handleGuardarCampos} disabled={guardarCamposBloqueado || guardarCargando}>
+                <button className="i-btn-guardar" style={{marginTop: '20px'}} onClick={handleGuardarCampos} disabled={guardarCamposBloqueado || guardarCargando}>
                   {guardarCargando ? <ClipLoader size={20} color="#000" /> : 'Guardar'}
                 </button>
               )}
@@ -1439,7 +1445,7 @@ export const Initiative = () => {
                             onClick={() => handleCancelarUsuario(index, solicitudesEnviadas[index].idUsuario)} 
                             disabled={faTrashBloqueado[index]}
                           >
-                            {faTrashBloqueado[index] ? <ClipLoader size={20} color="#000" /> : <FaTrash/>}
+                            {faTrashBloqueado[index] ? <ClipLoader size={20} color="#000" /> : <FaTimes/>}
                           </button>
                         </div>
                       </div>
@@ -1480,8 +1486,8 @@ export const Initiative = () => {
         {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
 
         <Modal.Footer>
-          <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
           <Button onClick={handleCerrarImagen}>Cerrar</Button>
+          <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
         </Modal.Footer>
       </Modal>
 
@@ -1509,10 +1515,10 @@ export const Initiative = () => {
         {fileError && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{fileError}</span>}
   
         <Modal.Footer>
+          <Button onClick={closeUploadModal} style={{width: '115px'}}>Cerrar</Button>
           <Button className='i-modal-guardar' onClick={handleUploadFile} disabled={uploadDisabled} style={{width: '115px'}}>
             {cargandoTarea ? <ClipLoader size={24} color="#fff"/> : 'Guardar'}
           </Button>
-          <Button onClick={closeUploadModal} style={{width: '115px'}}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
 
@@ -1615,10 +1621,10 @@ export const Initiative = () => {
             </div>
           )}
         <Modal.Footer>
+          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
           <Button className="eliminar" onClick={handleEliminaMiembro} disabled={eliminaBloqueado} style={{width: "127px"}}>
             {eliminaBloqueado ? <ClipLoader size={20} color="#fff" /> : 'Eliminar'}
           </Button>
-          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
       

@@ -645,10 +645,10 @@ export const Explore = () => {
             ¿Estás seguro que quieres eliminar la iniciativa <span style={{fontWeight:'bold'}}>{seleccionada.titulo}</span>?
           </div>
         <Modal.Footer>
+          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
           <Button className="eliminar" onClick={handleEliminaIniciativa} disabled={eliminaBloqueado} style={{width: "128px"}}>
             {eliminaBloqueado ? <ClipLoader color="white" size={20} /> : "Eliminar"}
           </Button>
-          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
           </Modal.Footer>
         </Modal>
       )}
@@ -656,15 +656,15 @@ export const Explore = () => {
       {/* Modal iniciativa eliminada*/}
       {seleccionada && (
         <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
-        <Modal.Header>
-          <div className="ea-modal-title">Éxito</div>
-        </Modal.Header>
-          <div className="ea-modal-body">
-            Iniciativa <span style={{fontWeight:'bold'}}>{seleccionada.titulo}</span> eliminada exitosamente
-          </div>
-        <Modal.Footer>
-          <Button onClick={handleCerrarEliminada}>Cerrar</Button>
-        </Modal.Footer>
+          <Modal.Header>
+            <div className="ea-modal-title">Éxito</div>
+          </Modal.Header>
+            <div className="ea-modal-body">
+              Iniciativa <span style={{fontWeight:'bold'}}>{seleccionada.titulo}</span> eliminada exitosamente
+            </div>
+          <Modal.Footer>
+            <Button onClick={handleCerrarEliminada}>Cerrar</Button>
+          </Modal.Footer>
         </Modal>
       )}
 
