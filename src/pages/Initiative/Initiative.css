@@ -1,6 +1,7 @@
 .i-container {
   display: flex;
   width: 1000px;
+  margin-top: 20px;
   margin-bottom: 20px;
   align-items: center;
   flex-direction: column;
@@ -21,8 +22,8 @@
   cursor: pointer;
   color: #A0C1BF;
   font-size: 30px;
-  margin-top: -25px;
-  margin-left: 1000px;
+  top: 20px;
+  right: 210px;
 }
 
 .i-fa-pen:hover{

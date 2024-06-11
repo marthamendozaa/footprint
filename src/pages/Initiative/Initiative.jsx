@@ -58,6 +58,7 @@ export const Initiative = () => {
 
   // Información de tareas
   const [tareas, setTareas] = useState(null);
+  const [tareasOriginal, setTareasOriginal] = useState(null);
   const datePickersTareas = useRef([]);
   const [tareasCompletadas, setTareasCompletadas] = useState(null);
 
@@ -165,8 +166,10 @@ export const Initiative = () => {
           return tareaData;
         });
         const tareas = await Promise.all(tareaPromises);
+        const tareasSinCompletar = tareas.filter((tarea) => !tarea.completada);
 
-        setTareas(tareas.filter((tarea) => !tarea.completada));
+        setTareas(tareasSinCompletar);
+        setTareasOriginal(JSON.parse(JSON.stringify(tareasSinCompletar)));
         setTareasCompletadas(tareas.filter((tarea) => tarea.completada));
       } catch (error) {
         console.error("Error obteniendo información de la iniciativa:", error.message);
@@ -633,8 +636,14 @@ export const Initiative = () => {
       setNuevaDescripcion(nuevaDescripcion);
       setEtiquetasIniciativa(etiquetasIniciativa);
       setNuevaFechaFinal(nuevaFechaFinal);
-      setIniciativa(nuevaIniciativa);
       
+      // Actualizar imagen de la iniciativa
+      if (imagenIniciativa) {
+        const urlImagen = await subirImagen(imagenIniciativa, `Iniciativas/${idIniciativa}`);
+        nuevaIniciativa = { ...nuevaIniciativa, urlImagen: urlImagen };
+      }
+
+      setIniciativa(nuevaIniciativa);
       await actualizaIniciativa(nuevaIniciativa);
 
       // Actualiza tareas de la iniciativa
@@ -652,6 +661,12 @@ export const Initiative = () => {
       setEditingCampos(false);
     }
   };
+
+  const handleCerrarCampos = () => {
+    setEditingCampos(false);
+    setTareas(tareasOriginal);
+    setImagenPreview(iniciativa.urlImagen);
+  }
 
 
 
@@ -774,54 +789,6 @@ export const Initiative = () => {
   };
 
 
-  //EDITAR TAREAS 
-  const [editingTareaId, setEditingTareaId] = useState(null);
-  const [nuevoTituloTarea, setNuevoTituloTarea] = useState("");
-  const [nuevaDescripcionTarea, setNuevaDescripcionTarea] = useState("");
-  const [nuevoUsuarioAsignado, setNuevoUsuarioAsignado] = useState("");
-
-  const startEditingTarea = (tarea) => {
-    setEditingTareaId(tarea.idTarea);
-    setNuevoTituloTarea(tarea.titulo);
-    setNuevaDescripcionTarea(tarea.descripcion);
-    setNuevaFechaTarea(tarea.fechaEntrega);
-    
-  };
-
-  const updateUsuarioAsignado = (usuario) => {
-    setNuevoUsuarioAsignado(usuario.idUsuario);
-    console.log("setNuevoUsuarioAsignado");
-    console.log(idIniciativa);
-    console.log(usuario.correo);
-    console.log(tarea.titulo);
-    enviarCorreoTarea(iniciativa, usuario);
-  }
-
-
-  const saveTareaChanges = async (tarea, index) => {
-    console.log('Editando tarea', tarea.idTarea);
-    try {
-      const tareaNueva = { ...tarea, titulo: nuevoTituloTarea, descripcion: nuevaDescripcionTarea, fechaEntrega: nuevaFechaTarea, idAsignado: nuevoUsuarioAsignado}
-      await actualizaTarea(tareaNueva);
-
-      const updatedTareas = [...tareas];
-      updatedTareas[index] = tareaNueva;
-
-
-      setTareas(updatedTareas);
-      setEditingTareaId(null);
-    } catch (error) {
-      console.error("Error updating tarea:", error);
-    }
-    
-  };
-
-  const cancelTareaEdit = () => {
-    setEditingTareaId(null);
-  };
-
-
-
   // Tareas height
   // Titulo
   const textareaRefs3 = useRef([null]);
@@ -867,7 +834,7 @@ export const Initiative = () => {
             )}
 
             {!editingCampos || esAdmin && (
-              <button className="i-fa-pen" onClick={handleCancelarCampos}>
+              <button className="i-fa-pen" onClick={handleCerrarCampos} style={{fontSize: "35px"}}>
                 <FaTimes />
               </button>
             )}
