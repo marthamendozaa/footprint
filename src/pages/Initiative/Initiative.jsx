@@ -1117,7 +1117,7 @@ export const Initiative = () => {
                                     {/* Asignar */}
                                     <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openAsignarTarea(tarea, index)}>
                                       {tarea.idAsignado && usuariosTodos ? (
-                                        <>{usuariosTodos[tarea.idAsignado].nombreUsuario}</>
+                                        <div className='i-titulo-normal'>{usuariosTodos[tarea.idAsignado].nombreUsuario}</div>
                                       ) : (
                                         <><FaUserPlus /> Asignar</>
                                       )}
@@ -1152,7 +1152,7 @@ export const Initiative = () => {
                                 </div>
                                 <div className="i-tarea-boton" style={{ marginTop: '5px' }}>
                                   {tarea.idAsignado && usuariosTodos ? (
-                                    <>{usuariosTodos[tarea.idAsignado].nombreUsuario}</>
+                                    <div className='i-titulo-normal'>{usuariosTodos[tarea.idAsignado].nombreUsuario}</div>
                                   ) : (
                                     <><FaUserPlus /> Sin Asignar</>
                                   )}
@@ -1242,7 +1242,7 @@ export const Initiative = () => {
                                 <div className="i-tarea-botones">
                                   <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
                                   <div className="i-tarea-boton" style={{marginTop: '5px', cursor: 'pointer' }} onClick={() => handleMostrarEntregable(tarea.urlEntrega)} > <FaFolder /> Documento </div>
-                                  <div className="i-tarea-boton" style={{marginTop: '5px'}} > {tarea.idAsignado && usuariosTodos && <>{usuariosTodos[tarea.idAsignado].nombreUsuario}</>} </div>
+                                  <div className="i-tarea-boton" style={{marginTop: '5px'}} > {tarea.idAsignado && usuariosTodos && <div className='i-titulo-normal'>{usuariosTodos[tarea.idAsignado].nombreUsuario}</div>} </div>
                                 </div>
                               
                             </div>
