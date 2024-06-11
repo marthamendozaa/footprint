@@ -14,6 +14,7 @@ import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import './Initiative.css';
 import Tarea from '../../classes/Tarea.js';
+import ShowText from '../../assets/ShowText';
 
 export const Initiative = () => {
   const { idIniciativa } = useParams();
@@ -881,9 +882,11 @@ export const Initiative = () => {
                       {nuevoTitulo ? `${nuevoTitulo.length}/30` : `0/30`}
                     </div>
                   </div>
-                ) : (
-                  <div className="i-titulo-normal">
-                    {iniciativa.titulo}
+                ) : ( 
+                  <div className="i-titulo-normal" > 
+                    <ShowText title={iniciativa.titulo} isCreateOpen={false}  >
+                      {iniciativa.titulo} 
+                    </ShowText>
                   </div>
                 )}
               </div>
