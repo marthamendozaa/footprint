@@ -153,7 +153,9 @@ export const Explore = () => {
 
         if (iniciativa.fechaCierre) {
           const [day, month, year] = iniciativa.fechaCierre.split('/');
+          // Verifica fecha hasta el final del día
           const fechaCierre = new Date(year, month - 1, day);
+          fechaCierre.setHours(23, 59, 59, 999);
           fechaLimite = (fechaCierre <= fechaActual) ? true : false;
         }
       
@@ -228,12 +230,7 @@ export const Explore = () => {
 
       // Filtrar por etiquetas
       const etiquetasIniciativa = Object.values(iniciativa.listaEtiquetas);
-      for (let etiqueta of etiquetasIniciativa) {
-        if (etiquetasSeleccionadas.includes(etiqueta)) {
-          filtroEtiqueta = true;
-          break;
-        }
-      };
+      filtroEtiqueta = etiquetasSeleccionadas.every(etiqueta => etiquetasIniciativa.includes(etiqueta));
       
       // Filtrar por privacidad
       const privacidadIniciativa = iniciativa.esPublica ? "Pública" : "Privada";
@@ -371,25 +368,32 @@ export const Explore = () => {
 
   // Toggle de icono de favoritos
   const handleToggleFavorita = async (idIniciativa) => {
-    setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
-    setTimeout(() => {
-      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
-    }, 600);
-
     let iniciativasFavoritasNuevo = [...iniciativasFavoritas];
+    let usuarioNuevo = {...usuario};
 
-    if (iniciativasFavoritas.includes(idIniciativa)) {
-      iniciativasFavoritasNuevo = iniciativasFavoritas.filter(favorita => favorita !== idIniciativa);
-    } else {
-      iniciativasFavoritasNuevo.push(idIniciativa);
+    try {
+      // Comienza animación
+      setAnimations(prev => ({ ...prev, [idIniciativa]: true }));
+
+      // Actualiza lista de iniciativas favoritas
+      if (iniciativasFavoritas.includes(idIniciativa)) {
+        iniciativasFavoritasNuevo = iniciativasFavoritas.filter(favorita => favorita !== idIniciativa);
+      } else {
+        iniciativasFavoritasNuevo.push(idIniciativa);
+      }
+
+      // Actualiza información del usuario
+      usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
+
+      await actualizaUsuario(usuarioNuevo);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      // Termina animación
+      setAnimations(prev => ({ ...prev, [idIniciativa]: false }));
+      setIniciativasFavoritas(iniciativasFavoritasNuevo);
+      setUsuario(usuarioNuevo);
     }
-    setIniciativasFavoritas(iniciativasFavoritasNuevo);
-
-    // Actualiza información del usuario con lista de favoritas nueva
-    const usuarioNuevo = {...usuario};
-    usuarioNuevo.listaIniciativasFavoritas = iniciativasFavoritasNuevo;
-    await actualizaUsuario(usuarioNuevo);
-    setUsuario(usuarioNuevo);
   };
 
 
@@ -641,10 +645,10 @@ export const Explore = () => {
             ¿Estás seguro que quieres eliminar la iniciativa <span style={{fontWeight:'bold'}}>{seleccionada.titulo}</span>?
           </div>
         <Modal.Footer>
+          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
           <Button className="eliminar" onClick={handleEliminaIniciativa} disabled={eliminaBloqueado} style={{width: "128px"}}>
             {eliminaBloqueado ? <ClipLoader color="white" size={20} /> : "Eliminar"}
           </Button>
-          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
           </Modal.Footer>
         </Modal>
       )}
@@ -652,15 +656,15 @@ export const Explore = () => {
       {/* Modal iniciativa eliminada*/}
       {seleccionada && (
         <Modal className="ea-modal" show={modalEliminada} onHide={handleCerrarEliminada}>
-        <Modal.Header>
-          <div className="ea-modal-title">Éxito</div>
-        </Modal.Header>
-          <div className="ea-modal-body">
-            Iniciativa <span style={{fontWeight:'bold'}}>{seleccionada.titulo}</span> eliminada exitosamente
-          </div>
-        <Modal.Footer>
-          <Button onClick={handleCerrarEliminada}>Cerrar</Button>
-        </Modal.Footer>
+          <Modal.Header>
+            <div className="ea-modal-title">Éxito</div>
+          </Modal.Header>
+            <div className="ea-modal-body">
+              Iniciativa <span style={{fontWeight:'bold'}}>{seleccionada.titulo}</span> eliminada exitosamente
+            </div>
+          <Modal.Footer>
+            <Button onClick={handleCerrarEliminada}>Cerrar</Button>
+          </Modal.Footer>
         </Modal>
       )}
 

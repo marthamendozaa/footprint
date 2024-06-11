@@ -62,8 +62,8 @@
     display: flex;
     flex-wrap: wrap;
     height: min-content;
-    gap: 15px;
-    justify-content: flex-start;
+    gap: 8px;
+    justify-content: space-around;
 }
   
 .r4-etiquetas li {

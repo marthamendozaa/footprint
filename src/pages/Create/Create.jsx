@@ -113,6 +113,7 @@ export const Create = () => {
   const autoResizeTextarea2 = (idTarea) => {
     const textarea = textareaRefs2.current[idTarea];
     if (textarea) {
+      textarea.style.height = '';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
@@ -219,6 +220,7 @@ export const Create = () => {
   const autoResizeTextarea = () => {
     const textarea = textareaRef.current;
     if (textarea) {
+      textarea.style.height = '';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
@@ -947,8 +949,8 @@ export const Create = () => {
             {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
 
             <Modal.Footer>
-              <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
               <Button onClick={handleCerrarImagen}>Cerrar</Button>
+              <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
             </Modal.Footer>
           </Modal>
           

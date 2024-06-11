@@ -1,6 +1,7 @@
 .i-container {
   display: flex;
   width: 1000px;
+  margin-top: 20px;
   margin-bottom: 20px;
   align-items: center;
   flex-direction: column;
@@ -20,8 +21,9 @@
   border: none;
   cursor: pointer;
   color: #A0C1BF;
-  font-size: 20px;
-  margin-top: -20px;
+  font-size: 30px;
+  top: 20px;
+  right: 210px;
 }
 
 .i-fa-pen:hover{
@@ -80,7 +82,7 @@ button.i-fa-pen:disabled {
   text-align: left;
 }
 
-.i-titulo-normal{
+.i-titulo-normal {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -282,8 +284,41 @@ li.i-etiqueta-item {
 .i-seccion-miembros {
   width: 20%;
   display: flex;
-  align-items: stretch;
   flex-direction: column;
+  justify-content: space-between;
+}
+
+.i-seccion-1 {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.i-guardar {
+  display: flex;
+  justify-content: center;
+}
+
+.i-btn-guardar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 25px;
+  font-weight: 600;
+  width: 169px;
+  height: 50px;
+  padding: 10px 30px;
+  background-color: #bbb;
+  border-radius: 30px;
+}
+
+.i-btn-guardar:hover {
+  background-color: #989898;
+}
+
+button.i-btn-guardar:disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .i-btn-ver-miembros {
@@ -315,8 +350,25 @@ li.i-etiqueta-item {
   background-color: #A0C1BF;
   border-radius: 25px;
   font-size: 12px;
+  font-weight: 600;
+  color: #212529;
   padding: 5px 10px;
   text-align: center;
+}
+
+.i-tarea-boton:disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.react-datepicker-2 {
+  width: 100px;
+  font-weight: 600;
+  font-size: 12px;
+  text-align: center;
+  background: none;
+  border: none;
+  border-radius: 3px;
 }
 
 /* Miembros */
@@ -369,22 +421,25 @@ li.i-etiqueta-item {
 }
 
 .i-btn-ver-solicitudes {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   bottom: 0;
-  background-color: #909da4; 
+  background-color: #A0C1BF; 
   border: none; 
   padding: 10px 20px; 
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 600;
   color: #000000;
-  font-weight: bold; 
   transition: background-color 0.3s ease;
-  border-radius: 20px;
+  border-radius: 25px;
   margin-top: 20px;
   margin-bottom: 5px;
   width: 100%;
 }
 
 .i-btn-ver-solicitudes:hover {
-  background-color: #6b7780;
+  background-color: #699AA0;
 }
 
 /* Modal Solicitudes */
@@ -409,7 +464,7 @@ li.i-etiqueta-item {
 /*TAREAS MARTHA*/
 
 .i-seccion-tareas {
-  width: 80%;
+  width: 100%;
   display: flex;
   align-items: flex-start;
   flex-direction: column;
@@ -417,7 +472,7 @@ li.i-etiqueta-item {
 
 .i-tareas-container {
   display: flex;
-  width: 85%;
+  width: 100%;
   flex-direction: column-reverse;
 }
 
@@ -429,23 +484,28 @@ li.i-etiqueta-item {
 
 .i-tarea {
   display: flex;
-  width: 100%;
+  flex-direction: row;
+  align-items: flex-start;
+  width: 80%;
   background-color: #E2EBF1;
   border-radius: 25px;
   margin-top: 10px;
   margin-bottom: 10px;
   padding: 10px 25px;
-  align-items: flex-start;
   font-weight: 600;
-  flex-direction: row;
-  overflow-x: auto;
-
 }
 
 .i-tarea-titulo {
   display: flex;
   flex-direction: row;
   font-size: 25px;
+  overflow: overlay;
+  max-width: 390px;
+  text-align: left;
+}
+
+.i-tarea-titulo::-webkit-scrollbar {
+  display: none;
 }
 
 .i-tarea-titulo:focus-visible {
@@ -464,9 +524,16 @@ input.i-tarea-titulo {
   display: flex;
 }
 
+.i-edit-tarea-box {
+  background: transparent;
+  font-weight: 600;
+  border: none;
+  overflow: none;
+}
 
-
-
+.i-edit-tarea-box:focus-visible {
+  outline: none;
+}
 
 .i-desc-input-texto-2 {
   position: relative;
@@ -711,6 +778,7 @@ input.i-tarea-titulo {
 /* Agregar usuario modal */
 .i-modal-lista-usuarios {
   max-height: 500px;
+  max-width: 100% !important;
   overflow: overlay;
 }
 
@@ -937,4 +1005,56 @@ li.i-etiqueta-item-2 {
 
 .i-modal-lista-usuarios::-webkit-scrollbar {
   display: none;
+}
+
+/* Isa estilos */
+.i-edit-tarea {
+  display: flex;
+  flex-direction: column;
+  margin-left: 20px;
+  font-size: 30px;
+  cursor: pointer;
+}
+
+.i-edit-tarea button {
+  color: #000;
+}
+
+.i-edit-tarea-2 button {
+  color: #000;
+  font-size: 20px;
+  background: transparent;
+  padding: 0px;
+}
+
+.i-edit-tarea button:hover,
+.i-edit-tarea-2 button:hover {
+  color: #A0C1BF;
+}
+
+.i-row-tarea {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.i-edit-tarea-2 {
+  display: flex;
+  flex-direction: column;
+  margin-left: 15px;
+}
+
+.i-input-titulo-tarea {
+  position: relative;
+  width: 100%;
+  background-color: transparent;
+  border-radius: 0px;
+  outline: none;
+  text-align: left;
+  font-weight: 600;
+  font-size: 25px;
+  color: #121212;
+  word-break: break-word;
+  resize: none;
+  padding-right: 20px; 
 }

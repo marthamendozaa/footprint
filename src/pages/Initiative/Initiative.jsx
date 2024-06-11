@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTrash, FaUser, FaEnvelope } from 'react-icons/fa';
+import { FaUserPlus, FaExclamationCircle , FaPen, FaCalendar, FaFolder, FaTimesCircle, FaGlobe, FaUnlockAlt, FaLock, FaImages, FaSearch, FaCheckCircle, FaHourglass, FaTimes, FaUser, FaEnvelope } from 'react-icons/fa';
 import { IoMdAddCircleOutline } from "react-icons/io";
 import { LuUpload } from 'react-icons/lu';
 import { useDropzone } from 'react-dropzone';
@@ -9,7 +9,7 @@ import { ClipLoader } from 'react-spinners';
 import { useParams } from 'react-router-dom';
 import DatePicker from "react-datepicker";
 import es from 'date-fns/locale/es';
-import { getIntereses, getIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud, actualizaTarea, enviarCorreoTarea } from '../../api/api.js';
+import { getIntereses, getIniciativa, actualizaIniciativa, getUsuarios, getMisTareas, getUsuario, getSolicitudes, subirImagen, crearSolicitud, existeSolicitud, actualizaSolicitud, suscribirseAIniciativa, eliminarMiembro, enviarCorreoMiembro, eliminarSolicitud, actualizaTarea } from '../../api/api.js';
 import Solicitud from '../../classes/Solicitud.js'
 import Fuse from 'fuse.js';
 import './Initiative.css';
@@ -41,12 +41,12 @@ export const Initiative = () => {
   const { user } = useAuth();
   const [infoAdmin, setInfoAdmin] = useState(null);
   const [esAdmin, setEsAdmin] = useState(false);
+  const [usuariosTodos, setUsuariosTodos] = useState({});
   const [miembros, setMiembros] = useState([]);
   const [usuarios, setUsuarios] = useState({});
   const [usuariosFiltrados, setUsuariosFiltrados] = useState({});
   const [totalMiembros, setTotalMiembros] = useState(false);
   const [usuariosTotal, setUsuariosTotales] = useState(false);
-  const [usuarioID, setUsuarioID] = useState(false);
 
   // Información de solicitudes
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
@@ -58,6 +58,9 @@ export const Initiative = () => {
 
   // Información de tareas
   const [tareas, setTareas] = useState(null);
+  const [tareasOriginal, setTareasOriginal] = useState(null);
+  const datePickersTareas = useRef([]);
+  const [tareasCompletadas, setTareasCompletadas] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,11 +76,11 @@ export const Initiative = () => {
 
         // Obtiene información de todos los usuarios
         const usuariosData = await getUsuarios();
+        setUsuariosTodos(usuariosData);
 
         // Obtiene información del admin de la iniciativa
         const adminIniciativa = usuariosData[iniciativaData.idAdmin];
         const usuarioEsAdmin = usuariosData[user].idUsuario === iniciativaData.idAdmin;
-        setUsuarioID(usuariosData[user].idUsuario);
         setInfoAdmin(adminIniciativa);
         setEsAdmin(usuarioEsAdmin);
 
@@ -163,7 +166,11 @@ export const Initiative = () => {
           return tareaData;
         });
         const tareas = await Promise.all(tareaPromises);
-        setTareas(tareas);
+        const tareasSinCompletar = tareas.filter((tarea) => !tarea.completada);
+
+        setTareas(tareasSinCompletar);
+        setTareasOriginal(JSON.parse(JSON.stringify(tareasSinCompletar)));
+        setTareasCompletadas(tareas.filter((tarea) => tarea.completada));
       } catch (error) {
         console.error("Error obteniendo información de la iniciativa:", error.message);
       }
@@ -212,10 +219,10 @@ export const Initiative = () => {
   };
   
 
-  const [filter, setFilter] = useState('');
+  const [filtroAsignar, setFiltroAsignar] = useState('');
   const buscarUsuarioAsignar = (event) => {
     const busqueda = event.target.value;
-    setFilter(busqueda);
+    setFiltroAsignar(busqueda);
 
     // Si el término de búsqueda está vacío, mostrar todos los usuarios
     if (!busqueda) {
@@ -422,12 +429,23 @@ export const Initiative = () => {
       // Eliminar de la lista de miembros
       const miembrosNuevo = miembros.filter((miembro) => miembro.idUsuario !== miembroEliminar.idUsuario);
       setMiembros(miembrosNuevo);
+      const totalMiembrosNuevo = totalMiembros.filter((miembro) => miembro.idUsuario !== miembroEliminar.idUsuario);
+      setTotalMiembros(totalMiembrosNuevo);
 
       // Regresar a la lista de usuarios
       const usuariosNuevo = {...usuarios};
       usuariosNuevo[miembroEliminar.idUsuario] = {...miembroEliminar, invitarCargando: false, invitarDesactivado: false, cancelarDesactivado: true};
       setUsuarios(usuariosNuevo);
       setUsuariosFiltrados(usuariosNuevo);
+
+      // Actualizar tareas sin miembro
+      let tareasNuevo = [...tareas];
+      for (const tarea of tareasNuevo) {
+        if (tarea.idAsignado === miembroEliminar.idUsuario) {
+          tarea.idAsignado = null;
+        }
+      }
+      setTareas(tareasNuevo);
       
       handleCerrarEliminar();
       handleMostrarEliminada();
@@ -555,18 +573,6 @@ export const Initiative = () => {
     }
   };
 
-  // Editar fecha de tarea
-  const [nuevaFechaTarea, setNuevaFechaTarea] = useState(new Date());
-
-  const datePickerCierreTarea = useRef(null);
-
-  const handleCambioFechaCierreTarea = () => {
-    if (datePickerCierreTarea.current) {
-      datePickerCierreTarea.current.setOpen(true);
-    }
-  };
-
-
   // Editar descripción
   const [nuevaDescripcion, setNuevaDescripcion] = useState("");
 
@@ -579,6 +585,7 @@ export const Initiative = () => {
   const autoResizeTextarea = () => {
     const textarea = textareaRef.current;
     if (textarea) {
+      textarea.style.height = 'auto';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
@@ -597,6 +604,7 @@ export const Initiative = () => {
 
   // Guardar la información editada
   const [guardarCamposBloqueado, setGuardarCamposBloqueado] = useState(false);
+  const [guardarCargando, setGuardarCargando] = useState(false);
 
   useEffect(() => {
     const verificarCampos = () => {
@@ -611,22 +619,54 @@ export const Initiative = () => {
   }, [imagenPreview, nuevoTitulo, nuevaDescripcion, Object.keys(etiquetasIniciativa)]);
 
   const handleGuardarCampos = async () => {
-    if (guardarCamposBloqueado) {
-      return
-    }
-
-    setEditingCampos(false);
+    setGuardarCargando(true);
+    let nuevaIniciativa = {...iniciativa};
 
     try {
+      // Actualiza información de la iniciativa
+      nuevaIniciativa = {
+        ...nuevaIniciativa,
+        titulo: nuevoTitulo,
+        descripcion: nuevaDescripcion,
+        listaEtiquetas: etiquetasIniciativa,
+        fechaCierre: formatDate(nuevaFechaFinal)
+      };
 
+      setNuevoTitulo(nuevoTitulo);
+      setNuevaDescripcion(nuevaDescripcion);
+      setEtiquetasIniciativa(etiquetasIniciativa);
+      setNuevaFechaFinal(nuevaFechaFinal);
+      
+      // Actualizar imagen de la iniciativa
+      if (imagenIniciativa) {
+        const urlImagen = await subirImagen(imagenIniciativa, `Iniciativas/${idIniciativa}`);
+        nuevaIniciativa = { ...nuevaIniciativa, urlImagen: urlImagen };
+      }
+
+      setIniciativa(nuevaIniciativa);
+      await actualizaIniciativa(nuevaIniciativa);
+
+      // Actualiza tareas de la iniciativa
+      const tareasPromises = tareas.map(async (tarea) => {
+        if (!miembros.some(miembro => miembro.idUsuario === tarea.idAsignado)) {
+          tarea.idAsignado = null;
+        }
+        await actualizaTarea(tarea);
+      });
+      await Promise.all(tareasPromises);
     } catch (error) {
-
+      console.log(error);
+    } finally {
+      setGuardarCargando(false);
+      setEditingCampos(false);
     }
   };
 
-  const handleCancelarCampos = async () => {
+  const handleCerrarCampos = () => {
     setEditingCampos(false);
-  };
+    setTareas(tareasOriginal);
+    setImagenPreview(iniciativa.urlImagen);
+  }
 
 
 
@@ -638,7 +678,6 @@ export const Initiative = () => {
   const [uploadDisabled, setUploadDisabled] = useState(true);
   const [cargandoTarea, setCargandoTarea] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
-  const [tarea, setTarea] = useState(new Tarea());
   const [tareaUpload, setTareaUpload] = useState(new Tarea());
   const [selectedTaskIndex, setSelectedTaskIndex] = useState(null);
 
@@ -664,7 +703,6 @@ export const Initiative = () => {
   };
 
   const handleMostrarEntregable = (tareaUrl) => {
-    
     setModalEntregable(true);
     setTareaEntregable(tareaUrl);
   };
@@ -696,6 +734,10 @@ export const Initiative = () => {
     } else {
       setFileError('');
       setUploadDisabled(false);
+
+      if (cargandoTarea) {
+        setUploadDisabled(true);
+      }
     }
   }, [selectedFile, cargandoTarea]);
 
@@ -712,19 +754,17 @@ export const Initiative = () => {
       const tareaNueva = { ...tareaUpload, urlEntrega: fileUrl, completada: true}
       await actualizaTarea(tareaNueva);
 
-      const updatedTareas = [...tareas];
-      updatedTareas[selectedTaskIndex] = tareaNueva;
+      const updatedTareas = tareas.filter((tarea, i) => i !== selectedTaskIndex);
+      const updatedTareasCompletadas = [...tareasCompletadas, tareaNueva];
 
       setTareas(updatedTareas);
-      setEditingTareaId(null);
-
-      closeUploadModal();
-
-      // Handle fileUrl appropriately in your application context
-
+      setTareasCompletadas(updatedTareasCompletadas);
     } catch (error) {
       console.error("Error al subir el archivo:", error.message);
-    } 
+    } finally {
+      setCargandoTarea(false);
+      closeUploadModal();
+    }
   };
 
   const { getRootProps: getRootPropsTarea, getInputProps: getInputPropsTarea } = useDropzone({
@@ -739,53 +779,46 @@ export const Initiative = () => {
       }
     }
   });
-  
-  //EDITAR TAREAS 
-  const [editingTareaId, setEditingTareaId] = useState(null);
-  const [nuevoTituloTarea, setNuevoTituloTarea] = useState("");
-  const [nuevaDescripcionTarea, setNuevaDescripcionTarea] = useState("");
-  const [nuevoUsuarioAsignado, setNuevoUsuarioAsignado] = useState("");
 
-  const startEditingTarea = (tarea) => {
-    setEditingTareaId(tarea.idTarea);
-    setNuevoTituloTarea(tarea.titulo);
-    setNuevaDescripcionTarea(tarea.descripcion);
-    setNuevaFechaTarea(tarea.fechaEntrega);
-    
+  const tareaFechaLimite = (fechaEntrega) => {
+    const fechaActual = new Date();
+    const fecha = new Date(fechaEntrega);
+    fecha.setHours(23, 59, 59, 999);
+
+    return fecha < fechaActual;
   };
 
-  const updateUsuarioAsignado = (usuario) => {
-    setNuevoUsuarioAsignado(usuario.idUsuario);
-    console.log("setNuevoUsuarioAsignado");
-    console.log(idIniciativa);
-    console.log(usuario.correo);
-    console.log(tarea.titulo);
-    enviarCorreoTarea(iniciativa, usuario);
-  }
 
+  // Tareas height
+  // Titulo
+  const textareaRefs3 = useRef([null]);
 
-  const saveTareaChanges = async (tarea, index) => {
-    console.log('Editando tarea', tarea.idTarea);
-    try {
-      const tareaNueva = { ...tarea, titulo: nuevoTituloTarea, descripcion: nuevaDescripcionTarea, fechaEntrega: nuevaFechaTarea, idAsignado: nuevoUsuarioAsignado}
-      await actualizaTarea(tareaNueva);
-
-      const updatedTareas = [...tareas];
-      updatedTareas[index] = tareaNueva;
-
-
-      setTareas(updatedTareas);
-      setEditingTareaId(null);
-    } catch (error) {
-      console.error("Error updating tarea:", error);
+  const autoResizeTextarea3 = (index) => {
+    const textarea = textareaRefs3.current[index];
+    if (textarea) {
+      textarea.style.height = '';
+      textarea.style.height = `${textarea.scrollHeight}px`;
     }
-    
   };
 
-  const cancelTareaEdit = () => {
-    setEditingTareaId(null);
-  };
+  useEffect(() => {
+    textareaRefs3.current.forEach((textarea, index) => {
+      if (textarea) {
+        autoResizeTextarea3(index);
+      }
+    });
+  }, [tareas]);
 
+  // Descripción
+  const textareaRefs2 = useRef([null]);
+
+  const autoResizeTextarea2 = (index) => {
+    const textarea = textareaRefs2.current[index];
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
 
 
   return (
@@ -801,15 +834,9 @@ export const Initiative = () => {
             )}
 
             {!editingCampos || esAdmin && (
-              <>
-                <button className="i-fa-pen" onClick={handleGuardarCampos} disabled={guardarCamposBloqueado}>
-                  Guardar
-                </button>
-
-                <button className="i-fa-pen-2" onClick={handleCancelarCampos}>
-                  Cerrar
-                </button>
-              </>
+              <button className="i-fa-pen" onClick={handleCerrarCampos} style={{fontSize: "35px"}}>
+                <FaTimes />
+              </button>
             )}
 
             {/* Foto de iniciativa */}
@@ -947,7 +974,7 @@ export const Initiative = () => {
         <div className="i-desc">
           <div className="i-progreso-texto">Progreso</div>
 
-          <ProgressBar progress={Math.round((tareas.filter(tarea => tarea.completada).length / tareas.length) * 100)} />
+          <ProgressBar progress={Math.round((tareasCompletadas.length / (tareas.length + tareasCompletadas.length)) * 100)} />
         </div>
 
         <div className="c-desc">
@@ -994,7 +1021,7 @@ export const Initiative = () => {
         <div className="i-tareas-miembros">
           <div className="i-seccion-tareas">
               {/* Tarea asignada a mí */}
-              <div className="i-titulo-tareas">Mis Tareas</div>
+              <div className="i-titulo-tareas">{esAdmin ? 'Tareas' : 'Mis Tareas'}</div>
               
               {(tareas && tareas.length > 0 && esAdmin) ? (
                 
@@ -1009,80 +1036,96 @@ export const Initiative = () => {
                       {/* VISTA TAREAS DE ADMIN EDITANDO */}
                       {editingCampos ? (
                         <div>
-                          {tareas.filter(tarea => !tarea.completada).map((tarea, index) => (
+                          {tareas.map((tarea, index) => (
                             <div className="i-tarea-container-2" key={tarea.idTarea}>
-                              
-                              {editingTareaId === tarea.idTarea ? (
-                              
+                              <div className="i-row-tarea">
                                 <div className="i-tarea">
-
                                   <div className="i-tarea-info">
+                                    
+                                    {/* Tarea titulo */}
                                     <div className="i-tarea-titulo">
                                       <div className="i-tarea-texto">
-                                      <input
-                                        type="text"
-                                        className="i-edit-tarea-box"
-                                        value={nuevoTituloTarea}
-                                        onChange={(e) => setNuevoTituloTarea(e.target.value)}
-                                        autoFocus
-                                        maxLength={30}
-                                      />
+                                        <input
+                                          type="text"
+                                          className="i-edit-tarea-box"
+                                          value={tareas[index].titulo}
+                                          onChange={(e) => {tareas[index].titulo = e.target.value; setTareas([...tareas]);}}
+                                          autoFocus
+                                          maxLength={30}
+                                        />
                                       </div>
                                     </div>
-                                      <input
-                                        type="text"
-                                        className="i-edit-desc-box"
-                                        value={nuevaDescripcionTarea}
-                                        onChange={(e) => setNuevaDescripcionTarea(e.target.value)}
-                                        maxLength={100}
-                                      />
 
-                                      <button onClick={() => saveTareaChanges(tarea, index)}>Save</button>
-                                      <button onClick={cancelTareaEdit}>Cancel</button>
-                                  
+                                    {/* Descripción */}
+                                    <div className='c-container-conteo'>
+                                      <div className="c-tarea-texto" style={{paddingTop: '2px'}}>
+                                        <style jsx>{`
+                                          textarea {
+                                            border-radius: 25px;
+                                            position: relative;
+                                            width: 100%;
+                                            height: 25px;
+                                            font-size: 16px;
+                                            resize: none;
+                                            outline: none;
+                                          }
+                                        `}
+                                        </style>
+                                        <textarea
+                                          ref={el => textareaRefs2.current[index] = el}
+                                          className="c-desc-input-texto-2"
+                                          value={tareas[index].descripcion}
+                                          onChange={(e) => {
+                                            tareas[index].descripcion = e.target.value;
+                                            setTareas([...tareas]);
+                                            autoResizeTextarea2(index);
+                                          }}
+                                          maxLength={200}
+                                          style={{ borderColor: 'transparent' }}
+                                        />
+                                      </div>
+
+                                      <button className="c-btn-editar-flex" style={{marginRight: '20px'}}>
+                                        {tarea.descripcion ? `${tarea.descripcion.length}/200` : `0/200`}
+                                      </button>
+                                    </div>
+
                                   </div>
 
+                                  {/* Botones tareas */}
                                   <div className="i-tarea-botones">
+                                    {/* Fecha */}
                                     <>
-                                    <div className="i-tarea-boton" onClick={handleCambioFechaCierreTarea}>
-                                      <FaCalendar/> Fecha
-                                      <DatePicker
-                                      className='react-datepicker__input-container-create'
-                                      selected={nuevaFechaTarea}
-                                      onChange={(date) => setNuevaFechaTarea(date)}
-                                      dateFormat="dd/MM/yyyy"
-                                      ref={datePickerCierreTarea}
-                                      locale={es}
-                                      showYearDropdown
-                                      scrollableYearDropdown 
-                                      yearDropdownItemNumber={66}
-                                      showMonthDropdown
-                                      minDate={today}
-                                      />
+                                      <div className="i-tarea-boton" style={tareaFechaLimite(tarea.fechaEntrega) ? {backgroundColor: "#f09e9e"} : {}}>
+                                        <FaCalendar/> Fecha
+                                        <DatePicker
+                                          className='react-datepicker-2'
+                                          selected={tareas[index].fechaEntrega}
+                                          onChange={(date) => {tareas[index].fechaEntrega = date; setTareas([...tareas]);}}
+                                          dateFormat="dd/MM/yyyy"
+                                          ref={(el) => (datePickersTareas.current[index] = el)}
+                                          locale={es}
+                                          showYearDropdown
+                                          scrollableYearDropdown 
+                                          yearDropdownItemNumber={66}
+                                          showMonthDropdown
+                                          minDate={today}
+                                        />
+                                      </div>
+                                    </>
+                                    
+                                    {/* Asignar */}
+                                    <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openAsignarTarea(tarea, index)}>
+                                      {tarea.idAsignado && usuariosTodos ? (
+                                        <div className='i-titulo-normal'>{usuariosTodos[tarea.idAsignado].nombreUsuario}</div>
+                                      ) : (
+                                        <><FaUserPlus /> Asignar</>
+                                      )}
                                     </div>
                                     
-                                  </>
-                                    <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento </div>
-                                    <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openAsignarTarea(tarea, index)}><FaFolder /> Asignar </div>
-                                  </div>
-
-                                </div>
-
-                              ) : (
-                                <div className="i-tarea">
-                                  <div className="i-tarea-info">
-                                    <div className="i-tarea-titulo">{tarea.titulo}</div>
-                                    <div className="i-tarea-desc" >{tarea.descripcion}</div>
-                                    <button className="c-btn-editar-tarea-2" onClick={() => startEditingTarea(tarea)}><FaPen /></button>
-                                  </div>
-                                  <div className="i-tarea-botones">
-                                    <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                                    <div className="i-tarea-boton" style={{ marginTop: '5px', cursor: 'pointer' }} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento </div>
                                   </div>
                                 </div>
-
-                              )}
-
+                              </div>
                             </div>
                           ))}  
                         </div>
@@ -1091,12 +1134,11 @@ export const Initiative = () => {
 
                       /* VISTA TAREAS TOTALES ADMIN */
                       <div>
-                        {tareas.filter(tarea => !tarea.completada).map((tarea, index) => (
+                        {tareas.map((tarea, index) => (
                           <div className="i-tareas-container-2" key={tarea.idTarea}>
                             <div className="i-tarea">
-
                               <div className="i-tarea-info">
-                                <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                                 <div className="i-tarea-desc">
                                   <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                     {tarea.descripcion}
@@ -1104,8 +1146,17 @@ export const Initiative = () => {
                                 </div>
                               </div>
                               <div className="i-tarea-botones">
-                                <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                                <div className="i-tarea-boton" style={{marginTop: '5px', cursor:'pointer'}} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento</div>
+                                {/* Asignar */}
+                                <div className="i-tarea-boton" style={tareaFechaLimite(tarea.fechaEntrega) ? {backgroundColor: "#f09e9e"} : {}}>
+                                  <FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}
+                                </div>
+                                <div className="i-tarea-boton" style={{ marginTop: '5px' }}>
+                                  {tarea.idAsignado && usuariosTodos ? (
+                                    <div className='i-titulo-normal'>{usuariosTodos[tarea.idAsignado].nombreUsuario}</div>
+                                  ) : (
+                                    <><FaUserPlus /> Sin Asignar</>
+                                  )}
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -1122,16 +1173,16 @@ export const Initiative = () => {
               ) : (
 
                 <div className='i-tareas-container'>
-
-                  {tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada).length > 0 ? (
-                    
+                  
+                  {/* VISTA TAREAS ASIGNADAS A MI */}
+                  {tareas.filter(tarea => tarea.idAsignado === user).length > 0 ? (  
                     <div>
-                    {tareas.filter(tarea => tarea.idAsignado === usuarioID && !tarea.completada).map((tarea, index) => (
+                    {tareas.filter(tarea => tarea.idAsignado === user).map((tarea, index) => (
                       <div className="i-tareas-container-2" key={tarea.idTarea}>
                         <div className="i-tarea">
 
                           <div className="i-tarea-info">
-                            <div className="i-tarea-titulo">{tarea.titulo}</div>
+                            <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                             <div className="i-tarea-desc">
                               <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                 {tarea.descripcion}
@@ -1139,8 +1190,17 @@ export const Initiative = () => {
                             </div>
                           </div>
                           <div className="i-tarea-botones">
-                            <div className="i-tarea-boton" ><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
-                            <div className="i-tarea-boton" style={{marginTop: '5px', cursor:'pointer'}} onClick={() => openUploadModal(tarea, index)}><FaFolder /> Documento</div>
+                            <div className="i-tarea-boton" style={tareaFechaLimite(tarea.fechaEntrega) ? {backgroundColor: "#f09e9e"} : {}}>
+                              <FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}
+                            </div>
+
+                            {/* Entregar tarea se desactiva si se pasa la fecha de entrega */}
+                            <button className="i-tarea-boton"
+                              style={{marginTop: '5px'}}
+                              disabled={tareaFechaLimite(tarea.fechaEntrega)}
+                              onClick={() => openUploadModal(tarea, index)}>
+                                <LuUpload /> Entregar
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -1162,19 +1222,19 @@ export const Initiative = () => {
           
               {/* Tarea completadas publicas */}
               <div className="i-titulo-tareas"> Tareas Completadas </div>
-              {tareas ? (
+              {tareasCompletadas ? (
                   <div className='i-tareas-container'>
-                    {tareas.filter(tarea => tarea.completada).length === 0 ? (
+                    {tareasCompletadas.length === 0 ? (
                       <div className="m-error">
                       No hay tareas completadas.
                       </div>
                     ) : (
                       <div>
-                        {tareas.filter(tarea => tarea.completada).map((tarea, idTarea) => (
+                        {tareasCompletadas.map((tarea, idTarea) => (
                           <div className="i-tarea-container-2" key={idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
-                                <div className="i-tarea-titulo">{tarea.titulo}</div>
+                                <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                                 <div className="i-tarea-desc">{tarea.descripcion}
                                 </div>
                                 
@@ -1182,6 +1242,7 @@ export const Initiative = () => {
                                 <div className="i-tarea-botones">
                                   <div className="i-tarea-boton"><FaCalendar /> Fecha {formatDate(tarea.fechaEntrega)}</div>
                                   <div className="i-tarea-boton" style={{marginTop: '5px', cursor: 'pointer' }} onClick={() => handleMostrarEntregable(tarea.urlEntrega)} > <FaFolder /> Documento </div>
+                                  <div className="i-tarea-boton" style={{marginTop: '5px'}} > {tarea.idAsignado && usuariosTodos && <div className='i-titulo-normal'>{usuariosTodos[tarea.idAsignado].nombreUsuario}</div>} </div>
                                 </div>
                               
                             </div>
@@ -1199,51 +1260,63 @@ export const Initiative = () => {
           </div>
 
           <div className="i-seccion-miembros">
-            <div className="i-tipo-miembro">Dueño</div>
-            {infoAdmin &&
-              <div className="i-btn-miembro" onClick={() => handleMostrarMiembro(infoAdmin)}>
-                  <div className='i-btn-miembro-contenido'>
-                    {infoAdmin.nombreUsuario}
-                  </div>
-              </div>
-            }
-            <div className="i-tipo-miembro">
-              Miembros {esAdmin && <IoMdAddCircleOutline className="i-agregar-miembros" onClick={() => setShowInvitarModal(true)}/>}
-            </div>
-            
-            {/* Miembros */}
-            <div>
-              {miembros.length == 0 ? (
-                <div> No hay miembros. </div>
-              ) : (
-                <div>
-                  {miembros.map((miembro, idMiembro) => (
-                    <div className="i-btn-miembro" key={idMiembro} onClick={() => handleMostrarMiembro(miembro)}>
-                      <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
-                        {miembro.nombreUsuario}
-                      </div>
-
-                      <div className='i-icon-estilos'>
-                        {esAdmin && (
-                          <FaTimesCircle className="i-icon-times-circle"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleMostrarEliminar(miembro);
-                          }}/>
-                        )}
-                      </div>
+            <div className='i-seccion-1'>
+              <div className="i-tipo-miembro">Dueño</div>
+              {infoAdmin &&
+                <div className="i-btn-miembro" onClick={() => handleMostrarMiembro(infoAdmin)}>
+                    <div className='i-btn-miembro-contenido'>
+                      {infoAdmin.nombreUsuario}
                     </div>
-                  ))}
                 </div>
+              }
+              <div className="i-tipo-miembro">
+                Miembros {esAdmin && <IoMdAddCircleOutline className="i-agregar-miembros" onClick={() => setShowInvitarModal(true)}/>}
+              </div>
+              
+              {/* Miembros */}
+              <div>
+                {miembros.length == 0 ? (
+                  <div> No hay miembros. </div>
+                ) : (
+                  <div>
+                    {miembros.map((miembro, idMiembro) => (
+                      <div className="i-btn-miembro" key={idMiembro} onClick={() => handleMostrarMiembro(miembro)}>
+                        <div className='i-btn-miembro-contenido' style={esAdmin? {width: '85%'} : {width: '100%'}}>
+                          {miembro.nombreUsuario}
+                        </div>
+
+                        <div className='i-icon-estilos'>
+                          {esAdmin && (
+                            <FaTimesCircle className="i-icon-times-circle"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMostrarEliminar(miembro);
+                            }}/>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {esAdmin && (
+                <button type="button" className="i-btn-ver-solicitudes" onClick={() => setShowSolicitudesModal(true)}>
+                  <FaEnvelope style={{marginRight: "5px"}}/> Solicitudes
+                </button>
               )}
             </div>
 
-            {esAdmin && (
-              <button type="button" className="i-btn-ver-solicitudes" onClick={() => setShowSolicitudesModal(true)}>
-                VER SOLICITUDES
-              </button>
-            )}
+            <div className='i-guardar'>
+              {!editingCampos || esAdmin && (
+                <button className="i-btn-guardar" style={{marginTop: '20px'}} onClick={handleGuardarCampos} disabled={guardarCamposBloqueado || guardarCargando}>
+                  {guardarCargando ? <ClipLoader size={20} color="#000" /> : 'Guardar'}
+                </button>
+              )}
+            </div>
+
           </div>
+
         </div>
       </div>
       ) : (
@@ -1387,7 +1460,7 @@ export const Initiative = () => {
                             onClick={() => handleCancelarUsuario(index, solicitudesEnviadas[index].idUsuario)} 
                             disabled={faTrashBloqueado[index]}
                           >
-                            {faTrashBloqueado[index] ? <ClipLoader size={20} color="#000" /> : <FaTrash/>}
+                            {faTrashBloqueado[index] ? <ClipLoader size={20} color="#000" /> : <FaTimes/>}
                           </button>
                         </div>
                       </div>
@@ -1428,8 +1501,8 @@ export const Initiative = () => {
         {errorImagen && <span className="c-error-imagen"><FaExclamationCircle className='c-fa-ec'/>{errorImagen}</span>}
 
         <Modal.Footer>
-          <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
           <Button onClick={handleCerrarImagen}>Cerrar</Button>
+          <Button onClick={handleSubirImagen} disabled={imagenBloqueado}>Guardar</Button>
         </Modal.Footer>
       </Modal>
 
@@ -1457,79 +1530,80 @@ export const Initiative = () => {
         {fileError && <span className='p-error-imagen'><FaExclamationCircle className='p-fa-ec'/>{fileError}</span>}
   
         <Modal.Footer>
-          <Button className='i-modal-guardar' onClick={handleUploadFile} disabled={uploadDisabled} style={{width: '115px'}}>
-            {cargandoTarea ? <ClipLoader size={24} color="#fff" /> : 'Guardar'}
-          </Button>
           <Button onClick={closeUploadModal} style={{width: '115px'}}>Cerrar</Button>
+          <Button className='i-modal-guardar' onClick={handleUploadFile} disabled={uploadDisabled} style={{width: '115px'}}>
+            {cargandoTarea ? <ClipLoader size={24} color="#fff"/> : 'Guardar'}
+          </Button>
         </Modal.Footer>
       </Modal>
 
       {/* Asignar tarea a usuario */}
-      <Modal className="modalcontainer, i-modal-lista-usuarios" show={showAsignarModal} onHide={closeUploadModal}>
-        <Modal.Header>
-          <Modal.Title>Asignar a usuario</Modal.Title>
-        </Modal.Header>
-        
-        <div className="c-input-body">
-          <div className='e-searchBar'>
-            <FaSearch className="e-icons"/>
-            <input
-              type='search'
-              placeholder='Buscar usuarios...'
-              value={filter}
-              onChange={buscarUsuarioAsignar}
-              className='e-searchBarCaja'
-            />
-          </div>
-        </div>
-
-        {totalMiembros ? (
-          (Object.values(totalMiembros).length == 0) ? (
-            <div className="m-error">
-              No se encontraron usuarios.
+      <Modal show={showAsignarModal} onHide={closeUploadModal} centered className='e-modal'>
+        <div className="modalcontainer, i-modal-lista-usuarios">
+          <Modal.Header closeButton style={{border: 'none'}}>
+            <Modal.Title>Asignar a usuario</Modal.Title>
+          </Modal.Header>
+          
+          {/* Cuerpo */}
+          <Modal.Body style={{paddingTop: '0px'}}>
+            {/* Searchbar */}
+            <div className='e-searchBar' style={{marginBottom: '20px'}}>
+              <FaSearch className="e-icons"/>
+              <input
+                type='search'
+                placeholder='Buscar usuarios...'
+                value={filtroAsignar}
+                onChange={buscarUsuarioAsignar}
+                className='e-searchBarCaja'
+              />
             </div>
-          ) : (
-            <>
-              {Object.values(totalMiembros).map((usuario, index) => (
-                <React.Fragment key={usuario.idUsuario}>
-                  <div className='i-invitar-usuarios'>
-                    {/* Información usuario */}
-                    <div className='i-informacion-usuarios'>
-                      <img src = {usuario.urlImagen}/>
+            
+            {/* Lista usuarios */}
+            {totalMiembros && selectedTaskIndex != null ? (
+              (Object.values(totalMiembros).length == 0) ? (
+                <div className="m-error">
+                  No se encontraron usuarios.
+                </div>
+              ) : (
+                <>
+                  {Object.values(totalMiembros).map((usuario, index) => (
+                    <React.Fragment key={index}>
+                      <div className='i-invitar-usuarios'>
+                        {/* Información usuario */}
+                        <div className='i-informacion-usuarios'>
+                          <img src = {usuario.urlImagen}/>
 
-                      <div className='i-informacion-usuario'>
-                        <div style={{fontWeight: '600'}}>
-                          {usuario.nombreUsuario}
+                          <div className='i-informacion-usuario'>
+                            <div style={{fontWeight: '600'}}>
+                              {usuario.nombreUsuario}
+                            </div>
+                            <div>
+                              {usuario.nombre}
+                            </div>
+                          </div>
                         </div>
-                        <div>
-                          {usuario.nombre}
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Boton invitar */}
-                      <div className='i-btn-container'>
-                        <Button className='i-invitar-usuarios-boton' onClick={() => updateUsuarioAsignado(usuario)}>
-                          Asignar
-                        </Button>
+                        {/* Boton invitar */}
+                          <div className='i-btn-container'>
+                            <Button className='i-invitar-usuarios-boton' onClick={() => {tareas[selectedTaskIndex].idAsignado = usuario.idUsuario; setTareas([...tareas]); setShowAsignarModal(false);}}>
+                              Asignar
+                            </Button>
+                          </div>
+
                       </div>
 
-                  </div>
-
-                  {usuario.idUsuario < Object.values(totalMiembros).length - 1 && <hr className='i-divider' />}
-                </React.Fragment>
-              ))}
-            </>
-          )
-        ) : (
-          <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
-            <Spinner animation="border" role="status"></Spinner>
-          </div>
-        )}
-
-        <Modal.Footer>
-          <Button onClick={closeUploadModal} style={{width: '115px'}}>Cerrar</Button>
-        </Modal.Footer>
+                      {index < Object.values(totalMiembros).length - 1 && <hr/>}
+                    </React.Fragment>
+                  ))}
+                </>
+              )
+            ) : (
+              <div className="spinner" style={{width: "100%", justifyContent: "center"}}>
+                <Spinner animation="border" role="status"></Spinner>
+              </div>
+            )}
+          </Modal.Body>
+        </div>
       </Modal>
 
 
@@ -1562,10 +1636,10 @@ export const Initiative = () => {
             </div>
           )}
         <Modal.Footer>
+          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
           <Button className="eliminar" onClick={handleEliminaMiembro} disabled={eliminaBloqueado} style={{width: "127px"}}>
             {eliminaBloqueado ? <ClipLoader size={20} color="#fff" /> : 'Eliminar'}
           </Button>
-          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
       

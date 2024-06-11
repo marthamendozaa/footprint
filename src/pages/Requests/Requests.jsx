@@ -299,10 +299,10 @@ export const Requests = () => {
             ¿Estás seguro que quieres eliminar esta solicitud?
           </div>
         <Modal.Footer>
+          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
           <Button className="eliminar" onClick={handleEliminaSolicitud} disabled={eliminaBloqueado} style={{width: "127px"}}>
             {eliminaBloqueado ? <ClipLoader size={20} color="#fff" /> : 'Eliminar'}
           </Button>
-          <Button onClick={handleCerrarEliminar}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
       
