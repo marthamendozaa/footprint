@@ -28,6 +28,7 @@
 }
   
 .side-navbar li a {
+    position: relative;
     color: #A0C1BF;
     padding: 15px;
     font-size: 22px;
@@ -41,8 +42,34 @@
     color: #000000; 
 }
 
+.side-navbar li:hover .rq-notifs {
+    background-color: #000;
+    color: #fff;
+}
+
 .boton-cerrar {
     position: absolute;
     top: 0;
     right: 0;
+}
+
+.rq-notifs,
+.rq-notifs-selected {
+    position: absolute;
+    display: flex;
+    background-color: #A0C1BF;
+    color: #fff;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    font-size: 10px;
+    top: 10px;
+    left: 28px;
+}
+
+.rq-notifs-selected {
+    background-color: #000;
+    color: #fff;
 }

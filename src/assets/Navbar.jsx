@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import { FaCompass, FaList, FaBell, FaUser, FaPlus } from 'react-icons/fa';
+import { getUsuario, getSolicitudes } from '../api/api.js';
 import logo from './evertech.png';
 import logo2 from './evertech2.png';
 import './Navbar.css';
@@ -8,6 +10,23 @@ import './Navbar.css';
 const Navbar = ({ isCreateOpen, toggleCreate }) => {
   const [selectedTab, setSelectedTab] = useState('');
   const [showText, setShowText] = useState(false);
+
+  const { user } = useAuth();
+  const [solicitudes, setSolicitudes] = useState(null);
+
+  useEffect(() => {
+      const fetchData = async () => {
+          const solicitudes = await getSolicitudes("Usuarios", user);
+          let contador = 0;
+          for (const solicitud of solicitudes) {
+            if (solicitud.estado == "Pendiente" || solicitud.tipoInvitacion == "UsuarioAIniciativa") {
+              contador += 1;
+            }
+          }
+          setSolicitudes(contador);
+      };
+      fetchData();
+  }, []);
 
   useEffect(() => {
     // Navbar abierto muestra el texto
@@ -58,7 +77,7 @@ const Navbar = ({ isCreateOpen, toggleCreate }) => {
 
       <li className={selectedTab === 'requests' ? 'selected' : ''} onClick={() => handleTabClick('requests')}>
         <Link to="/requests">
-          <FaBell /> {showText && 'Solicitudes'}
+          <FaBell /> {solicitudes && solicitudes > 0 && <div className={selectedTab === 'requests' ? 'rq-notifs-selected' : 'rq-notifs'}>{solicitudes}</div>} {showText && 'Solicitudes'}
         </Link>
       </li>
 
