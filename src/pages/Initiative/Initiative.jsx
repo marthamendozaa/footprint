@@ -49,6 +49,7 @@ export const Initiative = () => {
   const [usuariosTotal, setUsuariosTotales] = useState(false);
 
   // Información de solicitudes
+  const [notificaciones, setNotificaciones] = useState(null);
   const [solicitudesRecibidas, setSolicitudesRecibidas] = useState(null);
   const [solicitudesEnviadas, setSolicitudesEnviadas] = useState(null);
   const [usuariosRecibidos, setUsuariosRecibidos] = useState(null);
@@ -107,15 +108,19 @@ export const Initiative = () => {
           
           let solicitudesRecibidasData = []
           let solicitudesEnviadasData = []
+          let notifs = 0;
           for (const solicitud of solicitudes) {
             if (solicitud.tipoInvitacion == "UsuarioAIniciativa" && solicitud.estado == "Pendiente") {
               solicitudesRecibidasData.push(solicitud);
+              notifs += 1;
             } else if (solicitud.tipoInvitacion == "IniciativaAUsuario") {
               solicitudesEnviadasData.push(solicitud);
+              notifs += 1;
             }
           }
           setSolicitudesRecibidas(solicitudesRecibidasData);
           setSolicitudesEnviadas(solicitudesEnviadasData);
+          setNotificaciones(notifs);
 
           // Obtiene información de usuarios asociados a solicitudes
           let usuariosRecibidosData = [];
@@ -310,6 +315,7 @@ export const Initiative = () => {
       setFaTrashBloqueado(prevState => ({ ...prevState, [index]: false }));
       setSolicitudesEnviadas(solicitudesEnviadasNuevo);
       setUsuariosEnviados(usuariosEnviadosNuevo);
+      setNotificaciones(notificaciones - 1);
 
       usuariosNuevo = {...usuariosFiltrados};
 
@@ -356,6 +362,7 @@ export const Initiative = () => {
       setAceptarSolicitudD(prevState => ({ ...prevState, [index]: false }));
       setSolicitudesRecibidas(solicitudesRecibidasNuevo);
       setUsuariosRecibidos(usuariosRecibidosNuevo);
+      setNotificaciones(notificaciones - 1);
     }
   };
 
@@ -383,6 +390,7 @@ export const Initiative = () => {
       setRechazarSolicitudD(prevState => ({ ...prevState, [index]: false }));
       setSolicitudesRecibidas(solicitudesRecibidasNuevo);
       setUsuariosRecibidos(usuariosRecibidosNuevo);
+      setNotificaciones(notificaciones - 1);
     }
   };
   
@@ -1302,7 +1310,9 @@ export const Initiative = () => {
 
               {esAdmin && (
                 <button type="button" className="i-btn-ver-solicitudes" onClick={() => setShowSolicitudesModal(true)}>
-                  <FaEnvelope style={{marginRight: "5px"}}/> Solicitudes
+                  <FaEnvelope style={{marginRight: "5px"}}/>
+                  {notificaciones > 0 && <div className='i-notifs'>{notificaciones}</div>}
+                  Solicitudes
                 </button>
               )}
             </div>

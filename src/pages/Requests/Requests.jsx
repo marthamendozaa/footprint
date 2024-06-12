@@ -8,6 +8,9 @@ import './Requests.css';
 import ModalIniciativa from '../../assets/ModalIniciativa.jsx';
 
 export const Requests = () => {
+  // Información del usuario
+  const { user, notificaciones, setNotificaciones } = useAuth();
+
   // Solicitud seleccionada a eliminar
   const [idSolicitudEliminar, setIdSolicitudEliminar] = useState(null);
 
@@ -50,10 +53,10 @@ export const Requests = () => {
       handleMostrarError();
     } finally {
       setEliminaBloqueado(false);
+      setNotificaciones(notificaciones - 1);
     }
   };
 
-  const { user } = useAuth();
   
   // Información de solicitudes del usuario
   const [solicitudesEnviadas, setSolicitudesEnviadas] = useState(null);
@@ -120,7 +123,7 @@ export const Requests = () => {
     setSelectedIniciativa(iniciativa);
     if (iniciativa.listaMiembros.includes(user)) {
         setEsMiembro(true);
-    }else if (iniciativa.idAdmin === user){
+    } else if (iniciativa.idAdmin === user){
         setEsAdmin(true);
     } else {
         setEsAdmin(false);
@@ -135,37 +138,49 @@ export const Requests = () => {
   };
 
   const handleAceptarSolicitud = async (index) => {
-    // Actualizar Estatus de solicitud
-    let solicitudesRecibidasNuevo = [...solicitudesRecibidas];
-    solicitudesRecibidasNuevo[index].estado = "Aceptada";
-    const solicitud = solicitudesRecibidasNuevo[index];
+    try {
+      // Actualizar Estatus de solicitud
+      let solicitudesRecibidasNuevo = [...solicitudesRecibidas];
+      solicitudesRecibidasNuevo[index].estado = "Aceptada";
+      const solicitud = solicitudesRecibidasNuevo[index];
 
-    // Actualizar lista de solicitudes recibidas
-    let iniciativasRecibidasNueva = [...iniciativasRecibidas];
-    iniciativasRecibidasNueva = iniciativasRecibidasNueva.filter(iniciativa => iniciativa.idIniciativa !== solicitud.idIniciativa);
-    setIniciativasRecibidas(iniciativasRecibidasNueva);
+      // Actualizar lista de solicitudes recibidas
+      let iniciativasRecibidasNueva = [...iniciativasRecibidas];
+      iniciativasRecibidasNueva = iniciativasRecibidasNueva.filter(iniciativa => iniciativa.idIniciativa !== solicitud.idIniciativa);
+      setIniciativasRecibidas(iniciativasRecibidasNueva);
 
-    setSolicitudesRecibidas(solicitudesRecibidasNuevo);
-    await actualizaSolicitud(solicitud);
+      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+      await actualizaSolicitud(solicitud);
 
-    // Actualizar listaIniciativasMiembro del usuario que hizo la solicitud
-    const user = solicitudesRecibidas[index].idUsuario;
-    const iniciativa = solicitudesRecibidas[index].idIniciativa;
-    await suscribirseAIniciativa(user, iniciativa);
+      // Actualizar listaIniciativasMiembro del usuario que hizo la solicitud
+      const user = solicitudesRecibidas[index].idUsuario;
+      const iniciativa = solicitudesRecibidas[index].idIniciativa;
+      await suscribirseAIniciativa(user, iniciativa);  
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setNotificaciones(notificaciones - 1);
+    }
   };
 
   const handleRechazarSolicitud = async (index) => {
-    let solicitudesRecibidasNuevo = solicitudesRecibidas;
-    solicitudesRecibidasNuevo[index].estado = "Rechazada";
-    const solicitud = solicitudesRecibidasNuevo[index];
+    try {
+      let solicitudesRecibidasNuevo = solicitudesRecibidas;
+      solicitudesRecibidasNuevo[index].estado = "Rechazada";
+      const solicitud = solicitudesRecibidasNuevo[index];
 
-    // Actualizar lista de solicitudes recibidas
-    let iniciativasRecibidasNueva = [...iniciativasRecibidas];
-    iniciativasRecibidasNueva = iniciativasRecibidasNueva.filter(iniciativa => iniciativa.idIniciativa !== solicitud.idIniciativa);
-    setIniciativasRecibidas(iniciativasRecibidasNueva);
+      // Actualizar lista de solicitudes recibidas
+      let iniciativasRecibidasNueva = [...iniciativasRecibidas];
+      iniciativasRecibidasNueva = iniciativasRecibidasNueva.filter(iniciativa => iniciativa.idIniciativa !== solicitud.idIniciativa);
+      setIniciativasRecibidas(iniciativasRecibidasNueva);
 
-    setSolicitudesRecibidas(solicitudesRecibidasNuevo);
-    await actualizaSolicitud(solicitud);
+      setSolicitudesRecibidas(solicitudesRecibidasNuevo);
+      await actualizaSolicitud(solicitud);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setNotificaciones(notificaciones - 1);
+    }
   };
 
   return (

@@ -424,6 +424,7 @@ button.i-btn-guardar:disabled {
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
   bottom: 0;
   background-color: #A0C1BF; 
   border: none; 
@@ -440,6 +441,21 @@ button.i-btn-guardar:disabled {
 
 .i-btn-ver-solicitudes:hover {
   background-color: #699AA0;
+}
+
+.i-notifs {
+  display: flex;
+  position: absolute;
+  background-color: #000;
+  color: #fff;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+  top: 8px;
+  left: 46px;
 }
 
 /* Modal Solicitudes */
