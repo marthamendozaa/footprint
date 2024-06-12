@@ -15,6 +15,7 @@ import Fuse from 'fuse.js';
 import './Initiative.css';
 import Tarea from '../../classes/Tarea.js';
 import ShowText from '../../assets/ShowText';
+import ShowTarea from '../../assets/ShowTarea';
 
 export const Initiative = () => {
   const { idIniciativa } = useParams();
@@ -176,6 +177,7 @@ export const Initiative = () => {
 
   // Barra de progreso
   const ProgressBar = ({ progress }) => {
+    console.log('Length tareas',tareas.length);
     return (
       <div className="progress-bar-container">
         <div className="progress-bar" style={{ width: `${progress}%` }}></div>
@@ -837,6 +839,71 @@ export const Initiative = () => {
   };
 
 
+//Checa overflow en titulo para mostrar titulo completo
+  const [hasTextOverflow, setHasTextOverflow] = useState(false);
+  const titleRef = useRef(null);
+
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (titleRef.current && iniciativa) {
+        const titleElement = titleRef.current;
+        const containerWidth = 700; // container es de este tamaño
+        const hasOverflow = titleElement.scrollWidth > containerWidth;
+        setHasTextOverflow(hasOverflow);
+        console.log(hasOverflow);
+      }
+    };
+
+    checkOverflow();
+  
+    window.addEventListener('resize', checkOverflow);
+  
+    return () => {
+      window.removeEventListener('resize', checkOverflow);
+  
+    };
+  });
+
+
+  const [hasTareaOverflow, setHasTareaOverflow] = useState([]);
+  const titleTRefs = useRef([]);
+
+  useEffect(() => {
+    const checkOverflowTarea = (index) => {
+      if (titleTRefs.current[index] && iniciativa) {
+        const titleElement = titleTRefs.current[index];
+        const containerWidth = 400; // container es de este tamaño
+        const hasTareaOverflowNuevo = [...hasTareaOverflow];
+        hasTareaOverflowNuevo[index] = titleElement.scrollWidth > containerWidth;
+        setHasTareaOverflow(hasTareaOverflowNuevo);
+        console.log(hasTareaOverflowNuevo);
+      }
+    };
+
+    titleTRefs.current.forEach((titleTRef, index) => {
+
+      if (titleTRef) {
+        checkOverflowTarea(index);
+      }
+ 
+    });
+
+    const handleResize = () => {
+      titleTRefs.current.forEach((_, index) => {
+        checkOverflowTarea(index);
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+    
+  }, [iniciativa, tareas]);
+  
+  
+  
   return (
     <div>
       {iniciativa && tareas && miembros ? (
@@ -883,11 +950,19 @@ export const Initiative = () => {
                     </div>
                   </div>
                 ) : ( 
-                  <div className="i-titulo-normal" > 
-                    <ShowText title={iniciativa.titulo} isCreateOpen={false}  >
-                      {iniciativa.titulo} 
+                  <>
+                  {hasTextOverflow ? (
+                    <ShowText classname="i-showtext" title={iniciativa.titulo} isCreateOpen={false}>
+                      <div className="i-titulo-normal" ref={titleRef}>
+                        {iniciativa.titulo}
+                      </div>
                     </ShowText>
-                  </div>
+                  ) : (
+                    <div className="i-titulo-normal" ref={titleRef}>
+                      {iniciativa.titulo}
+                    </div>
+                  )}
+                  </>
                 )}
               </div>
   
@@ -1156,7 +1231,7 @@ export const Initiative = () => {
                           <div className="i-tareas-container-2" key={tarea.idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
-                                <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+                                  <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                                 <div className="i-tarea-desc">
                                   <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                     {tarea.descripcion}
@@ -1198,7 +1273,9 @@ export const Initiative = () => {
                         <div className="i-tarea">
 
                           <div className="i-tarea-info">
-                            <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+
+                               <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+
                             <div className="i-tarea-desc">
                               <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                 {tarea.descripcion}
@@ -1241,7 +1318,18 @@ export const Initiative = () => {
                           <div className="i-tarea-container-2" key={idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
-                                <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+
+                                {hasTareaOverflow[idTarea] ? (
+                                  <ShowTarea classname="i-showtext" title={tarea.titulo} isCreateOpen={false}>
+                                    <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}} ref={(ref) => titleTRefs.current[idTarea] = ref}>
+                                      {tarea.titulo}
+                                    </div>
+                                  </ShowTarea>
+                                ) : (
+                                  <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}} ref={(ref) => titleTRefs.current[idTarea] = ref}>
+                                    {tarea.titulo}
+                                  </div>
+                                )} 
                                 <div className="i-tarea-desc">{tarea.descripcion}
                                 </div>
                                 
