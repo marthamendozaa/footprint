@@ -451,7 +451,7 @@ export const Profile = () => {
                     {selectedImage.name}
                   </div>
                 ) : (
-                  <div className="c-drag-drop-text" style={{width: "150px"}}>
+                  <div className="c-drag-drop-text" style={{width: "150px", wordBreak: "break-word"}}>
                     <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra una imagen
                   </div>
                 )}

@@ -1553,7 +1553,7 @@ export const Initiative = () => {
                 {imagenSeleccionada.name}
               </div>
             ) : (
-              <div className="c-drag-drop-text" style={{width: "150px"}}>
+              <div className="c-drag-drop-text" style={{width: "150px", wordBreak: "break-word"}}>
                 <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra una imagen
               </div>
             )}
@@ -1582,7 +1582,7 @@ export const Initiative = () => {
                 {selectedFile.name}
               </div>
             ) : (
-              <div className="c-drag-drop-text" style={{width: "150px"}}>
+              <div className="c-drag-drop-text" style={{width: "150px", wordBreak:"break-word"}}>
                 <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra un archivo
               </div>
             )}
