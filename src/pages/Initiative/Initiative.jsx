@@ -853,6 +853,29 @@ export const Initiative = () => {
     };
     checkOverflowTarea();
   }, [tareasCompletadas]);
+
+
+  const [hasPendienteOverflow, setHasPendienteOverflow] = useState([]);
+  const titlePRefs = useRef([]);
+
+  useEffect(() => {
+    const checkOverflowPen = () => {
+      if (tareas) {
+        let hasPendienteOverflowNuevo = [...hasPendienteOverflow];
+
+        for (let i = 0; i < tareas.length; i++) {
+          if (titlePRefs.current[i]) {
+            const titleElement = titlePRefs.current[i];
+            const containerWidth = 400; // container es de este tamaño
+            hasPendienteOverflowNuevo[i] = titleElement.scrollWidth > containerWidth;
+          }
+        }
+        console.log(hasPendienteOverflowNuevo);
+        setHasPendienteOverflow(hasPendienteOverflowNuevo);
+      }
+    };
+    checkOverflowPen();
+  }, [tareas]);
   
   
   
@@ -1187,7 +1210,17 @@ export const Initiative = () => {
                           <div className="i-tareas-container-2" key={tarea.idTarea}>
                             <div className="i-tarea">
                               <div className="i-tarea-info">
-                                  <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+                                {hasPendienteOverflow[index] ? (
+                                  <ShowTarea classname="i-showtext" title={tarea.titulo} isCreateOpen={false}>
+                                    <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}} ref={(ref) => titlePRefs.current[index] = ref}>
+                                      {tarea.titulo}
+                                    </div>
+                                  </ShowTarea>
+                                ) : (
+                                  <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}} ref={(ref) => titlePRefs.current[index] = ref}>
+                                    {tarea.titulo}
+                                  </div>
+                                )} 
                                 <div className="i-tarea-desc">
                                   <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
                                     {tarea.descripcion}
@@ -1232,7 +1265,17 @@ export const Initiative = () => {
 
                           <div className="i-tarea-info">
 
-                               <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
+                            {hasPendienteOverflow[index] ? (
+                              <ShowTarea classname="i-showtext" title={tarea.titulo} isCreateOpen={false}>
+                                <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}} ref={(ref) => titlePRefs.current[index] = ref}>
+                                  {tarea.titulo}
+                                </div>
+                              </ShowTarea>
+                            ) : (
+                              <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}} ref={(ref) => titlePRefs.current[index] = ref}>
+                                {tarea.titulo}
+                              </div>
+                            )} 
 
                             <div className="i-tarea-desc">
                               <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
