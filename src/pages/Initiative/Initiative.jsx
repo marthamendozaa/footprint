@@ -700,7 +700,6 @@ export const Initiative = () => {
   const [modalEntregable, setModalEntregable] = useState(false);
 
   const openUploadModal = (tarea, index) => {
-    console.log('ID ONE UPLOAD', tarea.idTarea);
     setShowUploadModal(true);
     setFileError('');
     setTareaUpload(tarea);
@@ -710,7 +709,6 @@ export const Initiative = () => {
   };
 
   const openAsignarTarea = (tarea, index) => {
-    console.log('ID ONE Tarea', tarea.idTarea);
     setShowAsignarModal(true);
     setTareaUpload(tarea);
     setSelectedTaskIndex(index);
@@ -757,14 +755,11 @@ export const Initiative = () => {
   }, [selectedFile, cargandoTarea]);
 
   const handleUploadFile = async (tarea, index) => {
-    console.log('TAREA ID', tareaUpload.idTarea);
-    console.log('TAREA INDEX', selectedTaskIndex);
     setUploadDisabled(true);
     setCargandoTarea(true);
 
     try {
       const fileUrl = await subirImagen(selectedFile, `Tareas/${selectedTaskId}`);
-      console.log(fileUrl);
 
       const tareaNueva = { ...tareaUpload, urlEntrega: fileUrl, completada: true}
       await actualizaTarea(tareaNueva);
@@ -828,7 +823,6 @@ export const Initiative = () => {
         const containerWidth = 700; // container es de este tamaño
         const hasOverflow = titleElement.scrollWidth > containerWidth;
         setHasTextOverflow(hasOverflow);
-        console.log(hasOverflow);
       }
     };
 
@@ -851,7 +845,6 @@ export const Initiative = () => {
             hasTareaOverflowNuevo[i] = titleElement.scrollWidth > containerWidth;
           }
         }
-        console.log(hasTareaOverflowNuevo);
         setHasTareaOverflow(hasTareaOverflowNuevo);
       }
     };
