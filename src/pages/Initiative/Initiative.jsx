@@ -187,7 +187,6 @@ export const Initiative = () => {
 
   // Barra de progreso
   const ProgressBar = ({ progress }) => {
-    console.log('Length tareas',tareas.length);
     return (
       <div className="progress-bar-container">
         <div className="progress-bar" style={{ width: `${progress}%` }}></div>
@@ -832,7 +831,7 @@ export const Initiative = () => {
   };
 
 
-//Checa overflow en titulo para mostrar titulo completo
+  //Checa overflow en titulo para mostrar titulo completo
   const [hasTextOverflow, setHasTextOverflow] = useState(false);
   const titleRef = useRef(null);
 
@@ -848,13 +847,6 @@ export const Initiative = () => {
     };
 
     checkOverflow();
-  
-    window.addEventListener('resize', checkOverflow);
-  
-    return () => {
-      window.removeEventListener('resize', checkOverflow);
-  
-    };
   });
 
 
@@ -862,38 +854,23 @@ export const Initiative = () => {
   const titleTRefs = useRef([]);
 
   useEffect(() => {
-    const checkOverflowTarea = (index) => {
-      if (titleTRefs.current[index] && iniciativa) {
-        const titleElement = titleTRefs.current[index];
-        const containerWidth = 400; // container es de este tamaño
-        const hasTareaOverflowNuevo = [...hasTareaOverflow];
-        hasTareaOverflowNuevo[index] = titleElement.scrollWidth > containerWidth;
-        setHasTareaOverflow(hasTareaOverflowNuevo);
+    const checkOverflowTarea = () => {
+      if (tareasCompletadas) {
+        let hasTareaOverflowNuevo = [...hasTareaOverflow];
+
+        for (let i = 0; i < tareasCompletadas.length; i++) {
+          if (titleTRefs.current[i]) {
+            const titleElement = titleTRefs.current[i];
+            const containerWidth = 400; // container es de este tamaño
+            hasTareaOverflowNuevo[i] = titleElement.scrollWidth > containerWidth;
+          }
+        }
         console.log(hasTareaOverflowNuevo);
+        setHasTareaOverflow(hasTareaOverflowNuevo);
       }
     };
-
-    titleTRefs.current.forEach((titleTRef, index) => {
-
-      if (titleTRef) {
-        checkOverflowTarea(index);
-      }
- 
-    });
-
-    const handleResize = () => {
-      titleTRefs.current.forEach((_, index) => {
-        checkOverflowTarea(index);
-      });
-    };
-
-    window.addEventListener('resize', handleResize);
-
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-    
-  }, [iniciativa, tareas]);
+    checkOverflowTarea();
+  }, [tareasCompletadas]);
   
   
   
