@@ -677,6 +677,10 @@ export const Initiative = () => {
     setEditingCampos(false);
     setTareas(tareasOriginal);
     setImagenPreview(iniciativa.urlImagen);
+    setNuevoTitulo(iniciativa.titulo);
+    setNuevaDescripcion(iniciativa.descripcion);
+    setEtiquetasIniciativa(iniciativa.listaEtiquetas);
+    setNuevaFechaFinal(parseDate(iniciativa.fechaCierre));
   }
 
 
