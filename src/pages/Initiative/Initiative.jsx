@@ -790,32 +790,13 @@ export const Initiative = () => {
 
 
   // Tareas height
-  // Titulo
-  const textareaRefs3 = useRef([null]);
-
-  const autoResizeTextarea3 = (index) => {
-    const textarea = textareaRefs3.current[index];
-    if (textarea) {
-      textarea.style.height = '';
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }
-  };
-
-  useEffect(() => {
-    textareaRefs3.current.forEach((textarea, index) => {
-      if (textarea) {
-        autoResizeTextarea3(index);
-      }
-    });
-  }, [tareas]);
-
   // Descripción
   const textareaRefs2 = useRef([null]);
 
   const autoResizeTextarea2 = (index) => {
     const textarea = textareaRefs2.current[index];
     if (textarea) {
-      textarea.style.height = 'auto';
+      textarea.style.height = '';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
@@ -1085,9 +1066,9 @@ export const Initiative = () => {
                                         />
                                       </div>
 
-                                      <button className="c-btn-editar-flex" style={{marginRight: '20px'}}>
+                                      <div className="c-btn-editar-flex" style={{marginRight: '20px'}}>
                                         {tarea.descripcion ? `${tarea.descripcion.length}/200` : `0/200`}
-                                      </button>
+                                      </div>
                                     </div>
 
                                   </div>
