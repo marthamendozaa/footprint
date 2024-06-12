@@ -91,7 +91,7 @@ const Navbar = ({ isCreateOpen, toggleCreate }) => {
         </CustomLink>
       </li>
       <li className={selectedTab === 'myInitiatives' ? 'selected' : ''} onClick={() => handleTabClick('myInitiatives')}>
-        <CustomLink to="/myInitiatives" title="Mis iniciativas" isCreateOpen={isCreateOpen}>
+        <CustomLink to="/myInitiatives" title="Mis Iniciativas" isCreateOpen={isCreateOpen}>
           <FaList /> {showText && 'Mis Iniciativas'}
         </CustomLink>
       </li>
