@@ -595,7 +595,7 @@ export const Initiative = () => {
   const autoResizeTextarea = () => {
     const textarea = textareaRef.current;
     if (textarea) {
-      textarea.style.height = 'auto';
+      textarea.style.height = '';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
@@ -618,15 +618,16 @@ export const Initiative = () => {
 
   useEffect(() => {
     const verificarCampos = () => {
-      if (!imagenPreview || nuevoTitulo.trim() === '' || nuevaDescripcion.trim() === '' || Object.keys(etiquetasIniciativa).length === 0) {
+      const tareasValidas = tareas && tareas.every(tarea => tarea.titulo.trim() !== '' && tarea.descripcion.trim() !== '');
+      if (!imagenPreview || nuevoTitulo.trim() === '' || nuevaDescripcion.trim() === '' || Object.keys(etiquetasIniciativa).length === 0 || !tareasValidas) {
         setGuardarCamposBloqueado(true);
       } else {
         setGuardarCamposBloqueado(false);
       }
     };
-
+  
     verificarCampos();
-  }, [imagenPreview, nuevoTitulo, nuevaDescripcion, Object.keys(etiquetasIniciativa)]);
+  }, [imagenPreview, nuevoTitulo, nuevaDescripcion, Object.keys(etiquetasIniciativa), tareas]);
 
   const handleGuardarCampos = async () => {
     setGuardarCargando(true);
@@ -800,32 +801,13 @@ export const Initiative = () => {
 
 
   // Tareas height
-  // Titulo
-  const textareaRefs3 = useRef([null]);
-
-  const autoResizeTextarea3 = (index) => {
-    const textarea = textareaRefs3.current[index];
-    if (textarea) {
-      textarea.style.height = '';
-      textarea.style.height = `${textarea.scrollHeight}px`;
-    }
-  };
-
-  useEffect(() => {
-    textareaRefs3.current.forEach((textarea, index) => {
-      if (textarea) {
-        autoResizeTextarea3(index);
-      }
-    });
-  }, [tareas]);
-
   // Descripción
   const textareaRefs2 = useRef([null]);
 
   const autoResizeTextarea2 = (index) => {
     const textarea = textareaRefs2.current[index];
     if (textarea) {
-      textarea.style.height = 'auto';
+      textarea.style.height = '';
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
@@ -1117,6 +1099,10 @@ export const Initiative = () => {
                                           maxLength={30}
                                         />
                                       </div>
+
+                                      <div className="c-btn-editar-tarea">
+                                        {tareas[index].titulo.length}/30
+                                      </div>
                                     </div>
 
                                     {/* Descripción */}
@@ -1148,9 +1134,9 @@ export const Initiative = () => {
                                         />
                                       </div>
 
-                                      <button className="c-btn-editar-flex" style={{marginRight: '20px'}}>
+                                      <div className="c-btn-editar-flex" style={{marginRight: '20px'}}>
                                         {tarea.descripcion ? `${tarea.descripcion.length}/200` : `0/200`}
-                                      </button>
+                                      </div>
                                     </div>
 
                                   </div>
