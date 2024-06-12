@@ -608,15 +608,16 @@ export const Initiative = () => {
 
   useEffect(() => {
     const verificarCampos = () => {
-      if (!imagenPreview || nuevoTitulo.trim() === '' || nuevaDescripcion.trim() === '' || Object.keys(etiquetasIniciativa).length === 0) {
+      const tareasValidas = tareas && tareas.every(tarea => tarea.titulo.trim() !== '' && tarea.descripcion.trim() !== '');
+      if (!imagenPreview || nuevoTitulo.trim() === '' || nuevaDescripcion.trim() === '' || Object.keys(etiquetasIniciativa).length === 0 || !tareasValidas) {
         setGuardarCamposBloqueado(true);
       } else {
         setGuardarCamposBloqueado(false);
       }
     };
-
+  
     verificarCampos();
-  }, [imagenPreview, nuevoTitulo, nuevaDescripcion, Object.keys(etiquetasIniciativa)]);
+  }, [imagenPreview, nuevoTitulo, nuevaDescripcion, Object.keys(etiquetasIniciativa), tareas]);
 
   const handleGuardarCampos = async () => {
     setGuardarCargando(true);
@@ -1034,6 +1035,10 @@ export const Initiative = () => {
                                           autoFocus
                                           maxLength={30}
                                         />
+                                      </div>
+
+                                      <div className="c-btn-editar-tarea">
+                                        {tareas[index].titulo.length}/30
                                       </div>
                                     </div>
 

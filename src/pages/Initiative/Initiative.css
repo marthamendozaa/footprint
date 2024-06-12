@@ -500,7 +500,7 @@ button.i-btn-guardar:disabled {
   flex-direction: row;
   font-size: 25px;
   overflow: overlay;
-  max-width: 390px;
+  max-width: 400px;
   text-align: left;
 }
 
