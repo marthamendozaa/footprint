@@ -282,6 +282,7 @@ export const Initiative = () => {
       usuariosNuevo[idUsuario].invitarCargando = false;
       usuariosNuevo[idUsuario].cancelarDesactivado = false;
       setUsuariosFiltrados(usuariosNuevo);
+      setNotificaciones(notificaciones + 1);
     }
   };
 
