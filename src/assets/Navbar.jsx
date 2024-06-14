@@ -102,7 +102,7 @@ const Navbar = ({ isCreateOpen, toggleCreate }) => {
       </li>
       <br /><br />
       <Link to="/create" onClick={() => setSelectedTab('create')}>
-        <button type="button" className="btn" style={{ fontSize: "18px", width: isCreateOpen ? (showText && "130px") : "50px", backgroundColor: "#D9D9D9", borderRadius: "18px", height: "50px", fontWeight: "bold" }}>
+        <button type="button" className="btn" style={{ fontSize: "18px", width: isCreateOpen ? (showText && "130px") : "50px", backgroundColor: "#D9D9D9", borderRadius: "30px", height: "50px", fontWeight: "bold" }}>
           {isCreateOpen ? (showText && 'Crear') : <FaPlus />}
         </button>
       </Link>

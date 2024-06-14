@@ -1189,7 +1189,7 @@ export const Initiative = () => {
                               <div className="i-tarea-info">
                                   <div className="c-titulo-texto-tarea" style={{fontSize: '25px', maxWidth: '400px', whiteSpace: 'nowrap'}}>{tarea.titulo}</div>
                                 <div className="i-tarea-desc">
-                                  <div className="i-tarea-texto" style={{paddingTop: '2px'}}>
+                                  <div className="i-tarea-texto" style={{paddingTop: '2px', marginRight: '15px'}}>
                                     {tarea.descripcion}
                                   </div>
                                 </div>

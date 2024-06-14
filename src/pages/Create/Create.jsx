@@ -866,6 +866,11 @@ export const Create = () => {
                             dateFormat="dd/MM/yyyy"
                             ref={tarea.datePickerEntrega}
                             locale={es}
+                            showYearDropdown
+                            scrollableYearDropdown 
+                            yearDropdownItemNumber={66}
+                            showMonthDropdown
+                            minDate={today}
                           />
                         </div>
 
