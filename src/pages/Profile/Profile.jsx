@@ -313,6 +313,23 @@ export const Profile = () => {
     }
   });
 
+  // Calcular edad
+  const calcularEdad = (fecha) => {
+    const fechaActual = new Date();
+    const fechaNacimiento = new Date(fecha);
+    
+    let edad = fechaActual.getFullYear() - fechaNacimiento.getFullYear();
+    const mes = fechaActual.getMonth() - fechaNacimiento.getMonth();
+    const dia = fechaActual.getDate() - fechaNacimiento.getDate();
+
+    // Ajusta la edad si el cumpleaños de este año aún no ha pasado
+    if (mes < 0 || (mes == 0 && dia < 0)) {
+      edad--;
+    }
+  
+    return edad;
+  };
+
   return (
     <div className="profile-page">
       {/* Spinner */}
@@ -372,7 +389,7 @@ export const Profile = () => {
                 {/* Edad */}
                 {!admin && 
                   <div className="profile-icons-text">
-                    <p> <span> Edad: </span> {usuario.edad} años</p>
+                    <p> <span> Edad: </span> {calcularEdad(usuario.fechaNacimiento)} años</p>
                   </div>
                 }
 
@@ -451,7 +468,7 @@ export const Profile = () => {
                     {selectedImage.name}
                   </div>
                 ) : (
-                  <div className="c-drag-drop-text" style={{width: "150px"}}>
+                  <div className="c-drag-drop-text" style={{width: "150px", wordBreak: "break-word"}}>
                     <span style={{fontWeight: "600"}}>Selecciona</span> o arrastra una imagen
                   </div>
                 )}

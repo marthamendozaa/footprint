@@ -144,6 +144,13 @@ exports.eliminaIniciativa = onRequest(async (req, res) => {
       logger.info("Borrando tareas de la iniciativa...");
       for (const tarea of iniciativaData.data().listaTareas) {
         await getFirestore().doc(`Tareas/${tarea}`).delete();
+        
+        // Elimina archivos en el folder de la tareas
+        logger.info("Borrando archivos de la tarea...");
+        const [files] = await bucket.getFiles({ prefix: `Tareas/${tarea}` });
+        if (files.length > 0) {
+          await Promise.all(files.map(file => file.delete()));
+        }
       }
       
       // Elimina archivos en el folder
