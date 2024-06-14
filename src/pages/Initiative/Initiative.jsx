@@ -1112,7 +1112,7 @@ export const Initiative = () => {
                                             border-radius: 25px;
                                             position: relative;
                                             width: 100%;
-                                            height: 25px;
+                                            height: 70px;
                                             font-size: 16px;
                                             resize: none;
                                             outline: none;
